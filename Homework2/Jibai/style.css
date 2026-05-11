@@ -85,7 +85,35 @@ svg {
   stroke: #cbd5e1;
 }
 
+.axis-label {
+  font-size: 12px;
+  fill: #111827;
+}
+
 .placeholder-text {
   font-size: 14px;
   fill: #64748b;
+}
+
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #1f2933;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+}
+
+.legend-label {
+  font-size: 11px;
+  fill: #374151;
+}
+
+.cell-label {
+  font-size: 12px;
+  font-weight: bold;
 }
