@@ -108,11 +108,11 @@ function drawHeatmap(data) {
   g.append("g")
     .attr("class", "axis")
     .attr("transform", `translate(0, ${chartHeight})`)
-    .call(d3.axisBottom(x).tickFormat(d => companySizeLabels[d]));
+    .call(d3.axisBottom(x).tickFormat(d => companySizeLabels[d]).tickSizeOuter(0));
 
   g.append("g")
     .attr("class", "axis")
-    .call(d3.axisLeft(y).tickFormat(d => experienceLabels[d]));
+    .call(d3.axisLeft(y).tickFormat(d => experienceLabels[d]).tickSizeOuter(0));
 
   g.selectAll("rect")
     .data(cells)
@@ -174,35 +174,40 @@ function drawDistribution(data) {
   const height = svg.node().clientHeight;
 
   const margin = {
-    top: 20,
-    right: 30,
-    bottom: 55,
-    left: 75
+    top: 42,
+    right: 120,
+    bottom: 60,
+    left: 90
   };
 
   const chartWidth = width - margin.left - margin.right;
   const chartHeight = height - margin.top - margin.bottom;
 
+  const displayOrder = ["EX", "SE", "MI", "EN"];
+
   const salaryValues = data.map(d => d.salaryUsd).sort(d3.ascending);
   const salaryLimit = d3.quantile(salaryValues, 0.99);
+  const xMax = Math.ceil(salaryLimit / 50000) * 50000;
 
-  // Trim very high outliers so the distribution shapes stay readable.
+  // Trim very high outliers so the shape is easier to compare.
   const filteredData = data.filter(d => d.salaryUsd <= salaryLimit);
 
   const x = d3.scaleLinear()
-    .domain([0, salaryLimit])
-    .range([0, chartWidth])
-    .nice();
+    .domain([0, xMax])
+    .range([0, chartWidth]);
+
+  const topPadding = 35;
+  const bottomPadding = 35;
+  const ridgeGap = (chartHeight - topPadding - bottomPadding) / (displayOrder.length - 1);
 
   const y = d3.scalePoint()
-    .domain(experienceOrder)
-    .range([chartHeight - 20, 20])
-    .padding(0.6);
+    .domain(displayOrder)
+    .range([topPadding, chartHeight - bottomPadding]);
 
-  const xTicks = x.ticks(45);
-  const bandwidth = salaryLimit / 18;
+  const xTicks = x.ticks(60);
+  const bandwidth = salaryLimit / 22;
 
-  const densities = experienceOrder.map(exp => {
+  const densities = displayOrder.map(exp => {
     const group = filteredData.filter(d => d.experienceLevel === exp);
     const density = kernelDensityEstimator(kernelEpanechnikov(bandwidth), xTicks)(
       group.map(d => d.salaryUsd)
@@ -220,7 +225,7 @@ function drawDistribution(data) {
 
   const densityHeight = d3.scaleLinear()
     .domain([0, maxDensity])
-    .range([0, chartHeight / 4]);
+    .range([0, ridgeGap * 0.72]);
 
   const area = d3.area()
     .curve(d3.curveBasis)
@@ -236,14 +241,16 @@ function drawDistribution(data) {
   const g = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-  g.append("g")
+  const xAxis = g.append("g")
     .attr("class", "axis")
     .attr("transform", `translate(0, ${chartHeight})`)
-    .call(d3.axisBottom(x).ticks(5).tickFormat(d => `$${Math.round(d / 1000)}k`));
+    .call(d3.axisBottom(x).ticks(7).tickFormat(d => `$${Math.round(d / 1000)}k`).tickSizeOuter(0));
 
-  g.append("g")
+  const yAxis = g.append("g")
     .attr("class", "axis")
-    .call(d3.axisLeft(y).tickFormat(d => experienceLabels[d]));
+    .call(d3.axisLeft(y).tickFormat(d => experienceLabels[d]).tickSize(0));
+
+  yAxis.select(".domain").remove();
 
   const groups = g.selectAll(".ridge-group")
     .data(densities)
@@ -251,11 +258,18 @@ function drawDistribution(data) {
     .attr("class", "ridge-group")
     .attr("transform", d => `translate(0, ${y(d.experienceLevel)})`);
 
+  groups.append("line")
+    .attr("class", "ridge-baseline")
+    .attr("x1", 0)
+    .attr("x2", chartWidth)
+    .attr("y1", 0)
+    .attr("y2", 0);
+
   groups.append("path")
     .attr("class", "density-area")
     .attr("d", d => area(d.density))
     .attr("fill", d => experienceColors[d.experienceLevel])
-    .attr("opacity", 0.65)
+    .attr("opacity", 0.55)
     .on("mousemove", function(event, d) {
       tooltip
         .style("opacity", 1)
@@ -276,20 +290,12 @@ function drawDistribution(data) {
     .attr("d", d => line(d.density))
     .attr("fill", "none")
     .attr("stroke", d => experienceColors[d.experienceLevel])
-    .attr("stroke-width", 2);
-
-  groups.append("line")
-    .attr("x1", 0)
-    .attr("x2", chartWidth)
-    .attr("y1", 0)
-    .attr("y2", 0)
-    .attr("stroke", "#d8dee9")
-    .attr("stroke-width", 1);
+    .attr("stroke-width", 2.2);
 
   groups.append("circle")
     .attr("cx", d => x(d.median))
     .attr("cy", 0)
-    .attr("r", 4)
+    .attr("r", 4.5)
     .attr("fill", "#111827");
 
   svg.append("text")
@@ -302,8 +308,41 @@ function drawDistribution(data) {
   svg.append("text")
     .attr("class", "note-label")
     .attr("x", margin.left)
-    .attr("y", margin.top - 5)
+    .attr("y", 20)
     .text("Dots mark median salary. Top 1% salaries are trimmed for readability.");
+
+  drawDistributionLegend(svg, width, margin);
+}
+
+function drawDistributionLegend(svg, width, margin) {
+  const legend = svg.append("g")
+    .attr("transform", `translate(${width - margin.right + 25}, ${margin.top + 12})`);
+
+  legend.append("text")
+    .attr("class", "legend-label")
+    .attr("x", 0)
+    .attr("y", -8)
+    .text("Experience");
+
+  const displayOrder = ["EN", "MI", "SE", "EX"];
+
+  displayOrder.forEach((exp, i) => {
+    const row = legend.append("g")
+      .attr("transform", `translate(0, ${i * 22})`);
+
+    row.append("rect")
+      .attr("width", 12)
+      .attr("height", 12)
+      .attr("rx", 2)
+      .attr("fill", experienceColors[exp])
+      .attr("opacity", 0.7);
+
+    row.append("text")
+      .attr("class", "legend-label")
+      .attr("x", 18)
+      .attr("y", 10)
+      .text(experienceLabels[exp]);
+  });
 }
 
 function drawHeatmapLegend(svg, color, width, height, margin) {
@@ -341,7 +380,7 @@ function drawHeatmapLegend(svg, color, width, height, margin) {
   svg.append("g")
     .attr("class", "axis")
     .attr("transform", `translate(${legendX + legendWidth}, ${legendY})`)
-    .call(d3.axisRight(legendScale).ticks(4).tickFormat(d => `$${Math.round(d / 1000)}k`));
+    .call(d3.axisRight(legendScale).ticks(4).tickFormat(d => `$${Math.round(d / 1000)}k`).tickSizeOuter(0));
 
   svg.append("text")
     .attr("class", "legend-label")
