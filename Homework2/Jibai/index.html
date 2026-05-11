@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Data Science Job Salary Dashboard">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Science Job Salary Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <main class="dashboard">
+    <header class="dashboard-header">
+      <h1>Data Science Job Salary Dashboard</h1>
+      <p>Exploring how salary changes by experience, company size, remote work, and location.</p>
+    </header>
+
+    <section class="dashboard-grid">
+      <section class="panel" id="overview-panel">
+        <h2>Salary Overview</h2>
+        <p>Average salary by experience level and company size.</p>
+        <svg id="heatmap"></svg>
+      </section>
+
+      <section class="panel" id="distribution-panel">
+        <h2>Salary Distribution</h2>
+        <p>Comparing salary ranges across groups.</p>
+        <svg id="distribution"></svg>
+      </section>
+
+      <section class="panel panel-wide" id="flow-panel">
+        <h2>Career Flow</h2>
+        <p>Connecting experience level, remote work, and salary tier.</p>
+        <svg id="flow"></svg>
+      </section>
+    </section>
+  </main>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
