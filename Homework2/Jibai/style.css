@@ -117,3 +117,16 @@ svg {
   font-size: 12px;
   font-weight: bold;
 }
+
+.density-area {
+  cursor: pointer;
+}
+
+.density-line {
+  pointer-events: none;
+}
+
+.note-label {
+  font-size: 11px;
+  fill: #64748b;
+}

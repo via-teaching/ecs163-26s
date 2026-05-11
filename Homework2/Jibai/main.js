@@ -13,6 +13,15 @@ const companySizeLabels = {
   L: "Large"
 };
 
+const experienceOrder = ["EN", "MI", "SE", "EX"];
+
+const experienceColors = {
+  EN: "#8dd3c7",
+  MI: "#80b1d3",
+  SE: "#bebada",
+  EX: "#fb8072"
+};
+
 const tooltip = d3.select("body")
   .append("div")
   .attr("class", "tooltip");
@@ -37,7 +46,7 @@ d3.csv(dataPath).then(rawData => {
   console.log("Number of rows:", data.length);
 
   drawHeatmap(data);
-  drawPlaceholder("#distribution", "View 2");
+  drawDistribution(data);
   drawPlaceholder("#flow", "View 3");
 }).catch(error => {
   console.error("The CSV did not load correctly:", error);
@@ -60,7 +69,6 @@ function drawHeatmap(data) {
   const chartWidth = width - margin.left - margin.right;
   const chartHeight = height - margin.top - margin.bottom;
 
-  const experienceOrder = ["EN", "MI", "SE", "EX"];
   const companySizeOrder = ["S", "M", "L"];
 
   // Build average salary cells for each experience and company size group.
@@ -158,6 +166,146 @@ function drawHeatmap(data) {
   drawHeatmapLegend(svg, color, width, height, margin);
 }
 
+function drawDistribution(data) {
+  const svg = d3.select("#distribution");
+  svg.selectAll("*").remove();
+
+  const width = svg.node().clientWidth;
+  const height = svg.node().clientHeight;
+
+  const margin = {
+    top: 20,
+    right: 30,
+    bottom: 55,
+    left: 75
+  };
+
+  const chartWidth = width - margin.left - margin.right;
+  const chartHeight = height - margin.top - margin.bottom;
+
+  const salaryValues = data.map(d => d.salaryUsd).sort(d3.ascending);
+  const salaryLimit = d3.quantile(salaryValues, 0.99);
+
+  // Trim very high outliers so the distribution shapes stay readable.
+  const filteredData = data.filter(d => d.salaryUsd <= salaryLimit);
+
+  const x = d3.scaleLinear()
+    .domain([0, salaryLimit])
+    .range([0, chartWidth])
+    .nice();
+
+  const y = d3.scalePoint()
+    .domain(experienceOrder)
+    .range([chartHeight - 20, 20])
+    .padding(0.6);
+
+  const xTicks = x.ticks(45);
+  const bandwidth = salaryLimit / 18;
+
+  const densities = experienceOrder.map(exp => {
+    const group = filteredData.filter(d => d.experienceLevel === exp);
+    const density = kernelDensityEstimator(kernelEpanechnikov(bandwidth), xTicks)(
+      group.map(d => d.salaryUsd)
+    );
+
+    return {
+      experienceLevel: exp,
+      count: group.length,
+      median: d3.median(group, d => d.salaryUsd),
+      density
+    };
+  });
+
+  const maxDensity = d3.max(densities, group => d3.max(group.density, d => d[1]));
+
+  const densityHeight = d3.scaleLinear()
+    .domain([0, maxDensity])
+    .range([0, chartHeight / 4]);
+
+  const area = d3.area()
+    .curve(d3.curveBasis)
+    .x(d => x(d[0]))
+    .y0(0)
+    .y1(d => -densityHeight(d[1]));
+
+  const line = d3.line()
+    .curve(d3.curveBasis)
+    .x(d => x(d[0]))
+    .y(d => -densityHeight(d[1]));
+
+  const g = svg.append("g")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+  g.append("g")
+    .attr("class", "axis")
+    .attr("transform", `translate(0, ${chartHeight})`)
+    .call(d3.axisBottom(x).ticks(5).tickFormat(d => `$${Math.round(d / 1000)}k`));
+
+  g.append("g")
+    .attr("class", "axis")
+    .call(d3.axisLeft(y).tickFormat(d => experienceLabels[d]));
+
+  const groups = g.selectAll(".ridge-group")
+    .data(densities)
+    .join("g")
+    .attr("class", "ridge-group")
+    .attr("transform", d => `translate(0, ${y(d.experienceLevel)})`);
+
+  groups.append("path")
+    .attr("class", "density-area")
+    .attr("d", d => area(d.density))
+    .attr("fill", d => experienceColors[d.experienceLevel])
+    .attr("opacity", 0.65)
+    .on("mousemove", function(event, d) {
+      tooltip
+        .style("opacity", 1)
+        .style("left", `${event.pageX + 12}px`)
+        .style("top", `${event.pageY - 28}px`)
+        .html(`
+          <strong>${experienceLabels[d.experienceLevel]}</strong><br>
+          Median salary: ${formatSalary(d.median)}<br>
+          Records shown: ${d.count}
+        `);
+    })
+    .on("mouseleave", function() {
+      tooltip.style("opacity", 0);
+    });
+
+  groups.append("path")
+    .attr("class", "density-line")
+    .attr("d", d => line(d.density))
+    .attr("fill", "none")
+    .attr("stroke", d => experienceColors[d.experienceLevel])
+    .attr("stroke-width", 2);
+
+  groups.append("line")
+    .attr("x1", 0)
+    .attr("x2", chartWidth)
+    .attr("y1", 0)
+    .attr("y2", 0)
+    .attr("stroke", "#d8dee9")
+    .attr("stroke-width", 1);
+
+  groups.append("circle")
+    .attr("cx", d => x(d.median))
+    .attr("cy", 0)
+    .attr("r", 4)
+    .attr("fill", "#111827");
+
+  svg.append("text")
+    .attr("class", "axis-label")
+    .attr("x", margin.left + chartWidth / 2)
+    .attr("y", height - 10)
+    .attr("text-anchor", "middle")
+    .text("Salary in USD");
+
+  svg.append("text")
+    .attr("class", "note-label")
+    .attr("x", margin.left)
+    .attr("y", margin.top - 5)
+    .text("Dots mark median salary. Top 1% salaries are trimmed for readability.");
+}
+
 function drawHeatmapLegend(svg, color, width, height, margin) {
   const legendHeight = 120;
   const legendWidth = 12;
@@ -211,6 +359,22 @@ function drawPlaceholder(svgId, message) {
     .attr("x", 20)
     .attr("y", 35)
     .text(message);
+}
+
+function kernelDensityEstimator(kernel, xValues) {
+  return function(sample) {
+    return xValues.map(x => [
+      x,
+      d3.mean(sample, value => kernel(x - value))
+    ]);
+  };
+}
+
+function kernelEpanechnikov(bandwidth) {
+  return function(value) {
+    value = value / bandwidth;
+    return Math.abs(value) <= 1 ? 0.75 * (1 - value * value) / bandwidth : 0;
+  };
 }
 
 function formatSalary(value) {
