@@ -41,7 +41,7 @@ body {
   min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1.35fr 0.95fr;
+  grid-template-rows: 1.1fr 1.2fr;
   gap: 14px;
 }
 
@@ -78,6 +78,7 @@ svg {
 
 .axis text {
   font-size: 11px;
+  fill: #334155;
 }
 
 .axis path,
@@ -88,11 +89,6 @@ svg {
 .axis-label {
   font-size: 12px;
   fill: #111827;
-}
-
-.placeholder-text {
-  font-size: 14px;
-  fill: #64748b;
 }
 
 .tooltip {
@@ -126,7 +122,38 @@ svg {
   pointer-events: none;
 }
 
+.ridge-baseline {
+  stroke: #d8dee9;
+  stroke-width: 1;
+}
+
 .note-label {
   font-size: 11px;
   fill: #64748b;
+}
+
+.flow-link {
+  fill: none;
+  opacity: 0.28;
+  cursor: pointer;
+  mix-blend-mode: multiply;
+}
+
+.flow-link:hover {
+  opacity: 0.55;
+}
+
+.flow-node rect {
+  cursor: pointer;
+}
+
+.flow-node-label {
+  font-size: 11px;
+  fill: #1f2933;
+}
+
+.flow-layer-label {
+  font-size: 12px;
+  font-weight: bold;
+  fill: #374151;
 }

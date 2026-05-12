@@ -13,6 +13,19 @@ const companySizeLabels = {
   L: "Large"
 };
 
+const remoteLabels = {
+  0: "On-site",
+  50: "Hybrid",
+  100: "Remote"
+};
+
+const salaryTierLabels = {
+  low: "Under $75k",
+  mid: "$75k-$125k",
+  high: "$125k-$175k",
+  top: "$175k+"
+};
+
 const experienceOrder = ["EN", "MI", "SE", "EX"];
 
 const experienceColors = {
@@ -20,6 +33,12 @@ const experienceColors = {
   MI: "#80b1d3",
   SE: "#bebada",
   EX: "#fb8072"
+};
+
+const flowTypeColors = {
+  experience: "#80b1d3",
+  remote: "#b3de69",
+  salary: "#fdb462"
 };
 
 const tooltip = d3.select("body")
@@ -47,7 +66,7 @@ d3.csv(dataPath).then(rawData => {
 
   drawHeatmap(data);
   drawDistribution(data);
-  drawPlaceholder("#flow", "View 3");
+  drawSalaryFlow(data);
 }).catch(error => {
   console.error("The CSV did not load correctly:", error);
 });
@@ -241,7 +260,7 @@ function drawDistribution(data) {
   const g = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-  const xAxis = g.append("g")
+  g.append("g")
     .attr("class", "axis")
     .attr("transform", `translate(0, ${chartHeight})`)
     .call(d3.axisBottom(x).ticks(7).tickFormat(d => `$${Math.round(d / 1000)}k`).tickSizeOuter(0));
@@ -314,6 +333,283 @@ function drawDistribution(data) {
   drawDistributionLegend(svg, width, margin);
 }
 
+function drawSalaryFlow(data) {
+  const svg = d3.select("#flow");
+  svg.selectAll("*").remove();
+
+  const width = svg.node().clientWidth;
+  const height = svg.node().clientHeight;
+
+  const margin = {
+    top: 52,
+    right: 150,
+    bottom: 25,
+    left: 165
+  };
+
+  const chartWidth = width - margin.left - margin.right;
+  const chartHeight = height - margin.top - margin.bottom;
+
+  const flowData = buildSalaryFlowData(data);
+  const nodes = flowData.nodes;
+  const links = flowData.links;
+
+  layoutFlow(nodes, links, chartWidth, chartHeight);
+
+  const g = svg.append("g")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+  const layerMeta = [
+    { layer: 0, label: "Experience level" },
+    { layer: 1, label: "Remote work type" },
+    { layer: 2, label: "Salary tier" }
+  ];
+
+  layerMeta.forEach(item => {
+    const layerNodes = nodes.filter(d => d.layer === item.layer);
+    item.x = d3.mean(layerNodes, d => (d.x0 + d.x1) / 2);
+  });
+
+  g.selectAll(".flow-layer-label")
+    .data(layerMeta)
+    .join("text")
+    .attr("class", "flow-layer-label")
+    .attr("x", d => d.x)
+    .attr("y", -18)
+    .attr("text-anchor", "middle")
+    .text(d => d.label);
+
+  g.append("g")
+    .selectAll("path")
+    .data(links)
+    .join("path")
+    .attr("class", "flow-link")
+    .attr("d", d => flowPath(d))
+    .attr("stroke", d => flowTypeColors[nodes[d.source].type])
+    .attr("stroke-width", d => Math.max(1, d.width))
+    .on("mousemove", function(event, d) {
+      tooltip
+        .style("opacity", 1)
+        .style("left", `${event.pageX + 12}px`)
+        .style("top", `${event.pageY - 28}px`)
+        .html(`
+          <strong>${nodes[d.source].label} → ${nodes[d.target].label}</strong><br>
+          Records: ${d.value}
+        `);
+    })
+    .on("mouseleave", function() {
+      tooltip.style("opacity", 0);
+    });
+
+  const nodeGroups = g.append("g")
+    .selectAll(".flow-node")
+    .data(nodes)
+    .join("g")
+    .attr("class", "flow-node");
+
+  nodeGroups.append("rect")
+    .attr("x", d => d.x0)
+    .attr("y", d => d.y0)
+    .attr("width", d => d.x1 - d.x0)
+    .attr("height", d => Math.max(6, d.y1 - d.y0))
+    .attr("rx", 5)
+    .attr("fill", d => flowTypeColors[d.type])
+    .on("mousemove", function(event, d) {
+      tooltip
+        .style("opacity", 1)
+        .style("left", `${event.pageX + 12}px`)
+        .style("top", `${event.pageY - 28}px`)
+        .html(`
+          <strong>${d.label}</strong><br>
+          Records: ${d.value}
+        `);
+    })
+    .on("mouseleave", function() {
+      tooltip.style("opacity", 0);
+    });
+
+  nodeGroups.append("text")
+    .attr("class", "flow-node-label")
+    .attr("x", d => d.layer === 0 ? d.x0 - 10 : d.x1 + 10)
+    .attr("y", d => (d.y0 + d.y1) / 2 + 4)
+    .attr("text-anchor", d => d.layer === 0 ? "end" : "start")
+    .text(d => d.label);
+
+  svg.append("text")
+    .attr("class", "note-label")
+    .attr("x", margin.left)
+    .attr("y", 18)
+    .text("Flow width shows number of records. Salary tiers are based on salary in USD.");
+
+  drawFlowLegend(svg, width, margin);
+}
+
+function layoutFlow(nodes, links, chartWidth, chartHeight) {
+  const nodeWidth = 18;
+  const nodeGap = 14;
+
+  const layerX = d3.scalePoint()
+    .domain([0, 1, 2])
+    .range([0, chartWidth])
+    .padding(0.08);
+
+  nodes.forEach(node => {
+    const incoming = d3.sum(links.filter(link => link.target === node.index), link => link.value);
+    const outgoing = d3.sum(links.filter(link => link.source === node.index), link => link.value);
+
+    node.value = Math.max(incoming, outgoing);
+    node.x0 = layerX(node.layer) - nodeWidth / 2;
+    node.x1 = layerX(node.layer) + nodeWidth / 2;
+  });
+
+  const layers = d3.groups(nodes, d => d.layer);
+  const layerScales = layers.map(([, layerNodes]) => {
+    const totalValue = d3.sum(layerNodes, d => d.value);
+    const availableHeight = chartHeight - (layerNodes.length - 1) * nodeGap;
+    return availableHeight / totalValue;
+  });
+
+  const valueScale = d3.min(layerScales);
+
+  layers.forEach(([layer, layerNodes]) => {
+    const orderedNodes = sortFlowNodes(layerNodes);
+    const totalHeight = d3.sum(orderedNodes, d => d.value * valueScale) + (orderedNodes.length - 1) * nodeGap;
+    let y = (chartHeight - totalHeight) / 2;
+
+    orderedNodes.forEach(node => {
+      node.y0 = y;
+      node.y1 = y + node.value * valueScale;
+      y = node.y1 + nodeGap;
+    });
+  });
+
+  nodes.forEach(node => {
+    node.sourceOffset = 0;
+    node.targetOffset = 0;
+  });
+
+  links.sort((a, b) => {
+    const sourceDiff = nodes[a.source].layer - nodes[b.source].layer;
+
+    if (sourceDiff !== 0) {
+      return sourceDiff;
+    }
+
+    return nodes[a.target].y0 - nodes[b.target].y0;
+  });
+
+  links.forEach(link => {
+    const source = nodes[link.source];
+    const target = nodes[link.target];
+    const width = link.value * valueScale;
+
+    link.width = width;
+    link.x0 = source.x1;
+    link.x1 = target.x0;
+    link.y0 = source.y0 + source.sourceOffset + width / 2;
+    link.y1 = target.y0 + target.targetOffset + width / 2;
+
+    source.sourceOffset += width;
+    target.targetOffset += width;
+  });
+}
+
+function sortFlowNodes(nodes) {
+  const typeOrder = {
+    experience: ["EN", "MI", "SE", "EX"],
+    remote: ["0", "50", "100"],
+    salary: ["low", "mid", "high", "top"]
+  };
+
+  return nodes.sort((a, b) => {
+    const aKey = a.id.split("-").slice(1).join("-");
+    const bKey = b.id.split("-").slice(1).join("-");
+    const order = typeOrder[a.type];
+
+    return order.indexOf(aKey) - order.indexOf(bKey);
+  });
+}
+
+function flowPath(d) {
+  const curve = (d.x1 - d.x0) * 0.45;
+
+  return `
+    M ${d.x0},${d.y0}
+    C ${d.x0 + curve},${d.y0}
+      ${d.x1 - curve},${d.y1}
+      ${d.x1},${d.y1}
+  `;
+}
+
+function drawFlowLegend(svg, width, margin) {
+  const legend = svg.append("g")
+    .attr("transform", `translate(${width - margin.right + 35}, ${margin.top + 10})`);
+
+  legend.append("text")
+    .attr("class", "legend-label")
+    .attr("x", 0)
+    .attr("y", -8)
+    .text("Node type");
+
+  const items = [
+    { label: "Experience", type: "experience" },
+    { label: "Remote", type: "remote" },
+    { label: "Salary tier", type: "salary" }
+  ];
+
+  items.forEach((item, i) => {
+    const row = legend.append("g")
+      .attr("transform", `translate(0, ${i * 24})`);
+
+    row.append("rect")
+      .attr("width", 12)
+      .attr("height", 12)
+      .attr("rx", 2)
+      .attr("fill", flowTypeColors[item.type]);
+
+    row.append("text")
+      .attr("class", "legend-label")
+      .attr("x", 18)
+      .attr("y", 10)
+      .text(item.label);
+  });
+
+  const widthLegend = legend.append("g")
+    .attr("transform", "translate(0, 96)");
+
+  widthLegend.append("text")
+    .attr("class", "legend-label")
+    .attr("x", 0)
+    .attr("y", -8)
+    .text("Flow width");
+
+  const samples = [
+    { label: "50", width: 4 },
+    { label: "250", width: 11 },
+    { label: "700", width: 20 }
+  ];
+
+  samples.forEach((sample, i) => {
+    const row = widthLegend.append("g")
+      .attr("transform", `translate(0, ${i * 20})`);
+
+    row.append("line")
+      .attr("x1", 0)
+      .attr("x2", 30)
+      .attr("y1", 7)
+      .attr("y2", 7)
+      .attr("stroke", "#94a3b8")
+      .attr("stroke-width", sample.width)
+      .attr("opacity", 0.45);
+
+    row.append("text")
+      .attr("class", "legend-label")
+      .attr("x", 40)
+      .attr("y", 10)
+      .text(sample.label);
+  });
+}
+
 function drawDistributionLegend(svg, width, margin) {
   const legend = svg.append("g")
     .attr("transform", `translate(${width - margin.right + 25}, ${margin.top + 12})`);
@@ -343,6 +639,93 @@ function drawDistributionLegend(svg, width, margin) {
       .attr("y", 10)
       .text(experienceLabels[exp]);
   });
+}
+
+function buildSalaryFlowData(data) {
+  const nodes = [];
+  const links = [];
+  const nodeMap = new Map();
+
+  // Create a node once and reuse it later.
+  function getNode(id, label, layer, type) {
+    if (!nodeMap.has(id)) {
+      nodeMap.set(id, nodes.length);
+      nodes.push({
+        index: nodes.length,
+        id,
+        label,
+        layer,
+        type
+      });
+    }
+
+    return nodeMap.get(id);
+  }
+
+  data.forEach(d => {
+    const expId = `exp-${d.experienceLevel}`;
+    const remoteId = `remote-${d.remoteRatio}`;
+    const tierId = `tier-${getSalaryTier(d.salaryUsd)}`;
+
+    getNode(expId, experienceLabels[d.experienceLevel], 0, "experience");
+    getNode(remoteId, remoteLabels[d.remoteRatio], 1, "remote");
+    getNode(tierId, salaryTierLabels[getSalaryTier(d.salaryUsd)], 2, "salary");
+  });
+
+  const expToRemote = d3.rollups(
+    data,
+    group => group.length,
+    d => `exp-${d.experienceLevel}`,
+    d => `remote-${d.remoteRatio}`
+  );
+
+  const remoteToTier = d3.rollups(
+    data,
+    group => group.length,
+    d => `remote-${d.remoteRatio}`,
+    d => `tier-${getSalaryTier(d.salaryUsd)}`
+  );
+
+  expToRemote.forEach(([sourceId, targets]) => {
+    targets.forEach(([targetId, value]) => {
+      links.push({
+        source: nodeMap.get(sourceId),
+        target: nodeMap.get(targetId),
+        value
+      });
+    });
+  });
+
+  remoteToTier.forEach(([sourceId, targets]) => {
+    targets.forEach(([targetId, value]) => {
+      links.push({
+        source: nodeMap.get(sourceId),
+        target: nodeMap.get(targetId),
+        value
+      });
+    });
+  });
+
+  return {
+    nodes,
+    links
+  };
+}
+
+function getSalaryTier(salary) {
+  if (salary < 75000) {
+    return "low";
+  }
+
+  if (salary < 125000) {
+    return "mid";
+  }
+
+  if (salary < 175000) {
+    return "high";
+  }
+
+  return "top";
 }
 
 function drawHeatmapLegend(svg, color, width, height, margin) {
@@ -387,17 +770,6 @@ function drawHeatmapLegend(svg, color, width, height, margin) {
     .attr("x", legendX - 5)
     .attr("y", legendY - 8)
     .text("Avg salary");
-}
-
-function drawPlaceholder(svgId, message) {
-  const svg = d3.select(svgId);
-  svg.selectAll("*").remove();
-
-  svg.append("text")
-    .attr("class", "placeholder-text")
-    .attr("x", 20)
-    .attr("y", 35)
-    .text(message);
 }
 
 function kernelDensityEstimator(kernel, xValues) {
