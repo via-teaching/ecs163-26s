@@ -342,7 +342,7 @@ function drawSalaryFlow(data) {
 
   const margin = {
     top: 52,
-    right: 150,
+    right: 255,
     bottom: 25,
     left: 165
   };
@@ -543,7 +543,7 @@ function flowPath(d) {
 
 function drawFlowLegend(svg, width, margin) {
   const legend = svg.append("g")
-    .attr("transform", `translate(${width - margin.right + 35}, ${margin.top + 10})`);
+    .attr("transform", `translate(${width - 145}, ${margin.top + 8})`);
 
   legend.append("text")
     .attr("class", "legend-label")
