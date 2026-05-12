@@ -13,6 +13,7 @@ body {
 	background: #f5f5f5;
 	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 	overflow: hidden;
+	padding: 2% 2%;
 }
 
 /* dashboard title bar */
@@ -28,16 +29,16 @@ body {
 	border-bottom: 1px solid #ddd;
 }
 
-/* top row holds bar chart and scatter plot side by side */
+/* top row holds donut and grouped bar side by side */
 #top-row {
 	display: flex;
-	flex: 1;
+	flex: 4;
 	min-height: 0;
 }
 
-/* bottom row holds sankey at full width */
+/* bottom row holds sankey at full width, slightly taller */
 #bottom-row {
-	flex: 1;
+	flex: 5;
 	min-height: 0;
 	display: flex;
 }
@@ -57,7 +58,7 @@ body {
 
 /* axis styling */
 .axis text {
-	font-size: 11px;
+	font-size: 17px;
 	fill: #555;
 }
 
@@ -68,7 +69,7 @@ body {
 
 /* chart title styling */
 .chart-title {
-	font-size: 14px;
+	font-size: 16px;
 	font-weight: 600;
 	fill: #333;
 }
