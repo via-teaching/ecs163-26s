@@ -57,9 +57,8 @@ d3.csv("data/mxmh_survey_results.csv").then(function(rawData) {
 
 
 // ============================================================
-// view 1 - bar chart - genre distribution overview (context)
-// horizontal bars showing respondent count per genre
-// color encodes average mental health severity
+// view 1 - bar chart - avg mental health score per genre (context overview)
+// horizontal bars sorted by severity, color reinforces score
 function drawBarChart(data) {
 
 	// get container size
@@ -68,7 +67,7 @@ function drawBarChart(data) {
 	var height = container.clientHeight;
 
 	// margins for axes and labels
-	var margin = { top: 40, right: 140, bottom: 50, left: 120 };
+	var margin = { top: 40, right: 30, bottom: 50, left: 120 };
 	var innerW = width - margin.left - margin.right;
 	var innerH = height - margin.top - margin.bottom;
 
@@ -82,25 +81,24 @@ function drawBarChart(data) {
 	var g = svg.append("g")
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	// aggregate count and average mental health score per genre
-	var genreGroups = d3.rollups(
+	// compute average composite mental health score per genre
+	var genreScores = d3.rollups(
 		data,
 		function(v) {
 			return {
-				count: v.length,
-				avgScore: d3.mean(v, function(d) { return d.mentalHealthScore; })
+				avgScore: d3.mean(v, function(d) { return d.mentalHealthScore; }),
+				count: v.length
 			};
 		},
 		function(d) { return d.favGenre; }
 	);
 
-	// sort by count descending
-	genreGroups.sort(function(a, b) { return b[1].count - a[1].count; });
+	// sort by average score descending so highest severity is at top
+	genreScores.sort(function(a, b) { return b[1].avgScore - a[1].avgScore; });
 
-	// extract genre names
-	var genres = genreGroups.map(function(d) { return d[0]; });
-	var maxCount = d3.max(genreGroups, function(d) { return d[1].count; });
-	var scoreExtent = d3.extent(genreGroups, function(d) { return d[1].avgScore; });
+	// extract genre names and score range
+	var genres = genreScores.map(function(d) { return d[0]; });
+	var scoreExtent = d3.extent(genreScores, function(d) { return d[1].avgScore; });
 
 	// y scale - band scale for genre names
 	var yScale = d3.scaleBand()
@@ -108,15 +106,15 @@ function drawBarChart(data) {
 		.range([0, innerH])
 		.padding(0.15);
 
-	// x scale - linear for respondent count
+	// x scale - linear for score, fixed 0 to 10 to match mental health range
 	var xScale = d3.scaleLinear()
-		.domain([0, maxCount])
-		.nice()
+		.domain([0, 10])
 		.range([0, innerW]);
 
-	// color scale - sequential yellow-orange-red for severity
-	var colorScale = d3.scaleSequential(d3.interpolateYlOrRd)
-		.domain(scoreExtent);
+	// color scale - green to red, low score is good (green), high is bad (red)
+	var colorScale = d3.scaleLinear()
+		.domain([0, 5, 10])
+		.range(["#4CAF50", "#FFC107", "#F44336"]);
 
 	// draw y axis with genre labels
 	g.append("g")
@@ -129,7 +127,7 @@ function drawBarChart(data) {
 	g.append("g")
 		.attr("class", "axis")
 		.attr("transform", "translate(0," + innerH + ")")
-		.call(d3.axisBottom(xScale).ticks(6));
+		.call(d3.axisBottom(xScale).ticks(5));
 
 	// x axis label
 	svg.append("text")
@@ -138,7 +136,7 @@ function drawBarChart(data) {
 		.attr("text-anchor", "middle")
 		.style("font-size", "12px")
 		.style("fill", "#555")
-		.text("Number of Respondents");
+		.text("Avg Mental Health Score (0-10)");
 
 	// chart title
 	svg.append("text")
@@ -146,27 +144,27 @@ function drawBarChart(data) {
 		.attr("x", margin.left + innerW / 2)
 		.attr("y", 22)
 		.attr("text-anchor", "middle")
-		.text("Genre Distribution & Avg Mental Health Score");
+		.text("Mental Health Severity by Genre");
 
-	// draw horizontal bars
+	// draw horizontal bars, one per genre
 	g.selectAll(".bar")
-		.data(genreGroups)
+		.data(genreScores)
 		.enter()
 		.append("rect")
 		.attr("class", "bar")
 		.attr("y", function(d) { return yScale(d[0]); })
 		.attr("x", 0)
 		.attr("height", yScale.bandwidth())
-		.attr("width", function(d) { return xScale(d[1].count); })
+		.attr("width", function(d) { return xScale(d[1].avgScore); })
 		.attr("fill", function(d) { return colorScale(d[1].avgScore); })
 		.attr("rx", 2)
 		.on("mouseover", function(event, d) {
-			// show tooltip with genre details
+			// show tooltip with genre score details
 			tooltip.style("opacity", 1)
 				.html(
 					"<strong>" + d[0] + "</strong><br/>" +
-					"Count: " + d[1].count + "<br/>" +
-					"Avg Score: " + d[1].avgScore.toFixed(1) + " / 10"
+					"Avg Score: " + d[1].avgScore.toFixed(2) + " / 10<br/>" +
+					"Respondents: " + d[1].count
 				);
 		})
 		.on("mousemove", function(event) {
@@ -179,53 +177,18 @@ function drawBarChart(data) {
 			tooltip.style("opacity", 0);
 		});
 
-	// --- color legend for mental health severity ---
-	var legendW = 15;
-	var legendH = innerH * 0.5;
-	var legendX = innerW + 20;
-	var legendY = (innerH - legendH) / 2;
-
-	// legend title
-	g.append("text")
-		.attr("x", legendX + legendW / 2)
-		.attr("y", legendY - 10)
-		.attr("text-anchor", "middle")
+	// add score value label at end of each bar
+	g.selectAll(".bar-label")
+		.data(genreScores)
+		.enter()
+		.append("text")
+		.attr("class", "bar-label")
+		.attr("x", function(d) { return xScale(d[1].avgScore) + 4; })
+		.attr("y", function(d) { return yScale(d[0]) + yScale.bandwidth() / 2; })
+		.attr("dy", "0.35em")
 		.style("font-size", "10px")
-		.style("font-weight", "600")
 		.style("fill", "#555")
-		.text("Avg MH Score");
-
-	// gradient definition for legend bar
-	var defs = svg.append("defs");
-	var gradient = defs.append("linearGradient")
-		.attr("id", "bar-legend-gradient")
-		.attr("x1", "0%").attr("y1", "100%")
-		.attr("x2", "0%").attr("y2", "0%");
-
-	// gradient stops from low to high
-	gradient.append("stop").attr("offset", "0%").attr("stop-color", colorScale(scoreExtent[0]));
-	gradient.append("stop").attr("offset", "50%").attr("stop-color", colorScale((scoreExtent[0] + scoreExtent[1]) / 2));
-	gradient.append("stop").attr("offset", "100%").attr("stop-color", colorScale(scoreExtent[1]));
-
-	// legend rectangle with gradient fill
-	g.append("rect")
-		.attr("x", legendX)
-		.attr("y", legendY)
-		.attr("width", legendW)
-		.attr("height", legendH)
-		.style("fill", "url(#bar-legend-gradient)")
-		.attr("rx", 2);
-
-	// legend axis with score values
-	var legendScale = d3.scaleLinear()
-		.domain(scoreExtent)
-		.range([legendH, 0]);
-
-	g.append("g")
-		.attr("transform", "translate(" + (legendX + legendW) + "," + legendY + ")")
-		.call(d3.axisRight(legendScale).ticks(5).tickFormat(function(d) { return d.toFixed(1); }))
-		.selectAll("text")
-		.style("font-size", "9px");
+		.text(function(d) { return d[1].avgScore.toFixed(1); });
 }
 
 
