@@ -41,6 +41,7 @@ const flowTypeColors = {
   salary: "#fdb462"
 };
 
+// Tooltip. 
 const tooltip = d3.select("body")
   .append("div")
   .attr("class", "tooltip");
@@ -48,7 +49,7 @@ const tooltip = d3.select("body")
 d3.csv(dataPath).then(rawData => {
   console.log("Raw data:", rawData);
 
-  // Clean the main columns before building the charts.
+  // Clean the main columns.
   const data = rawData.map(d => ({
     workYear: +d.work_year,
     experienceLevel: d.experience_level,
@@ -107,6 +108,7 @@ function drawHeatmap(data) {
     });
   });
 
+  // Use position for categories and color for average salary.
   const x = d3.scaleBand()
     .domain(companySizeOrder)
     .range([0, chartWidth])
@@ -124,6 +126,7 @@ function drawHeatmap(data) {
   const g = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+  // Draw heatmap axes.
   g.append("g")
     .attr("class", "axis")
     .attr("transform", `translate(0, ${chartHeight})`)
@@ -133,6 +136,7 @@ function drawHeatmap(data) {
     .attr("class", "axis")
     .call(d3.axisLeft(y).tickFormat(d => experienceLabels[d]).tickSizeOuter(0));
 
+  // Draw cell for each category pair.
   g.selectAll("rect")
     .data(cells)
     .join("rect")
@@ -157,6 +161,7 @@ function drawHeatmap(data) {
       tooltip.style("opacity", 0);
     });
 
+  // Add salary labels inside the cells.
   g.selectAll(".cell-label")
     .data(cells)
     .join("text")
@@ -226,6 +231,7 @@ function drawDistribution(data) {
   const xTicks = x.ticks(60);
   const bandwidth = salaryLimit / 22;
 
+  // Estimate a salary distribution for each experience level.
   const densities = displayOrder.map(exp => {
     const group = filteredData.filter(d => d.experienceLevel === exp);
     const density = kernelDensityEstimator(kernelEpanechnikov(bandwidth), xTicks)(
@@ -260,6 +266,7 @@ function drawDistribution(data) {
   const g = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+  // Draw the salary axis.
   g.append("g")
     .attr("class", "axis")
     .attr("transform", `translate(0, ${chartHeight})`)
@@ -284,6 +291,7 @@ function drawDistribution(data) {
     .attr("y1", 0)
     .attr("y2", 0);
 
+  // Draw the distribution shapes.
   groups.append("path")
     .attr("class", "density-area")
     .attr("d", d => area(d.density))
@@ -311,6 +319,7 @@ function drawDistribution(data) {
     .attr("stroke", d => experienceColors[d.experienceLevel])
     .attr("stroke-width", 2.2);
 
+  // Mark median salary for each group.
   groups.append("circle")
     .attr("cx", d => x(d.median))
     .attr("cy", 0)
@@ -354,6 +363,7 @@ function drawSalaryFlow(data) {
   const nodes = flowData.nodes;
   const links = flowData.links;
 
+  // Position nodes and links for the flow layout.
   layoutFlow(nodes, links, chartWidth, chartHeight);
 
   const g = svg.append("g")
@@ -370,6 +380,7 @@ function drawSalaryFlow(data) {
     item.x = d3.mean(layerNodes, d => (d.x0 + d.x1) / 2);
   });
 
+  // Add headings for the three flow stages.
   g.selectAll(".flow-layer-label")
     .data(layerMeta)
     .join("text")
@@ -379,6 +390,7 @@ function drawSalaryFlow(data) {
     .attr("text-anchor", "middle")
     .text(d => d.label);
 
+  // Draw links behind the nodes.
   g.append("g")
     .selectAll("path")
     .data(links)
@@ -407,6 +419,7 @@ function drawSalaryFlow(data) {
     .join("g")
     .attr("class", "flow-node");
 
+  // Draw flow nodes as vertical blocks.
   nodeGroups.append("rect")
     .attr("x", d => d.x0)
     .attr("y", d => d.y0)
@@ -453,6 +466,7 @@ function layoutFlow(nodes, links, chartWidth, chartHeight) {
     .range([0, chartWidth])
     .padding(0.08);
 
+  // Calculate node size from incoming and outgoing flow.
   nodes.forEach(node => {
     const incoming = d3.sum(links.filter(link => link.target === node.index), link => link.value);
     const outgoing = d3.sum(links.filter(link => link.source === node.index), link => link.value);
@@ -471,6 +485,7 @@ function layoutFlow(nodes, links, chartWidth, chartHeight) {
 
   const valueScale = d3.min(layerScales);
 
+  // Stack nodes within each layer.
   layers.forEach(([layer, layerNodes]) => {
     const orderedNodes = sortFlowNodes(layerNodes);
     const totalHeight = d3.sum(orderedNodes, d => d.value * valueScale) + (orderedNodes.length - 1) * nodeGap;
@@ -498,6 +513,7 @@ function layoutFlow(nodes, links, chartWidth, chartHeight) {
     return nodes[a.target].y0 - nodes[b.target].y0;
   });
 
+  // Assign each link a vertical position inside its node.
   links.forEach(link => {
     const source = nodes[link.source];
     const target = nodes[link.target];
@@ -646,7 +662,7 @@ function buildSalaryFlowData(data) {
   const links = [];
   const nodeMap = new Map();
 
-  // Create a node once and reuse it later.
+  // Create a node.
   function getNode(id, label, layer, type) {
     if (!nodeMap.has(id)) {
       nodeMap.set(id, nodes.length);
@@ -672,6 +688,7 @@ function buildSalaryFlowData(data) {
     getNode(tierId, salaryTierLabels[getSalaryTier(d.salaryUsd)], 2, "salary");
   });
 
+  // Count flows from experience to remote work.
   const expToRemote = d3.rollups(
     data,
     group => group.length,
@@ -679,6 +696,7 @@ function buildSalaryFlowData(data) {
     d => `remote-${d.remoteRatio}`
   );
 
+  // Count flows from remote work to salary tier.
   const remoteToTier = d3.rollups(
     data,
     group => group.length,
