@@ -537,7 +537,7 @@ function drawSankey(data) {
 		.attr("x", width / 2)
 		.attr("y", 22)
 		.attr("text-anchor", "middle")
-		.text("Music Type Effect %");
+		.text("Music Improvement Effect %, Rank from Best to Worst");
 
 	// keep only rows with valid music effects
 	var filtered = data.filter(function(d) {
