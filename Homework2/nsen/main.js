@@ -4,11 +4,11 @@ const height = window.innerHeight;
 // const width = 400;
 // const height = 350;
 
-// let barChartLeft = 0,
-//   barChartTop = 0;
 let barChartMargin = { top: 40, right: 30, bottom: 85, left: 70 },
   barChartWidth = width - barChartMargin.left - barChartMargin.right,
   barChartHeight = height - barChartMargin.top - barChartMargin.bottom;
+
+let pieMargin = 50;
 
 // plots
 d3.csv("student_mental_health.csv")
@@ -31,9 +31,9 @@ d3.csv("student_mental_health.csv")
     console.log("processedData", processedData);
 
     // plot 1: Bar chart
-    const svg = d3.select("#bar-svg");
+    const barSvg = d3.select("#bar-svg");
 
-    const g1 = svg.append("g").attr("width", width).attr("height", height);
+    const g1 = barSvg.append("g").attr("width", width).attr("height", height);
 
     // Reduce data to category counts
     let barData = d3.rollup(
@@ -63,7 +63,7 @@ d3.csv("student_mental_health.csv")
           ),
       )
       .range([barChartMargin.left, width - barChartMargin.right])
-			.padding(0.08);;
+      .padding(0.08);
 
     // Draw x axis
     const xAxisCall = d3.axisBottom(x1).ticks(5);
@@ -109,101 +109,150 @@ d3.csv("student_mental_health.csv")
       .attr("font-size", "20px")
       .text("Age (years)");
 
-		// Draw bars
-		const barColor = "#77ACA2";
-		const highlightColor = "orange"
-		const rect = g1.append("g")
-			.classed("mark", true)
-			.selectAll("rect")
-			.data(barData)
-			.join("rect")
-			.attr("x", d => x1(d.gpa))
-			.attr("y", d => y1(d.age))
-			.attr("width", x1.bandwidth())
-			.attr("height", d => height - barChartMargin.bottom - y1(d.age))
-			.style("fill", barColor)
+    // Draw bars
+    const barColor = "#77ACA2";
+    const highlightColor = "orange";
+    const rect = g1
+      .append("g")
+      .classed("mark", true)
+      .selectAll("rect")
+      .data(barData)
+      .join("rect")
+      .attr("x", (d) => x1(d.gpa))
+      .attr("y", (d) => y1(d.age))
+      .attr("width", x1.bandwidth())
+      .attr("height", (d) => height - barChartMargin.bottom - y1(d.age))
+      .style("fill", barColor);
 
-    // const g2 = svg
-    //   .append("g")
-    //   .attr("width", distrWidth + distrMargin.left + distrMargin.right)
-    //   .attr("height", distrHeight + distrMargin.top + distrMargin.bottom)
-    //   .attr("transform", `translate(${distrLeft}, ${distrTop})`);
+    // plot 2: Pie charts
+		const pieWidth = (width / 2) + pieMargin * 1.5
+		const pieHeight = (height / 2) + pieMargin * 1.5
+		
+		const radius = Math.min(pieWidth, pieHeight) / 2 - pieMargin * 2;
+		
+		// pie 1
+    const pieSvg = d3.select("#pie-svg");
+    const g2_pie1 = pieSvg
+      .append("g")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("transform", `translate(${pieMargin + radius},${pieMargin + radius})`);
 
-    // //plot 2: Bar Chart for Team Player Count
+    const data_pie1 = { a: 20, b: 80 };
 
-    // const teamCounts = processedData.reduce(
-    //   (s, { teamID }) => ((s[teamID] = (s[teamID] || 0) + 1), s),
-    //   {},
-    // );
-    // const teamData = Object.keys(teamCounts).map((key) => ({
-    //   teamID: key,
-    //   count: teamCounts[key],
-    // }));
-    // console.log("teamData", teamData);
+    const color_pie1 = d3
+      .scaleOrdinal()
+      .domain(Object.keys(data_pie1))
+      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
 
-    // const g3 = svg
-    //   .append("g")
-    //   .attr("width", teamWidth + teamMargin.left + teamMargin.right)
-    //   .attr("height", teamHeight + teamMargin.top + teamMargin.bottom)
-    //   .attr("transform", `translate(${teamMargin.left}, ${teamTop})`);
+		const dataArray_pie1 = Object.entries(data_pie1).map(([key, value]) => ({key, value}));
+		const pie_pie1 = d3.pie().value(d => d.value).sort(null);
+		const data_ready_pie1 = pie_pie1(dataArray_pie1);
 
-    // // X label
-    // g3.append("text")
-    //   .attr("x", teamWidth / 2)
-    //   .attr("y", teamHeight + 50)
-    //   .attr("font-size", "20px")
-    //   .attr("text-anchor", "middle")
-    //   .text("Team");
+		const arc_pie1 = d3.arc().innerRadius(0).outerRadius(radius)
+    g2_pie1.selectAll("whatever")
+      .data(data_ready_pie1)
+      .enter()
+      .append("path")
+      .attr("d", d => arc_pie1(d))
+      .attr("fill", d => color_pie1(d.data.key))
+      .attr("stroke", "black")
+      .style("stroke-width", "2px")
+      .style("opacity", 0.7);
 
-    // // Y label
-    // g3.append("text")
-    //   .attr("x", -(teamHeight / 2))
-    //   .attr("y", -40)
-    //   .attr("font-size", "20px")
-    //   .attr("text-anchor", "middle")
-    //   .attr("transform", "rotate(-90)")
-    //   .text("Number of players");
 
-    // // X ticks
-    // const x2 = d3
-    //   .scaleBand()
-    //   .domain(teamData.map((d) => d.teamID))
-    //   .range([0, teamWidth])
-    //   .paddingInner(0.3)
-    //   .paddingOuter(0.2);
+		// pie 2
+		const g2_pie2 = pieSvg
+      .append("g")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("transform", `translate(${pieMargin + radius},${pieMargin + radius + pieMargin + radius * 2})`);
 
-    // const xAxisCall2 = d3.axisBottom(x2);
-    // g3.append("g")
-    //   .attr("transform", `translate(0, ${teamHeight})`)
-    //   .call(xAxisCall2)
-    //   .selectAll("text")
-    //   .attr("y", "10")
-    //   .attr("x", "-5")
-    //   .attr("text-anchor", "end")
-    //   .attr("transform", "rotate(-40)");
+    const data_pie2 = { a: 20, b: 80 };
 
-    // // Y ticks
-    // const y2 = d3
-    //   .scaleLinear()
-    //   .domain([0, d3.max(teamData, (d) => d.count)])
-    //   .range([teamHeight, 0])
-    //   .nice();
+    const color_pie2 = d3
+      .scaleOrdinal()
+      .domain(Object.keys(data_pie2))
+      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
 
-    // const yAxisCall2 = d3.axisLeft(y2).ticks(6);
-    // g3.append("g").call(yAxisCall2);
+		const dataArray_pie2 = Object.entries(data_pie2).map(([key, value]) => ({key, value}));
+		const pie_pie2 = d3.pie().value(d => d.value).sort(null);
+		const data_ready_pie2 = pie_pie2(dataArray_pie2);
 
-    // // bars
-    // const bars = g3.selectAll("rect").data(teamData);
+		const arc_pie2 = d3.arc().innerRadius(0).outerRadius(radius)
+    g2_pie2.selectAll("whatever")
+      .data(data_ready_pie2)
+      .enter()
+      .append("path")
+      .attr("d", d => arc_pie2(d))
+      .attr("fill", d => color_pie2(d.data.key))
+      .attr("stroke", "black")
+      .style("stroke-width", "2px")
+      .style("opacity", 0.7);
 
-    // bars
-    //   .enter()
-    //   .append("rect")
-    //   .attr("y", (d) => y2(d.count))
-    //   .attr("x", (d) => x2(d.teamID))
-    //   .attr("width", x2.bandwidth())
-    //   .attr("height", (d) => teamHeight - y2(d.count))
-    //   .attr("fill", "steelblue");
+
+		// pie 3
+		const g2_pie3 = pieSvg
+      .append("g")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("transform", `translate(${pieMargin + radius + pieMargin + radius * 2},${pieMargin + radius})`);
+
+    const data_pie3 = { a: 20, b: 80 };
+
+    const color_pie3 = d3
+      .scaleOrdinal()
+      .domain(Object.keys(data_pie3))
+      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
+
+		const dataArray_pie3 = Object.entries(data_pie3).map(([key, value]) => ({key, value}));
+		const pie_pie3 = d3.pie().value(d => d.value).sort(null);
+		const data_ready_pie3 = pie_pie3(dataArray_pie3);
+
+		const arc_pie3 = d3.arc().innerRadius(0).outerRadius(radius)
+    g2_pie3.selectAll("whatever")
+      .data(data_ready_pie3)
+      .enter()
+      .append("path")
+      .attr("d", d => arc_pie3(d))
+      .attr("fill", d => color_pie3(d.data.key))
+      .attr("stroke", "black")
+      .style("stroke-width", "2px")
+      .style("opacity", 0.7);
+
+
   })
   .catch(function (error) {
     console.log(error);
   });
+
+
+function drawPie(svg, pieWidth, pieHeight, radius, x, y) {
+    const g2 = svg
+      .append("g")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("transform", `translate(${pieMargin + radius + ((pieMargin + radius * 2) * x)},${pieMargin + radius + ((pieMargin + radius * 2) * y)})`);
+
+    const data = { a: 20, b: 80 };
+
+    const color = d3
+      .scaleOrdinal()
+      .domain(Object.keys(data))
+      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
+
+		const dataArray = Object.entries(data).map(([key, value]) => ({key, value}));
+		const pie = d3.pie().value(d => d.value).sort(null);
+		const data_ready = pie(dataArray);
+
+		const arc = d3.arc().innerRadius(0).outerRadius(radius)
+    g2.selectAll("whatever")
+      .data(data_ready)
+      .enter()
+      .append("path")
+      .attr("d", d => arc(d))
+      .attr("fill", d => color(d.data.key))
+      .attr("stroke", "black")
+      .style("stroke-width", "2px")
+      .style("opacity", 0.7);
+}
