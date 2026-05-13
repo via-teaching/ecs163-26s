@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Data Science Salaries — Salary Drivers Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- D3 core (required by assignment) -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <!-- d3-sankey: an official D3 module used for the advanced (Sankey) view -->
+  <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+</head>
+<body>
+  <!--
+    Dashboard layout follows a focus + context paradigm:
+      - Left column hosts two small "context" views (overview bar chart, heatmap).
+      - Right column hosts the large "focus" view (Sankey, the advanced method).
+    The whole layout is a CSS grid that scales to fill the browser viewport.
+  -->
+  <header class="dashboard-header">
+    <h1>Data Science Salaries:- What Drives Pay?</h1>
+    <p class="subtitle">
+      Exploring how <strong>experience level</strong>, <strong>job role</strong>, and
+      <strong>company size</strong> shape salaries across 3,755 jobs (2020–2023).
+      Start with the overview on the top-left, then trace the flows in the Sankey to see
+      how seniority routes into roles and company sizes, and confirm pay magnitudes in the heatmap.
+    </p>
+  </header>
+
+  <main class="dashboard-grid">
+    <!-- VIEW 1: OVERVIEW (context) — bar chart of avg salary by experience level -->
+    <section class="panel panel-overview" id="panel-bar">
+      <h2 class="panel-title">Average Salary by Experience Level</h2>
+      <p class="panel-sub">Overview — the dominant salary driver</p>
+      <div class="chart-container" id="chart-bar"></div>
+    </section>
+
+    <!-- VIEW 2: HEATMAP (context) — experience x company size salary magnitudes -->
+    <section class="panel panel-heatmap" id="panel-heatmap">
+      <h2 class="panel-title">Avg Salary: Experience × Company Size</h2>
+      <p class="panel-sub">How seniority and company size combine</p>
+      <div class="chart-container" id="chart-heatmap"></div>
+    </section>
+
+    <!-- VIEW 3: SANKEY (focus, advanced) — flows from experience -> role -> company size -->
+    <section class="panel panel-sankey" id="panel-sankey">
+      <h2 class="panel-title">Flow of Jobs: Experience → Role → Company Size</h2>
+      <p class="panel-sub">Focus view — width of each flow is proportional to the number of jobs</p>
+      <div class="chart-container" id="chart-sankey"></div>
+    </section>
+  </main>
+
+  <!-- Shared tooltip element used by all three views -->
+  <div id="tooltip" class="tooltip" style="opacity:0;"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
