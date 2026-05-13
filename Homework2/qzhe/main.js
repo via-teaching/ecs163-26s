@@ -253,6 +253,10 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
 
     //read and store the data, use -> to seperate each part
     //count the number for each node(age_service and service_genre)
+    //get source(begin node), target(end node)
+    //add source, target into node, check if they're already there or not
+    //create links by index from node
+
     const graph_data = rawData.reduce((s, d) => {
         const age_service = d.ageGroup + " -> " + d["Primary streaming service"];
         const service_genre = d["Primary streaming service"] + " -> " + d["Fav genre"];
