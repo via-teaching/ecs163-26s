@@ -22,7 +22,7 @@
         </nav>
 
         <div class="page">
-             <div v-if="activeTab === 1" class="page_overview">
+             <div v-show="activeTab === 1" class="page_overview">
                 <div :class="['frame_focus', graphs[0]]">
                 
                 </div>
@@ -35,21 +35,21 @@
                 
                 </div>
              </div>
-             <div v-if="activeTab === 2" class="page_sankey">
-                <div class="frame_sankey">
+             <div v-show="activeTab === 2" class="page_sankey">
+                <div :class="['frame_sankey', 'graph_sankey']">
 
                 </div>
 
              </div>
 
-             <div v-if="activeTab === 3" class="page_X">
-                <div class="frame_X">
+             <div v-show="activeTab === 3" class="page_multilines">
+                <div :class="['frame_multilines', 'graph_multilines']">
                     
                 </div>
 
              </div>
 
-             <div v-if="activeTab === 4" class="page_Y">
+             <div v-show="activeTab === 4" class="page_Y">
                 <div class="frame_Y">
                     
                 </div>
@@ -63,6 +63,12 @@
         * {
             margin: 0;
             padding: 0;
+        }
+
+        .frame_sankey{
+            width: 100vw;
+            height: 85vh;
+
         }
            
         .page_overview{
@@ -119,17 +125,19 @@
 	<script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
-    <script src="sankey.js"></script>
+
     
-	<script>
+	<script type="module">
+        import {draw_sankey} from "./sankey.js"
+        import {draw_multilines} from "./multilines.js"
         const {createApp} = Vue
         createApp({
             data(){
                 return {
                     r: ["frame_focus", "frame_r1", "frame_r2"],
                     activeTab: 1,
-                    menu: [{id: 1, name: "Overview", page: "overview.js"}, {id: 2, name: "SankeyGraph", page: "sankey.js"}, {id: 3, name: "X", page: ""}, {id: 4, name: "Y", page: ""}],
-                    graphs: ["graph_sankey", "graph_X", "graph_Y"]
+                    menu: [{id: 1, name: "Overview", page: "overview.js"}, {id: 2, name: "SankeyGraph", page: "./sankey.js"}, {id: 3, name: "multilines", page: "./multilines.js"}, {id: 4, name: "Y", page: ""}],
+                    graphs: ["graph_sankey", "graph_multilines", "graph_Y"]
                 }
             },
             computed:{
@@ -137,6 +145,9 @@
                     const selected = this.menu.find(i => i.id === this.activeTab)
                     return selected ? selected.page : {}
                 }
+            },
+            mounted() {
+                this.drawPage();
             },
             methods:{
                 selectMenu(id){
@@ -146,7 +157,12 @@
                     focus = this.graphs[index]
                     this.graphs.splice(index, 1)
                     this.graphs.unshift(focus)
+                    this.drawPage();
                     console.info("now focusing on" + this.graphs[0])
+                },
+                drawPage(){
+                    draw_sankey();
+                    draw_multilines();
                 }
             }
         }).mount('#app')
