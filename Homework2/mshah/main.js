@@ -406,3 +406,146 @@ function ribbon(x0, sy0, sy1, x1, ty0, ty1) {
   return `M${x0},${sy0} C${mx},${sy0} ${mx},${ty0} ${x1},${ty0}
           L${x1},${ty1} C${mx},${ty1} ${mx},${sy1} ${x0},${sy1} Z`;
 }
+
+// =============================================================
+//  VIEW 3 – SCATTER PLOT  (focus)
+//  X: hours of music listened per day
+//  Y: self-reported anxiety score (0–10)
+//  Single color dots — the focus is the relationship, not genre.
+//  SVG is rendered at 60% of the container width, centered,
+//  so white space is equal on left and right.
+// =============================================================
+function drawScatter(data) {
+  const container = document.getElementById("scatter-area");
+  const fullW = container.clientWidth;
+  const H     = container.clientHeight;
+
+  // Render at 60% width, centered
+  const W      = fullW * 0.60;
+  const offsetX = (fullW - W) / 2;
+
+  const margin = { top: 14, right: 30, bottom: 44, left: 52 };
+  const iW = W - margin.left - margin.right;
+  const iH = H - margin.top  - margin.bottom;
+
+  // SVG spans full container width so the centering offset works cleanly
+  const svg = d3.select("#scatter-area").append("svg")
+    .attr("width", fullW).attr("height", H);
+
+  // Drawing group shifted right by offsetX + left margin
+  const g = svg.append("g")
+    .attr("transform", `translate(${offsetX + margin.left},${margin.top})`);
+
+  // ── Scales ───────────────────────────────────────────────
+  const xScale = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.hours) + 0.5])
+    .range([0, iW]);
+
+  const yScale = d3.scaleLinear()
+    .domain([0, 10])
+    .range([iH, 0]);
+
+  // ── Grid lines ────────────────────────────────────────────
+  g.append("g").attr("class", "grid")
+    .call(d3.axisLeft(yScale).tickSize(-iW).tickFormat(""))
+    .call(ax => ax.select(".domain").remove());
+
+  g.append("g").attr("class", "grid")
+    .attr("transform", `translate(0,${iH})`)
+    .call(d3.axisBottom(xScale).tickSize(-iH).tickFormat(""))
+    .call(ax => ax.select(".domain").remove());
+
+  // ── Axes ─────────────────────────────────────────────────
+  g.append("g").attr("class", "axis")
+    .attr("transform", `translate(0,${iH})`)
+    .call(d3.axisBottom(xScale).ticks(10))
+    .call(ax => ax.select(".domain").remove());
+
+  g.append("g").attr("class", "axis")
+    .call(d3.axisLeft(yScale).ticks(5))
+    .call(ax => ax.select(".domain").remove());
+
+  // ── Axis labels ──────────────────────────────────────────
+  g.append("text").attr("class", "axis-label")
+    .attr("x", iW / 2).attr("y", iH + 36)
+    .attr("text-anchor", "middle")
+    .text("Hours of Music Listened Per Day");
+
+  g.append("text").attr("class", "axis-label")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -iH / 2).attr("y", -42)
+    .attr("text-anchor", "middle")
+    .text("Anxiety Score (0–10)");
+
+  // ── Scatter dots ─────────────────────────────────────────
+  // Small jitter on both axes to prevent overplotting on integer scores
+  g.selectAll(".dot")
+    .data(data)
+    .join("circle")
+      .attr("class", "dot")
+      .attr("cx", d => xScale(d.hours + (Math.random() - 0.5) * 0.3))
+      .attr("cy", d => yScale(d.anxiety + (Math.random() - 0.5) * 0.4))
+      .attr("r", 3.5)
+      .attr("fill", "#992685")
+      .attr("fill-opacity", 0.45)
+      .attr("stroke", "none")
+      .on("mouseover", (event, d) => showTip(
+        `Genre: ${d.genre}<br>
+         Hours/day: ${d.hours}<br>
+         Anxiety: ${d.anxiety}<br>
+         Depression: ${d.depression}`, event))
+      .on("mousemove", (event, d) => showTip(
+        `Genre: ${d.genre}<br>
+         Hours/day: ${d.hours}<br>
+         Anxiety: ${d.anxiety}<br>
+         Depression: ${d.depression}`, event))
+      .on("mouseout", hideTip);
+
+  // ── Linear regression trend line ─────────────────────────
+  // Helps readers see whether more listening hours correlate
+  // with higher or lower anxiety scores across the dataset
+  const n     = data.length;
+  const sumX  = d3.sum(data, d => d.hours);
+  const sumY  = d3.sum(data, d => d.anxiety);
+  const sumXY = d3.sum(data, d => d.hours * d.anxiety);
+  const sumX2 = d3.sum(data, d => d.hours * d.hours);
+
+  const slope     = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / n;
+
+  const xMin = d3.min(data, d => d.hours);
+  const xMax = d3.max(data, d => d.hours);
+
+  g.append("line")
+    .attr("x1", xScale(xMin)).attr("y1", yScale(slope * xMin + intercept))
+    .attr("x2", xScale(xMax)).attr("y2", yScale(slope * xMax + intercept))
+    .attr("stroke", "#FF0000")
+    .attr("stroke-width", 1.8)
+    .attr("stroke-dasharray", "5,3");
+
+  // ── Legend ───────────────────────────────────────────────
+  const lx = iW - 140;
+  const ly = 4;
+  const lg = g.append("g").attr("transform", `translate(${lx},${ly})`);
+
+  // Dot item
+  lg.append("circle")
+    .attr("cx", 6).attr("cy", 6).attr("r", 3.5)
+    .attr("fill", "#992685").attr("fill-opacity", 0.55);
+  lg.append("text")
+    .attr("x", 14).attr("y", 10)
+    .attr("font-size", 9).attr("fill", "#555")
+    .attr("font-family", "Arial, sans-serif")
+    .text("Survey respondent");
+
+  // Trend line item
+  lg.append("line")
+    .attr("x1", 0).attr("x2", 14).attr("y1", 22).attr("y2", 22)
+    .attr("stroke", "#FF0000").attr("stroke-width", 1.8)
+    .attr("stroke-dasharray", "5,3");
+  lg.append("text")
+    .attr("x", 18).attr("y", 26)
+    .attr("font-size", 9).attr("fill", "#555")
+    .attr("font-family", "Arial, sans-serif")
+    .text("Trend line");
+}
