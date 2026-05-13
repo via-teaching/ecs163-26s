@@ -256,9 +256,7 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
 
 
     Object.keys(graph_data).forEach(function(key){
-        const arrowPos = key.indexOf(" -> ");
-        const sourceName = key.substring(0, arrowPos);
-        const targetName = key.substring(arrowPos + 4);
+        const [sourceName, targetName] = key.split(" -> ");
 
         if(node_info[sourceName] == undefined){
             node_info[sourceName] = graph.nodes.length;
