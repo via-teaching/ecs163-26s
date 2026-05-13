@@ -30,10 +30,10 @@ let profileYearData = [];
 let regionColor;
 
 Promise.all([
-  d3.csv("data/yearly_region.csv", parseYearly),
-  d3.csv("data/country_year.csv", parseCountryYear),
-  d3.csv("data/profile_year.csv", parseProfileYear),
-  d3.csv("data/region_totals.csv", parseRegionTotal)
+  d3.csv("gtd_summary_data/yearly_region.csv", parseYearly),
+  d3.csv("gtd_summary_data/country_year.csv", parseCountryYear),
+  d3.csv("gtd_summary_data/profile_year.csv", parseProfileYear),
+  d3.csv("gtd_summary_data/region_totals.csv", parseRegionTotal)
 ]).then(([yearly, countryYear, profileYear, regionTotals]) => {
   yearlyData = yearly;
   countryYearData = countryYear;
