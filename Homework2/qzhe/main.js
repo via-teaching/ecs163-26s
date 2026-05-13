@@ -2,17 +2,19 @@ let abFilter = 25;
 const width = window.innerWidth;
 const height = window.innerHeight;
 
-
+//the place and size of scatter plot
 let scatterLeft = 700, scatterTop = 0;
 let scatterMargin = {top: 20, right: 40, bottom: 50, left: 70},
 scatterWidth = 600 - scatterMargin.left - scatterMargin.right,
 scatterHeight = 350 - scatterMargin.top - scatterMargin.bottom;
 
+//the place and size of bar Chart
 let teamLeft = 0, teamTop = 0;
 let teamMargin = {top: 20, right: 40, bottom: 50, left: 70},
 teamWidth = 600 - teamMargin.left - teamMargin.right,
 teamHeight = 350 - teamMargin.top - teamMargin.bottom;
 
+////the place and size of Sankey diagram
 let distrLeft = 0, distrTop = 350;
 let distrMargin = {top: 20, right: 40, bottom: 50, left: 70},
 distrWidth = width - 200 - distrMargin.left - distrMargin.right,
@@ -22,9 +24,12 @@ distrHeight = height - 350 - distrMargin.top - distrMargin.bottom;
 
 
 // plots
+//read the dataset
 d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
     console.log("rawData", rawData);
 
+    //check the dataset, change string into number
+    //create age group to classify
     rawData.forEach(function(d){
         d["Hours per day"] = Number(d["Hours per day"]);
         d.Age = Number(d.Age);
@@ -53,7 +58,10 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
     //Scatter plot
     const svg = d3.select("svg");
 
+    //different Primary streaming service will use different color
     const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(rawData.map(d => d['Primary streaming service']));
+
+    //create group of the scatter plot
 
     const g1 = svg.append("g")
                 .attr("width", scatterWidth + scatterMargin.left + scatterMargin.right)
@@ -62,7 +70,7 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
 
 
     
-
+    //add the title, make it stay in the top of graph
     g1.append("text")
     .attr("x", scatterWidth / 2)
     .attr("y", 5)
@@ -70,7 +78,7 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
     .attr("text-anchor", "middle")
     .text("Age vs Daily Listening Hours");
 
-    // X label
+    // X label(age)
     g1.append("text")
     .attr("x", scatterWidth / 2)
     .attr("y", scatterHeight + 50)
@@ -79,7 +87,7 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
     .text("Age");
 
 
-    // Y label
+    // Y label(hours per day), rotate 90
     g1.append("text")
     .attr("x", -(scatterHeight / 2))
     .attr("y", -40)
@@ -88,13 +96,13 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
     .attr("transform", "rotate(-90)")
     .text("Hours Per Day");
 
-    // X ticks
+    // X ticks, map the age to the horizontal position of the scatter plot
     const x1 = d3.scaleLinear()
     .domain([0, d3.max(rawData, d => d.Age)])
     .range([0, scatterWidth]);
 
-    const xAxisCall = d3.axisBottom(x1)
-                        .ticks(7);
+    //create x axis
+    const xAxisCall = d3.axisBottom(x1).ticks(7);
     g1.append("g")
     .attr("transform", `translate(0, ${scatterHeight})`)
     .call(xAxisCall)
@@ -104,17 +112,17 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
         .attr("text-anchor", "end")
         .attr("transform", "rotate(-40)");
 
-    // Y ticks
+    // Y ticks(map the hours to the vertical position of the scatter plot)
     const y1 = d3.scaleLinear()
     .domain([0, d3.max(rawData, d => d["Hours per day"])])
     .range([scatterHeight, 0]);
 
-    const yAxisCall = d3.axisLeft(y1)
-                        .ticks(13);
+    //create y axis
+    const yAxisCall = d3.axisLeft(y1).ticks(13);
     g1.append("g").call(yAxisCall);
 
 
-    // circles
+    // circles, for every data
     const circles = g1.selectAll("circle").data(rawData);
 
     circles.enter().append("circle")
@@ -124,22 +132,25 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
          .attr("fill", d => colorScale(d['Primary streaming service']))
          .attr("opacity", 0.7);
 
+         //get all streaming services, creating the legend
         const services_color = colorScale.domain();
 
     const legend = g1.append("g")
         .attr("transform", `translate(${scatterWidth - 100}, 0)`);
 
+        //every service get different color
     services_color.forEach((service, i) => {
         const legendRow = legend.append("g")
             .attr("transform", `translate(0, ${i * 15})`);
 
-
+        //color
         legendRow.append("rect")
             .attr("width", 10)
             .attr("height", 10)
             .attr("fill", colorScale(service))
             .attr("opacity", 0.7);
 
+            //text to explain each color
         legendRow.append("text")
             .attr("x", 20)
             .attr("y", 10)
@@ -155,6 +166,7 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
 
     //Bar Chart
 
+    //depend on different service, counting total hours using hours per day
     const hours = rawData.reduce((s, d) => {
         const service = d['Primary streaming service'];
         const hours = Number(d['Hours per day']);
@@ -162,14 +174,17 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
         return s;
     }, {});
 
+    //change the data to array
     const bar = Object.keys(hours).map((key) => ({ service: key, total_hours: hours[key] }));
     console.log("bar", bar);
 
+    //create bar chart group
     const g2 = svg.append("g")
                 .attr("width", teamWidth + teamMargin.left + teamMargin.right)
                 .attr("height", teamHeight + teamMargin.top + teamMargin.bottom)
                 .attr("transform", `translate(${teamMargin.left}, ${teamMargin.top})`);
     
+    //title for bar chart, move it to the top of the graph
     g2.append("text")
     .attr("x", scatterWidth / 2)
     .attr("y", 5)
@@ -178,7 +193,7 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
     .text("Total Listening Hours for each Streaming Service");
 
 
-    // X label
+    // X label(Primary Streaming Service)
     g2.append("text")
     .attr("x", teamWidth / 2)
     .attr("y", teamHeight + 50)
@@ -187,7 +202,7 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
     .text("Primary Streaming Service");
 
 
-    // Y label
+    // Y label(Total Hours)
     g2.append("text")
     .attr("x", -(teamHeight / 2))
     .attr("y", -40)
@@ -196,7 +211,7 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
     .attr("transform", "rotate(-90)")
     .text("Total Hours");
 
-    // X ticks
+    // X ticks(each service corresponds to a specific pillar position.)
     const x2 = d3.scaleBand()
     .domain(bar.map(d => d.service))
     .range([0, teamWidth])
@@ -213,7 +228,7 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
         .attr("text-anchor", "end")
         .attr("transform", "rotate(-40)");
 
-    // Y ticks
+    // Y ticks(Each total hour corresponds to a specific pillar position.)
     const y2 = d3.scaleLinear()
     .domain([0, d3.max(bar, d => d.total_hours)])
     .range([teamHeight, 0])
@@ -236,7 +251,8 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
 
     //Sankey diagram
 
-    
+    //read and store the data, use -> to seperate each part
+    //count the number for each node(age_service and service_genre)
     const graph_data = rawData.reduce((s, d) => {
         const age_service = d.ageGroup + " -> " + d["Primary streaming service"];
         const service_genre = d["Primary streaming service"] + " -> " + d["Fav genre"];
@@ -247,14 +263,16 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
         return s;
     }, {});
 
+    //nodes: age->service -> genre
     const graph = {
         nodes: [],
         links: []
     };
 
+    //check if the node is appeard before
     const node_info = {};
 
-
+    //push data into ndoe and links
     Object.keys(graph_data).forEach(function(key){
         const [sourceName, targetName] = key.split(" -> ");
 
@@ -278,16 +296,16 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
     
 
 
-
+    //create Sankey graph group, move it to the right place
     const g3 = svg.append("g")
             .attr("width", distrWidth + distrMargin.left + distrMargin.right)
             .attr("height", distrHeight + distrMargin.top + distrMargin.bottom)
             .attr("transform", `translate(${distrLeft + distrMargin.left}, ${distrTop + distrMargin.top})`);
-
+    //use different color for different services
       var sankeyColor = d3.scaleOrdinal(d3.schemeTableau10);
 
 
-    // X label
+    // add the title for the graph, at the bottom of graph
     g3.append("text")
     .attr("x", distrWidth / 2)
     .attr("y", distrHeight)
@@ -296,10 +314,10 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
     .text("Age Group -> Streaming Service -> Favorite Genre");
 
 
-    // Y label
+    // Y label(number of table)
     g3.append("text")
     .attr("x", -(distrHeight / 2))
-    .attr("y", -40)
+    .attr("y", -30)
     .attr("font-size", "15px")
     .attr("text-anchor", "middle")
     .attr("transform", "rotate(-90)")
@@ -308,18 +326,18 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
 
 
   
-
+// Set the sankey diagram properties
     var sankey = d3.sankey()
         .nodeWidth(10)
         .nodePadding(20)
         .size([distrWidth, distrHeight]);
-
+// Constructs a new Sankey generator with the default settings.
     sankey
         .nodes(graph.nodes)
         .links(graph.links)
         .layout(1);
 
-  
+   // add in the links
     var link = g3.append("g")
         .selectAll(".link")
         .data(graph.links)
@@ -337,11 +355,11 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
                     return colorScale(d.target.name);
                 }
             })
-            .style("stroke-opacity", 0.5)
+            .style("stroke-opacity", 0.7)
             .style("stroke-width", function(d) { return Math.max(1, d.dy); })
             .sort(function(a, b) { return b.dy - a.dy; });
 
-
+ // add in the nodes
      var node = g3.append("g")
         .selectAll(".node")
         .data(graph.nodes)
@@ -349,7 +367,7 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
         .attr("class", "node")
         .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
-
+  // add the rectangles for the nodes
     node.append("rect")
         .attr("height", function(d) { return d.dy; })
         .attr("width", sankey.nodeWidth())
@@ -357,19 +375,6 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData =>{
         .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
         .append("title")
             .text(function(d) { return d.name + "\n" + d.value + " people"; });
-
-
-
-    node.append("text")
-        .attr("x", -6)
-        .attr("y", function(d) { return d.dy / 2; })
-        .attr("dy", ".35em")
-        .attr("text-anchor", "end")
-        .attr("font-size", "10px")
-        .text(function(d) { return d.name; })
-        .filter(function(d) { return d.x < distrWidth / 2; })
-            .attr("x", 6 + sankey.nodeWidth())
-            .attr("text-anchor", "start");
 
 
     
