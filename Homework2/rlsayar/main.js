@@ -43,7 +43,8 @@ const activeTypes = new Set(ALL_TYPES); // shared type filter across all views
 let scatterMode = 'all';   // 'all' | 'type' | 'kmeans'
 let pcpMode     = 'all';   // 'all' | 'type' | 'kmeans'
 let pokemonData = [];
-const updaters  = { bar: null, scatter: null, pcp: null };
+const updaters  = { bar: null, scatter: null, radar: null };
+let radarMode = 'type'; // 'type' | 'kmeans' | 'all'
 
 // ── Global type toggle ────────────────────────────────────────
 // Toggles a type in activeTypes and propagates to every chart updater.
@@ -57,7 +58,7 @@ function toggleType(type, itemG) {
   }
   if (updaters.bar)     updaters.bar();
   if (updaters.scatter) updaters.scatter();
-  if (updaters.pcp)     updaters.pcp();
+  if (updaters.radar)   updaters.radar();
 }
 
 // ── Mode switches ─────────────────────────────────────────────
@@ -71,13 +72,13 @@ function setScatterMode(mode) {
   drawScatter(pokemonData);
 }
 
-function setPCPMode(mode) {
-  pcpMode = mode;
-  document.querySelectorAll('#pcp-controls .toggle-btn').forEach(btn => {
+function setRadarMode(mode) {
+  radarMode = mode;
+  document.querySelectorAll('#radar-controls .toggle-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.mode === mode);
   });
-  document.getElementById('pcp-chart').innerHTML = '';
-  drawPCP(pokemonData);
+  document.getElementById('radar-chart').innerHTML = '';
+  drawRadar(pokemonData);
 }
 
 // ── K-Means clustering ────────────────────────────────────────
@@ -144,11 +145,11 @@ function kMeans(data, k, maxIter = 80) {
 function redrawAll() {
   document.getElementById('bar-chart').innerHTML    = '';
   document.getElementById('scatter-plot').innerHTML = '';
-  document.getElementById('pcp-chart').innerHTML    = '';
+  document.getElementById('radar-chart').innerHTML  = '';
   d3.selectAll('.tooltip').remove();
   drawBarChart(pokemonData);
   drawScatter(pokemonData);
-  drawPCP(pokemonData);
+  drawRadar(pokemonData);
 }
 
 d3.csv('data/pokemon.csv', r => ({
@@ -476,211 +477,179 @@ function drawScatter(data) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// View 3 — Parallel Coordinates  (Advanced Focus)
+// View 3 — Radar / Rose Chart  (Advanced Focus)
 //
-// Three modes (toggled by buttons above the panel):
-//   'all'    — one semi-transparent line per Pokémon, color = type
-//   'type'   — one thick line per type showing average stats
-//   'kmeans' — five thick lines showing k-means cluster centroids
+// Three modes toggled by buttons above the panel:
+//   'type'   — one filled polygon per primary type showing avg stats
+//   'kmeans' — five cluster centroid polygons from k-means
+//   'all'    — one semi-transparent polygon per Pokémon (hover to identify)
 // ─────────────────────────────────────────────────────────────
-function drawPCP(data) {
-  const { w: W, h: H } = dims('pcp-chart');
-  const m  = { top: 36, right: 18, bottom: 55, left: 22 };
-  const iW = W - m.left - m.right;
-  const iH = H - m.top  - m.bottom;
+function drawRadar(data) {
+  const { w: W, h: H } = dims('radar-chart');
+  if (!W || !H) return;
 
   const tip = d3.select('.tooltip');
 
-  const svg = d3.select('#pcp-chart').append('svg').attr('width', W).attr('height', H);
+  // Leave room on right for the type legend
+  const m  = { top: 24, right: 152, bottom: 20, left: 16 };
+  const iW = W - m.left - m.right;
+  const iH = H - m.top  - m.bottom;
+  const cx = iW / 2;
+  const cy = iH / 2;
+  const R  = Math.min(iW, iH) * 0.40;
+
+  const svg = d3.select('#radar-chart').append('svg').attr('width', W).attr('height', H);
   const g   = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
 
-  // Stat dimensions (named statDims to avoid shadowing the global dims() helper)
-  const statDims = [
-    { key: 'hp',      label: 'HP'      },
-    { key: 'attack',  label: 'Attack'  },
-    { key: 'spAtk',   label: 'Sp.Atk'  },
-    { key: 'defense', label: 'Defense' },
-    { key: 'spDef',   label: 'Sp.Def'  },
-    { key: 'speed',   label: 'Speed'   }
-  ];
+  const N    = STAT_KEYS.length;
+  const step = (2 * Math.PI) / N;
 
-  // X scale: evenly spaces the six axes
-  const xPos = d3.scalePoint()
-    .domain(statDims.map(d => d.key)).range([0, iW]);
+  // Radial scale: stat value → pixel radius (capped at 160)
+  const rScale = d3.scaleLinear().domain([0, 160]).range([0, R]).clamp(true);
 
-  // Shared Y scale across all axes so heights are directly comparable
-  const globalMax = d3.max(data, d =>
-    Math.max(d.hp, d.attack, d.spAtk, d.defense, d.spDef, d.speed)
-  );
-  const yOf = {};
-  statDims.forEach(dim => {
-    yOf[dim.key] = d3.scaleLinear().domain([0, globalMax]).range([iH, 0]);
+  // Concentric reference rings at 40 / 80 / 120 / 160
+  [40, 80, 120, 160].forEach(val => {
+    g.append('circle').attr('cx', cx).attr('cy', cy).attr('r', rScale(val))
+      .attr('fill', 'none').attr('stroke', '#eee').attr('stroke-width', 1);
+    g.append('text').attr('x', cx + 3).attr('y', cy - rScale(val) - 2)
+      .attr('fill', '#bbb').attr('font-size', '8px').text(val);
   });
 
-  // Converts a stat profile into a polyline path across all axes
-  const linePath = d3.line();
-  function profilePath(d) {
-    return linePath(statDims.map(dim => [xPos(dim.key), yOf[dim.key](d[dim.key])]));
-  }
+  // Axis spokes and stat labels
+  STAT_KEYS.forEach((key, i) => {
+    const angle = step * i - Math.PI / 2;
+    const x2 = cx + R * Math.cos(angle);
+    const y2 = cy + R * Math.sin(angle);
+    g.append('line').attr('x1', cx).attr('y1', cy).attr('x2', x2).attr('y2', y2)
+      .attr('stroke', '#ddd').attr('stroke-width', 1);
+    const lr = R * 1.18;
+    g.append('text')
+      .attr('x', cx + lr * Math.cos(angle))
+      .attr('y', cy + lr * Math.sin(angle))
+      .attr('text-anchor', Math.cos(angle) > 0.3 ? 'start' : Math.cos(angle) < -0.3 ? 'end' : 'middle')
+      .attr('dominant-baseline', Math.sin(angle) > 0.3 ? 'hanging' : Math.sin(angle) < -0.3 ? 'auto' : 'middle')
+      .attr('fill', '#333').attr('font-size', '11px').attr('font-weight', '600')
+      .text(STAT_LABELS[i]);
+  });
 
-  // ── Mode: All Pokémon ─────────────────────────────────────
-  if (pcpMode === 'all') {
-    // Semi-transparent lines — overlapping density reveals type patterns
-    const lines = g.selectAll('.pcp-line').data(data).join('path')
-      .attr('class', 'pcp-line')
-      .attr('d', profilePath)
-      .attr('fill', 'none')
-      .attr('stroke', d => typeColor(d.type1))
-      .attr('stroke-width', 0.9).attr('opacity', 0.20)
-      .attr('display', d => activeTypes.has(d.type1) ? null : 'none')
-      .on('mouseover', function(event, d) {
-        d3.select(this).raise().attr('stroke-width', 2.8).attr('opacity', 1);
-        tip.transition().duration(80).style('opacity', 0.95);
-        tip.html(
-          `<strong>${d.name}</strong>` +
-          `&ensp;<span style="color:${typeColor(d.type1)}">${d.type1}` +
-          `${d.type2 ? ' / ' + d.type2 : ''}</span><br>` +
-          `HP&nbsp;${d.hp}&ensp;·&ensp;ATK&nbsp;${d.attack}&ensp;·&ensp;DEF&nbsp;${d.defense}<br>` +
-          `SpA&nbsp;${d.spAtk}&ensp;·&ensp;SpD&nbsp;${d.spDef}&ensp;·&ensp;SPD&nbsp;${d.speed}`
-        )
-        .style('left', (event.pageX + 14) + 'px').style('top', (event.pageY - 36) + 'px');
-      })
-      .on('mousemove', event => {
-        tip.style('left', (event.pageX + 14) + 'px').style('top', (event.pageY - 36) + 'px');
-      })
-      .on('mouseout', function() {
-        d3.select(this).attr('stroke-width', 0.9).attr('opacity', 0.20);
-        tip.transition().duration(150).style('opacity', 0);
-      });
-
-    updaters.pcp = () => {
-      lines.attr('display', d => activeTypes.has(d.type1) ? null : 'none');
-    };
+  // Builds a closed SVG polygon path from a stat-profile object
+  function radarPath(profile) {
+    const pts = STAT_KEYS.map((key, i) => {
+      const angle = step * i - Math.PI / 2;
+      const r = rScale(profile[key] || 0);
+      return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+    });
+    return d3.line()(pts) + 'Z';
   }
 
   // ── Mode: Type Averages ───────────────────────────────────
-  if (pcpMode === 'type') {
-    // Compute average stats per primary type
+  if (radarMode === 'type') {
     const typeAvgs = Array.from(
       d3.rollup(data, v => ({
-        type:  v[0].type1,
-        count: v.length,
+        type: v[0].type1, count: v.length,
         ...Object.fromEntries(STAT_KEYS.map(k => [k, d3.mean(v, d => d[k])]))
-      }), d => d.type1),
-      ([, avg]) => avg
+      }), d => d.type1), ([, avg]) => avg
     );
 
-    // One thick line per type, filterable by the global type filter
-    const typeLines = g.selectAll('.type-line').data(typeAvgs).join('path')
-      .attr('class', 'type-line')
-      .attr('d', profilePath)
-      .attr('fill', 'none')
-      .attr('stroke', d => typeColor(d.type))
-      .attr('stroke-width', 2).attr('opacity', 0.80)
+    const polys = g.selectAll('.radar-polygon').data(typeAvgs).join('path')
+      .attr('class', 'radar-polygon')
+      .attr('d', d => radarPath(d))
+      .attr('fill', d => typeColor(d.type)).attr('fill-opacity', 0.12)
+      .attr('stroke', d => typeColor(d.type)).attr('stroke-width', 1.5)
       .attr('display', d => activeTypes.has(d.type) ? null : 'none')
       .on('mouseover', function(event, d) {
-        d3.select(this).raise().attr('stroke-width', 4).attr('opacity', 1);
+        d3.select(this).raise().attr('fill-opacity', 0.40).attr('stroke-width', 2.8);
         tip.transition().duration(80).style('opacity', 0.95);
         tip.html(
-          `<strong style="color:${typeColor(d.type)}">${d.type} (avg)</strong>` +
-          `&ensp;${d.count} Pokémon<br>` +
+          `<strong style="color:${typeColor(d.type)}">${d.type} (avg)</strong>&ensp;${d.count} Pokémon<br>` +
           STAT_KEYS.map((k, j) => `${STAT_LABELS[j]}: <b>${d[k].toFixed(1)}</b>`).join('&ensp;·&ensp;')
-        )
-        .style('left', (event.pageX + 14) + 'px').style('top', (event.pageY - 36) + 'px');
+        ).style('left', (event.pageX + 14) + 'px').style('top', (event.pageY - 36) + 'px');
       })
-      .on('mousemove', event => {
-        tip.style('left', (event.pageX + 14) + 'px').style('top', (event.pageY - 36) + 'px');
-      })
+      .on('mousemove', event => { tip.style('left', (event.pageX+14)+'px').style('top',(event.pageY-36)+'px'); })
       .on('mouseout', function() {
-        d3.select(this).attr('stroke-width', 2).attr('opacity', 0.80);
+        d3.select(this).attr('fill-opacity', 0.12).attr('stroke-width', 1.5);
         tip.transition().duration(150).style('opacity', 0);
       });
 
-    updaters.pcp = () => {
-      typeLines.attr('display', d => activeTypes.has(d.type) ? null : 'none');
-    };
+    updaters.radar = () => { polys.attr('display', d => activeTypes.has(d.type) ? null : 'none'); };
   }
 
   // ── Mode: K-Means Clusters ────────────────────────────────
-  if (pcpMode === 'kmeans') {
-    // Five cluster centroid profiles as thick distinct lines
+  if (radarMode === 'kmeans') {
     const { centroids } = kMeans(data, 5);
 
-    g.selectAll('.cluster-line').data(centroids).join('path')
-      .attr('class', 'cluster-line')
-      .attr('d', profilePath)
-      .attr('fill', 'none')
-      .attr('stroke', (_, i) => CLUSTER_COLORS[i])
-      .attr('stroke-width', 3).attr('opacity', 0.85)
+    g.selectAll('.cluster-polygon').data(centroids).join('path')
+      .attr('class', 'cluster-polygon')
+      .attr('d', d => radarPath(d))
+      .attr('fill', (_, i) => CLUSTER_COLORS[i]).attr('fill-opacity', 0.13)
+      .attr('stroke', (_, i) => CLUSTER_COLORS[i]).attr('stroke-width', 2)
       .on('mouseover', function(event, d) {
         const i = centroids.indexOf(d);
-        d3.select(this).raise().attr('stroke-width', 5).attr('opacity', 1);
+        d3.select(this).raise().attr('fill-opacity', 0.38).attr('stroke-width', 3);
         tip.transition().duration(80).style('opacity', 0.95);
         tip.html(
-          `<strong style="color:${CLUSTER_COLORS[i]}">${d.name}</strong>` +
-          `&ensp;(${d.count} Pokémon)<br>` +
-          `Top types: ${d.topTypes.map(({ t, n }) => `${t} (${n})`).join(', ')}<br>` +
-          STAT_KEYS.map((k, j) => `${STAT_LABELS[j]}: <b>${d[k].toFixed(1)}</b>`).join('&ensp;·&ensp;')
-        )
-        .style('left', (event.pageX + 14) + 'px').style('top', (event.pageY - 36) + 'px');
+          `<strong style="color:${CLUSTER_COLORS[i]}">${d.name}</strong>&ensp;(${d.count} Pokémon)<br>` +
+          `Top types: ${d.topTypes.map(({t,n})=>`${t}(${n})`).join(', ')}<br>` +
+          STAT_KEYS.map((k,j)=>`${STAT_LABELS[j]}: <b>${d[k].toFixed(1)}</b>`).join('&ensp;·&ensp;')
+        ).style('left', (event.pageX+14)+'px').style('top',(event.pageY-36)+'px');
       })
-      .on('mousemove', event => {
-        tip.style('left', (event.pageX + 14) + 'px').style('top', (event.pageY - 36) + 'px');
-      })
+      .on('mousemove', event => { tip.style('left',(event.pageX+14)+'px').style('top',(event.pageY-36)+'px'); })
       .on('mouseout', function() {
-        d3.select(this).attr('stroke-width', 3).attr('opacity', 0.85);
+        d3.select(this).attr('fill-opacity', 0.13).attr('stroke-width', 2);
         tip.transition().duration(150).style('opacity', 0);
       });
 
-    // Cluster legend at the bottom
-    const clLeg = g.append('g').attr('transform', `translate(0,${iH + 16})`);
+    // Cluster color legend at top-right
+    const clLeg = g.append('g').attr('transform', `translate(${iW + 16}, 0)`);
+    clLeg.append('text').attr('y', -4).attr('fill','#555').attr('font-size','11px').attr('font-weight','600').text('Clusters');
     centroids.forEach((c, i) => {
-      const rowG = clLeg.append('g').attr('transform', `translate(${i * (iW / 5)},0)`);
-      rowG.append('line').attr('x1', 0).attr('y1', 5).attr('x2', 18).attr('y2', 5)
-        .attr('stroke', CLUSTER_COLORS[i]).attr('stroke-width', 3);
-      rowG.append('text').attr('x', 22).attr('y', 5)
-        .attr('fill', '#222').attr('font-size', '9px').attr('font-weight', '600')
-        .attr('dominant-baseline', 'middle').text(c.name);
-      rowG.append('text').attr('x', 22).attr('y', 17)
-        .attr('fill', '#888').attr('font-size', '8px').text(`${c.count} Pokémon`);
+      const rg = clLeg.append('g').attr('transform', `translate(0,${i*32+8})`);
+      rg.append('rect').attr('width',10).attr('height',10).attr('rx',2).attr('fill',CLUSTER_COLORS[i]);
+      rg.append('text').attr('x',14).attr('y',9).attr('fill','#222').attr('font-size','10px').text(c.name);
+      rg.append('text').attr('x',14).attr('y',20).attr('fill','#888').attr('font-size','9px').text(`${c.count} Pokémon`);
     });
 
-    // K-Means clusters cross types — not filtered by activeTypes
-    updaters.pcp = () => {};
+    updaters.radar = () => {};
   }
 
-  // ── Vertical axes (all modes) ─────────────────────────────
-  statDims.forEach(dim => {
-    const axG = g.append('g').attr('class', 'pcp-axis')
-      .attr('transform', `translate(${xPos(dim.key)},0)`);
-    axG.call(d3.axisLeft(yOf[dim.key]).ticks(4).tickSize(3))
-      .call(a => a.select('.domain').attr('stroke', '#bbb'))
-      .call(a => a.selectAll('.tick line').attr('stroke', '#bbb'))
-      .call(a => a.selectAll('text').attr('fill', '#555').attr('font-size', '9px'));
-    axG.append('text').attr('class', 'dim-label')
-      .attr('y', -14).attr('text-anchor', 'middle')
-      .attr('fill', '#222').attr('font-size', '12px').attr('font-weight', '600')
-      .text(dim.label);
+  // ── Mode: Individual Pokémon ──────────────────────────────
+  if (radarMode === 'all') {
+    // All Pokémon as semi-transparent polygons; hover to identify one
+    const polys = g.selectAll('.ind-polygon').data(data).join('path')
+      .attr('class', 'ind-polygon')
+      .attr('d', d => radarPath(d))
+      .attr('fill', d => typeColor(d.type1)).attr('fill-opacity', 0.04)
+      .attr('stroke', d => typeColor(d.type1)).attr('stroke-width', 0.5).attr('opacity', 0.3)
+      .attr('display', d => activeTypes.has(d.type1) ? null : 'none')
+      .on('mouseover', function(event, d) {
+        d3.select(this).raise().attr('fill-opacity', 0.5).attr('stroke-width', 2.5).attr('opacity', 1);
+        tip.transition().duration(80).style('opacity', 0.95);
+        tip.html(
+          `<strong>${d.name}</strong>&ensp;<span style="color:${typeColor(d.type1)}">${d.type1}${d.type2?' / '+d.type2:''}</span><br>` +
+          STAT_KEYS.map((k,j)=>`${STAT_LABELS[j]}: <b>${d[k]}</b>`).join('&ensp;·&ensp;')
+        ).style('left',(event.pageX+14)+'px').style('top',(event.pageY-36)+'px');
+      })
+      .on('mousemove', event => { tip.style('left',(event.pageX+14)+'px').style('top',(event.pageY-36)+'px'); })
+      .on('mouseout', function() {
+        d3.select(this).attr('fill-opacity',0.04).attr('stroke-width',0.5).attr('opacity',0.3);
+        tip.transition().duration(150).style('opacity', 0);
+      });
+
+    updaters.radar = () => { polys.attr('display', d => activeTypes.has(d.type1) ? null : 'none'); };
+  }
+
+  // ── Type legend (right side, always shown) ────────────────
+  const legOffY = radarMode === 'kmeans' ? 5 * 32 + 22 : 0;
+  const legG = g.append('g').attr('transform', `translate(${iW + 16}, ${legOffY})`);
+  legG.append('text').attr('y', -4).attr('fill','#555').attr('font-size','11px').attr('font-weight','600')
+    .text('Type (click to filter)');
+  ALL_TYPES.forEach((type, i) => {
+    const col = Math.floor(i / 9), row = i % 9;
+    const itemG = legG.append('g')
+      .attr('class', `legend-item${activeTypes.has(type) ? '' : ' inactive'}`)
+      .attr('transform', `translate(${col * 68}, ${row * 14 + 8})`);
+    itemG.append('circle').attr('r',5).attr('cx',5).attr('fill',typeColor(type)).attr('opacity',0.9);
+    itemG.append('text').attr('x',13).attr('dy','0.35em').attr('fill','#333').attr('font-size','10px').text(type);
+    itemG.on('click', () => toggleType(type, itemG));
   });
-
-  // ── Type color legend at bottom (hidden in k-means mode) ─
-  if (pcpMode !== 'kmeans') {
-    const legCols  = 9;
-    const legItemW = iW / legCols;
-    const legG = g.append('g').attr('transform', `translate(0,${iH + 16})`);
-    legG.append('text')
-      .attr('x', iW / 2).attr('y', -5)
-      .attr('text-anchor', 'middle').attr('fill', '#777').attr('font-size', '10px')
-      .text('Line color = Primary Type');
-    ALL_TYPES.forEach((type, i) => {
-      const col = i % legCols;
-      const row = Math.floor(i / legCols);
-      const entG = legG.append('g')
-        .attr('transform', `translate(${col * legItemW + 2},${row * 14 + 2})`);
-      entG.append('rect').attr('width', 10).attr('height', 10).attr('rx', 2)
-        .attr('fill', typeColor(type));
-      entG.append('text').attr('x', 13).attr('y', 9)
-        .attr('fill', '#444').attr('font-size', '9px').text(type);
-    });
-  }
 }
