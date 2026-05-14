@@ -7,10 +7,10 @@
 	<title>Dashboard-nsen</title>
 </head>
 <body style="width:100%;height:100%;margin: 0;">
-	<svg id="pie-svg" width="100%" height="100%">
+	<!-- <svg id="sankey-svg" width="100%" height="100%">
 
-	</svg>
-	<!-- <div class="parent">
+	</svg> -->
+	<div class="parent">
 		<div class="bar inline-block-child">
 			<h1>Percentage Response with Depression</h1>
 			<svg id="bar-svg" width="100%" height="100%" overflow="visible"></svg>
@@ -20,9 +20,14 @@
 			<h1>Percentage Response with Depression</h1>
 			<svg id="pie-svg" width="100%" height="100%" overflow="visible"></svg>
 		</div>
-	</div> -->
+	</div>
+	<div class="sankey">
+		<h1>Percentage Response with Depression</h1>
+		<svg id="sankey-svg" width="100%" height="100%" overflow="visible"></svg>
+	</div>
 
 	<script src="https://d3js.org/d3.v6.min.js"></script>
+	<script src="https://unpkg.com/d3-sankey@0"></script>
 	<script src="main.js"></script>
 	<script>
 

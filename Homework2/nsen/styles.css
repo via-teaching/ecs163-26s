@@ -1,21 +1,33 @@
 .pie {
   /* Equal to: translateX(10px) or translate(10px, 0) */
-  transform: translate(50px);
+  position: absolute;
+	/* display: flex; */
+  /* justify-content: center; */
+  /* align-items: center; */
+	/* transform: translateX(50%); */
 	background-color: blue;
 }
 
 .bar {
   /* Equal to: translateX(10px) or translate(10px, 0) */
-  transform: translate(20);
+  /* transform: translate(20px); */
   background-color: pink;
 }
 
+.sankey {
+	background-color: red;
+	box-sizing: border-box;
+	width: 50%;
+	transform: translate(50%, 80px);
+}
+
 .inline-block-child {
+	width: 50%;
   display: inline-block;
+	/* padding: 1rem; */
+	box-sizing: border-box;
 }
 .parent {
   background: mediumpurple;
   padding: 1rem;
 }
-
-
