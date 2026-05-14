@@ -49,8 +49,8 @@
 
              </div>
 
-             <div v-show="activeTab === 4" class="page_Y">
-                <div class="frame_Y">
+             <div v-show="activeTab === 4" class="page_bar">
+                <div :class="['frame_bar', 'graph_bar']">
                     
                 </div>
 
@@ -128,8 +128,9 @@
 
     
 	<script type="module">
-        import {draw_sankey} from "./sankey.js"
-        import {draw_multilines} from "./multilines.js"
+        import {draw_sankey} from "./sankey.js";
+        import {draw_multilines} from "./multilines.js";
+        import {draw_bar} from "./bar.js";
         const {createApp} = Vue
         createApp({
             data(){
@@ -137,7 +138,7 @@
                     r: ["frame_focus", "frame_r1", "frame_r2"],
                     activeTab: 1,
                     menu: [{id: 1, name: "Overview", page: "overview.js"}, {id: 2, name: "SankeyGraph", page: "./sankey.js"}, {id: 3, name: "multilines", page: "./multilines.js"}, {id: 4, name: "Y", page: ""}],
-                    graphs: ["graph_sankey", "graph_multilines", "graph_Y"]
+                    graphs: ["graph_sankey", "graph_multilines", "graph_bar"]
                 }
             },
             computed:{
@@ -163,6 +164,7 @@
                 drawPage(){
                     draw_sankey();
                     draw_multilines();
+                    draw_bar();
                 }
             }
         }).mount('#app')
