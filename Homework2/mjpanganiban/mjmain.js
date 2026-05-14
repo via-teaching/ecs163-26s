@@ -1,14 +1,13 @@
-const windoww = window.innerWidth;
-const windowh = window.innerHeight; 
-
-const margin = { top: 70, right: 40, bottom: 70, left: 175 }
+const margin = { top: 70, right: 70, bottom: 70, left: 175 };
 const width = 600 - margin.right - margin.left;
+const windoww = window.innerWidth - margin.left - margin.right;
+const windowh = window.innerHeight; 
 const height = 400 - margin.top - margin.bottom;
 const radius = Math.min(width, height) / 2 - margin;
-const pieWidth = 600 - margin.left - margin.right; 
-const pieHeight = 600 - margin.top - margin.bottom; 
-const chordw = 500;
-const chordh = 500;
+const pieWidth = 600 - margin.left - margin.right;
+const pieHeight = 600 - margin.top - margin.bottom;
+const chordw = 600 - margin.left - margin.right;
+const chordh = 600 - margin.top - margin.bottom;
 const inrad = 140;
 const outrad = 150;
 
@@ -18,37 +17,120 @@ d3.csv("pokemon.csv").then(rawData => {
     rawData.forEach(function (d) {
         d.Attack = Number(d.Attack);
         d.Sp_Atk = Number(d.Sp_Atk);
+        d.HP = Number(d.HP);
     });
+
+    //bar chart 
+    const svg = d3.select("#mjpangan").append("svg")
+        .attr("width", windoww + margin.right + margin.left)
+        .attr("height", height + margin.bottom + 25)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + 40 + ")");
+
+    const avg_atk = d3.nest()
+        .key(function (d) { return d.Type_1; })
+        .rollup(function (values) {
+            return d3.mean(values, function (d) {
+                return d.Attack;
+            });
+        })
+        .entries(rawData);
+
+    avg_atk.sort((a, b) => d3.descending(a.value, b.value));
+
+    const x = d3.scaleLinear()
+        .range([0, windoww - 80])
+        .domain([0, d3.max(avg_atk, function (d) { return d.value })]);
+
+    const y = d3.scaleBand()
+        .range([height, 0])
+        .padding(0.1)
+        .domain(avg_atk.map(function (d) { return d.key }));
+
+    const xAxis = d3.axisBottom(x)
+    const yAxis = d3.axisLeft(y)
+
+    svg.selectAll(".bar")
+        .data(avg_atk)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("y", function (d) { return y(d.key); })
+        .attr("height", y.bandwidth())
+        .attr("x", 0)
+        .attr("width", function (d) { return x(d.value); })
+        .style("fill", "skyblue")
+
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+
+    svg.append("g")
+        .call(yAxis)
+
+    svg.append('text')
+        .attr("x", windoww / 2)
+        .attr("y", height + 50)
+        .attr("font-size", "15px")
+        .attr("text-anchor", "middle")
+        .text("Average Attack");
+
+    svg.append("text")
+        .attr("x", -(width / 3))
+        .attr("y", -70)
+        .attr("font-size", "15px")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .text("Pokemon Type");
+
+    svg.append('text')
+        .attr("x", (windoww / 2))
+        .attr("y", -20)
+        .attr("font-size", "20px")
+        .attr("text-anchor", "middle")
+        .text("Pokemon Type Strength Overview: Average Attack");
+
+
 
     //donut chart 
     const svg1 = d3.select("#mjpangan").append("svg")
-        .attr("width", pieWidth + margin.right + 30)
-        .attr("height", pieHeight + margin.top - 50)
+        .attr("width", pieWidth + margin.right + 300)
+        .attr("height", pieHeight + margin.top)
         .append("g")
-        .attr("transform", "translate(" + pieWidth / 2 + "," + pieHeight / 2 + ")");
+        .attr("transform", "translate(" + 400 + "," + pieHeight / 2 + ")");
 
-    const f_data = rawData.filter(d => d.Type_1 === "Water");
-    const thresh = [20, 40, 80, 100, 120, 140, 160, 180];
+    const f_data = rawData.filter(d => d.Type_1 === "Psychic");
+    const d_data = rawData.filter(d => d.Type_1 === "Dragon");
+    const n_data = rawData.filter(d => d.Type_1 === "Normal");
+
+    const thresh = [30, 60, 90, 120, 150, 180, 210, 240, 270];
     const binbin = d3.histogram()
         .value(function (d) {
-            return d.Sp_Atk;
+            return d.HP;
         })
         .thresholds(thresh);
 
-    const binbins = binbin(f_data);
+    const fbins = binbin(f_data);
+    const dbins = binbin(d_data);
+    const nbins = binbin(n_data);
 
-    binbins.forEach(function (d) {
+    fbins.forEach(function (d) {
         d.label = d.x0 + "-" + (d.x1 - 1);
     });
-    console.log(binbins);
+    console.log(fbins);
+
+    dbins.forEach(function (d) {
+        d.label = d.x0 + "-" + (d.x1 - 1);
+    });
+
+    nbins.forEach(function (d) {
+        d.label = d.x0 + "-" + (d.x1 - 1);
+    });
+    console.log(dbins);
 
     const color = d3.scaleOrdinal()
-        .domain(binbins.map(d => d.label))
-        .range(["#05fcaa", "#05b6fc", "#1105fc", "#8505fc", "#47fc05", "#fc05be", "#fc0547"]);
-
-    const pie = d3.pie()
-        .value(d => d.length);
-    const data = pie(binbins);
+        .domain(thresh)
+        .range(d3.schemePaired);
 
     const parc = d3.arc()
         .innerRadius(50)
@@ -56,71 +138,125 @@ d3.csv("pokemon.csv").then(rawData => {
         .cornerRadius(10)
         .padAngle(0.01);
 
-    svg1.selectAll('path')
-        .data(pie(binbins))
-        .enter()
-        .append('path')
-        .attr('d', parc)
-        .attr('fill', function (d) { return color(d.data.label); })
-        .attr('stroke', 'white')
-        .attr('stroke-width', 1);
+    function update(data) {
+        svg1.selectAll('path').remove();
+        svg1.selectAll('.legend-item').remove();
+        svg1.selectAll('text').remove();
 
-    const legend = svg1.append("g")
-        .attr('transform', 'translate(0, 10)');
+        var pie = d3.pie()
+            .value(function (d) { return d.length; })
+            .sort(function (a, b) { console.log(a); return d3.ascending(a.key, b.key); });
+        //var data_ready = pie(data);
 
-    const legendb = legend.selectAll('.legend-item')
-        .data(pie(binbins))
-        .enter()
-        .append('g')
-        .attr('class', 'legend-item')
-        .attr('transform', function (d, i) {
-            return 'translate(200,' + (i * 22) + ')';
-        });
+        var u = svg1.selectAll('path')
+            .data(pie(data))
+            .enter()
+            .append('path')
+            .attr('d', parc)
+            .attr('fill', function (d) { return color(d.data.label); })
+            .attr('stroke', 'white')
+            .attr('stroke-width', 1);
 
-    legendb.append('rect')
-        .attr('width', 14)
-        .attr('height', 14)
-        .attr('fill', function (d) {
-            return color(d.data.label);
-        });
+        var legend = svg1.append("g")
+            .attr('transform', 'translate(0, 10)');
 
-    legendb.append('text')
-        .attr('x', 22)
-        .attr('y', 10)
-        .attr('font-size', '12px')
-        .attr('fill', 'black')
-        .text(function (d) {
-            return d.data.label;
-        });
+        var legendb = legend.selectAll('.legend-item')
+            .data(pie(data))
+            .enter()
+            .append('g')
+            .attr('class', 'legend-item')
+            .attr('transform', function (d, i) {
+                return 'translate(200,' + (i * 22) + ')';
+            });
 
-    svg1.append('text')
-        .attr('x', 200)
-        .attr('y', -10)
-        .attr('font-size', '12px')
-        .attr('fill', 'black')
-        .text("Legend:")
+        legendb.append('rect')
+            .attr('width', 14)
+            .attr('height', 14)
+            .attr('fill', function (d) {
+                return color(d.data.label);
+            });
 
-    svg1.append('text')
-        .attr("x", 0)
-        .attr("y", - 180)
-        .attr("font-size", "20px")
-        .attr("text-anchor", "middle")
-        .text("Water Special Attack distrbution");
+        legendb.append('text')
+            .attr('x', 22)
+            .attr('y', 10)
+            .attr('font-size', '12px')
+            .attr('fill', 'black')
+            .text(function (d) {
+                return d.data.label;
+            });
+
+        svg1.append('text')
+            .attr('x', 200)
+            .attr('y', -10)
+            .attr('font-size', '12px')
+            .attr('fill', 'black')
+            .text("Legend:")
+
+        if (data === fbins) {
+            svg1.append('text')
+                .attr("x", 0)
+                .attr("y", - 180)
+                .attr("font-size", "20px")
+                .attr("text-anchor", "middle")
+                .text("Psychic Type: HP Distrbution");
+        }
+        if (data === dbins) {
+            svg1.append('text')
+                .attr("x", 0)
+                .attr("y", - 180)
+                .attr("font-size", "20px")
+                .attr("text-anchor", "middle")
+                .text("Dragon Type: HP Distrbution");
+        }
+        if (data === nbins) {
+            svg1.append('text')
+                .attr("x", 0)
+                .attr("y", - 180)
+                .attr("font-size", "20px")
+                .attr("text-anchor", "middle")
+                .text("Normal Type: HP Distrbution");
+        }
+
+
+
+    }
+    update(fbins);
+
+    d3.select("#dragonbutton")
+        .style('position', 'absolute')
+        .style('left', '500px')
+        .style('top', '760px');
+    d3.select("#psybutton")
+        .style('position', 'absolute')
+        .style('left', '165px')
+        .style('top', '760px');
+    d3.select("#normalbutton")
+        .style('position', 'absolute')
+        .style('left', '320px')
+        .style('top', '760px');
+
+    d3.select("#dragonbutton").on('click', function () {
+        update(dbins);
+    });
+    d3.select("#psybutton").on('click', function () {
+        update(fbins);
+    });
+    d3.select("#normalbutton").on('click', function () {
+        update(nbins);
+    });
+
+
+
+
 
 
     //chord diagram
-    const typedata = rawData.map(function (d) {
+    const filt = rawData.filter(function(d) { return d.Type_2 && d.Type_2.trim() !== ""; });
+    const typedata = filt.map(function (d) {
 
-        let t;
-        if (d.Type_2 && d.Type_2.trim() !== "") {
-            t = d.Type_2;
-        }
-        else {
-            t = "No Type 2";
-        }
         return {
             t1: d.Type_1,
-            t2: t
+            t2: d.Type_2,
         };
     });
     console.log('typedata', typedata);
@@ -164,10 +300,10 @@ d3.csv("pokemon.csv").then(rawData => {
         .range(d3.schemeTableau10);
 
     const svg2 = d3.select("#mjpangan").append("svg")
-        .attr("width", chordw)
-        .attr("height", chordh)
+        .attr("width", chordw + margin.left + margin.right)
+        .attr("height", chordh + 55)
         .append("g")
-        .attr("transform", "translate(" + chordw / 2 + "," + chordh / 2 + ")");
+        .attr("transform", "translate(" + 350 + "," + chordh / 2 + ")");
 
     const chords = chord(t1and2);
 
@@ -190,7 +326,7 @@ d3.csv("pokemon.csv").then(rawData => {
         .attr('fill', d => ccolor(types[d.source.index]))
         .attr('stroke', d => d3.rgb(ccolor(types[d.source.index])).darker());
 
-    const lrad = outrad + 30;
+    const lrad = outrad + 20;
     group.append('text')
         .each(d => {
             d.angle = (d.startAngle + d.endAngle) / 2;
@@ -208,90 +344,17 @@ d3.csv("pokemon.csv").then(rawData => {
         .style('font-size', '12px')
         .style('fill', 'black')
         .text(d => types[d.index]);
-    
+
     svg2.append('text')
         .attr("x", 0)
-        .attr("y", -205)
+        .attr("y", -195)
         .attr("font-size", "20px")
         .attr("text-anchor", "middle")
-        .text("Intersection of Pokemon Types");
+        .text("Intersection of Pokemon Types (Excluding No Type 2)");
 
-    
-//bar chart 
-    const svg = d3.select("#mjpangan").append("svg")
-        .attr("width", width + margin.right + 70)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", "translate(" + 100 + "," + 40 + ")"); 
+}); 
 
-    const avg_atk = d3.nest()
-        .key(function (d) { return d.Type_1; })
-        .rollup(function (values) {
-            return d3.mean(values, function (d) {
-                return d.Attack;
-            });
-        })
-        .entries(rawData); 
-
-    avg_atk.sort((a,b) => d3.descending(a.value, b.value));
-    
-    const x = d3.scaleLinear()
-        .range([0, width])
-        .domain([0, d3.max(avg_atk, function (d) { return d.value })]);
-
-    const y = d3.scaleBand()
-        .range([height, 0])
-        .padding(0.1)
-        .domain(avg_atk.map(function (d) { return d.key }));
-
-    const xAxis = d3.axisBottom(x)
-    const yAxis = d3.axisLeft(y)
-
-    svg.selectAll(".bar")
-        .data(avg_atk)
-        .enter().append("rect")
-        .attr("class", "bar")
-        .attr("y", function (d) { return y(d.key); })
-        .attr("height", y.bandwidth())
-        .attr("x", 0)
-        .attr("width", function (d) { return x(d.value); })
-        .style("fill", "skyblue")
-
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
-
-    svg.append("g")
-        .call(yAxis)
-
-    svg.append('text')
-        .attr("x", width / 2)
-        .attr("y", height + 50)
-        .attr("font-size", "15px")
-        .attr("text-anchor", "middle")
-        .text("Average Attack");
-
-    svg.append("text")
-        .attr("x", -(width / 3))
-        .attr("y", -70)
-        .attr("font-size", "15px")
-        .attr("text-anchor", "middle")
-        .attr("transform", "rotate(-90)")
-        .text("Type");
-
-    svg.append('text')
-        .attr("x", (width / 2))
-        .attr("y", -20)
-        .attr("font-size", "20px")
-        .attr("text-anchor", "middle")
-        .text("Average Attack by Pokemon Type");
-
-    
-    
-    
-
-
-});
+//I used Youtube Videos, D3.js Graph Gallery, and ChatGPT to help with my code 
+//used to help learn how to code different graphs, add the buttons, and fix errors 
 
 
