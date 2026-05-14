@@ -478,10 +478,19 @@ d3.csv("mxmh_survey_results.csv").then((rawData) => {
     .append("text")
     .attr("anchor", "middle")
     .attr("x", 0)
-    .attr("y", -10)
+    .attr("y", -20)
     .text("Favorite Genre")
     .style("font-family", "Arial")
     .style("font-size", 12);
+
+  const legendSubtext = legend
+    .append("text")
+    .attr("anchor", "middle")
+    .attr("x", 0)
+    .attr("y", -8)
+    .text("(HOVER TO HIGHLIGHT)")
+    .style("font-family", "Arial")
+    .style("font-size", 10);
 
   const legendItem = legend
     .selectAll(".legend-item")
