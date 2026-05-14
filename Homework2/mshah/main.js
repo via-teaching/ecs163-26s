@@ -176,11 +176,9 @@ function drawAlluvial(data) {
 
   const total  = valid.length;
   const NODE_W = 10;
-  const PAD    = 3; // px gap between adjacent node bars
+  const PAD    = 3; // gap between adjacent node bars
 
-  // ── Proportional node layout ──────────────────────────────
-  // Each node bar height = (its count / total) * available height
-  function layoutNodes(keys, countMap) {
+  function layoutNodes(keys, countMap) {  // each node bar height calculated
     const usableH = iH - PAD * (keys.length - 1);
     let y = 0;
     return keys.map(k => {
@@ -191,8 +189,7 @@ function drawAlluvial(data) {
     });
   }
 
-  // Count totals for each node column
-  const genreTotal  = d3.rollup(valid, v => v.length, d => d.genre);
+  const genreTotal  = d3.rollup(valid, v => v.length, d => d.genre);  // Count totals for each node column
   const bucketTotal = d3.rollup(valid, v => v.length, d => hoursBucket(d.hours));
   const effectTotal = d3.rollup(valid, v => v.length, d => d.effect);
 
@@ -200,56 +197,44 @@ function drawAlluvial(data) {
   const bucketNodes = layoutNodes(HOUR_ORDER,   bucketTotal);
   const effectNodes = layoutNodes(EFFECT_ORDER, effectTotal);
 
-  // Node lookup maps
-  const gMap = new Map(genreNodes.map(n  => [n.key, n]));
+  const gMap = new Map(genreNodes.map(n  => [n.key, n]));  //node lookup
   const bMap = new Map(bucketNodes.map(n => [n.key, n]));
   const eMap = new Map(effectNodes.map(n => [n.key, n]));
 
-  // ── X positions of the three node columns ─────────────────
-  const xGenre  = 0;
+  const xGenre  = 0;  // x positions 
   const xBucket = iW / 2;
   const xEffect = iW;
 
-  // ── Cross-flow counts ────────────────────────────────────
-  // genre → bucket counts
-  const gbFlow = d3.rollup(valid, v => v.length,
+  const gbFlow = d3.rollup(valid, v => v.length, // cross flow bucket counts
     d => d.genre, d => hoursBucket(d.hours));
 
-  // bucket → effect counts
-  const beFlow = d3.rollup(valid, v => v.length,
+  const beFlow = d3.rollup(valid, v => v.length,  // hours to effeects count
     d => hoursBucket(d.hours), d => d.effect);
 
-  // ── Cursor maps: where each ribbon starts on a node ──────
-  // (ribbons stack downward as we iterate)
   const curGenreR  = new Map(genres.map(k       => [k, gMap.get(k).y0]));
   const curBucketL = new Map(HOUR_ORDER.map(k   => [k, bMap.get(k).y0]));
   const curBucketR = new Map(HOUR_ORDER.map(k   => [k, bMap.get(k).y0]));
   const curEffectL = new Map(EFFECT_ORDER.map(k => [k, eMap.get(k).y0]));
 
-  // Height scale: pixels per respondent
-  const hFactor = (iH - PAD * (Math.max(genres.length, HOUR_ORDER.length) - 1)) / total;
+  const hFactor = (iH - PAD * (Math.max(genres.length, HOUR_ORDER.length) - 1)) / total;  // height pixels per respondent
 
-  // ── Genre → Bucket ribbons (monochromatic blue) ───────────
   genres.forEach(genre => {
     const bucketMap = gbFlow.get(genre) || new Map();
 
-    HOUR_ORDER.forEach(bucket => {
+    HOUR_ORDER.forEach(bucket => {  //genre to hours
       const count = bucketMap.get(bucket) || 0;
       if (!count) return;
 
       const h = count * hFactor;
 
-      // Source: right edge of genre node, advance cursor downward
       const sy0 = curGenreR.get(genre);
       const sy1 = sy0 + h;
       curGenreR.set(genre, sy1);
 
-      // Target: left edge of bucket node, advance cursor downward
       const ty0 = curBucketL.get(bucket);
       const ty1 = ty0 + h;
       curBucketL.set(bucket, ty1);
 
-      // Draw cubic bezier ribbon, colored by genre (blue shades)
       g.append("path")
         .attr("d", ribbon(xGenre + NODE_W, sy0, sy1, xBucket, ty0, ty1))
         .attr("fill", genreColor(genre))
@@ -262,8 +247,7 @@ function drawAlluvial(data) {
     });
   });
 
-  // ── Bucket → Effect ribbons (effect outcome colors) ──────
-  HOUR_ORDER.forEach(bucket => {
+  HOUR_ORDER.forEach(bucket => {  //bucket to effect
     const effectMap = beFlow.get(bucket) || new Map();
 
     EFFECT_ORDER.forEach(effect => {
@@ -280,7 +264,6 @@ function drawAlluvial(data) {
       const ty1 = ty0 + h;
       curEffectL.set(effect, ty1);
 
-      // Draw cubic bezier ribbon, colored by effect outcome
       g.append("path")
         .attr("d", ribbon(xBucket + NODE_W, sy0, sy1, xEffect, ty0, ty1))
         .attr("fill", EFFECT_COLOR[effect])
@@ -293,25 +276,21 @@ function drawAlluvial(data) {
     });
   });
 
-  // ── Genre nodes (left column) ─────────────────────────────
-  genreNodes.forEach(n => {
+  genreNodes.forEach(n => {  //genre nodes
     g.append("rect")
       .attr("x", xGenre).attr("y", n.y0)
       .attr("width", NODE_W)
       .attr("height", Math.max(n.y1 - n.y0, 1))
       .attr("fill", genreColor(n.key)).attr("rx", 2);
 
-    // Genre label to the left
-    g.append("text")
+    g.append("text")  // label genre nodes
       .attr("x", xGenre - 4).attr("y", (n.y0 + n.y1) / 2)
       .attr("text-anchor", "end").attr("dominant-baseline", "middle")
       .attr("font-size", 8.5).attr("fill", "#555")
       .attr("font-family", "Arial, sans-serif")
       .text(n.key);
   });
-
-  // ── Bucket nodes (middle column) ──────────────────────────
-  bucketNodes.forEach(n => {
+  bucketNodes.forEach(n => {  //bucket nodes
     const h = Math.max(n.y1 - n.y0, 1);
 
     g.append("rect")
@@ -319,8 +298,7 @@ function drawAlluvial(data) {
       .attr("width", NODE_W).attr("height", h)
       .attr("fill", "#888").attr("rx", 2);
 
-    // Label inside the node if tall enough
-    if (h > 10) {
+    if (h > 10) {  // label bucket nodes
       g.append("text")
         .attr("x", xBucket + NODE_W / 2).attr("y", (n.y0 + n.y1) / 2)
         .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
@@ -329,9 +307,7 @@ function drawAlluvial(data) {
         .text(n.key);
     }
   });
-
-  // ── Effect nodes (right column) ───────────────────────────
-  effectNodes.forEach(n => {
+  effectNodes.forEach(n => {  //effect nodes
     const h = Math.max(n.y1 - n.y0, 1);
 
     g.append("rect")
@@ -339,8 +315,7 @@ function drawAlluvial(data) {
       .attr("width", NODE_W).attr("height", h)
       .attr("fill", EFFECT_COLOR[n.key]).attr("rx", 2);
 
-    // Effect label to the right
-    g.append("text")
+    g.append("text")  // label effect nodes
       .attr("x", xEffect + NODE_W + 5).attr("y", (n.y0 + n.y1) / 2)
       .attr("text-anchor", "start").attr("dominant-baseline", "middle")
       .attr("font-size", 9.5).attr("fill", EFFECT_COLOR[n.key])
@@ -348,9 +323,8 @@ function drawAlluvial(data) {
       .text(n.key);
   });
 
-  // ── Column header labels ──────────────────────────────────
   [
-    { label: "GENRE",        x: xGenre  + NODE_W / 2 },
+    { label: "GENRE",        x: xGenre  + NODE_W / 2 },  //header labels
     { label: "DAILY HOURS",  x: xBucket + NODE_W / 2 },
     { label: "MUSIC EFFECT", x: xEffect + NODE_W / 2 },
   ].forEach(({ label, x }) => {
@@ -362,52 +336,33 @@ function drawAlluvial(data) {
       .attr("letter-spacing", "0.07em")
       .text(label);
   });
-
-  // ── Alluvial legend ───────────────────────────────────────
-  // Show what blue shades mean and what effect colors mean
-  const lx = iW + 14;
-  const lg = g.append("g").attr("transform", `translate(${lx}, 0)`);
 }
-
-// ── Cubic bezier ribbon path helper ──────────────────────────
-// Draws a filled band flowing from (x0, sy0→sy1) to (x1, ty0→ty1)
 function ribbon(x0, sy0, sy1, x1, ty0, ty1) {
   const mx = (x0 + x1) / 2;
   return `M${x0},${sy0} C${mx},${sy0} ${mx},${ty0} ${x1},${ty0}
           L${x1},${ty1} C${mx},${ty1} ${mx},${sy1} ${x0},${sy1} Z`;
 }
 
-// =============================================================
-//  VIEW 3 – SCATTER PLOT  (focus)
-//  X: hours of music listened per day
-//  Y: self-reported anxiety score (0–10)
-//  Single color dots — the focus is the relationship, not genre.
-//  SVG is rendered at 60% of the container width, centered,
-//  so white space is equal on left and right.
-// =============================================================
+//  VIEW 3: Scatter Plot (Hours of Music Listened Per Day vs. Anxiety Score)
 function drawScatter(data) {
   const container = document.getElementById("scatter-area");
   const fullW = container.clientWidth;
   const H     = container.clientHeight;
 
-  // Render at 60% width, centered
-  const W      = fullW * 0.60;
+  const W      = fullW * 0.55;
   const offsetX = (fullW - W) / 2;
 
   const margin = { top: 14, right: 30, bottom: 44, left: 52 };
   const iW = W - margin.left - margin.right;
   const iH = H - margin.top  - margin.bottom;
 
-  // SVG spans full container width so the centering offset works cleanly
-  const svg = d3.select("#scatter-area").append("svg")
+  const svg = d3.select("#scatter-area").append("svg")  // span full container
     .attr("width", fullW).attr("height", H);
 
-  // Drawing group shifted right by offsetX + left margin
   const g = svg.append("g")
     .attr("transform", `translate(${offsetX + margin.left},${margin.top})`);
 
-  // ── Scales ───────────────────────────────────────────────
-  const xScale = d3.scaleLinear()
+  const xScale = d3.scaleLinear()  //scales
     .domain([0, d3.max(data, d => d.hours) + 0.5])
     .range([0, iW]);
 
@@ -415,8 +370,7 @@ function drawScatter(data) {
     .domain([0, 10])
     .range([iH, 0]);
 
-  // ── Grid lines ────────────────────────────────────────────
-  g.append("g").attr("class", "grid")
+  g.append("g").attr("class", "grid")  //grid lines
     .call(d3.axisLeft(yScale).tickSize(-iW).tickFormat(""))
     .call(ax => ax.select(".domain").remove());
 
@@ -425,8 +379,7 @@ function drawScatter(data) {
     .call(d3.axisBottom(xScale).tickSize(-iH).tickFormat(""))
     .call(ax => ax.select(".domain").remove());
 
-  // ── Axes ─────────────────────────────────────────────────
-  g.append("g").attr("class", "axis")
+  g.append("g").attr("class", "axis")  //axes
     .attr("transform", `translate(0,${iH})`)
     .call(d3.axisBottom(xScale).ticks(10))
     .call(ax => ax.select(".domain").remove());
@@ -435,8 +388,7 @@ function drawScatter(data) {
     .call(d3.axisLeft(yScale).ticks(5))
     .call(ax => ax.select(".domain").remove());
 
-  // ── Axis labels ──────────────────────────────────────────
-  g.append("text").attr("class", "axis-label")
+  g.append("text").attr("class", "axis-label")  //axis labels
     .attr("x", iW / 2).attr("y", iH + 36)
     .attr("text-anchor", "middle")
     .text("Hours of Music Listened Per Day");
@@ -447,9 +399,7 @@ function drawScatter(data) {
     .attr("text-anchor", "middle")
     .text("Anxiety Score (0–10)");
 
-  // ── Scatter dots ─────────────────────────────────────────
-  // Small jitter on both axes to prevent overplotting on integer scores
-  g.selectAll(".dot")
+  g.selectAll(".dot")  // scatter plots and prevent over plotting
     .data(data)
     .join("circle")
       .attr("class", "dot")
@@ -471,10 +421,7 @@ function drawScatter(data) {
          Depression: ${d.depression}`, event))
       .on("mouseout", hideTip);
 
-  // ── Linear regression trend line ─────────────────────────
-  // Helps readers see whether more listening hours correlate
-  // with higher or lower anxiety scores across the dataset
-  const n     = data.length;
+  const n     = data.length;  //trend line
   const sumX  = d3.sum(data, d => d.hours);
   const sumY  = d3.sum(data, d => d.anxiety);
   const sumXY = d3.sum(data, d => d.hours * d.anxiety);
@@ -493,13 +440,11 @@ function drawScatter(data) {
     .attr("stroke-width", 1.8)
     .attr("stroke-dasharray", "5,3");
 
-  // ── Legend ───────────────────────────────────────────────
-  const lx = iW - 140;
+  const lx = iW - 140;  //legend
   const ly = 4;
   const lg = g.append("g").attr("transform", `translate(${lx},${ly})`);
 
-  // Dot item
-  lg.append("circle")
+  lg.append("circle")  //dots color and placement
     .attr("cx", 6).attr("cy", 6).attr("r", 3.5)
     .attr("fill", "#992685").attr("fill-opacity", 0.55);
   lg.append("text")
@@ -508,8 +453,7 @@ function drawScatter(data) {
     .attr("font-family", "Arial, sans-serif")
     .text("Survey respondent");
 
-  // Trend line item
-  lg.append("line")
+  lg.append("line")  //trend line red thing
     .attr("x1", 0).attr("x2", 14).attr("y1", 22).attr("y2", 22)
     .attr("stroke", "#FF0000").attr("stroke-width", 1.8)
     .attr("stroke-dasharray", "5,3");
