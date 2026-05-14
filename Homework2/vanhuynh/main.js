@@ -35,7 +35,7 @@ d3.csv("data/mxmh_survey_results.csv").then(rawData => {
         instrumentalist: d["Instrumentalist"],
         composer: d["Composer"],
         exploratory: d["Exploratory"]
-    })).filter(d => d.age < 100 && d.hours <= 24); // Remove extreme outliers
+    })).filter(d => d.age < 100 && d.hours <= 24);
 
     updateDashboard();
 });
