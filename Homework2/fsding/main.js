@@ -45,7 +45,8 @@ let distrMargin = {top: 10, right: 30, bottom: 30, left: 60},
         ["Generation 3", "#35ab64"],
         ["Generation 4", "#ffcfff"],
         ["Generation 5", "grey"],
-        ["Generation 6", "#2f27a1"]
+        ["Generation 6", "#2f27a1"],
+        ["None", "#9697b5"]
     ]);
 
 // plots
@@ -282,10 +283,17 @@ d3.csv("pokemon.csv").then(rawData =>{
     gensByType.forEach(p => {
         p.forEach(q => {
             //nodes.push({"name":q.Type_2});
+            if(q.Type_2.length > 0){
             nodesList.push(q.Type_2);
             links3.push({"source": "Generation " + q.Generation,
                         "target":q.Type_2,
                         "value": q.count})
+            } else {
+            nodesList.push("None");
+            links3.push({"source": "Generation " + q.Generation,
+                        "target":"None",
+                        "value": q.count})
+            }
         });
     });
 
