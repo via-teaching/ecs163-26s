@@ -1,3 +1,13 @@
+/*
+    DISCLOSURE:
+    Generative AI was used to create the initial template, to debug and fix errors, and to find appropriate libraries and functions.
+    Gen AI was used alongside manual correction and additions to turn the template into a final product. All decisions regarding chart type,
+    layout, information explored, and certain color schemes was made by the human author. Gen AI was given specific instructions to execute
+    for writing code, and was not allowed to make independent decisions regarding code.
+
+    All code was reviewed manually before submission. Comments were either modified or manually created.
+*/
+
 // Global variables to store data and areas
 let globalWorldData, globalRawData;
 let mapArea, pieArea, sankeyArea;
@@ -8,7 +18,7 @@ const formatComma = d3.format(",");
 
 // Data processing function
 function dataProcessor(d) {
-    // Anonymous function to calculate kill counts
+    // Logic to calculate kill counts
     const nkill = d.nkill ? +d.nkill : 0;
 
     // Sort kill counts into bins for the Sankey graph
@@ -315,7 +325,7 @@ function drawSankey(data) {
     g.append("text").attr("class", "chart-title").attr("x", sankeyArea.w / 2).attr("y", 0)
         .text("Attack Lifecycle: Method → Outcome → Fatalities");
 
-    // Text for successful vs unsuccessful nodes
+    // Rectangles for successful vs unsuccessful nodes
     node.append("rect")
         .attr("x", d => d.x0)
         .attr("y", d => d.y0)
