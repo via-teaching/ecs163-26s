@@ -2,35 +2,17 @@ let abFilter = 25;
 const width = window.innerWidth;
 const height = window.innerHeight;
 
-//d3 = require("d3@7", "d3-sankey@0.12");
 
-/**
- * let scatterLeft = 0, scatterTop = 0;
-let scatterMargin = {top: 10, right: 30, bottom: 30, left: 60},
-    scatterWidth = 400 - scatterMargin.left - scatterMargin.right,
-    scatterHeight = 350 - scatterMargin.top - scatterMargin.bottom;
-
-let distrLeft = 400, distrTop = 0;
-let distrMargin = {top: 10, right: 30, bottom: 30, left: 60},
-    distrWidth = 400 - distrMargin.left - distrMargin.right,
-    distrHeight = 350 - distrMargin.top - distrMargin.bottom;
-
+//bar graph
 let teamLeft = 0, teamTop = 400;
-let teamMargin = {top: 10, right: 30, bottom: 30, left: 60},
-    teamWidth = width - teamMargin.left - teamMargin.right,
-    teamHeight = height-450 - teamMargin.top - teamMargin.bottom;
- */
-
-
-
-let teamLeft = 0, teamTop = 0;
 let teamMargin = {top: 50, right: 30, bottom: 30, left: 60},
-    teamWidth = 400 - teamMargin.left - teamMargin.right,
+    teamWidth = width/2 - teamMargin.left - teamMargin.right,
     teamHeight = 400 - teamMargin.top - teamMargin.bottom;
 
-let scatterLeft = 0, scatterTop = teamHeight;
-let scatterMargin = {top: 100, right: 30, bottom: 30, left: 60},
-    scatterWidth = 400 - scatterMargin.left - scatterMargin.right,
+    //scatterplot
+let scatterLeft = teamWidth, scatterTop = 400;
+let scatterMargin = {top: 100, right: 30, bottom: 30, left: 120},
+    scatterWidth = width/2 - scatterMargin.left - scatterMargin.right,
     scatterHeight = 400 - scatterMargin.top - scatterMargin.bottom;
 
 //let distrLeft = scatterMargin.width, distrTop = teamHeight;
@@ -74,16 +56,16 @@ d3.csv("pokemon.csv").then(rawData =>{
     const g1 = svg.append("g")
                 .attr("width", scatterWidth + scatterMargin.left + scatterMargin.right)
                 .attr("height", scatterHeight + scatterMargin.top + scatterMargin.bottom)
-                .attr("transform", `translate(${scatterMargin.left}, ${scatterTop + scatterMargin.top})`);
+                .attr("transform", `translate(${scatterLeft + scatterMargin.left}, ${scatterTop + scatterMargin.top})`);
 
     
                 // X label
     g1.append("text")
     .attr("x", scatterWidth / 2)
-    .attr("y", scatterTop)
+    .attr("y", scatterHeight + 80)
     .attr("font-size", "25px")
     .attr("text-anchor", "middle")
-    .text("Fig 2: HP vs Attack of Water Types");
+    .text("HP vs Attack of Water Types");
 
     g1.append("text")
     .attr("x", scatterWidth / 2)
@@ -171,7 +153,7 @@ d3.csv("pokemon.csv").then(rawData =>{
     .attr("y", teamHeight + 80)
     .attr("font-size", "25px")
     .attr("text-anchor", "middle")
-    .text("Fig 1: Distribution of All Pokemon Types");
+    .text("Overview: Distribution of All Pokemon Types");
 
 
     // Y label
@@ -224,7 +206,12 @@ d3.csv("pokemon.csv").then(rawData =>{
     .attr("x", d => x2(d.Type_1))
     .attr("width", x2.bandwidth())
     .attr("height", d => teamHeight - y2(d.count))
-    .attr("fill", "steelblue");
+   // .attr("fill", "steelblue");
+    .attr("fill", function(d) { 
+          if(d.Type_1 === "Water"){
+            return "steelblue"
+          }
+		  return "grey" });
 
 
 
@@ -306,10 +293,14 @@ d3.csv("pokemon.csv").then(rawData =>{
                 .attr("height", distrHeight + distrMargin.top + distrMargin.bottom)
                 .attr("transform", `translate(${distrLeft}, ${distrTop})`);
  
+// Credit to d3noob for this D3 Sankey example https://gist.github.com/d3noob/06e72deea99e7b4859841f305f63ba85
 
         sankey = d3.sankey()
       .nodes(nodes3)
       .links(links)
+      .nodeWidth(36)
+      .nodePadding(1)
+      .size([distrWidth, distrHeight])
       .layout(32);
 
 var path = sankey.link();
@@ -317,7 +308,15 @@ var formatNumber = d3.format(",.0f"),    // zero decimal places
     format = function(d) { return formatNumber(d) + " " + units; },
     color = d3.scaleOrdinal(d3.schemeCategory10);
 
-var units = "Widgets";
+var units = "Pokemon";
+
+
+ g2.append("text")
+    .attr("x", distrWidth / 2)
+    .attr("y", distrHeight + 30)
+    .attr("font-size", "25px")
+    .attr("text-anchor", "middle")
+    .text("Water types across generations and their secondary types");
 
   // add in the links
   var link = g2.append("g").selectAll(".link")
@@ -352,9 +351,10 @@ var units = "Widgets";
 
   // add the rectangles for the nodes
   node.append("rect")
-      .attr("height", function(d) { return d.dy; })
+      .attr("height", function(d) { return d.dy; }) 
       .attr("width", sankey.nodeWidth())
       .style("fill", function(d) { 
+
 		  return d.color = color(d.name.replace(/ .*/, "")); })
       .style("stroke", function(d) { 
 		  return d3.rgb(d.color).darker(2); })

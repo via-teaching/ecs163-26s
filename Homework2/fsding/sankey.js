@@ -1,3 +1,5 @@
+// Credit to d3noob for this D3 example https://gist.github.com/d3noob/06e72deea99e7b4859841f305f63ba85
+
 d3.sankey = function() {
   var sankey = {},
       nodeWidth = 24,

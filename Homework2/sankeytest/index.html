@@ -73,8 +73,6 @@ d3.csv("sankey.csv", function(error, data) {
                        "value": +d.value });
    });
 
-    console.log("nodes", graph.nodes);
-    console.log("links", graph.links);
 
   // return only the distinct / unique nodes
   graph.nodes = d3.keys(d3.nest()
@@ -98,6 +96,9 @@ d3.csv("sankey.csv", function(error, data) {
       .links(graph.links)
       .layout(32);
 
+
+    console.log("nodes", graph.nodes);
+    console.log("links", graph.links);
   // add in the links
   var link = svg.append("g").selectAll(".link")
       .data(graph.links)
