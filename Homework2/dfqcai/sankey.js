@@ -17,6 +17,8 @@ export function draw_sankey(){
         const accept_jobs = new Set();
         const company_loc_counts = [];
         const accept_company_locs = new Set();
+        accept_jobs.add("Other");
+        accept_company_locs.add("other");
         rawData.forEach(d => {
             const target_job = job_counts.find(node => node["name"] === d[DJobTitle]);
             const target_company_loc = company_loc_counts.find(node => node["name"] === d[DCompanyLoc]);
@@ -55,7 +57,7 @@ export function draw_sankey(){
             return{
                 "job_title": !accept_jobs.has(d[DJobTitle]) ? "Other" : d[DJobTitle],
                 "salary_in_usd": d[DSalary] = Number(d[DSalary]),
-                "company_location": !accept_company_locs.has(d[DCompanyLoc]) ? "Other" : d[DCompanyLoc]
+                "company_location": !accept_company_locs.has(d[DCompanyLoc]) ? "other" : d[DCompanyLoc]
             }
         });
 
@@ -161,27 +163,116 @@ export function draw_sankey(){
         window.addEventListener("resize", show_chart);
 
         function show_chart(){
+
             // Graph draw
             d3.selectAll('.graph_sankey').selectAll("*").remove();
             const rect = document.querySelector('.graph_sankey').getBoundingClientRect();
-            const svg = d3.selectAll('.graph_sankey').append('svg').attr('width', rect.width).attr('height', rect.height);
-            const sankey_generator = d3.sankey().nodeWidth(20).nodePadding(10).extent([[0,0], [rect.width, rect.height]]);
+            const width = rect.width;
+            const height = rect.height;
+    
+            const margin = {top: 20, bottom: 0, left: 140, right: 70};
+    
+            const innerWidth = width - margin.right;
+            const innerHeight = height - margin.top - margin.bottom;
+            const svg = d3.selectAll('.graph_sankey').append('svg').attr('width', width).attr('height', height);
+            const sankey_generator = d3.sankey().nodeWidth(20).nodePadding(10).extent([[width > 500 ? margin.left : 0, margin.top], [innerWidth, innerHeight]]);
             const path_generator = d3.sankeyLinkHorizontal();
             const graph_data = sankey_generator({nodes, links});
-            console.log("graph_data", graph_data);
+            console.log("graph_data", graph_data);           
 
             const color = d3.scaleOrdinal(d3.schemeTableau10);
 
-            const rectangle = svg.append("g").selectAll("rect").data(graph_data.nodes).enter().append("rect").attr("x", d => d.x0).attr("y", d => d.y0).attr("width", d => d.x1 - d.x0).attr("height", d => d.y1 - d.y0).attr("fill", d => color(d["name"]));
+            const rectangle = svg.append("g")
+            .selectAll("rect")
+            .data(graph_data.nodes)
+            .enter()
+            .append("rect")
+            .attr("x", d => d.x0)
+            .attr("y", d => d.y0)
+            .attr("width", d => d.x1 - d.x0)
+            .attr("height", d => d.y1 - d.y0)
+            .attr("fill", d => color(d["name"]));
 
-            const path = svg.append("g").attr("fill", "none").attr("stroke", "gray").attr("stroke-opacity", 0.4).selectAll("path").data(graph_data.links).enter().append("path").attr("d", path_generator).attr("stroke-width", d => Math.max(1, d.width));
+            const path = svg.append("g")
+            .attr("fill", "none")
+            .attr("stroke", "gray")
+            .attr("stroke-opacity", 0.4)
+            .selectAll("path")
+            .data(graph_data.links)
+            .enter()
+            .append("path")
+            .attr("d", path_generator)
+            .attr("stroke-width", d => Math.max(1, d.width));
 
             path.on("mouseenter", function(event, d) {
-                d3.select(this).transition().duration(200).attr("stroke", "black").attr("stroke-opacity", 0.8);
+                d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("stroke", "black")
+                .attr("stroke-opacity", 0.8);
+
+                d3.select(this)
+                .append("title")
+                .text(d => `source: ${d["source"]["name"]}\ntarget: ${d["target"]["name"]}\nnumber of employees: ${d["value"]}`)
             });
             path.on("mouseleave", function(event, d) {
-                d3.select(this).transition().duration(200).attr("stroke", "gray").attr("stroke-opacity", 0.4);
+                d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("stroke", "gray")
+                .attr("stroke-opacity", 0.4);
             });
+
+            graph_data["nodes"].forEach(d => {
+                if(accept_jobs.has(d["name"])){
+                    svg.append("text")
+                    .attr("x", d["x0"])
+                    .attr("y", (d["y1"] + d["y0"]) / 2)
+                    .text(d["name"])
+                    .attr("text-anchor", "end")
+                }
+                if(accept_company_locs.has(d["name"])){
+                    svg.append("text")
+                    .attr("x", d["x1"])
+                    .attr("y", (d["y1"] + d["y0"]) / 2)
+                    .text(d["name"])
+                    .attr("text-anchor", "start")
+                }
+            });
+
+            // config legend
+            // locate legend
+            const legend = svg.append("g")
+            .attr("transform", `translate(${width - margin.right + 4}, ${margin.top})`);
+
+            // print legend shape
+            legend.selectAll("line")
+            .data(graph_data.nodes.filter(cell => Number.isFinite(cell["name"])))
+            .join("line")
+            .attr("stroke-width", 2)
+            .attr("stroke", d => color(d["name"]))
+            .attr("fill", "none")
+            .attr("x1", 0)
+            .attr("x1", 10)
+            .attr("y1", (d, i) => i * 20 + 6)
+            .attr("y2", (d, i) => i * 20 + 6)
+            .style("cursor", "pointer");
+
+            // print description of legend
+            legend.selectAll("text")
+            .data(graph_data.nodes.filter(cell => Number.isFinite(cell["name"])))
+            .join("text")
+            .attr("x", 18)
+            .attr("y", (d, i) => i * 20 + 10)
+            .attr("font-size", 9)
+            .text(d => d["name"]);
+
+            svg.append("text")
+                .attr("x", innerWidth / 2)
+                .attr("y", margin.top / 2)
+                .attr("text-anchor", "middle")
+                .attr("font-size", 12)
+                .text("job, company location, salary sankey graph");
 
             return svg.node();
         }
