@@ -1,12 +1,6 @@
-// Load info from HTML imports
-const width = window.innerWidth;
-const height = window.innerHeight;
-const svg = d3.select("#main-svg");
-
-// Define display areas
-const mapArea = { x: 0, y: 0, w: width * 0.6, h: height * 0.5 };
-const pieArea = { x: width * 0.6, y: 0, w: width * 0.4, h: height * 0.5 };
-const sankeyArea = { x: 50, y: height * 0.55, w: width - 100, h: height * 0.4 };
+// Global variables to store data and areas
+let globalWorldData, globalRawData;
+let mapArea, pieArea, sankeyArea;
 
 // Code for tooltips
 const tooltip = d3.select("body").append("div").attr("class", "tooltip");
@@ -35,23 +29,49 @@ function dataProcessor(d) {
     };
 }
 
+const svg = d3.select("#main-svg");
+
 // Run data processing function and pass to functions
 Promise.all([
     d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"),
     d3.csv("data/globalterrorismdb_0718dist.csv", dataProcessor)
 ]).then(([worldData, rawData]) => {
-    drawMap(worldData, rawData);
-    drawSankey(rawData);
-    drawPieChart(rawData);
+    globalWorldData = worldData;
+    globalRawData = rawData;
+    renderAll();
 });
+
+// Resize listener
+window.addEventListener("resize", renderAll);
+
+function renderAll() {
+    // Clear previous elements
+    svg.selectAll("*").remove();
+
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    // Update display areas
+    const leftWidth = width * 0.45;
+    const rightWidth = width * 0.55;
+    mapArea = { x: 0, y: 0, w: leftWidth, h: height * 0.5 };
+    pieArea = { x: 0, y: height * 0.5, w: leftWidth, h: height * 0.5 };
+    sankeyArea = { x: leftWidth + 40, y: 60, w: rightWidth - 80, h: height - 120 };
+
+    if (globalWorldData && globalRawData) {
+        drawMap(globalWorldData, globalRawData);
+        drawSankey(globalRawData);
+        drawPieChart(globalRawData);
+    }
+}
 
 // Chart 1: World map of all attack locations
 function drawMap(world, data) {
-    const g = svg.append("g").attr("transform", `translate(${mapArea.x}, ${mapArea.y + 100})`);
+    const g = svg.append("g").attr("transform", `translate(${mapArea.x}, ${mapArea.y + 60})`);
 
     const projection = d3.geoNaturalEarth1()
-        .scale(mapArea.w / 7)
-        .translate([mapArea.w / 2, mapArea.h / 2]);
+        .scale(mapArea.w / 6)
+        .translate([mapArea.w / 2, mapArea.h / 2.5]);
 
     const path = d3.geoPath().projection(projection);
 
@@ -74,14 +94,22 @@ function drawMap(world, data) {
         .attr("opacity", 0.4);
 
     g.append("text").attr("class", "chart-title")
-        .attr("x", mapArea.w / 2).attr("y", -40).text("Global Incident Hotspots");
+        .attr("x", mapArea.w / 2).attr("y", -30).text("Global Incident Hotspots");
+
+    g.append("text")
+        .attr("x", mapArea.w / 2)
+        .attr("y", -10)
+        .attr("text-anchor", "middle")
+        .style("font-size", "12px")
+        .style("fill", "lightgray")
+        .text("Each red dot represents a single terrorist attack.");
 }
 
 // Chart 2: Pie chart showing regional deaths
 function drawPieChart(data) {
     const radius = Math.min(pieArea.w, pieArea.h) / 2.5;
     const g = svg.append("g")
-        .attr("transform", `translate(${pieArea.x + pieArea.w / 3}, ${pieArea.y + pieArea.h / 2 + 100})`);
+        .attr("transform", `translate(${pieArea.x + pieArea.w / 3}, ${pieArea.y + pieArea.h / 2 + 30})`);
 
     const aggregated = d3.rollups(data, v => d3.sum(v, d => d.nkill), d => d.region)
         .sort((a, b) => b[1] - a[1]);
@@ -153,7 +181,7 @@ function drawPieChart(data) {
 
     g.append("text")
         .attr("class", "chart-title")
-        .attr("y", -radius - 90)
+        .attr("y", -radius - 40)
         .text("Fatalities by Region");
 }
 
@@ -223,7 +251,7 @@ function drawSankey(data) {
         .attr("stroke-width", d => Math.max(1, d.width))
         .on("mouseover", function (event, d) {
             d3.select(this).style("stroke-opacity", 0.7);
-            
+
             const sourceName = d.source.name.includes(": ") ? `${d.source.name.split(": ")[1]} (${d.source.name.split(": ")[0]})` : d.source.name;
             const targetName = d.target.name.includes(": ") ? `${d.target.name.split(": ")[1]} (${d.target.name.split(": ")[0]})` : d.target.name;
 
@@ -246,7 +274,7 @@ function drawSankey(data) {
         .attr("class", "node")
         .on("mouseover", function (event, d) {
             d3.select(this).select("rect").style("opacity", 0.8);
-            
+
             // Clean up name for tooltip if it's a split outcome node
             let displayName = d.name;
             if (d.name.includes(": ")) {
