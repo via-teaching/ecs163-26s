@@ -21,6 +21,33 @@ let distrMargin = {top: 10, right: 30, bottom: 30, left: 60},
     distrWidth = width - distrMargin.left - distrMargin.right,
     distrHeight = height - 450 - distrMargin.top - distrMargin.bottom;
 
+  const nodeColorMap = new Map([
+        ["Normal", "grey"],
+        ["Bug", "olivedrab"],
+        ["Fire", "#ff7d19"],
+        ["Ice", "paleturquoise"],
+        ["Psychic", "lightcoral"],
+        ["Poison", "mediumorchid"],
+        ["Fighting", "#a52a2a"],
+        ["Electric", "gold"],
+        ["Fairy", "#f7a8dc"],
+        ["Rock", "burlywood"],
+        ["Ghost", "darkslateblue"],
+        ["Flying", "cornflowerblue"],
+        ["Ground", "#b56121"],
+        ["Dragon", "slateblue"],
+        ["Grass", "forestgreen"],
+        ["Dark", "#2b2424"],
+        ["Steel", "lightsteelblue"],
+        ["Water", "deepskyblue"],
+        ["Generation 1", "Crimson"],
+        ["Generation 2", "#b181e3"],
+        ["Generation 3", "#35ab64"],
+        ["Generation 4", "#ffcfff"],
+        ["Generation 5", "grey"],
+        ["Generation 6", "#2f27a1"]
+    ]);
+
 // plots
 d3.csv("pokemon.csv").then(rawData =>{
     console.log("rawData", rawData);
@@ -116,7 +143,7 @@ d3.csv("pokemon.csv").then(rawData =>{
          .attr("cx", d => x1(d.HP))
          .attr("cy", d => y1(d.Attack))
          .attr("r", 5)
-         .attr("fill", "#69b3a2");
+         .attr("fill", "deepskyblue");
 
 
 
@@ -206,12 +233,17 @@ d3.csv("pokemon.csv").then(rawData =>{
     .attr("x", d => x2(d.Type_1))
     .attr("width", x2.bandwidth())
     .attr("height", d => teamHeight - y2(d.count))
-   // .attr("fill", "steelblue");
+   // .attr("fill", "deepskyblue");
     .attr("fill", function(d) { 
-          if(d.Type_1 === "Water"){
-            return "steelblue"
-          }
-		  return "grey" });
+          //if(d.Type_1 === "Water"){
+           // return nodeColorMap.get(d.Type_1);
+       // } 
+        //return d3.rgb(nodeColorMap.get(d.Type_1)).darker(1); })
+		  return d.color = nodeColorMap.get(d.Type_1);})
+    .attr("stroke", function(d) { 
+        if(d.Type_1 === "Water"){
+            return "#0307fc";
+        } });
 
 
 
@@ -286,6 +318,7 @@ d3.csv("pokemon.csv").then(rawData =>{
     console.log("nodes", nodes3);
     console.log("links", links)
 
+  
    
 
     const g2 = svg.append("g")
@@ -309,6 +342,8 @@ var formatNumber = d3.format(",.0f"),    // zero decimal places
     color = d3.scaleOrdinal(d3.schemeCategory10);
 
 var units = "Pokemon";
+
+
 
 
  g2.append("text")
@@ -354,8 +389,8 @@ var units = "Pokemon";
       .attr("height", function(d) { return d.dy; }) 
       .attr("width", sankey.nodeWidth())
       .style("fill", function(d) { 
-
-		  return d.color = color(d.name.replace(/ .*/, "")); })
+          //color(d.name.replace(/ .*/, ""))
+		  return d.color = nodeColorMap.get(d.name);})
       .style("stroke", function(d) { 
 		  return d3.rgb(d.color).darker(2); })
     .append("title")
