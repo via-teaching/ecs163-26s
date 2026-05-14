@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokémon Stats Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- Dashboard header with title and subtitle -->
+    <header id="header">
+      <h1>Pokémon Stats Dashboard</h1>
+      <span id="subtitle">Type distribution · Attack vs Defense · Full stat profiles across all generations</span>
+    </header>
+
+    <!-- Three-panel grid: overview on top, two focus views on bottom -->
+    <div id="grid">
+
+      <!-- View 1 (Context / Overview): horizontal bar chart of type counts -->
+      <section id="view-overview" class="view">
+        <h2 class="view-title">Overview: Pokémon Count by Primary Type</h2>
+        <div id="bar-chart" class="chart"></div>
+      </section>
+
+      <!-- View 2 (Focus): Attack vs Defense — individual, type averages, or k-means -->
+      <section id="view-scatter" class="view">
+        <div class="view-header">
+          <h2 class="view-title">Focus: Attack vs. Defense</h2>
+          <div id="scatter-controls">
+            <button class="toggle-btn active" data-mode="all"    onclick="setScatterMode('all')">Individual Pokémon</button>
+            <button class="toggle-btn"        data-mode="type"   onclick="setScatterMode('type')">Type Averages</button>
+            <button class="toggle-btn"        data-mode="kmeans" onclick="setScatterMode('kmeans')">K-Means (k=5)</button>
+          </div>
+        </div>
+        <div id="scatter-plot" class="chart"></div>
+      </section>
+
+      <!-- View 3 (Advanced Focus): radar / rose chart — type averages, k-means, or individual -->
+      <section id="view-radar" class="view">
+        <div class="view-header">
+          <h2 class="view-title">Focus: Base Stat Profiles (Radar)</h2>
+          <div id="radar-controls">
+            <button class="toggle-btn active" data-mode="type"   onclick="setRadarMode('type')">Type Averages</button>
+            <button class="toggle-btn"        data-mode="kmeans" onclick="setRadarMode('kmeans')">K-Means (k=5)</button>
+            <button class="toggle-btn"        data-mode="all"    onclick="setRadarMode('all')">Individual Pokémon</button>
+          </div>
+        </div>
+        <div id="radar-chart" class="chart"></div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- D3.js v7 from CDN -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
