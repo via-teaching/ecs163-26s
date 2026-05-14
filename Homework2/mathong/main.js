@@ -37,6 +37,7 @@ function updateAll() {
 
   updateScatter();
   updateBarHighlight();
+  updateRadar();
 
   // show/hide the active filter badge in the header
   if (state.selectedType) {
@@ -335,6 +336,163 @@ function updateScatter() {
 }
 
 // -------------------------------------------------------------------
+// VIEW 3: Radar plot — average stat profile per type (advanced)
+// All 18 type polygons shown faintly when no filter is active.
+// Selecting a type highlights it and draws the overall average
+// as a reference shape so you can see how it compares.
+// -------------------------------------------------------------------
+
+const RADAR_DIMS   = ["HP", "Attack", "Defense", "Sp_Atk", "Sp_Def", "Speed"];
+const RADAR_LABELS = ["HP", "Atk", "Def", "Sp.Atk", "Sp.Def", "Spd"];
+
+let radarSvgG, radarRadius, radarCx, radarCy, radarScale, typeAverages, overallAvg;
+
+// compute average stats for every type and for all pokemon combined
+function computeAverages() {
+  const grouped = d3.group(state.data, d => d.Type_1);
+
+  typeAverages = {};
+  grouped.forEach((pokemon, type) => {
+    typeAverages[type] = {};
+    RADAR_DIMS.forEach(dim => {
+      typeAverages[type][dim] = d3.mean(pokemon, d => d[dim]);
+    });
+  });
+
+  overallAvg = {};
+  RADAR_DIMS.forEach(dim => {
+    overallAvg[dim] = d3.mean(state.data, d => d[dim]);
+  });
+}
+
+// converts a stats object into an array of [x, y] polygon points
+function radarPoints(stats) {
+  return RADAR_DIMS.map((dim, i) => {
+    const angle = (2 * Math.PI * i / RADAR_DIMS.length) - Math.PI / 2;
+    const r = radarScale(stats[dim]);
+    return [radarCx + r * Math.cos(angle), radarCy + r * Math.sin(angle)];
+  });
+}
+
+function drawRadar() {
+  const container = document.getElementById("chart-pcp");
+  const { width, height } = container.getBoundingClientRect();
+  const svgH = height - 28;
+
+  d3.select("#chart-pcp svg").remove();
+
+  const svg = d3.select("#chart-pcp")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", svgH);
+
+  radarSvgG = svg.append("g");
+
+  // center the radar in the panel, leaving room for axis labels
+  const padding = 44;
+  radarRadius = Math.min(width, svgH) / 2 - padding;
+  radarCx = width / 2;
+  radarCy = svgH / 2;
+
+  // single linear scale shared across all 6 axes (0 → global max stat)
+  const maxStat = d3.max(state.data, d => d3.max(RADAR_DIMS, dim => d[dim]));
+  radarScale = d3.scaleLinear().domain([0, maxStat]).range([0, radarRadius]);
+
+  // concentric circle grid lines at 25%, 50%, 75%, 100% of max
+  [0.25, 0.5, 0.75, 1].forEach(t => {
+    radarSvgG.append("circle")
+      .attr("cx", radarCx).attr("cy", radarCy)
+      .attr("r", radarRadius * t)
+      .attr("fill", "none")
+      .attr("stroke", "#2e3148")
+      .attr("stroke-dasharray", "3,3");
+  });
+
+  // one radial axis line per stat dimension
+  RADAR_DIMS.forEach((dim, i) => {
+    const angle = (2 * Math.PI * i / RADAR_DIMS.length) - Math.PI / 2;
+    const x2 = radarCx + radarRadius * Math.cos(angle);
+    const y2 = radarCy + radarRadius * Math.sin(angle);
+
+    // axis spoke
+    radarSvgG.append("line")
+      .attr("x1", radarCx).attr("y1", radarCy)
+      .attr("x2", x2).attr("y2", y2)
+      .attr("stroke", "#2e3148");
+
+    // label at the tip of each spoke, nudged outward past the circle
+    const labelR = radarRadius + 16;
+    radarSvgG.append("text")
+      .attr("x", radarCx + labelR * Math.cos(angle))
+      .attr("y", radarCy + labelR * Math.sin(angle))
+      .attr("text-anchor", "middle")
+      .attr("dominant-baseline", "middle")
+      .style("fill", "#e8eaf0")
+      .style("font-size", "11px")
+      .style("font-weight", "600")
+      .text(RADAR_LABELS[i]);
+  });
+
+  computeAverages();
+  updateRadar();
+}
+
+function updateRadar() {
+  if (!radarSvgG) return;
+
+  // remove previous polygons so we redraw cleanly on filter change
+  radarSvgG.selectAll("polygon.radar-type").remove();
+  radarSvgG.selectAll("polygon.radar-avg").remove();
+
+  if (state.selectedType) {
+    // faint polygons for all other types as context
+    Object.entries(typeAverages).forEach(([type, stats]) => {
+      if (type === state.selectedType) return;
+      radarSvgG.append("polygon")
+        .attr("class", "radar-type")
+        .attr("points", radarPoints(stats).join(" "))
+        .attr("fill", TYPE_COLORS[type] || "#888")
+        .attr("fill-opacity", 0.04)
+        .attr("stroke", TYPE_COLORS[type] || "#888")
+        .attr("stroke-opacity", 0.15)
+        .attr("stroke-width", 1);
+    });
+
+    // dashed overall-average polygon as a reference baseline
+    radarSvgG.append("polygon")
+      .attr("class", "radar-avg")
+      .attr("points", radarPoints(overallAvg).join(" "))
+      .attr("fill", "none")
+      .attr("stroke", "#7b7f9e")
+      .attr("stroke-width", 1.5)
+      .attr("stroke-dasharray", "4,3");
+
+    // highlighted polygon for the selected type
+    const selColor = TYPE_COLORS[state.selectedType] || "#888";
+    radarSvgG.append("polygon")
+      .attr("class", "radar-type")
+      .attr("points", radarPoints(typeAverages[state.selectedType]).join(" "))
+      .attr("fill", selColor)
+      .attr("fill-opacity", 0.25)
+      .attr("stroke", selColor)
+      .attr("stroke-width", 2.5);
+
+  } else {
+    // no filter — show all 18 types at low opacity
+    Object.entries(typeAverages).forEach(([type, stats]) => {
+      radarSvgG.append("polygon")
+        .attr("class", "radar-type")
+        .attr("points", radarPoints(stats).join(" "))
+        .attr("fill", TYPE_COLORS[type] || "#888")
+        .attr("fill-opacity", 0.08)
+        .attr("stroke", TYPE_COLORS[type] || "#888")
+        .attr("stroke-opacity", 0.5)
+        .attr("stroke-width", 1);
+    });
+  }
+}
+
+// -------------------------------------------------------------------
 // load data and kick off all views
 // -------------------------------------------------------------------
 
@@ -359,5 +517,6 @@ d3.csv("data/pokemon.csv").then(rawData => {
 
   drawBar();
   drawScatter();
+  drawRadar();
 
 }).catch(err => console.error("Failed to load pokemon.csv:", err));
