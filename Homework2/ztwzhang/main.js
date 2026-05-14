@@ -27,17 +27,20 @@ const tooltip = d3.select("#tooltip");
 let yearlyData = [];
 let countryYearData = [];
 let profileYearData = [];
+let worldGeo;
 let regionColor;
 
 Promise.all([
   d3.csv("gtd_summary_data/yearly_region.csv", parseYearly),
   d3.csv("gtd_summary_data/country_year.csv", parseCountryYear),
   d3.csv("gtd_summary_data/profile_year.csv", parseProfileYear),
-  d3.csv("gtd_summary_data/region_totals.csv", parseRegionTotal)
-]).then(([yearly, countryYear, profileYear, regionTotals]) => {
+  d3.csv("gtd_summary_data/region_totals.csv", parseRegionTotal),
+  d3.json("gtd_summary_data/world.geojson")
+]).then(([yearly, countryYear, profileYear, regionTotals, world]) => {
   yearlyData = yearly;
   countryYearData = countryYear;
   profileYearData = profileYear;
+  worldGeo = world;
 
   const regions = regionTotals.map(d => d.region);
   regionColor = d3.scaleOrdinal()
@@ -285,6 +288,16 @@ function drawMap() {
     .attr("d", path)
     .attr("fill", "#f8fbff")
     .attr("stroke", "#b7c2cf");
+
+  g.selectAll(".land")
+    .data(worldGeo.features)
+    .enter()
+    .append("path")
+    .attr("class", "land")
+    .attr("d", path)
+    .attr("fill", "#edf3f8")
+    .attr("stroke", "#c7d2df")
+    .attr("stroke-width", 0.45);
 
   g.append("path")
     .datum(d3.geoGraticule10())
