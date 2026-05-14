@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Pokemon Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+      color: #222;
+    }
+
+    h1 {
+      margin: 12px 18px 4px 18px;
+      font-size: 26px;
+    }
+
+    p {
+      margin: 0 18px 10px 18px;
+      color: #555;
+      font-size: 14px;
+    }
+
+    #dashboard {
+      display: grid;
+      grid-template-columns: 440px 1fr;
+      grid-template-rows: 330px 330px;
+      gap: 12px;
+      height: calc(100vh - 76px);
+      padding: 0 16px 16px 16px;
+    }
+
+    .chart {
+      background: white;
+      border: 1px solid #d9dee8;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    #bar_dataviz {
+      grid-row: 1 / span 2;
+    }
+
+    svg text {
+      font-size: 11px;
+    }
+
+    .title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .axis-label {
+      font-size: 12px;
+      fill: #444;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pokemon Stats Dashboard</h1>
+  <p>Click a primary type in the bar chart to filter the scatter plot and parallel coordinates plot.</p>
+
+  <div id="dashboard">
+    <div id="bar_dataviz" class="chart"></div>
+    <div id="scatter_dataviz" class="chart"></div>
+    <div id="parallel_dataviz" class="chart"></div>
+  </div>
+
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
