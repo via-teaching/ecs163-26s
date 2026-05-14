@@ -236,3 +236,10 @@ d3.csv("data/student-mat.csv").then(function(data){
 }).catch(function(error){
     console.log("Error loading the data: ", error);//handle error if data fails to load
 });
+
+/*
+LLM usage disclaimer: As a new Javascript learner, I used LLM in part of this assignment for learning purpose. 
+For example, my idea of dynamically changing the Bar Chart based on selected data, brushing and linking is clear, 
+but I had no idea how to implement these two functionalities due to my limited  D3.js knowledge. LLM gave me clear 
+instructions and all essential basics to implement them. Also, it helped me understand them very well(comments are made).
+*/
