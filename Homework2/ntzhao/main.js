@@ -462,7 +462,18 @@ d3.csv("mxmh_survey_results.csv").then((rawData) => {
   // Docs: https://d3-graph-gallery.com/graph/custom_legend.html
   const legend = g3
     .append("g")
-    .attr("transform", `translate(${visSizes.plot3.width - 80}, 20)`);
+    .attr("transform", `translate(${visSizes.plot3.width - 80}, 10)`);
+
+  // Create legend label
+  const legendLabel = legend
+    .append("text")
+    .attr("anchor", "middle")
+    .attr("x", 0)
+    .attr("y", -10)
+    .text("LEGEND")
+    .style("font-family", "Arial")
+    .style("font-size", 12);
+
   const legendItem = legend
     .selectAll(".legend-item")
     .data(genres)
