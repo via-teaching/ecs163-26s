@@ -6,7 +6,7 @@ const margin = { top: 30, right: 30, bottom: 80, left: 50 };
 const headerHeight = 40;
 
 // Width allocated to legend box
-const legendWidth = 100;
+const legendWidth = 60;
 
 // Square size allocated to legend color
 const legendDotSize = 20;
@@ -347,16 +347,25 @@ d3.csv("mxmh_survey_results.csv").then((rawData) => {
     .attr("transform", "translate(" + margin.left + "," + margin.top * 2 + ")");
 
   // Choose dimensions for parallel coordinates plot
-  const dimensions = [
-    "BPM",
-    "Age",
-    "Hours per day",
-    "Mental health challenges", // Sum of Anxiety, Depression, and OCD
-    "Anxiety",
-    "Insomnia",
-    "Depression",
-    "OCD",
-  ];
+  // If window size is smaller, use less dimensions
+  const dimensions =
+    windowWidth < 1000
+      ? [
+          "BPM",
+          "Age",
+          "Hours per day",
+          "Mental health challenges", // Sum of Anxiety, Depression, and OCD
+        ]
+      : [
+          "BPM",
+          "Age",
+          "Hours per day",
+          "Mental health challenges", // Sum of Anxiety, Depression, and OCD
+          "Anxiety",
+          "Insomnia",
+          "Depression",
+          "OCD",
+        ];
 
   // Create y-scale for each dimension
   var y = {};
@@ -462,7 +471,7 @@ d3.csv("mxmh_survey_results.csv").then((rawData) => {
   // Docs: https://d3-graph-gallery.com/graph/custom_legend.html
   const legend = g3
     .append("g")
-    .attr("transform", `translate(${visSizes.plot3.width - 80}, 10)`);
+    .attr("transform", `translate(${visSizes.plot3.width - legendWidth}, 10)`);
 
   // Create legend label
   const legendLabel = legend
@@ -470,7 +479,7 @@ d3.csv("mxmh_survey_results.csv").then((rawData) => {
     .attr("anchor", "middle")
     .attr("x", 0)
     .attr("y", -10)
-    .text("LEGEND")
+    .text("Favorite Genre")
     .style("font-family", "Arial")
     .style("font-size", 12);
 
