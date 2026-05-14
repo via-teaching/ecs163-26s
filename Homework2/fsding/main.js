@@ -15,12 +15,13 @@ let scatterMargin = {top: 100, right: 30, bottom: 30, left: 120},
     scatterWidth = width/2 - scatterMargin.left - scatterMargin.right,
     scatterHeight = 400 - scatterMargin.top - scatterMargin.bottom;
 
-//let distrLeft = scatterMargin.width, distrTop = teamHeight;
+// sankey
 let distrLeft = 0, distrTop = 0;
 let distrMargin = {top: 10, right: 30, bottom: 30, left: 60},
     distrWidth = width - distrMargin.left - distrMargin.right,
     distrHeight = height - 450 - distrMargin.top - distrMargin.bottom;
 
+//color map for sankey, bar graph
   const nodeColorMap = new Map([
         ["Normal", "grey"],
         ["Bug", "olivedrab"],
@@ -176,6 +177,7 @@ d3.csv("pokemon.csv").then(rawData =>{
     .text("Type");
 
 
+    //title
      g3.append("text")
     .attr("x", teamWidth / 2)
     .attr("y", teamHeight + 80)
@@ -234,12 +236,7 @@ d3.csv("pokemon.csv").then(rawData =>{
     .attr("x", d => x2(d.Type_1))
     .attr("width", x2.bandwidth())
     .attr("height", d => teamHeight - y2(d.count))
-   // .attr("fill", "deepskyblue");
     .attr("fill", function(d) { 
-          //if(d.Type_1 === "Water"){
-           // return nodeColorMap.get(d.Type_1);
-       // } 
-        //return d3.rgb(nodeColorMap.get(d.Type_1)).darker(1); })
 		  return d.color = nodeColorMap.get(d.Type_1);})
     .attr("stroke", function(d) { 
         if(d.Type_1 === "Water"){
@@ -250,7 +247,7 @@ d3.csv("pokemon.csv").then(rawData =>{
 
         //plot 3 Sankey: type 1 (water) -> gens -> type2
 
-   // const nodes = [{"name":"Water"}];
+    //nodes and links list
     const nodesList = ["Water"];
     const links3 = [];
     
@@ -270,16 +267,18 @@ d3.csv("pokemon.csv").then(rawData =>{
     const sortedGens = [];
     const gensByType = [];
 
-   // for (let index = 1; index <= a; index++) {
+   // sort set of water type pokemon by gen
    genData.forEach(p => {
         sortedGens.push(waterData.filter(d=>d.Generation == p.Generation));    
     });
 
+    // get counts of secondary type by gen
     sortedGens.forEach(p => {
         type2Counts = p.reduce((s, { Type_2 }) => (s[Type_2] = (s[Type_2] || 0) + 1, s), {});
         gensByType.push(Object.keys(type2Counts).map((key) => ({ Type_2: key, Generation: p.at(0).Generation, count: type2Counts[key] })))
     });
 
+    // nodes, links created
     gensByType.forEach(p => {
         p.forEach(q => {
             //nodes.push({"name":q.Type_2});
@@ -297,7 +296,7 @@ d3.csv("pokemon.csv").then(rawData =>{
         });
     });
 
-
+   //remove duplicate nodes
    const nodesListFiltered = [...new Set(nodesList)].filter(d => d.id !== "");
    const links = links3.filter(d => d.target !== "");
 
@@ -353,13 +352,21 @@ var units = "Pokemon";
 
 
 
-
+//title
  g2.append("text")
     .attr("x", distrWidth / 2)
     .attr("y", distrHeight + 30)
     .attr("font-size", "25px")
     .attr("text-anchor", "middle")
     .text("Water types across generations and their secondary types");
+
+//credit for example sankey code
+ g2.append("text")
+    .attr("x", distrWidth / 2)
+    .attr("y", distrHeight + 50)
+    .attr("font-size", "10px")
+    .attr("text-anchor", "middle")
+    .text("Example code from d3noob: https://gist.github.com/d3noob/06e72deea99e7b4859841f305f63ba85");   
 
   // add in the links
   var link = g2.append("g").selectAll(".link")
