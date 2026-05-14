@@ -483,6 +483,7 @@ d3.csv("mxmh_survey_results.csv").then((rawData) => {
     .style("font-family", "Arial")
     .style("font-size", 12);
 
+  // Create legend hint subtext
   const legendSubtext = legend
     .append("text")
     .attr("anchor", "middle")
