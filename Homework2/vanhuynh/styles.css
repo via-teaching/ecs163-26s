@@ -1,0 +1,113 @@
+:root {
+    --bg-color: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.85);
+    --text-color: #f8fafc;
+    --accent-color: #38bdf8;
+    --border-color: rgba(255, 255, 255, 0.1);
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 20px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+h1 {
+    text-align: center;
+    margin: 0 0 20px 0;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text-color);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 20px;
+    flex-grow: 1;
+    min-height: 0;
+}
+
+.view {
+
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(10px);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+}
+
+.view-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-align: center;
+    color: var(--accent-color);
+}
+
+.svg-container {
+    flex: 1 1 0;
+    min-height: 0;
+    position: relative;
+    width: 100%;
+}
+
+svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.view-bottom {
+    grid-column: span 2;
+}
+
+/* D3 Elements styling */
+.axis text {
+    fill: #94a3b8;
+    font-family: 'Inter';
+    font-size: 11px;
+}
+
+.axis path,
+.axis line {
+    stroke: #475569;
+}
+
+.grid line {
+    stroke: #334155;
+    stroke-dasharray: 2px;
+}
+
+.grid path {
+    stroke-width: 0;
+}
+
+.tooltip {
+    position: absolute;
+    background: rgba(15, 23, 42, 0.9);
+    color: #fff;
+    padding: 10px;
+    border-radius: 6px;
+    pointer-events: none;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+}
