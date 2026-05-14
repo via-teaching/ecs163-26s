@@ -270,71 +270,123 @@ d3.csv("pokemon.csv").then(rawData =>{
         });
     });
 
-   const nodesListFiltered = [...new Set(nodesList)];
+
+   const nodesListFiltered = [...new Set(nodesList)].filter(d => d.id !== "");
+   const links = links3.filter(d => d.target !== "");
+
    const nodes3 = [];
 
+    // loop through each link replacing the text with its index from node
+   links.forEach(function (d, i) {
+    links[i].source = nodesListFiltered.indexOf(links[i].source);
+    links[i].target = nodesListFiltered.indexOf(links[i].target);
+  });
+
+  // now loop through each nodes to make nodes an array of objects
+  // rather than an array of strings
+
    nodesListFiltered.forEach(n => {
-     nodes3.push({"id": n});
+     nodes3.push({"name": n});
    });
+
+   
 
 
     console.log("genData", genData);
     console.log("sortedGens", sortedGens);
     console.log("gensByType", gensByType);
 
-    console.log("nodesList", nodes3);
-    console.log("nodesListFiltered", nodesListFiltered);
-    console.log("links", links3)
+    console.log("nodes", nodes3);
+    console.log("links", links)
 
-    var sankey = d3.sankey()
-                .nodes(nodes3)
-              //  .nodeId(d => d.id)
-              //  .nodeWidth(15)
-                .links(links3)
-              //  .extent([[distrLeft, distrTop], [distrWidth, distrHeight]]);
-    
-    //var path = sankey.link();
+   
 
     const g2 = svg.append("g")
                 .attr("width", distrWidth + distrMargin.left + distrMargin.right)
                 .attr("height", distrHeight + distrMargin.top + distrMargin.bottom)
                 .attr("transform", `translate(${distrLeft}, ${distrTop})`);
+ 
 
-    g2.append("text")
-    .attr("x", distrWidth / 2)
-    .attr("y", distrHeight + 80)
-    .attr("font-size", "25px")
-    .attr("text-anchor", "middle")
-    .text("Fig 3: Water Types across Generations + secondary types");
+        sankey = d3.sankey()
+      .nodes(nodes3)
+      .links(links)
+      .layout(32);
 
-     const link = g2.append("g").selectAll(".link")
-      .data(links3)
-      .enter()
-      .append("path")
-        .attr("class", "link")
-        .attr("d", sankey.link() )
-        .style("stroke-width", function(d) { return Math.max(1, d.dy); })
-        .sort(function(a, b) { return b.dy - a.dy; });
+var path = sankey.link();
+var formatNumber = d3.format(",.0f"),    // zero decimal places
+    format = function(d) { return formatNumber(d) + " " + units; },
+    color = d3.scaleOrdinal(d3.schemeCategory10);
 
+var units = "Widgets";
 
+  // add in the links
+  var link = g2.append("g").selectAll(".link")
+      .data(links)
+    .enter().append("path")
+      .attr("class", "link")
+      .attr("d", path)
+      .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+      .sort(function(a, b) { return b.dy - a.dy; });
 
+  // add the link titles
+  link.append("title")
+        .text(function(d) {
+    		return d.source.name + " → " + 
+                d.target.name + "\n" + format(d.value); });
 
-     const node = g2.append("g").selectAll(".node")
+  // add in the nodes
+  var node = g2.append("g").selectAll(".node")
       .data(nodes3)
-
     .enter().append("g")
       .attr("class", "node")
-   //   .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-    
+      .attr("transform", function(d) { 
+		  return "translate(" + d.x + "," + d.y + ")"; })
+      .call(d3.drag()
+        .subject(function(d) {
+          return d;
+        })
+        .on("start", function() {
+          this.parentNode.appendChild(this);
+        })
+        .on("drag", dragmove));
 
-    node.append("rect")
+  // add the rectangles for the nodes
+  node.append("rect")
       .attr("height", function(d) { return d.dy; })
       .attr("width", sankey.nodeWidth())
-      .style("fill", "steelblue")
-      .style("stroke", "steelblue");
+      .style("fill", function(d) { 
+		  return d.color = color(d.name.replace(/ .*/, "")); })
+      .style("stroke", function(d) { 
+		  return d3.rgb(d.color).darker(2); })
+    .append("title")
+      .text(function(d) { 
+		  return d.name + "\n" + format(d.value); });
 
-    console.log("graph.nodes", sankey.nodes);
-      
+  // add in the title for the nodes
+  node.append("text")
+      .attr("x", -6)
+      .attr("y", function(d) { return d.dy / 2; })
+      .attr("dy", ".35em")
+      .attr("text-anchor", "end")
+      .attr("transform", null)
+      .text(function(d) { return d.name; })
+    .filter(function(d) { return d.x < width / 2; })
+      .attr("x", 6 + sankey.nodeWidth())
+      .attr("text-anchor", "start");
+
+  // the function for moving the nodes
+  function dragmove(d) {
+    d3.select(this)
+      .attr("transform", 
+            "translate(" 
+               + d.x + "," 
+               + (d.y = Math.max(
+                  0, Math.min(distrHeight - d.dy, d3.event.y))
+                 ) + ")");
+    sankey.relayout();
+    link.attr("d", path);
+  }
+
 
     }).catch(function(error){
     console.log(error);
