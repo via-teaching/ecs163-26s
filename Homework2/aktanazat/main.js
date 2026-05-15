@@ -246,7 +246,7 @@ function drawTurnoutScatter(data) {
   const isCompact = width < 520;
   const margin = isCompact
     ? { top: 22, right: 20, bottom: 34, left: 42 }
-    : { top: 28, right: 30, bottom: 54, left: 66 };
+    : { top: 28, right: 160, bottom: 54, left: 66 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
@@ -337,8 +337,8 @@ function drawTurnoutScatter(data) {
     .attr("text-anchor", "middle")
     .text("Total votes cast");
 
-  drawOutcomeLegend(svg, width - (isCompact ? 82 : 168), 8, isCompact);
-  drawSizeLegend(svg, width - (isCompact ? 94 : 150), height - (isCompact ? 64 : 104), r, isCompact);
+  drawOutcomeLegend(svg, width - (isCompact ? 82 : 112), isCompact ? 8 : 94, isCompact);
+  drawSizeLegend(svg, width - (isCompact ? 94 : 126), height - (isCompact ? 64 : 86), r, isCompact);
 }
 
 function drawParallelCoordinates(data) {
