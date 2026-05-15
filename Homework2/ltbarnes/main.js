@@ -1,25 +1,20 @@
 const width = window.innerWidth;
 const height = window.innerHeight;
+const colW = Math.floor(width / 3);
 
-// Chart positions (left offset, top offset)
-let barLeft = 0,      barTop = 0;
-let scatterLeft = 340, scatterTop = 0;
-let parallelLeft = 680, parallelTop = 0;
+// REPLACE sizing lines with:
+// Instead of hard code, use example from WS1
+let barWidth  = colW - barMargin.left - barMargin.right;
+let barHeight = height - 100 - barMargin.top - barMargin.bottom;
+let barLeft   = 0;
 
-// Bar chart sizing + margins
-let barMargin = { top: 40, right: 20, bottom: 110, left: 52 };
-let barWidth  = 340 - barMargin.left - barMargin.right;
-let barHeight = height - 80 - barMargin.top - barMargin.bottom;
+let scatterWidth  = colW - scatterMargin.left - scatterMargin.right;
+let scatterHeight = height - 100 - scatterMargin.top - scatterMargin.bottom;
+let scatterLeft   = colW;
 
-// Scatter plot sizing + margins
-let scatterMargin = { top: 40, right: 20, bottom: 50, left: 55 };
-let scatterWidth  = 340 - scatterMargin.left - scatterMargin.right;
-let scatterHeight = height - 80 - scatterMargin.top - scatterMargin.bottom;
-
-// Parallel coordinates sizing + margins
-let parallelMargin = { top: 50, right: 30, bottom: 20, left: 30 };
-let parallelWidth  = width - 680 - parallelMargin.left - parallelMargin.right;
-let parallelHeight = height - 80 - parallelMargin.top - parallelMargin.bottom;
+let parallelWidth  = width - colW * 2 - parallelMargin.left - parallelMargin.right;
+let parallelHeight = height - 100 - parallelMargin.top - parallelMargin.bottom;
+let parallelLeft   = colW * 2;
 
 // Pokémon type -> color lookup table
 const TYPE_COLORS = {
