@@ -1,0 +1,52 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+
+.container {
+    display: grid;
+    grid-template-areas:
+      "header header"
+      "overview focus"
+      "advanced advanced";
+    grid-template-columns: 1fr 3fr;
+    gap: 3px;
+    background-color: dodgerblue;
+    padding: 5px;
+    height: 100vh;
+  }
+  
+  .container div {
+    background-color: white;
+    padding: 10px;
+  }
+  
+  .container div.header {
+    grid-area: header;
+    text-align: center;
+  }
+
+  .container div.overview {
+    grid-area: overview;
+  }
+  
+  .container div.focus {
+    grid-area: focus;
+  }
+  
+
+  
+  .container div.advanced {
+    grid-area: advanced;
+    text-align: center;
+  }
+
+/*
+Temporary outline of the sections to see them better
+*/
+.header, 
+.overview,
+.focus,
+.advanced {
+  border: 5px solid black;
+}

@@ -1,19 +1,49 @@
-<!doctype html>
-<html style="width:100%;height:100%;">
+<!--
+References: 
+
+W3Schools Grid Layout Module (https://www.w3schools.com/css/css_grid.asp )
+- Used to create skelton for dashboard 
+- Split code into HTML and CSS files 
+
+-->
+
+<!DOCTYPE html>
+<html>
 <head>
-	<meta charset="utf-8">
-	<meta name="description" content="">
-	<title>D3 Example</title>
+  <title>CSS Grid Layout</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body style="width:100%;height:100%;margin: 0;">
-	<svg width="100%" height="100%">
 
-	</svg>
-
-	<script src="https://d3js.org/d3.v5.min.js"></script>
+<body>
 	<script src="main.js"></script>
-	<script>
+  
 
-	</script>
+  <div class="container">
+    <div class="header">
+      <h2>Student Mental Health</h2>
+	  <p> We will view what mental health condicition is more reported, how this differs by year, and the number of students who sought treament.</p>
+    </div>
+
+    <div class="overview">
+		<h2> Distribution of Depression, Anxiety, and Panic Attacks faced amongst students</h2>
+	  <p> Bar Chart to show the number of students who face every mental health condition</p>
+    <div id="overview-chart"></div>
+    </div>
+
+    <div class="focus">
+      <h3>Focus: Mental Health Patterns by Year/h3>
+      <p>How does a student;s year of study relate to depression/anxiety/panic attacks they face?</p>
+      <div id="focus-chart"></div>
+    </div>
+
+    <div class="advanced">
+      <h4>Advanced: Academic Year, Mental Health Concern, and Treatment Seeking</h4>
+      <div id="advanced-chart"></div>
+    </div>
+  </div>
+  	<script src="https://d3js.org/d3.v7.min.js"></script>
+  	<script src="main.js"></script>
+	
 </body>
 </html>
+
