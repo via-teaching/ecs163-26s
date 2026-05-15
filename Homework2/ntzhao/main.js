@@ -226,8 +226,12 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr("transform", "translate(0," + visSizes.plot1.height + ")")
     .call(d3.axisBottom(barX))
     .selectAll("text")
-    .attr("transform", "translate(-10,0)rotate(-30)")
-    .style("text-anchor", "end");
+    .attr("transform", `translate(-10,0)rotate(${useLargeLayout ? -30 : -20})`)
+    .style("text-anchor", "end")
+    .style(
+      "font-size",
+      useLargeLayout ? standardFontSize : standardFontSize * 0.833,
+    );
 
   // Create y-scale for bar chart
   var barY = d3
@@ -264,7 +268,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
   g1.append("text")
     .attr("text-anchor", "middle")
     .attr("x", visSizes.plot1.width / 2)
-    .attr("y", 0)
+    .attr("y", -20)
     .text("Frequency of favorite genres in dataset")
     .style("font-family", "Arial")
     .style("font-size", standardFontSize * 1.125);
@@ -345,7 +349,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
   g2.append("text")
     .attr("text-anchor", "middle")
     .attr("x", visSizes.plot2.width / 2)
-    .attr("y", 0)
+    .attr("y", -20)
     .text("Mental health challenges vs. hours per day of music")
     .style("font-family", "Arial")
     .style("font-size", standardFontSize * 1.125);
@@ -494,7 +498,8 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .style("text-anchor", "middle")
     .attr("y", -9)
     .text((d) => d)
-    .style("fill", "black");
+    .style("fill", "black")
+    .style("font-size", standardFontSize);
 
   // Add chart legend to illustrate genre colors
   // With added interactivity (hover to highlight certain genre)
