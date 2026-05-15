@@ -1,6 +1,6 @@
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: Calibri, sans-serif;
   }
 
 .container {
@@ -10,6 +10,7 @@ body {
       "overview focus"
       "advanced advanced";
     grid-template-columns: 1fr 3fr;
+    grid-template-rows: 1fr 3fr;
     gap: 3px;
     background-color: dodgerblue;
     padding: 5px;
@@ -28,10 +29,12 @@ body {
 
   .container div.overview {
     grid-area: overview;
+    overflow: hidden;
   }
   
   .container div.focus {
     grid-area: focus;
+    overflow: hidden;
   }
   
 
@@ -39,6 +42,7 @@ body {
   .container div.advanced {
     grid-area: advanced;
     text-align: center;
+    overflow: hidden;
   }
 
 /*
