@@ -1,10 +1,6 @@
-let abFilter = 25;
-// const width = window.innerWidth;
-// const height = window.innerHeight;
+// Dimensions and margins
 const width = window.innerWidth / 3;
 const height = window.innerHeight / 3;
-// const width = 400;
-// const height = 350;
 
 const pieWindowWidth = window.innerWidth / 3;
 const pieWindowHeight = window.innerHeight / 3;
@@ -23,6 +19,8 @@ let sankeyMargin = { top: 40, right: 50, bottom: 30, left: 50 },
   sankeyHeight = height - sankeyMargin.top - sankeyMargin.bottom;
 
 // plots
+
+// Load the dataset
 d3.csv("data/student_mental_health.csv")
   .then((rawData) => {
     console.log("rawData", rawData);
@@ -43,6 +41,8 @@ d3.csv("data/student_mental_health.csv")
     console.log("processedData", processedData);
 
     // plot 1: Bar chart
+
+    // Select the bar-svg element to populate
     const barSvg = d3.selectAll("#bar-svg");
 
     const g1 = barSvg
@@ -141,7 +141,7 @@ d3.csv("data/student_mental_health.csv")
       .attr("height", (d) => height - barChartMargin.bottom - y1(d.age))
       .style("fill", barColor);
 
-    // Bar titles
+    // Bar title
     rect
       .append("title")
       .text((d) => `GPA Range: ${d.gpa}\nAge (years): ${d.age.toFixed(2)}`);
@@ -174,9 +174,10 @@ d3.csv("data/student_mental_health.csv")
 
     const radius = Math.min(pieWidth, pieHeight) / 2 - pieMargin * 2;
 
+    // Select pie-svg element to populate
     const pieSvg = d3.selectAll("#pie-svg");
-    // .attr("transform", `translate(${pieWindowWidth / 5}, ${pieWindowHeight / 10})`);
 
+    // Calculate the depressed proportion of the population
     const pieData = d3.rollup(
       processedData,
       (d) => (d.filter((f) => f.depression == "yes").length / d.length) * 100,
@@ -185,24 +186,28 @@ d3.csv("data/student_mental_health.csv")
 
     console.log(pieData);
 
+    // Create pie for Year 1
     const data_pie1 = {
       a: pieData.get("year 1"),
       b: 100 - pieData.get("year 1"),
     };
     drawPie(pieSvg, data_pie1, pieWidth, pieHeight, radius, 0, 0, "Year 1");
 
+    // Create pie for Year 2
     const data_pie2 = {
       a: pieData.get("year 2"),
       b: 100 - pieData.get("year 2"),
     };
     drawPie(pieSvg, data_pie2, pieWidth, pieHeight, radius, 1, 0, "Year 2");
 
+    // Create pie for Year 3
     const data_pie3 = {
       a: pieData.get("year 3"),
       b: 100 - pieData.get("year 3"),
     };
     drawPie(pieSvg, data_pie3, pieWidth, pieHeight, radius, 0, 1, "Year 3");
 
+    // Create pie for Year 4
     const data_pie4 = {
       a: pieData.get("year 4"),
       b: 100 - pieData.get("year 4"),
@@ -219,13 +224,17 @@ d3.csv("data/student_mental_health.csv")
       .style("font-weight", "bold")
       .text("Ratio of Students with Depression");
 
-    // Legend
+    // Create legend
     const g2 = pieSvg
       .append("g")
       .attr("width", width)
       .attr("height", height)
-      .attr("transform", `translate(${pieMargin * 3 + radius * 5},${radius * 2 + pieMargin})`);
+      .attr(
+        "transform",
+        `translate(${pieMargin * 3 + radius * 5},${radius * 2 + pieMargin})`,
+      );
 
+    // Legend title
     g2.append("text")
       .attr("font-size", "12px")
       .attr("text-anchor", "left")
@@ -234,11 +243,14 @@ d3.csv("data/student_mental_health.csv")
     // Color 1
     const item1 = g2.append("g").attr("transform", `translate(${-20},${10})`);
 
+    // Indicator box
     item1
       .append("rect")
       .attr("width", "10px")
       .attr("height", "10px")
       .attr("fill", "orange");
+
+    // Item text
     item1
       .append("text")
       .attr("font-size", "10px")
@@ -249,11 +261,14 @@ d3.csv("data/student_mental_health.csv")
     // Color 2
     const item2 = g2.append("g").attr("transform", `translate(${-20},${30})`);
 
+    // Indicator box
     item2
       .append("rect")
       .attr("width", "10px")
       .attr("height", "10px")
       .attr("fill", "#77ACA2");
+
+    // Item text
     item2
       .append("text")
       .attr("font-size", "10px")
@@ -263,8 +278,11 @@ d3.csv("data/student_mental_health.csv")
 
     // plot 3: Sankey
     const color = "#77ACA2";
+
+    // Select sankey-svg element to populate
     const sankeySvg = d3.selectAll("#sankey-svg");
 
+    // Create sankey object
     const sankey = d3
       .sankey()
       .nodeSort(null)
@@ -279,8 +297,11 @@ d3.csv("data/student_mental_health.csv")
         ],
       ]);
 
+    // Convert data into nodes and links
     const graphData = graph(processedData);
     console.log("graphdata", graphData);
+
+    // Process the nodes and links with the sankey object
     const { nodes, links } = sankey({
       nodes: graphData.nodes.map((d) => Object.create(d)),
       links: graphData.links.map((d) => Object.create(d)),
@@ -396,6 +417,7 @@ d3.csv("data/student_mental_health.csv")
   });
 
 function drawPie(svg, data, pieWidth, pieHeight, radius, x, y, text) {
+  // Create pie group
   const g2 = svg
     .append("g")
     .attr("width", width)
@@ -405,22 +427,29 @@ function drawPie(svg, data, pieWidth, pieHeight, radius, x, y, text) {
       `translate(${pieMargin + radius + (pieMargin + radius * 2) * x},${pieMargin + radius + (pieMargin + radius * 2) * y})`,
     );
 
+  // Color function to select pie colors from
   const color = d3
     .scaleOrdinal()
     .domain(Object.keys(data))
     .range(["orange", "#77ACA2"]);
 
+  // Convert data into usable objects
   const dataArray = Object.entries(data).map(([key, value]) => ({
     key,
     value,
   }));
+
+  // Create pie object
   const pie = d3
     .pie()
     .value((d) => d.value)
     .sort(null);
+
+  // Use pie object to process dataArray into drawable data info
   const data_ready = pie(dataArray);
   console.log("dataready", data_ready);
 
+  // Draw the pie chart
   const arc = d3.arc().innerRadius(0).outerRadius(radius);
   const pieElement = g2
     .selectAll("whatever")
@@ -433,6 +462,7 @@ function drawPie(svg, data, pieWidth, pieHeight, radius, x, y, text) {
     .style("stroke-width", "2px")
     .style("opacity", 0.7);
 
+  // Pie title
   pieElement
     .append("title")
     .text(
@@ -458,6 +488,7 @@ function graph(processedData) {
   const indexByKey = new d3.InternMap([], JSON.stringify);
   const links = [];
 
+  // Process data into nodes
   for (const k of keys) {
     const uniqueValues = [
       ...new Set(processedData.map((d) => d[k.toLowerCase()])),
@@ -470,11 +501,15 @@ function graph(processedData) {
       );
     }
 
+    // Generate list of nodes and assign indices
     for (const value of uniqueValues) {
       const key = [k.toLowerCase(), value];
+
       if (nodeByKey.has(key)) continue;
+
       const node = { name: value };
       nodes.push(node);
+
       nodeByKey.set(key, node);
       indexByKey.set(key, ++index);
     }
@@ -483,19 +518,23 @@ function graph(processedData) {
   console.log("nodeByKey", nodeByKey);
   console.log("indexByKey", indexByKey);
 
+  // Process data into links
   for (let i = 1; i < keys.length; ++i) {
     const a = keys[i - 1].toLowerCase();
     const b = keys[i].toLowerCase();
     const prefix = keys.slice(0, i + 1);
     const linkByKey = new d3.InternMap([], JSON.stringify);
+
     for (const d of processedData) {
       const names = prefix.map((k) => d[k.toLowerCase()]);
       const value = d.value || 1;
+
       let link = linkByKey.get(names);
       if (link) {
         link.value += value;
         continue;
       }
+
       link = {
         source: indexByKey.get([a, d[a.toLowerCase()]]),
         target: indexByKey.get([b, d[b.toLowerCase()]]),
@@ -503,6 +542,7 @@ function graph(processedData) {
         value,
         gameName: d.Name,
       };
+
       links.push(link);
       linkByKey.set(names, link);
     }

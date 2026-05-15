@@ -1,5 +1,4 @@
 .parent {
-  /* background: mediumpurple; */
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -13,17 +12,14 @@
 }
 
 .sankey {
-	/* background-color: red; */
 	width: 50%;
 	transform: translate(0, -50px);
 }
 
 .pie {
-	/* background-color: blue; */
   position: relative;
 }
 
 .bar {
-  /* background-color: pink; */
 	position: relative;
 }
