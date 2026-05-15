@@ -167,10 +167,12 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
   );
 
   // Map counts into an array to pass in as data to bar creation
-  const countsArray = Array.from(counts).map(([genre, count]) => ({
-    genre,
-    count,
-  }));
+  const countsArray = Array.from(counts)
+    .map(([genre, count]) => ({
+      genre,
+      count,
+    }))
+    .sort((itemA, itemB) => itemA.genre.localeCompare(itemB.genre));
 
   // Create element for bar chart
   const g1 = d3
@@ -194,7 +196,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
   var barX = d3
     .scaleBand()
     .range([0, visSizes.plot1.width])
-    .domain(data.map((d) => d["Fav genre"]))
+    .domain(genres)
     .padding(0.2);
 
   // Create x-axis for bar chart
@@ -202,7 +204,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr("transform", "translate(0," + visSizes.plot1.height + ")")
     .call(d3.axisBottom(barX))
     .selectAll("text")
-    .attr("transform", "translate(-10,0)rotate(-45)")
+    .attr("transform", "translate(-10,0)rotate(-30)")
     .style("text-anchor", "end");
 
   // Create y-scale for bar chart
@@ -220,7 +222,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
   // Add x-axis label
   g1.append("text")
     .attr("text-anchor", "end")
-    .attr("x", visSizes.plot1.width)
+    .attr("x", visSizes.plot1.width + 30)
     .attr("y", visSizes.plot1.height + margin.top + 20)
     .text("Favorite genre")
     .style("font-family", "Arial")
