@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Music & Mental Health Data (MxMH dataset)</title>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    .dashboard {
+      display: flex;
+      justify-content: center;
+    }
+
+    .chart-container {
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Music & Mental Health Dashboard</h1>
+
+<div class="dashboard">
+  <div class="chart-container">
+    <h2>Favorite Genre vs. Hours per Day</h2>
+    <svg id="barChart" width="600" height="600"></svg>
+  </div>
+
+  <div class="chart-container">
+    <h2>Hours per Day vs. Age</h2>
+    <svg id="scatterPlot" width="600" height="600"></svg>
+  </div>
+</div>
+
+<script>
+
+// load CSV
+d3.csv("mxmh_survey_results.csv").then(data => {
+
+  // Convert numeric fields
+  data.forEach(d => {
+    d.Age = +d.Age;
+    d["Hours per day"] = +d["Hours per day"];
+  });
+
+ //Bar chart
+ //Fav genre vs listening hrs
+
+  const genreData = d3.rollups(
+    data,
+    v => d3.mean(v, d => d["Hours per day"]),
+    d => d["Fav genre"]
+  );
+
+  //convert to objects
+  const barData = genreData.map(d => ({
+    genre: d[0],
+    avgHours: d[1]
+  }));
+
+  //sort by hours
+  barData.sort((a, b) => b.avgHours - a.avgHours);
+
+  const barSvg = d3.select("#barChart");
+  const barWidth = 600;
+  const barHeight = 400;
+
+  const margin = { top: 20, right: 20, bottom: 100, left: 60 };
+
+  const xBar = d3.scaleBand()
+    .domain(barData.map(d => d.genre))
+    .range([margin.left, barWidth - margin.right])
+    .padding(0.2);
+
+  const yBar = d3.scaleLinear()
+    .domain([0, d3.max(barData, d => d.avgHours)])
+    .nice()
+    .range([barHeight - margin.bottom, margin.top]);
+
+  //bars
+  barSvg.selectAll("rect")
+    .data(barData)
+    .enter()
+    .append("rect")
+    .attr("x", d => xBar(d.genre))
+    .attr("y", d => yBar(d.avgHours))
+    .attr("width", xBar.bandwidth())
+    .attr("height", d => barHeight - margin.bottom - yBar(d.avgHours))
+    .attr("fill", "steelblue");
+
+  //x-axis
+  barSvg.append("g")
+    .attr("transform", `translate(0,${barHeight - margin.bottom})`)
+    .call(d3.axisBottom(xBar))
+    .selectAll("text")
+    .attr("transform", "rotate(-40)")
+    .style("text-anchor", "end");
+
+  //yaxis
+  barSvg.append("g")
+    .attr("transform", `translate(${margin.left},0)`)
+    .call(d3.axisLeft(yBar));
+
+  // Y Label
+  barSvg.append("text")
+    .attr("class", "axis-label")
+    .attr("x", -barHeight / 2)
+    .attr("y", 15)
+    .attr("transform", "rotate(-90)")
+    .text("Average Hours per Day");
+
+  //scatterplot
+  //hours per day vs age
+
+  const scatterSvg = d3.select("#scatterPlot");
+
+  const scatterWidth = 600;
+  const scatterHeight = 400;
+
+  const xScatter = d3.scaleLinear()
+    .domain(d3.extent(data, d => d.Age))
+    .nice()
+    .range([margin.left, scatterWidth - margin.right]);
+
+  const yScatter = d3.scaleLinear()
+    .domain(d3.extent(data, d => d["Hours per day"]))
+    .nice()
+    .range([scatterHeight - margin.bottom, margin.top]);
+
+  //dots
+  scatterSvg.selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle")
+    .attr("cx", d => xScatter(d.Age))
+    .attr("cy", d => yScatter(d["Hours per day"]))
+    .attr("r", 5)
+    .attr("fill", "tomato")
+    .attr("opacity", 0.7);
+
+  //x-axis
+  scatterSvg.append("g")
+    .attr("transform", `translate(0,${scatterHeight - margin.bottom})`)
+    .call(d3.axisBottom(xScatter));
+
+  //yaxis
+  scatterSvg.append("g")
+    .attr("transform", `translate(${margin.left},0)`)
+    .call(d3.axisLeft(yScatter));
+
+  //xaxis label
+  scatterSvg.append("text")
+    .attr("class", "axis-label")
+    .attr("x", scatterWidth / 2)
+    .attr("y", scatterHeight - 10)
+    .attr("text-anchor", "middle")
+    .text("Age");
+
+  //yaxis label
+  scatterSvg.append("text")
+    .attr("class", "axis-label")
+    .attr("x", -scatterHeight / 2)
+    .attr("y", 15)
+    .attr("transform", "rotate(-90)")
+    .text("Hours per Day");
+
+});
+
+</script>
+
+</body>
+</html>
