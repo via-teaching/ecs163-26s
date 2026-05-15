@@ -23,7 +23,7 @@ let sankeyMargin = { top: 40, right: 50, bottom: 30, left: 50 },
   sankeyHeight = height - sankeyMargin.top - sankeyMargin.bottom;
 
 // plots
-d3.csv("student_mental_health.csv")
+d3.csv("data/student_mental_health.csv")
   .then((rawData) => {
     console.log("rawData", rawData);
 
