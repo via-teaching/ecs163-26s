@@ -2,6 +2,10 @@ const width = window.innerWidth;
 const height = window.innerHeight;
 const colW = Math.floor(width / 3);
 
+// Have to set before using
+let barMargin      = { top: 40, right: 20, bottom: 120, left: 55 };
+let scatterMargin  = { top: 40, right: 20, bottom: 55,  left: 55 };
+let parallelMargin = { top: 50, right: 40, bottom: 20,  left: 40 };
 // REPLACE sizing lines with:
 // Instead of hard code, use example from WS1
 let barWidth  = colW - barMargin.left - barMargin.right;
@@ -42,27 +46,32 @@ function moveTip(evt) {
 }
 function hideTip() { tip.style("opacity", 0); }
 
-// Load dataset and build dashboard visuals
-d3.csv("data/pokemon_alopez247.csv").then(rawData => {
+// load data
+d3.csv("data/pokemon_alopez247.csv", function(d) {
 
   // Convert numeric values from strings
-  rawData.forEach(function(d) {
-    d.HP         = +d.HP;
-    d.Attack     = +d.Attack;
-    d.Defense    = +d.Defense;
-    d.Sp_Atk    = +d.Sp_Atk;
-    d.Sp_Def    = +d.Sp_Def;
-    d.Speed      = +d.Speed;
-    d.Total      = +d.Total;
-    d.Generation = +d.Generation;
-    d.isLegendary = d.isLegendary === "True";
-  });
+  return {
+    Name:         d.Name,
+    Type_1:       d.Type_1,
+    Type_2:       d.Type_2,
+    HP:           +d.HP,
+    Attack:       +d.Attack,
+    Defense:      +d.Defense,
+    Sp_Atk:       +d.Sp_Atk,
+    Sp_Def:       +d.Sp_Def,
+    Speed:        +d.Speed,
+    Total:        +d.Total,
+    Generation:   +d.Generation,
+    isLegendary:   d.isLegendary === "True"
+  };
+
+}).then(function(data) {
 
   const svg = d3.select("svg");
 
-  buildBarChart(svg, rawData);
-  buildScatter(svg, rawData);
-  buildParallel(svg, rawData);
+  buildBarChart(svg, data);
+  buildScatter(svg, data);
+  buildParallel(svg, data);
   buildLegend();
 
 }).catch(function(error) {
@@ -73,8 +82,7 @@ d3.csv("data/pokemon_alopez247.csv").then(rawData => {
 function buildBarChart(svg, data) {
 
   const g = svg.append("g")
-    .attr("transform", `translate(${barLeft + barMargin.left}, ${barTop + barMargin.top})`);
-
+    .attr("transform", `translate(${barLeft + barMargin.left}, ${barMargin.top})`);
   // Count Pokémon by primary type and sort highest first
   let counts = d3.nest()
     .key(d => d.Type_1)
@@ -85,7 +93,7 @@ function buildBarChart(svg, data) {
   // Chart title
   svg.append("text")
     .attr("x", barLeft + barMargin.left + barWidth / 2)
-    .attr("y", barTop + 22)
+    .attr("y", 22)
     .attr("text-anchor", "middle")
     .style("font-size", "14px")
     .style("font-weight", "bold")
@@ -159,12 +167,11 @@ function buildBarChart(svg, data) {
 function buildScatter(svg, data) {
 
   const g = svg.append("g")
-    .attr("transform", `translate(${scatterLeft + scatterMargin.left}, ${scatterTop + scatterMargin.top})`);
-
+    .attr("transform", `translate(${scatterLeft + scatterMargin.left}, ${scatterMargin.top})`);
   // Chart title
   svg.append("text")
     .attr("x", scatterLeft + scatterMargin.left + scatterWidth / 2)
-    .attr("y", scatterTop + 22)
+    .attr("y", 22)
     .attr("text-anchor", "middle")
     .style("font-size", "14px")
     .style("font-weight", "bold")
@@ -252,15 +259,14 @@ function buildScatter(svg, data) {
 function buildParallel(svg, data) {
 
   const g = svg.append("g")
-    .attr("transform", `translate(${parallelLeft + parallelMargin.left}, ${parallelTop + parallelMargin.top})`);
-
+    .attr("transform", `translate(${parallelLeft + parallelMargin.left}, ${parallelMargin.top})`);
   // Stats shown in the parallel coordinates chart
   const dims = ["HP", "Attack", "Defense", "Sp_Atk", "Sp_Def", "Speed"];
 
   // Chart title
   svg.append("text")
     .attr("x", parallelLeft + parallelMargin.left + parallelWidth / 2)
-    .attr("y", parallelTop + 22)
+    .attr("y", 22)
     .attr("text-anchor", "middle")
     .style("font-size", "14px")
     .style("font-weight", "bold")
