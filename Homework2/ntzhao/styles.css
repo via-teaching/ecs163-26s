@@ -11,7 +11,8 @@ body {
   min-height: 100vh;
   width: 100%;
 
-  --header-height: 40px;
+  --header-height: 60px;
+  --page-padding: 20px;
 }
 
 #headerSection {
@@ -23,9 +24,24 @@ body {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - var(--header-height));
+  gap: 1px;
 }
 
 #layoutTopRow {
   display: flex;
+  gap: 1px;
   width: 100%;
+
+  @media screen and (max-width: 700px) {
+    height: 66%;
+    flex-direction: column;
+  }
+}
+
+.viz {
+  border: 1px solid black;
+
+  @media screen and (min-width: 700px) {
+    width: 100%;
+  }
 }

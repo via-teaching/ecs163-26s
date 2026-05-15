@@ -2,37 +2,52 @@ const windowWidth = window.innerWidth;
 const windowHeight = window.innerHeight;
 
 // Standard margin (applies to all vis)
-const margin = { top: 30, right: 30, bottom: 80, left: 50 };
+const margin =
+  windowWidth > 700
+    ? { top: 30, right: 40, bottom: 80, left: 50 }
+    : { top: 30, right: 40, bottom: 120, left: 50 };
 const headerHeight = 40;
 
 // Width allocated to legend box
 const legendWidth = 60;
 
 // Square size allocated to legend color
-const legendDotSize = 20;
+const legendDotSize = windowHeight * 0.02;
 
 // Height for each visualization
 const visHeight = windowHeight / 2 - margin.top - margin.bottom - headerHeight;
+const mobileVisHeight =
+  windowHeight / 3 - margin.top - margin.bottom - headerHeight;
 
 // Height for the div wrapper of each visualization
 // Used to dynamically set wrapper height in this script.
 const visDivHeight = windowHeight / 2 - headerHeight;
+const mobileVisDivHeight = windowHeight / 3 - headerHeight;
+
+// Font size defaults to 12 on most screens
+const standardFontSize = windowWidth > 700 ? 12 : 10;
 
 const visSizes = {
   plot1: {
     left: 0,
     top: 0,
     margin,
-    width: windowWidth / 2 - margin.left - margin.right,
-    height: visHeight,
+    width:
+      windowWidth > 700
+        ? windowWidth / 2 - margin.left - margin.right
+        : windowWidth - margin.left - margin.right,
+    height: windowWidth > 700 ? visHeight : mobileVisHeight,
     legendWidth,
   },
   plot2: {
     left: 0,
     top: 0,
     margin,
-    width: windowWidth / 2 - margin.left - margin.right,
-    height: visHeight,
+    width:
+      windowWidth > 700
+        ? windowWidth / 2 - margin.left - margin.right
+        : windowWidth - margin.left - margin.right,
+    height: windowWidth > 700 ? visHeight : mobileVisHeight,
     legendWidth,
   },
   plot3: {
@@ -40,7 +55,7 @@ const visSizes = {
     top: 0,
     margin,
     width: windowWidth - margin.left - margin.right - legendWidth,
-    height: visHeight,
+    height: windowWidth > 700 ? visHeight : mobileVisHeight,
     legendWidth,
   },
 };
@@ -137,10 +152,16 @@ function calculateLineValue(slope, intercept, x) {
 // Dynamically set heights of layout rows
 const layoutTopRow = d3
   .select("#layoutTopRow")
-  .style("height", `${visDivHeight}px`);
+  .style(
+    "height",
+    `${windowHeight > 700 ? visDivHeight : mobileVisDivHeight}px`,
+  );
 const layoutBottomRow = d3
   .select("#layoutBottomRow")
-  .style("height", `${visDivHeight}px`);
+  .style(
+    "height",
+    `${windowHeight > 700 ? visDivHeight : mobileVisDivHeight}px`,
+  );
 
 // Parse data and make graphs
 d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
@@ -226,7 +247,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr("y", visSizes.plot1.height + margin.top + 20)
     .text("Favorite genre")
     .style("font-family", "Arial")
-    .style("font-size", 12);
+    .style("font-size", standardFontSize);
 
   // Add y-axis label
   g1.append("text")
@@ -236,7 +257,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr("x", -margin.top)
     .text("Frequency")
     .style("font-family", "Arial")
-    .style("font-size", 12);
+    .style("font-size", standardFontSize);
 
   // Add bar chart title
   g1.append("text")
@@ -245,7 +266,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr("y", 0)
     .text("Frequency of favorite genres in dataset")
     .style("font-family", "Arial")
-    .style("font-size", 14);
+    .style("font-size", standardFontSize * 1.125);
 
   // Bars
   g1.selectAll("mybar")
@@ -307,7 +328,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr("y", visSizes.plot2.height + margin.top + 10)
     .text("Hours per day of music")
     .style("font-family", "Arial")
-    .style("font-size", 12);
+    .style("font-size", standardFontSize);
 
   // Add y-axis label
   g2.append("text")
@@ -317,7 +338,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr("x", -margin.top)
     .text("Mental health challenges")
     .style("font-family", "Arial")
-    .style("font-size", 12);
+    .style("font-size", standardFontSize);
 
   // Add scatterplot title
   g2.append("text")
@@ -326,7 +347,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr("y", 0)
     .text("Mental health challenges vs. hours per day of music")
     .style("font-family", "Arial")
-    .style("font-size", 14);
+    .style("font-size", standardFontSize * 1.125);
 
   // Add scatterplot dots
   g2.append("g")
@@ -358,6 +379,8 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
 
   // PARALLEL COORDINATES PLOT
   // Docs: https://d3-graph-gallery.com/parallel.html
+
+  console.log(visSizes.plot3);
 
   // Create element for parallel coordinates plot
   const g3 = d3
@@ -484,27 +507,30 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .append("text")
     .attr("anchor", "middle")
     .attr("x", 0)
-    .attr("y", -20)
+    .attr("y", -40)
     .text("Favorite Genre")
     .style("font-family", "Arial")
-    .style("font-size", 12);
+    .style("font-size", standardFontSize);
 
   // Create legend hint subtext
   const legendSubtext = legend
     .append("text")
     .attr("anchor", "middle")
     .attr("x", 0)
-    .attr("y", -8)
+    .attr("y", -28)
     .text("(HOVER TO HIGHLIGHT)")
     .style("font-family", "Arial")
-    .style("font-size", 10);
+    .style("font-size", standardFontSize * 0.833);
 
   const legendItem = legend
     .selectAll(".legend-item")
     .data(genres)
     .enter()
     .append("g")
-    .attr("transform", (d, i) => `translate(0, ${i * 24})`)
+    .attr(
+      "transform",
+      (d, i) => `translate(0, ${i * (legendDotSize * 1.2) - 20})`,
+    )
     .style("cursor", "pointer")
     .on("mouseover", (event, idx) => {
       const genre = genres[idx];
@@ -561,7 +587,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr("x", legendDotSize + 8)
     .attr("y", legendDotSize / 2)
     .attr("dominant-baseline", "middle")
-    .style("font-size", "12px")
+    .style("font-size", standardFontSize)
     .style("font-family", "Arial")
     .text((d) => d);
 
@@ -572,5 +598,5 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr("y", -30)
     .text("Music and Mental Health: Parallel Coorindates")
     .style("font-family", "Arial")
-    .style("font-size", 14);
+    .style("font-size", standardFontSize * 1.125);
 });
