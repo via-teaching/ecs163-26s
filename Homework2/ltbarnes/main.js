@@ -155,7 +155,7 @@ function buildBarChart(svg, data) {
   // X-axis label
   g.append("text")
     .attr("x", barWidth / 2)
-    .attr("y", barHeight + 105)
+    .attr("y", barHeight + barMargin.bottom - 8)
     .attr("text-anchor", "middle")
     .style("font-size", "11px").style("fill", "#555")
     .text("Primary Type");
@@ -222,12 +222,28 @@ function buildScatter(svg, data) {
   // Add a red border around legendary Pokémon
   drawDots(leg, 4.5, "#e60000");
 
-  // Show note explaining legendary outline
+  
+  // legend_ary legend
+  const legLabelX = scatterWidth - 10;
+
+  // Non-legendary dot
+  g.append("circle")
+    .attr("cx", legLabelX - 64).attr("cy", -6)
+    .attr("r", 4).attr("fill", "#aaa").attr("opacity", 0.65);
   g.append("text")
-    .attr("x", scatterWidth).attr("y", 0)
-    .attr("text-anchor", "end")
+    .attr("x", legLabelX - 57).attr("y", -2)
+    .style("font-size", "10px").style("fill", "#555")
+    .text("Normal");
+
+  // Legendary dot with red outline
+  g.append("circle")
+    .attr("cx", legLabelX - 10).attr("cy", -6)
+    .attr("r", 4).attr("fill", "#aaa").attr("opacity", 0.65)
+    .attr("stroke", "#e60000").attr("stroke-width", 1.5);
+  g.append("text")
+    .attr("x", legLabelX - 3).attr("y", -2)
     .style("font-size", "10px").style("fill", "#e60000")
-    .text("red outline = Legendary");
+    .text("Legendary");
 
   // Add axes
   g.append("g")
@@ -269,6 +285,13 @@ function buildParallel(svg, data) {
     .style("font-size", "14px")
     .style("font-weight", "bold")
     .text("Six-Stat Profile (Parallel Coordinates)");
+
+  // y label for parallel
+  g.append("text")
+    .attr("transform", `translate(-28, ${parallelHeight / 2}) rotate(-90)`)
+    .attr("text-anchor", "middle")
+    .style("font-size", "11px").style("fill", "#555")
+    .text("Stat Value");
 
   // Position stat dimensions
   const xPos = d3.scalePoint()
