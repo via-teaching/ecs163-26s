@@ -135,7 +135,10 @@ function drawDecadeOverview(data) {
   svg.selectAll("*").remove();
 
   const { width, height } = getChartBox(selector);
-  const margin = { top: 28, right: 28, bottom: 46, left: 46 };
+  const isCompact = width < 520;
+  const margin = isCompact
+    ? { top: 20, right: 18, bottom: 34, left: 38 }
+    : { top: 26, right: 28, bottom: 54, left: 46 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
@@ -179,20 +182,31 @@ function drawDecadeOverview(data) {
 
   // Bars encode measure counts by decade and outcome.
   layers.selectAll("rect")
-    .data(d => d)
+    .data(layer => layer.map(point => ({
+      decade: point.data.decade,
+      outcome: layer.key,
+      count: point.data[layer.key],
+      total: point.data.Passed + point.data.Failed,
+      y0: point[0],
+      y1: point[1]
+    })))
     .enter()
     .append("rect")
-    .attr("x", d => x(d.data.decade))
-    .attr("y", d => y(d[1]))
-    .attr("height", d => y(d[0]) - y(d[1]))
+    .attr("class", "decade-bar")
+    .attr("x", d => x(d.decade))
+    .attr("y", d => y(d.y1))
+    .attr("height", d => y(d.y0) - y(d.y1))
     .attr("width", x.bandwidth())
-    .attr("opacity", 0.92);
+    .attr("opacity", 0.92)
+    .on("mouseenter", d => showDecadeTooltip(d))
+    .on("mousemove", moveTooltip)
+    .on("mouseleave", hideTooltip);
 
   // Decade axis.
   chart.append("g")
     .attr("class", "axis")
     .attr("transform", `translate(0,${innerHeight})`)
-    .call(d3.axisBottom(x));
+    .call(d3.axisBottom(x).tickValues(isCompact ? decades.filter((d, i) => i % 2 === 0).map(d => d.decade) : x.domain()));
 
   // Measure count axis.
   chart.append("g")
@@ -203,7 +217,7 @@ function drawDecadeOverview(data) {
   chart.append("text")
     .attr("class", "axis-label")
     .attr("x", innerWidth / 2)
-    .attr("y", innerHeight + 38)
+    .attr("y", innerHeight + (isCompact ? 28 : 42))
     .attr("text-anchor", "middle")
     .text("Election decade");
 
@@ -225,7 +239,10 @@ function drawTurnoutScatter(data) {
   svg.selectAll("*").remove();
 
   const { width, height } = getChartBox(selector);
-  const margin = { top: 30, right: 30, bottom: 48, left: 66 };
+  const isCompact = width < 520;
+  const margin = isCompact
+    ? { top: 22, right: 20, bottom: 34, left: 42 }
+    : { top: 28, right: 30, bottom: 54, left: 66 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
@@ -251,7 +268,7 @@ function drawTurnoutScatter(data) {
   // Turnout gridlines.
   chart.append("g")
     .attr("class", "gridline")
-    .call(d3.axisLeft(y).ticks(4).tickSize(-innerWidth).tickFormat(""));
+    .call(d3.axisLeft(y).ticks(isCompact ? 3 : 4).tickSize(-innerWidth).tickFormat(""));
 
   // 50% reference line.
   chart.append("line")
@@ -268,7 +285,7 @@ function drawTurnoutScatter(data) {
     .attr("class", "annotation")
     .attr("x", x(50) + 6)
     .attr("y", 12)
-    .text("50% yes");
+    .text(isCompact ? "50%" : "50% yes");
 
   // Scatter: x = yes share, y/radius = turnout, color = outcome.
   chart.selectAll("circle")
@@ -291,18 +308,18 @@ function drawTurnoutScatter(data) {
   chart.append("g")
     .attr("class", "axis")
     .attr("transform", `translate(0,${innerHeight})`)
-    .call(d3.axisBottom(x).ticks(5).tickFormat(d => `${d}%`));
+    .call(d3.axisBottom(x).ticks(isCompact ? 4 : 5).tickFormat(d => `${d}%`));
 
   // Total-votes axis.
   chart.append("g")
     .attr("class", "axis")
-    .call(d3.axisLeft(y).ticks(4).tickFormat(compactNumber));
+    .call(d3.axisLeft(y).ticks(isCompact ? 3 : 4).tickFormat(compactNumber));
 
   // x = yes vote share.
   chart.append("text")
     .attr("class", "axis-label")
     .attr("x", innerWidth / 2)
-    .attr("y", innerHeight + 39)
+    .attr("y", innerHeight + (isCompact ? 28 : 42))
     .attr("text-anchor", "middle")
     .text("Yes vote share");
 
@@ -311,12 +328,12 @@ function drawTurnoutScatter(data) {
     .attr("class", "axis-label")
     .attr("transform", "rotate(-90)")
     .attr("x", -innerHeight / 2)
-    .attr("y", -46)
+    .attr("y", isCompact ? -30 : -46)
     .attr("text-anchor", "middle")
     .text("Total votes cast");
 
-  drawOutcomeLegend(svg, width - 168, 8);
-  drawSizeLegend(svg, width - 132, height - 96, r);
+  drawOutcomeLegend(svg, width - (isCompact ? 82 : 168), 8, isCompact);
+  drawSizeLegend(svg, width - (isCompact ? 94 : 150), height - (isCompact ? 64 : 104), r, isCompact);
 }
 
 function drawParallelCoordinates(data) {
@@ -325,8 +342,10 @@ function drawParallelCoordinates(data) {
   svg.selectAll("*").remove();
 
   const { width, height } = getChartBox(selector);
-  const isCompact = width < 620;
-  const margin = { top: 34, right: 54, bottom: 34, left: 54 };
+  const isCompact = width < 520;
+  const margin = isCompact
+    ? { top: 26, right: 28, bottom: 24, left: 40 }
+    : { top: 34, right: 54, bottom: 34, left: 54 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
@@ -336,7 +355,7 @@ function drawParallelCoordinates(data) {
   const focusData = data
     .slice()
     .sort((a, b) => d3.descending(a.totalVotes, b.totalVotes))
-    .slice(0, 180);
+    .slice(0, isCompact ? 90 : 180);
 
   const dimensions = ["year", "typeCode", "sponsorCode", "yesShare", "totalVotes"];
   const dimensionLabels = {
@@ -382,7 +401,7 @@ function drawParallelCoordinates(data) {
     .attr("d", d => line(dimensions.map(dim => [x(dim), yScales[dim](d[dim])])))
     .attr("stroke", d => outcomeColors(d.outcome))
     .attr("stroke-width", 1.15)
-    .attr("stroke-opacity", 0.34)
+    .attr("stroke-opacity", isCompact ? 0.48 : 0.34)
     .on("mouseenter", d => showTooltip(d))
     .on("mousemove", moveTooltip)
     .on("mouseleave", hideTooltip);
@@ -408,14 +427,16 @@ function drawParallelCoordinates(data) {
     .attr("font-weight", 700)
     .text(d => dimensionLabels[d]);
 
-  // Note why this plot uses a subset.
-  chart.append("text")
-    .attr("class", "annotation")
-    .attr("x", 0)
-    .attr("y", innerHeight + 25)
-    .text(isCompact ? "Top 180 by turnout; color = outcome." : "Parallel coordinates show the 180 highest-turnout measures; color is outcome.");
+  if (!isCompact) {
+    // Note why this plot uses a subset.
+    chart.append("text")
+      .attr("class", "annotation")
+      .attr("x", 0)
+      .attr("y", innerHeight + 25)
+      .text("Parallel coordinates show the 180 highest-turnout measures; color is outcome.");
+  }
 
-  drawOutcomeLegend(svg, width - 168, 52);
+  drawOutcomeLegend(svg, width - (isCompact ? 82 : 168), isCompact ? 34 : 52, isCompact);
 }
 
 function normalizeSponsor(value) {
@@ -447,7 +468,7 @@ function buildParallelAxis(dim, scale, isCompact) {
   return d3.axisLeft(scale).tickFormat(d => labels[d] || d);
 }
 
-function drawOutcomeLegend(svg, x, y) {
+function drawOutcomeLegend(svg, x, y, isCompact = false) {
   const legendData = ["Passed", "Failed"];
 
   // Shared pass/fail legend.
@@ -460,9 +481,9 @@ function drawOutcomeLegend(svg, x, y) {
     .enter()
     .append("rect")
     .attr("x", 0)
-    .attr("y", (d, i) => i * 18)
-    .attr("width", 10)
-    .attr("height", 10)
+    .attr("y", (d, i) => i * (isCompact ? 14 : 18))
+    .attr("width", isCompact ? 8 : 10)
+    .attr("height", isCompact ? 8 : 10)
     .attr("fill", d => outcomeColors(d));
 
   // Outcome labels.
@@ -471,13 +492,13 @@ function drawOutcomeLegend(svg, x, y) {
     .enter()
     .append("text")
     .attr("class", "legend-label")
-    .attr("x", 16)
-    .attr("y", (d, i) => i * 18 + 9)
-    .text(d => d);
+    .attr("x", isCompact ? 13 : 16)
+    .attr("y", (d, i) => i * (isCompact ? 14 : 18) + 9)
+    .text(d => isCompact ? d[0] : d);
 }
 
-function drawSizeLegend(svg, x, y, rScale) {
-  const sizes = [100000, 300000];
+function drawSizeLegend(svg, x, y, rScale, isCompact = false) {
+  const sizes = isCompact ? [100000] : [100000, 300000];
 
   // Scatter size legend.
   const legend = svg.append("g")
@@ -488,7 +509,7 @@ function drawSizeLegend(svg, x, y, rScale) {
     .attr("class", "legend-label")
     .attr("x", 0)
     .attr("y", 0)
-    .text("Total votes");
+    .text(isCompact ? "Votes" : "Total votes");
 
   // Reference circles for turnout.
   legend.selectAll("circle")
@@ -521,6 +542,14 @@ function showTooltip(d) {
   moveTooltip();
 }
 
+function showDecadeTooltip(d) {
+  highlightDecade(d.decade);
+  tooltip
+    .style("opacity", 1)
+    .html(`<strong>${d.decade} ballot measures</strong>${d.outcome}: ${d.count} of ${d.total} measures<br>Hovering a decade filters the individual-measure views.`);
+  moveTooltip();
+}
+
 function moveTooltip() {
   tooltip
     .style("left", `${d3.event.clientX}px`)
@@ -528,14 +557,36 @@ function moveTooltip() {
 }
 
 function hideTooltip() {
-  highlightMeasure(null);
+  clearHighlights();
   tooltip.style("opacity", 0);
 }
 
 function highlightMeasure(id) {
+  const activeMeasure = ballotData.find(d => d.id === id);
+
+  d3.selectAll(".decade-bar")
+    .classed("is-muted", d => Boolean(activeMeasure) && d.decade !== activeMeasure.decade)
+    .classed("is-active", d => Boolean(activeMeasure) && d.decade === activeMeasure.decade);
+
   d3.selectAll(".measure-point,.parallel-line")
     .classed("is-muted", d => Boolean(id) && d.id !== id)
     .classed("is-active", d => Boolean(id) && d.id === id);
+}
+
+function highlightDecade(decade) {
+  d3.selectAll(".decade-bar")
+    .classed("is-muted", d => Boolean(decade) && d.decade !== decade)
+    .classed("is-active", d => Boolean(decade) && d.decade === decade);
+
+  d3.selectAll(".measure-point,.parallel-line")
+    .classed("is-muted", d => Boolean(decade) && d.decade !== decade)
+    .classed("is-active", d => Boolean(decade) && d.decade === decade);
+}
+
+function clearHighlights() {
+  d3.selectAll(".decade-bar,.measure-point,.parallel-line")
+    .classed("is-muted", false)
+    .classed("is-active", false);
 }
 
 function uniqueSorted(values) {
