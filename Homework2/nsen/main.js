@@ -156,9 +156,8 @@ d3.csv("student_mental_health.csv")
 
     const radius = Math.min(pieWidth, pieHeight) / 2 - pieMargin * 2;
 
-    const pieSvg = d3.selectAll("#pie-svg")
+    const pieSvg = d3.selectAll("#pie-svg");
     // .attr("transform", `translate(${pieWindowWidth / 5}, ${pieWindowHeight / 10})`);
-    
 
     const pieData = d3.rollup(
       processedData,
@@ -442,10 +441,21 @@ function graph(processedData) {
   const links = [];
 
   for (const k of keys) {
-    for (const d of processedData) {
-      const key = [k.toLowerCase(), d[k.toLowerCase()]];
+    const uniqueValues = [
+      ...new Set(processedData.map((d) => d[k.toLowerCase()])),
+    ];
+
+    // Special sort for the GPA key
+    if (k === "GPA") {
+      uniqueValues.sort((a, b) =>
+        parseFloat(parseFloat(b.slice(0, 3) - a.slice(0, 3))),
+      );
+    }
+
+    for (const value of uniqueValues) {
+      const key = [k.toLowerCase(), value];
       if (nodeByKey.has(key)) continue;
-      const node = { name: d[k.toLowerCase()] };
+      const node = { name: value };
       nodes.push(node);
       nodeByKey.set(key, node);
       indexByKey.set(key, ++index);
