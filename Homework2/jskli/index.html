@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pokemon Battle Dashboard</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- D3.js is required for this homework. -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+  <div id="dashboard">
+    <header id="dashboard-header">
+      <div>
+        <h1>Pokemon Battle Dashboard</h1>
+        <p>
+          Explore how Pokemon types differ in frequency, attack/defense balance,
+          and overall battle stat profiles.
+        </p>
+      </div>
+
+      <div id="controls">
+        <label for="type-filter">Filter by Type:</label>
+        <select id="type-filter">
+          <option value="All">All Types</option>
+        </select>
+      </div>
+    </header>
+
+    <section id="overview-panel" class="panel">
+      <h2>Overview: Pokemon Count by Primary Type</h2>
+      <svg id="bar-chart"></svg>
+    </section>
+
+    <main id="bottom-panels">
+      <section class="panel">
+        <h2>Focus: Attack vs. Defense</h2>
+        <svg id="scatter-plot"></svg>
+      </section>
+
+      <section class="panel">
+        <h2>Advanced: Pokemon Stat Profiles</h2>
+        <svg id="parallel-coordinates"></svg>
+      </section>
+    </main>
+  </div>
+
+  <div id="tooltip"></div>
+
+  <script src="main.js"></script>
+</body>
+</html>
