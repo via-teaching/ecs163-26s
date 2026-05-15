@@ -1,0 +1,178 @@
+/* Make width and height easier to control */
+* {
+  box-sizing: border-box;       /* Include padding and border in size */
+}
+
+/* Style the full page */
+body {
+  background-color: #FAFAFA;    /* Light gray background */
+  font-family: Helvetica, Arial, sans-serif; /* Simple readable font */
+  padding: 18px;                /* Add page padding */
+  margin: 0;                    /* Remove browser margin */
+}
+
+/* Give every SVG a white background */
+svg {
+  background-color: #FFFFFF;    /* White chart background */
+}
+
+/* Main page wrapper */
+.page-container {
+  width: 100%;                  /* Use full page width */
+  max-width: 1650px;            /* Keep dashboard from becoming too wide */
+  margin: 0 auto;               /* Center dashboard */
+}
+
+/* Dashboard title card */
+.dashboard-header {
+  background-color: #FFFFFF;    /* Match chart cards */
+  border-radius: 8px;           /* Soft corners */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* Light shadow */
+  padding: 10px 18px;           /* Small padding */
+  margin-bottom: 14px;          /* Gap below header */
+  text-align: center;           /* Center title and subtitle */
+}
+
+/* Main dashboard title */
+.dashboard-header h1 {
+  font-size: 22px;              /* Large but not huge */
+  color: #2C3E50;               /* Dark blue-gray */
+  margin: 0 0 5px 0;            /* Small bottom spacing */
+}
+
+/* Dashboard subtitle */
+.dashboard-header p {
+  font-size: 14px;              /* Smaller than title */
+  color: #555555;               /* Softer text color */
+  margin: 0;                    /* Remove default paragraph margin */
+  line-height: 1.35;            /* Make it readable */
+}
+
+/* Dashboard chart area */
+.dashboard-container {
+  display: flex;                /* Use flexbox */
+  flex-direction: column;       /* Stack rows vertically */
+  gap: 18px;                    /* Space between chart rows */
+  width: 100%;                  /* Use full width */
+  height: calc(100vh - 120px);  /* Fit under the title card */
+  max-height: calc(100vh - 120px); /* Prevent extra overflow */
+}
+
+/* Top row with two charts */
+.top-row {
+  display: flex;                /* Put top charts side by side */
+  gap: 18px;                    /* Space between top charts */
+  flex: 1;                      /* Use half of dashboard height */
+  min-height: 0;                /* Help flex shrink correctly */
+}
+
+/* Top row chart cards */
+.top-row .chart-container {
+  flex: 1;                      /* Equal chart width */
+  min-width: 0;                 /* Prevent overflow */
+}
+
+/* Bottom row with one chart */
+.bottom-row {
+  display: flex;                /* Keep bottom chart as a row */
+  flex: 1;                      /* Use half of dashboard height */
+  min-height: 0;                /* Help flex shrink correctly */
+}
+
+/* Bottom row chart card */
+.bottom-row .chart-container {
+  flex: 1;                      /* Use all available width */
+  width: 100%;                  /* Full width */
+  min-width: 0;                 /* Prevent overflow */
+}
+
+/* General chart card style */
+.chart-container {
+  background-color: #FFFFFF;    /* White card */
+  border-radius: 8px;           /* Rounded corners */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  padding: 16px;                /* Padding inside card */
+  display: flex;                /* Use flexbox inside card */
+  flex-direction: column;       /* Title above chart */
+  overflow: hidden;             /* Hide accidental overflow */
+}
+
+/* Chart title text */
+.chart-title {
+  font-size: 18px;              /* Readable title size */
+  font-weight: 600;             /* Semi-bold */
+  color: #2C3E50;               /* Dark blue-gray */
+  margin: 0 0 8px 0;            /* Small bottom spacing */
+  text-align: center;           /* Center title */
+  flex-shrink: 0;               /* Do not shrink title */
+}
+
+/* Chart drawing area */
+.chart-content {
+  flex: 1;                      /* Use remaining card space */
+  position: relative;           /* Keep chart positioning stable */
+  display: flex;                /* Center the SVG */
+  align-items: center;          /* Center vertically */
+  justify-content: center;      /* Center horizontally */
+  min-height: 0;                /* Help flex sizing */
+}
+
+/* SVG inside chart area */
+.chart-content svg {
+  max-width: 100%;              /* Do not exceed card width */
+  max-height: 100%;             /* Do not exceed card height */
+}
+
+/* Tablet layout */
+@media (max-width: 1024px) {
+  .top-row {
+    flex-direction: column;     /* Stack top charts */
+  }
+
+  .dashboard-container {
+    height: auto;               /* Allow scroll on smaller screens */
+    max-height: none;           /* Remove fixed max height */
+  }
+
+  .chart-container {
+    min-height: 400px;          /* Keep charts readable */
+  }
+}
+
+/* Mobile layout */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;              /* Less page padding */
+  }
+
+  .dashboard-header {
+    padding: 10px;              /* Less header padding */
+    margin-bottom: 10px;        /* Smaller gap */
+  }
+
+  .dashboard-header h1 {
+    font-size: 18px;            /* Smaller mobile title */
+  }
+
+  .dashboard-header p {
+    font-size: 12px;            /* Smaller mobile subtitle */
+  }
+
+  .dashboard-container {
+    gap: 10px;                  /* Smaller row gap */
+  }
+
+  .top-row {
+    gap: 10px;                  /* Smaller top chart gap */
+  }
+
+  .chart-container {
+    padding: 14px;              /* Smaller card padding */
+    min-height: 360px;          /* Keep mobile charts readable */
+  }
+
+  .chart-title {
+    font-size: 16px;            /* Smaller chart titles */
+    margin-bottom: 8px;         /* Smaller spacing */
+  }
+}
