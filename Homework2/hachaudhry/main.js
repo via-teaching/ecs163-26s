@@ -14,8 +14,6 @@
 "use strict";
 
 
-// CONSTANTS
-
 
 //ordered by global frequency
 // (most common first so I can control stream layer ordering)
@@ -31,7 +29,7 @@ const ATTACK_TYPES = [
   "Hijacking"
 ];
 
-// Categorical color scale: one distinct hue per attack type
+//color scale (different for different types of attacks)
 const attackColor = d3.scaleOrdinal()
   .domain(ATTACK_TYPES)
   .range([
@@ -120,7 +118,7 @@ Object.keys(GTD_TO_ISO).forEach(function(name) {
 });
 
 
-const tooltip = d3.select("#tooltip"); // shared tooltip div from index.html
+const tooltip = d3.select("#tooltip"); // shared tooltip div
 
 function showTip(html, evt) {
   tooltip.style("opacity", 1).html(html)
@@ -140,13 +138,13 @@ let selectedRegion = null;
 
 
 Promise.all([
-  d3.csv("../../globalterrorismdb_0718dist.csv"),   // GTD dataset
-  d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json") // world polygons
+  d3.csv("globalterrorismdb_0718dist.csv"),   // GTD dataset
+  d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json") //world shapes
 ]).then(function(results) {
   var raw   = results[0];
   var world = results[1];
 
-  d3.select("#loading").style("display", "none"); // hide spinner once data is loaded
+  d3.select("#loading").style("display", "none"); //hides loading thingy
 
   //converting strings to numbers for the fields we use
   raw.forEach(function(d) {
@@ -191,7 +189,7 @@ Promise.all([
       };
     });
 
-  //attack type count by year (global)
+  // attack type count by year (global)
   var yearTypeGlobal = {};
   raw.forEach(function(d) {
     var y = d.iyear, t = d.attacktype1_txt;
@@ -208,7 +206,7 @@ Promise.all([
     regionYearType[r][y][t] = (regionYearType[r][y][t] || 0) + 1;
   });
 
-  // converts a year→type lookup into the flat row array d3.stack() needs
+  // converts a year to type lookup into the flat row array d3.stack() needs (for the stream graph)
   function buildStreamRows(yearTypeTable) {
     return d3.range(1970, 2018).map(function(y) {
       var row = { year: y };
@@ -226,7 +224,7 @@ Promise.all([
   var streamCtrl = drawStream(globalStreamRows);
   var barCtrl    = drawBar(regionData);
 
-  //linked interaction: clicking a country filters all three views by region
+  //linked interaction (so that clicking a country puts all the views settings on that region the country is part of)
   function onCountryClick(region) {
     selectedRegion = (selectedRegion === region) ? null : region;
 
@@ -259,9 +257,9 @@ function drawMap(world, countryAgg) {
   var W = panel.clientWidth;
   var H = panel.clientHeight;
 
-  var svg = d3.select("#map-svg"); // SVG element for the map
+  var svg = d3.select("#map-svg"); // SVG for map
 
-  // Natural Earth projection: low-distortion world map
+  // world map
   var projection = d3.geoNaturalEarth1()
     .scale(W / 6.3)
     .translate([W / 2, H / 2]);
@@ -274,7 +272,7 @@ function drawMap(world, countryAgg) {
     return countryAgg[k].attacks;
   }));
 
-  // Log scale so heavily-skewed attack counts still show color variation across all countries
+  // log scale for colors so we can see extremes distinctly
   var logNorm = d3.scaleLog()
     .domain([1, maxAttacks])
     .range([0, 1])
@@ -282,10 +280,10 @@ function drawMap(world, countryAgg) {
 
   function fillColor(attacks) {
     if (!attacks || attacks < 1) return "#1e2030"; //no-data countries
-    return d3.interpolateYlOrRd(logNorm(attacks)); // light yellow → dark red
+    return d3.interpolateYlOrRd(logNorm(attacks)); // color scale
   }
 
-  // Full-sphere path creates the ocean background
+  // attempt at an ocean
   svg.append("path")
     .datum({ type: "Sphere" })
     .attr("d", pathGen)
@@ -293,7 +291,7 @@ function drawMap(world, countryAgg) {
     .attr("stroke", "#2d2e3e")
     .attr("stroke-width", 0.5);
 
-  // Graticule draws lat/lon grid lines for geographic context
+  // gridlines (lat/lon)
   svg.append("path")
     .datum(d3.geoGraticule()())
     .attr("d", pathGen)
@@ -301,13 +299,13 @@ function drawMap(world, countryAgg) {
     .attr("stroke", "#21223a")
     .attr("stroke-width", 0.3);
 
-  // One SVG path per country, colored by attack count
+  // SVG path per country, and colored based off attack count
   var countryPaths = svg.selectAll(".country")
     .data(countries.features)
     .enter()
     .append("path")
     .attr("class", "country")
-    .attr("d", pathGen) // draws the country boundary
+    .attr("d", pathGen) //country boundaries
     .attr("stroke", "#2a2b3d")
     .attr("stroke-width", 0.4)
     .attr("fill", function(d) {
@@ -347,13 +345,13 @@ function drawMap(world, countryAgg) {
     .on("click", function(d) {
       var name = ISO_TO_GTD[+d.id];
       var c    = name && countryAgg[name];
-      if (c && state.onClick) state.onClick(c.region); // fire cross-view filter
+      if (c && state.onClick) state.onClick(c.region);
     });
 
   // Color legend
   var lgW = 130, lgH = 8;
   var defs = svg.append("defs");
-  var grad = defs.append("linearGradient").attr("id", "choropleth-grad"); // gradient for legend bar
+  var grad = defs.append("linearGradient").attr("id", "choropleth-grad");
 
   d3.range(0, 1.01, 0.1).forEach(function(t) {
     grad.append("stop")
@@ -389,7 +387,7 @@ function drawMap(world, countryAgg) {
 
   var state = { onClick: null, _region: null };
 
-  // Highlights countries in the selected region and dims all others
+  // highlights countries in the selected region and dims out all others (kind of pops them out)
   state.setRegion = function(region) {
     state._region = region;
     countryPaths
@@ -428,11 +426,11 @@ function drawStream(initRows) {
   var iW = W - margin.left - margin.right;
   var iH = H - margin.top - margin.bottom;
 
-  var svg = d3.select("#stream-svg"); // SVG element for the stream graph
+  var svg = d3.select("#stream-svg"); // SVG for the stream graph
   var g   = svg.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  // Linear x scale mapping years to pixel positions
+  //linear x scale mapping years for pixel positions
   var xScale = d3.scaleLinear()
     .domain([1970, 2017])
     .range([0, iW]);
@@ -448,7 +446,7 @@ function drawStream(initRows) {
     .attr("text-anchor", "middle")
     .text("Year");
 
-  // Y axis label only — no ticks because wiggle offset makes absolute y-values meaningless
+  // Y axis label only, no ticks because wiggle offset makes absolute y-values meaningless
   g.append("text")
     .attr("class", "axis-label")
     .attr("transform", "rotate(-90)")
@@ -456,21 +454,21 @@ function drawStream(initRows) {
     .attr("text-anchor", "middle")
     .text("Number of Attacks");
 
-  // stackOffsetWiggle minimises total slope change → characteristic stream graph shape
+  // stackOffsetWiggle minimises total slope change to characteristic stream graph shape
   // stackOrderInsideOut places the largest series centrally for visual balance
   var stack = d3.stack()
     .keys(ATTACK_TYPES)
     .offset(d3.stackOffsetWiggle)
     .order(d3.stackOrderInsideOut);
 
-  var yScale = d3.scaleLinear().range([iH, 0]); // domain set dynamically in computeStack
+  var yScale = d3.scaleLinear().range([iH, 0]); // domain set for change in computeStack
 
-  // Area generator with Basis smoothing for the organic stream appearance
+  // smoothing so the stream graph looks nice
   var area = d3.area()
     .x(function(d) { return xScale(d.data.year); })
     .curve(d3.curveBasis);
 
-  // Recomputes the stacked layout and updates yScale + area y accessors
+  // recomputes the stacked layout and updates yScale + area y accessors
   function computeStack(rows) {
     var stacked = stack(rows);
     var yMin = d3.min(stacked, function(layer) {
@@ -487,7 +485,7 @@ function drawStream(initRows) {
 
   var initStacked = computeStack(initRows);
 
-  // One filled path per attack type; thickness encodes attack frequency
+  //path per attack type, thickness represents attack frequency
   var streamPaths = g.selectAll(".stream-path")
     .data(initStacked)
     .enter()
@@ -507,7 +505,7 @@ function drawStream(initRows) {
       d3.selectAll(".stream-path").attr("opacity", 0.82);
     });
 
-  var legendG = svg.append("g") // legend group positioned to the right of the chart
+  var legendG = svg.append("g") // legend positioned to the right of the chart
     .attr("transform", "translate(" + (W - margin.right + 12) + "," + margin.top + ")");
 
   legendG.append("text")
@@ -517,7 +515,7 @@ function drawStream(initRows) {
   ATTACK_TYPES.forEach(function(t, i) {
     var row = legendG.append("g").attr("transform", "translate(0," + (i * 15) + ")");
 
-    row.append("rect") // colored swatch matching stream layer
+    row.append("rect")
       .attr("width", 10).attr("height", 10).attr("rx", 2)
       .attr("fill", attackColor(t));
 
@@ -527,7 +525,7 @@ function drawStream(initRows) {
       .text(t.length > 23 ? t.slice(0, 22) + "…" : t);
   });
 
-  // Re-stacks data for the selected region and animates stream paths to new shapes
+  // redoes the process for a selected region and animates stream paths to new shapes
   function update(newRows, regionName) {
     var newStacked = computeStack(newRows);
 
@@ -563,21 +561,21 @@ function drawBar(regionData) {
   var g   = svg.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  // Band scale assigns a vertical slot to each region
+  //band scale assigns a vertical slot to each region
   var yScale = d3.scaleBand()
     .domain(regionData.map(function(d) { return d.region; }))
     .range([0, iH])
     .paddingInner(0.22)
     .paddingOuter(0.08);
 
-  // Linear x scale spanning 0 to the highest total casualties of any region
+  // linear x scale from 0 to the highest total # of casualties of any region
   var xMax = d3.max(regionData, function(d) { return d.killed + d.wounded; });
   var xScale = d3.scaleLinear()
     .domain([0, xMax])
     .range([0, iW])
     .nice();
 
-  // Stack splits each region bar into a killed segment and a wounded segment
+  // splits each region bar into a killed segment and a wounded segment
   var stackGen = d3.stack().keys(["killed", "wounded"]);
   var stacked  = stackGen(regionData);
 
@@ -591,7 +589,7 @@ function drawBar(regionData) {
     )
     .select(".domain").remove();
 
-  // One group per casualty type; fill color applied at the group level
+  // one group for casualty type, color for group level
   var barGroups = g.selectAll(".bar-layer")
     .data(stacked)
     .enter()
@@ -599,13 +597,13 @@ function drawBar(regionData) {
     .attr("class", "bar-layer")
     .attr("fill", function(d) { return barColors[d.key]; });
 
-  // One rect per region per casualty type
+  // one rect per region per casualty type
   var rects = barGroups.selectAll("rect")
     .data(function(d) { return d; })
     .enter()
     .append("rect")
     .attr("y",      function(d) { return yScale(d.data.region); })
-    .attr("x",      function(d) { return xScale(d[0]); })              // start of segment
+    .attr("x",      function(d) { return xScale(d[0]); }) // start of segment
     .attr("width",  function(d) { return Math.max(0, xScale(d[1]) - xScale(d[0])); }) // segment length
     .attr("height", yScale.bandwidth())
     .attr("rx", 2)
@@ -663,7 +661,7 @@ function drawBar(regionData) {
       .text(barLabels[key]);
   });
 
-  // Dims bars outside the selected region; resets when region is null
+  // Dims bars outside the selected region (resets when region is null)
   function setRegion(region) {
     rects.attr("opacity", function(d) {
       if (!region) return 0.85;
