@@ -1,0 +1,56 @@
+* {
+  box-sizing: border-box;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+
+body {
+    width:100%;
+    height:100%;
+    margin: 0;
+}
+.dashboard {
+    display: grid; 
+    grid-template-columns: 1fr 1fr;  /* 2 equal width cols */
+    grid-template-rows: 1fr 1.2fr;     /* 2 rows, 2nd 1.2x tall */
+    height: 100vh; /* take up full viewport */
+    gap: 10px; 
+    padding: 10px; 
+    box-sizing: border-box;
+    background: #ac07b8; 
+
+}
+
+.chart {
+    border: 1px solid black; 
+    background: #ffffff; 
+    display: flex; 
+    flex-direction: column;
+    border-radius: 5px;
+
+    /* I asked AI for help to fix issue where svg took up too much width */
+    min-width: 0; 
+    min-height: 0; 
+    overflow: auto; /* Adds scrollbars ONLY if the cell is smaller than the chart */    
+}
+.chart-double {
+    grid-column: span 2; 
+}
+
+h1 { 
+    margin: 10px; 
+    text-align: center; 
+    color: #333; 
+}
+
+h3 { 
+    margin: 10px; 
+    font-size: 16px; 
+    text-align: center; 
+    color: #333; 
+}
+
+.svg { 
+    width: 100%; 
+    height: 100%; 
+}
+
