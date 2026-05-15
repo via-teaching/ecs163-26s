@@ -1,7 +1,14 @@
+// ECS163 HW2
+// Xinyi Li
+// ccwli@ucdavis.edu
+// Student Alcohol Consumption Dataset (Math)
+
+// --- Layout & configuration ---
 let abFilter = 25;
 const width = window.innerWidth;
 const height = window.innerHeight;
 
+//initializa svg container
 const svg = d3.select("svg")
     .attr("width", width)
     .attr("height", height);
@@ -10,37 +17,38 @@ const svg = d3.select("svg")
 const padding = 60;
 const topRowHeight = Math.min(350, height * 0.42);
 
+// margrins for 3 (i didn't renamed the margrin names from the templete)
 let scatterMargin = {top: 50, right: 30, bottom: 60, left: 60};
 let distrMargin = {top: 50, right: 30, bottom: 60, left: 60};
 let teamMargin = {top: 50, right: 20, bottom: 50, left: 80};
 
-// top row charts
+// dimensions for top row charts
 let scatterWidth = width * 0.35;
 let scatterHeight = Math.min(280, topRowHeight * 0.7);
 
 let distrWidth = width * 0.35;
 let distrHeight = Math.min(280, topRowHeight * 0.7);
 
-// positions
+// positions 
 let scatterLeft = padding;
 
 let distrLeft = width * 0.52;
 let distrTop = 50;
 
-// bottom PCP
+// bottom PCP chart
 let teamTop = scatterHeight + 140;
 
 let teamWidth = width * 0.82;
 let teamHeight = height * 0.3;
 
-// plots
-d3.csv("student-mat.csv").then(rawData =>{
+// ---  Data Loading & Processing ---
+d3.csv("student-mat.csv").then(rawData =>{ //load dataset and tooltip
     console.log("rawData", rawData);
     const tooltip = d3.select("#tooltip");
 
     rawData.forEach(function(d,i){
         d.id = i;
-        d.studytime = Number(d.studytime);
+        d.studytime = Number(d.studytime); //convert strings to numbers
         d.G3 = Number(d.G3);
         d.absences = Number(d.absences);
         d.Walc = Number(d.Walc);
@@ -49,7 +57,7 @@ d3.csv("student-mat.csv").then(rawData =>{
 
 
     const filteredData = rawData
-    const processedData = filteredData.map(d=>{
+    const processedData = filteredData.map(d=>{// assign unique id for cross-linking
                           return {
                             'id': d.id,
                             'studytime': d.studytime,
@@ -61,13 +69,14 @@ d3.csv("student-mat.csv").then(rawData =>{
                             'Dalc': d.Dalc
                           };
     });
-    console.log("processedData", processedData);
+    console.log("processedData", processedData);//check processedData works
  
-    //plot 1: Scatter Plot for study time and final grade
+// --- plot 1: Scatter Plot for study time and final grade ---
+    // correlation between study time and final grade/ G3
   
     const svg = d3.select("svg");
     
-
+    //postion
     const g1 = svg.append("g")
                 .attr("width", scatterWidth + scatterMargin.left + scatterMargin.right)
                 .attr("height", scatterHeight + scatterMargin.top + scatterMargin.bottom)
@@ -97,37 +106,41 @@ d3.csv("student-mat.csv").then(rawData =>{
     .attr("font-size", "18px")
     .text("Does More Study Time Improve Final Grades?");
 
-    // X ticks
+    // X ticks, map study time to pixel width
     const x1 = d3.scaleLinear()
-    .domain([0, d3.max(processedData, d => d.studytime)])
-    .range([0, scatterWidth]);
-
+    .domain([0, d3.max(processedData, d => d.studytime)])// data range
+    .range([0, scatterWidth]);// pixel range on svg
+    
+    // x axis generator
     const xAxisCall = d3.axisBottom(x1)
-                        .ticks(7);
-    g1.append("g")
-    .attr("transform", `translate(0, ${scatterHeight})`)
-    .call(xAxisCall)
-    .selectAll("text")
-        .attr("y", "10")
-        .attr("x", "-5")
-        .attr("text-anchor", "end")
-        .attr("transform", "rotate(-40)");
+                        .ticks(7);//number of ticks shown
 
-    // Y ticks
+    g1.append("g")// append x axis to scatter plot group
+        .attr("transform", `translate(0, ${scatterHeight})`)// move axis to bottom of chart
+        .call(xAxisCall)
+        .selectAll("text")
+            .attr("y", "10")
+            .attr("x", "-5")
+            .attr("text-anchor", "end")
+            .attr("transform", "rotate(-40)");// rotate labels to avoid overlap
+
+    // Y ticks, map final grade to pixel height
     const y1 = d3.scaleLinear()
-    .domain([0, d3.max(processedData, d => d.G3)])
-    .range([scatterHeight, 0]);
+        .domain([0, d3.max(processedData, d => d.G3)])
+        .range([scatterHeight, 0]);// inverted range,  svg y increases downward
 
+    // y axis generator    
     const yAxisCall = d3.axisLeft(y1)
                         .ticks(13);
-    g1.append("g").call(yAxisCall);
+    g1.append("g")
+        .call(yAxisCall);// append y axis to scatter plot group
 
-     //legend
 
+    //legend
     const legend = g1.append("g")
-        .attr("transform", "translate(10,-10)");
+        .attr("transform", "translate(10,-10)");//position
 
-    legend.append("rect")
+    legend.append("rect")//pink, female
         .attr("width", 10)
         .attr("height", 10)
         .attr("fill", "#ff69b4");
@@ -137,7 +150,7 @@ d3.csv("student-mat.csv").then(rawData =>{
         .attr("y", 10)
         .text("Female");
 
-    legend.append("rect")
+    legend.append("rect")//blue, male
         .attr("x", 80)
         .attr("width", 10)
         .attr("height", 10)
@@ -149,7 +162,6 @@ d3.csv("student-mat.csv").then(rawData =>{
         .text("Male");
 
 
-
     // circles
     const circles = g1.selectAll("circle").data(processedData);
 
@@ -159,49 +171,50 @@ d3.csv("student-mat.csv").then(rawData =>{
          .attr("r", 5)
          .attr("class", d => "scatter-dot dot-" + d.id)
          .attr("fill", d=> d.sex==='F'? '#ff69b4':'#4682b4')
-         .on("mouseover", handleMouseOver)
+         .on("mouseover", handleMouseOver)//hover effect defined latter
          .on("mouseout", handleMouseOut);
 
-    const g2 = svg.append("g")
+//--- plot 2: Heatmap for alcohol consumption and final grade ---
+
+    const g2 = svg.append("g")//create container group, position
                 .attr("width", distrWidth + distrMargin.left + distrMargin.right)
                 .attr("height", distrHeight + distrMargin.top + distrMargin.bottom)
                 .attr("transform", `translate(${distrLeft}, ${distrTop})`);
 
-    //plot 2: Heatmap for alcohol consumption and final grade
-
     console.log('processedData', processedData);
 
+    // build a 5*5 grid of walc*dalc combination
     const heatmapData=[];
     for (let walc =1; walc<=5; walc++){
         for (let dalc=1; dalc<=5; dalc++){
+            // filter students in each alcohol consumption category pair
             const group = processedData.filter(d=>
                 d.Walc === walc && d.Dalc === dalc
             );
 
-            const avgG3 = d3.mean(group, d=> d.G3);
+            const avgG3 = d3.mean(group, d=> d.G3);//average g3 for each combination
 
             heatmapData.push({
                 Walc: walc,
                 Dalc: dalc,
-                avgG3: avgG3||0
+                avgG3: avgG3||0 //handle empty groups
             });
         }
     }
     console.log("heatmapData", heatmapData)
     
 
-
-    // x scale
+    // x scale, weekend alcohol consumption
     const x2 = d3.scaleBand()
         .domain([1,2,3,4,5])
         .range([0,distrWidth]);
 
-    // Y scale
+    // y scale, workday alcohol consumption
     const y2= d3.scaleBand()
         .domain([1,2,3,4,5])
         .range([distrHeight, 0]);
 
-    //color
+    //color, map ave grade to color intensity
 
     const colorScale = d3.scaleSequential()
         .interpolator(d3.interpolateYlOrRd)
@@ -225,11 +238,11 @@ d3.csv("student-mat.csv").then(rawData =>{
         .attr("y", d => y2(d.Dalc))
         .attr("width", x2.bandwidth())
         .attr("height", y2.bandwidth())
-        .attr("fill", d => colorScale(d.avgG3))
-        .attr("stroke", "white")
+        .attr("fill", d => colorScale(d.avgG3))//encode average grade as color
+        .attr("stroke", "white")//visual separation between cells
         .attr("stroke-width", 0.5)
 
-        .on("mouseover", function(event, d) {
+        .on("mouseover", function(event, d) {//interaction
             tooltip
                 .style("opacity", 1)
                 .style("pointer-events", "all")
@@ -240,13 +253,13 @@ d3.csv("student-mat.csv").then(rawData =>{
                 );
         })
 
-        .on("mousemove", function(event) {
+        .on("mousemove", function(event) {//mousemove effect
             tooltip
                 .style("left", (event.pageX + 10) + "px")
                 .style("top", (event.pageY + 10) + "px");
         })
 
-        .on("mouseout", function() {
+        .on("mouseout", function() {//mouseout effect
             tooltip.style("opacity", 0);
         });
 
@@ -278,11 +291,11 @@ d3.csv("student-mat.csv").then(rawData =>{
         .attr("transform", "rotate(-90)")
         .text("Workday Alcohol Consumption (Dalc)");
 
-    // eatmap Legend
+    // heatmap Legend
     const legendHeight = 150;
     const legendWidth = 15;
 
-    const legendScale = d3.scaleLinear() // dark for bad grade, light for good grade
+    const legendScale = d3.scaleLinear() // dark for bad grade to show serious, light for good grade
         .domain([20, 0])
         .range([0, legendHeight]);
 
@@ -312,7 +325,7 @@ d3.csv("student-mat.csv").then(rawData =>{
         .attr("offset", d => d.offset)
         .attr("stop-color", d => d.color);
 
-    const hmlegend = g2.append("g")
+    const hmlegend = g2.append("g")//position
         .attr("transform", `translate(${distrWidth + 30}, 20)`);
 
     // gradient rect
@@ -333,19 +346,15 @@ d3.csv("student-mat.csv").then(rawData =>{
         .text("Avg G3")
         .style("font-size", "12px");
 
+// --- Plot 3: Parallel Coordinates Plot ---
 
-    //Plot 3: Parallel Coordinates Plot
-
-
-    const dimensions = [
+    const dimensions = [//dimensions used
         'studytime',
         'failures',
         'absences',
         'Walc',
         'G3'
     ];
-
-    
 
     // y scale
     const yScales = {};
@@ -378,7 +387,7 @@ d3.csv("student-mat.csv").then(rawData =>{
         .attr("class", d => "line line-" + d.id)
         .attr("d", path)
         .style("fill", "none")
-        .style("stroke", d => d.sex === 'F' ? '#ff69b4' : '#4682b4')
+        .style("stroke", d => d.sex === 'F' ? '#ff69b4' : '#4682b4')//pink female, blue male
         .style("stroke-width", 1.5)
         .style("opacity", 0.4);
 
@@ -392,7 +401,7 @@ d3.csv("student-mat.csv").then(rawData =>{
         G3: "Final Grade"
     };
 
-    // y axis
+    // y axis: position, color, size...
     g3.selectAll("myAxis")
         .data(dimensions).enter()
         .append("g")
@@ -406,7 +415,8 @@ d3.csv("student-mat.csv").then(rawData =>{
         .style("font-size", "12px");
 
 
-    // brushing
+    // brushing interaction: select range in pcp, show included lines in pcp and dots in scatter
+    //vertical brush on each pcp axis
     g3.selectAll(".brush")
         .data(dimensions)
         .enter()
@@ -415,20 +425,21 @@ d3.csv("student-mat.csv").then(rawData =>{
         .attr("transform", d => `translate(${xScalePCP(d)},0)`)
         .each(function(dim) {
 
-            d3.select(this).call(
+            d3.select(this).call(//attach a vertical brush to each axis
                 d3.brushY()
                     .extent([
-                        [-10, 0],
-                        [10, teamHeight]
+                        [-10, 0],// slight horizontal padding
+                        [10, teamHeight]// full vertical range of chart
                     ])
-                    .on("brush end", brushed)
+                    .on("brush end", brushed)// update on interaction
             );
 
         });
-
+    
+    // function/hander for brush, the filter logic
     function brushed() {
 
-        const activeBrushes = {};
+        const activeBrushes = {};// store active brush ranges for each dimension
 
         g3.selectAll(".brush")
             .each(function(dim) {
@@ -436,7 +447,7 @@ d3.csv("student-mat.csv").then(rawData =>{
                 const selection = d3.brushSelection(this);
 
                 if (selection) {
-
+                    // convert pixel range back to data range using inverse scale
                     activeBrushes[dim] = selection.map(
                         yScales[dim].invert
                     );
@@ -445,8 +456,9 @@ d3.csv("student-mat.csv").then(rawData =>{
 
             });
 
-        pcpLines.style("display", function(d) {
+        pcpLines.style("display", function(d) {// filter pcp lines
 
+            // check if data point satisfies all active brush filter
             return Object.keys(activeBrushes).every(dim => {
 
                 const range = activeBrushes[dim];
@@ -455,15 +467,15 @@ d3.csv("student-mat.csv").then(rawData =>{
                     && d[dim] >= range[1];
 
             })
-            ? null
-            : "none";
+            ? null // keep visible
+            : "none"; // hide if outside filter
 
         });
 
-        d3.selectAll(".scatter-dot")
+        d3.selectAll(".scatter-dot") // link brush to scatter plot
             .style("opacity", function(d) {
 
-                return Object.keys(activeBrushes).every(dim => {
+                return Object.keys(activeBrushes).every(dim => {//same filter logic as pcp
 
                     const range = activeBrushes[dim];
 
@@ -471,34 +483,35 @@ d3.csv("student-mat.csv").then(rawData =>{
                         && d[dim] >= range[1];
 
                 })
-                ? 1
-                : 0.08;
+                ? 1 // selected points fully visible
+                : 0.08; // not selected fade
 
             });
 
     }
 
-    //heatmap & pcp  hover interaction, put it here because pcplines is defined before here
+    //heatmap & pcp  hover interaction
+    //put it here because pcplines is defined just above here/not before plot1
     g2.selectAll("rect")
         .on("mouseover", function(event, d) {
 
             pcpLines
-                .style("opacity", 0.03);
+                .style("opacity", 0.03);// fade all pcp lines
 
-            pcpLines
+            pcpLines // highlight lines matching selected (Walc, Dalc) category
                 .filter(p =>
                     p.Walc === d.Walc &&
                     p.Dalc === d.Dalc
                 )
-                .raise()
+                .raise() //selected lines to front
                 .style("opacity", 1)
-                .style("stroke", "lime")
+                .style("stroke", "lime") // highlight color
                 .style("stroke-width", "3px");
         })
 
         .on("mouseout", function() {
 
-            pcpLines
+            pcpLines //mouseout, back to default state
                 .style("opacity", 0.4)
                 .style("stroke-width", "1.5px")
                 .style("stroke", d =>
@@ -519,9 +532,9 @@ d3.csv("student-mat.csv").then(rawData =>{
     // legend
 
     const pcpLegend = g3.append("g")
-        .attr("transform", `translate(${teamWidth -90}, -35)`); // 放在右上角，标题附近
+        .attr("transform", `translate(${teamWidth -90}, -35)`);//position
 
-    // female
+    // pink female
     pcpLegend.append("rect")
         .attr("width", 10)
         .attr("height", 10)
@@ -533,7 +546,7 @@ d3.csv("student-mat.csv").then(rawData =>{
         .style("font-size", "12px")
         .text("Female");
 
-    // male
+    // blue male
     pcpLegend.append("rect")
         .attr("y", 20) 
         .attr("width", 10)
@@ -547,7 +560,7 @@ d3.csv("student-mat.csv").then(rawData =>{
         .text("Male");
 
 
-// interaction
+// hover interaction function
 function handleMouseOver(event,d) {
     // other dots and path darken
     d3.selectAll(".scatter-dot").style("opacity", 0.1);
@@ -588,3 +601,16 @@ function handleMouseOut(event,d) {
 }).catch(function(error){
     console.log(error);
 });
+
+// I used ChatGPT to help with the layout style
+// (spend a lot of time stucked at fixed layout vs fitting layout)
+
+// Also helped with interaction functions
+// (stucked at the hover, but seem like the data already overlap heavily 
+// and this makes the pcp not obviously reacted to hover from scatter/heatmap)
+
+// Debugging
+// And used it to check my work meets requirements
+
+// At the very beginning, used it to learn how to clone from github, etc
+// (Its my first time using this way)
