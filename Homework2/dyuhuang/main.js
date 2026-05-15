@@ -1,3 +1,24 @@
+/*
+ * Notes on outside help (per ECS 163 syllabus):
+ *
+ * Office hours with Professor Liu:
+ *   I went to Professor Liu's office hours to talk through the dashboard
+ *   design. We discussed the focus + context idea and he helped me decide
+ *   that the bar chart should work as the overview/context view, while
+ *   the scatter plot and parallel coordinates would be the focus views.
+ *
+ * AI usage:
+ *   I used Claude mainly as a learning tool:
+ *     - To learn D3 v5 syntax for the parallel coordinates plot, since
+ *       we haven't covered it in lecture.
+ *     - To help debug some layout problems (titles overlapping with
+ *       axis labels, views overflowing into each other).
+ *     - To double-check that my understanding of focus + context was
+ *       correct after talking with Professor Liu.
+ *   I read through every line before using it and made changes to fit
+ *   my own code.
+ */
+
 let abFilter = 25;
 let selectedType = null; 
 
