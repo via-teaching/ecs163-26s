@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="D3 dashboard exploring San Francisco ballot measure outcomes over time, turnout, and measure attributes.">
+  <title>SF Ballot Measures Dashboard</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="dashboard" aria-label="San Francisco ballot measure visualization dashboard">
+    <header class="dashboard-header">
+      <div>
+        <p class="eyebrow">ECS 163 Homework 2</p>
+        <h1>San Francisco ballot measures, 1961–2010</h1>
+      </div>
+      <p class="rationale">I used this to compare which SF ballot measures passed, how turnout changed, and whether measure type or sponsor lines up with yes vote share.</p>
+    </header>
+
+    <section class="grid" aria-label="Three ballot measure charts">
+      <article class="panel overview-panel">
+        <div class="panel-copy">
+          <p class="view-label">Overview</p>
+          <h2>Pass and fail counts by decade</h2>
+        </div>
+        <svg id="decade-chart" role="img" aria-label="Stacked bar chart of passed and failed measures by decade"></svg>
+      </article>
+
+      <article class="panel scatter-panel">
+        <div class="panel-copy">
+          <p class="view-label">Focus</p>
+          <h2>Vote share vs. turnout</h2>
+        </div>
+        <svg id="scatter-chart" role="img" aria-label="Scatter plot of yes share and total votes"></svg>
+      </article>
+
+      <article class="panel parallel-panel">
+        <div class="panel-copy">
+          <p class="view-label">Parallel coordinates</p>
+          <h2>High-turnout measures by year, type, sponsor, vote share, and votes</h2>
+        </div>
+        <svg id="parallel-chart" role="img" aria-label="Parallel coordinates plot of measure profiles"></svg>
+      </article>
+    </section>
+  </main>
+
+  <div id="tooltip" class="tooltip" aria-hidden="true"></div>
+
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
