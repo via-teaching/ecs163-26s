@@ -125,9 +125,9 @@ function moveTip(evt) {
 }
 function hideTip() { tip.style("opacity",0); }
 
-// Load dataset and build dashboard visuals
+// use d3 csv splitting
 d3.csv("data/pokemon_alopez247.csv", function(d) {
-  // Convert numeric values from strings
+  
   return {
     Name:        d.Name,
     Type_1:      d.Type_1,
@@ -150,6 +150,8 @@ d3.csv("data/pokemon_alopez247.csv", function(d) {
 });
 
 // Bar chart
+// HW1 and WS1
+// 
 function buildBarChart(data) {
 
   // Chart sizing + margins
@@ -242,6 +244,8 @@ function buildBarChart(data) {
 }
 
 // Scatter plot
+// Copied from HW1
+// Added hover functionality from WS2
 function buildScatter(data) {
 
   // Chart sizing + margins
@@ -310,6 +314,7 @@ function buildScatter(data) {
   drawDots(leg, 4.5, "#e60000");
 
   // Show note explaining legendary outline
+  // Not nessecary but it's interesting
   g.append("text")
     .attr("x", iW).attr("y", 0)
     .attr("text-anchor","end")
