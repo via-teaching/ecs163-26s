@@ -12,7 +12,7 @@ const headerHeight = 40;
 const legendWidth = 60;
 
 // Square size allocated to legend color
-const legendDotSize = windowHeight * 0.02;
+const legendDotSize = windowWidth > 700 ? windowHeight * 0.02 : 10;
 
 // Height for each visualization
 const visHeight = windowHeight / 2 - margin.top - margin.bottom - headerHeight;
@@ -54,7 +54,10 @@ const visSizes = {
     left: 0,
     top: 0,
     margin,
-    width: windowWidth - margin.left - margin.right - legendWidth,
+    width:
+      windowWidth > 700
+        ? windowWidth - margin.left - margin.right - legendWidth
+        : windowWidth - margin.left - margin.right,
     height: windowWidth > 700 ? visHeight : mobileVisHeight,
     legendWidth,
   },
@@ -498,9 +501,19 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
   // Add chart legend to illustrate genre colors
   // With added interactivity (hover to highlight certain genre)
   // Docs: https://d3-graph-gallery.com/graph/custom_legend.html
+  const legendRowLength =
+    windowWidth > 700
+      ? 1
+      : windowWidth > 500
+        ? genres.length / 4
+        : genres.length / 8;
+
   const legend = g3
     .append("g")
-    .attr("transform", `translate(${visSizes.plot3.width - legendWidth}, 10)`);
+    .attr(
+      "transform",
+      `translate(${windowWidth > 700 ? visSizes.plot3.width - legendWidth : 0}, ${windowWidth > 700 ? 10 : visSizes.plot3.height + 80})`,
+    );
 
   // Create legend label
   const legendLabel = legend
@@ -529,7 +542,8 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .append("g")
     .attr(
       "transform",
-      (d, i) => `translate(0, ${i * (legendDotSize * 1.2) - 20})`,
+      (d, i) =>
+        `translate(${Math.floor(i % legendRowLength) * 100}, ${Math.floor(i / legendRowLength) * (legendDotSize * 1.2) - 20})`,
     )
     .style("cursor", "pointer")
     .on("mouseover", (event, idx) => {
