@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html>
+<!-- head of the document -->
+<head>
+    <!-- Set character encoding to UTF-8 for proper text display -->
+    <meta charset="UTF-8">
+    <!-- Page title for browser tab -->
+    <title>Student Alcohol and Performance Dashboard</title>
+    <!-- For responsive design -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Link to CSS style file -->
+    <link rel="stylesheet" href="main.css" />
+</head>
+
+<!-- body of the document -->
+<body translate="no">
+    <!-- Main page container -->
+    <div class="page-container">
+        <!-- Dashboard title and short explanation so the story is clear -->
+        <div class="dashboard-header">
+            <h1>Alcohol Use, Attendance, and Math Performance Dashboard</h1>
+            <p>
+                This dashboard uses workday alcohol level as the main grouping variable to compare attendance, grade patterns, and lifestyle profiles.
+            </p>
+        </div>
+
+        <!-- Dashboard container for all visualizations -->
+        <div class="dashboard-container">
+            <!-- First row: two containers side by side -->
+            <div class="top-row">
+                <!-- Container for bar chart panel -->
+                <div class="chart-container" id="container-1">
+                    <!-- Title for bar chart -->
+                    <h2 class="chart-title">Overview: Average Absences by Alcohol Use Level</h2>
+                    <!-- bar chart container -->
+                    <div class="chart-content" id="chart-1"></div>
+                </div>
+                <!-- Container for heatmap chart panel -->
+                <div class="chart-container" id="container-2">
+                    <!-- Title for heatmap chart -->
+                    <h2 class="chart-title">Focus View: Student Count by Absence Range and Grade Band</h2>
+                    <!-- heatmap chart container -->
+                    <div class="chart-content" id="chart-2"></div>
+                </div>
+            </div>
+            <!-- second Row: full-width container -->
+            <div class="bottom-row">
+                <!-- Container for parallel coordinates chart panel -->
+                <div class="chart-container" id="container-3">
+                    <!-- Title for parallel coordinates chart -->
+                    <h2 class="chart-title">Context View: Lifestyle Profile by Alcohol Level</h2>
+                    <!-- parallel coordinates chart container -->
+                    <div class="chart-content" id="chart-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load D3.js library v7 -->
+    <script src="https://unpkg.com/d3@7/dist/d3.min.js"></script>
+    <!-- Load the js file including our charts -->
+    <script src="main.js"></script>
+
+</body>
+
+</html>
