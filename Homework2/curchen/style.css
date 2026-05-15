@@ -1,0 +1,86 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #fafafa;
+}
+
+header {
+  padding: 8px 16px;
+}
+header h1 {
+  margin: 0;
+  font-size: 22px;
+}
+.subtitle {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #555;
+}
+
+#dashboard {
+  display: grid;
+  grid-template-columns: 60% 40%;
+  grid-template-rows: 50% 50%;
+  height: 92vh;
+  padding: 8px;
+}
+
+.view {
+  background: white;
+  border: 1px solid #ccc;
+  margin: 4px;
+  padding: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.view.focus {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+}
+#view-heatmap { grid-row: 1; grid-column: 2; }
+#view-scatter { grid-row: 2; grid-column: 2; }
+
+.view-title {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+}
+
+.chart-container {
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.chart-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+.caption {
+  font-size: 13px;
+  color: #555;
+  flex: 0 0 auto;
+  margin-top: 4px;
+}
+
+.axis text { font-size: 12px; }
+.axis-label { font-size: 14px; font-weight: bold; }
+
+/* Heatmap has 18 categorical ticks per axis and needs tighter type labels to avoid overlap. */
+#heatmap-svg .axis text { font-size: 10px; }
+
+.tooltip {
+  position: absolute;
+  background: #333;
+  color: white;
+  padding: 5px 8px;
+  font-size: 12px;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.legend-text { font-size: 12px; }
+.legend-title { font-size: 13px; font-weight: bold; }
