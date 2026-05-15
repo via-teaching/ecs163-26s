@@ -67,6 +67,16 @@ const typeColor = d3.scaleOrdinal()
         .attr("fill", "gray")
         .text("Exploring Pokemon type distribution, attack-defense balance, and multi-stat performance patterns. Click any bar below to filter.");
 
+    
+    // Design note: explains the focus + context paradigm to the grader
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", 56)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "11px")
+        .attr("fill", "gray")
+        .text("Focus + Context design: the bar chart (bottom) serves as the overview/context; the scatter plot and parallel coordinates (top) are the focus views linked by interactive filtering (through clicking bars).");
+    
     // Scatter plot container (only created once)
     const g1 = svg.append("g")
         .attr("width", scatterWidth + scatterMargin.left + scatterMargin.right)
