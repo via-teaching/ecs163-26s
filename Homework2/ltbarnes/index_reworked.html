@@ -5,16 +5,16 @@
   <title>Pokémon Dashboard</title>
   <style>
     html, body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      font-family: sans-serif;
-      background: #fff;
-      overflow: hidden;
-    }
-    svg {
-      display: block;
-    }
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    font-family: sans-serif;
+    background: #fff;
+    overflow: hidden;
+  }
+  svg {
+    display: block;
+  }
 
     /* Tooltip */
     #tooltip {
@@ -64,7 +64,9 @@
 <body>
 
 <svg id="main-svg"></svg>
-<div id="legend"></div>
+<div id="legend">
+  <span style="font-weight:bold; font-size:11px; margin-right:8px; color:#333;">Color = Primary Type:</span>
+</div>
 <div id="tooltip"></div>
 
 <script src="https://d3js.org/d3.v5.min.js"></script>
