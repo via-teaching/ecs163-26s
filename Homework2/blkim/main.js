@@ -1,4 +1,4 @@
-const DATA_URL = "data/pokemon_alopez247.csv"; // kaggle csv from the pokemon link on hw2 readme
+const DATA_URL = "data/pokemon_alopez247.csv"; // kaggle csv from the pokemon dataset linked in the homework readme
 
 const TYPE_TOP_N = 10;
 
@@ -16,18 +16,18 @@ let processed = [];
 let typeColor = () => "#888";
 let resizeTimer = null;
 
-// debounce resize bc otherwise it redraws like crazy when you drag the window
+// debounce resize so the dashboard does not redraw on every pixel while resizing the window
 function debouncedDraw() {
 	clearTimeout(resizeTimer);
 	resizeTimer = setTimeout(draw, 120);
 }
 
-// wipe the svg inner stuff so we arent drawing on top of leftover garbage
+// clear svg contents before redraw to avoid stacking old elements
 function clearSvg(sel) {
 	sel.selectAll("*").remove();
 }
 
-// pick a color per type group and reuse it everywhere so the 3 charts dont look random
+// assign one color per type group, shared across all three views
 function buildTypeColorScale(rows) {
 	const counts = d3.rollups(
 		rows,
@@ -41,8 +41,8 @@ function buildTypeColorScale(rows) {
 	return d3.scaleOrdinal().domain(domain).range(range);
 }
 
-// trim/fix strings from csv + make uid so hover can line up scatter dot w parallel path
-// smash rare types into "other" or the donut chart gets a million tiny useless slices
+// clean csv strings and add uid to match scatter points with parallel-coordinate paths on hover
+// group rare types as "other" so the donut does not have too many small slices
 function prepareRows(raw) {
 	const parsed = raw.map((d, i) => {
 		const type1 = String(d.Type_1 ?? "")
@@ -90,7 +90,7 @@ function drawOverview(svg, data) {
 	const cy = margin.top + innerH / 2;
 	const r = Math.max(44, Math.min(innerW, innerH) / 2) - 8;
 
-	// count rows per type group, those counts = pie slices
+	// count rows per type group; each count becomes one pie slice
 	const rollup = d3.rollups(
 		data,
 		(v) => v.length,
@@ -101,10 +101,10 @@ function drawOverview(svg, data) {
 	const pie = d3.pie().sort(null).value((d) => d.count);
 	const arc = d3.arc().innerRadius(r * 0.52).outerRadius(r);
 
-	// plop the donut roughly in the center of the panel
+	// center the donut group in the panel
 	const g = svg.append("g").attr("transform", `translate(${cx},${cy})`);
 
-	// each slice is a path, fill = type color, title = built-in browser tooltip on hover
+	// each slice is a path with type fill color; title element provides the hover tooltip
 	g.selectAll("path.slice")
 		.data(pie(pieData))
 		.join("path")
@@ -116,7 +116,7 @@ function drawOverview(svg, data) {
 		.append("title")
 		.text((d) => `${d.data.key}: ${d.data.count} Pokemon`);
 
-	// only write % labels on bigger slices or the text stacks and looks messy
+	// show percent labels only on large slices to avoid overlapping text
 	g.selectAll("text.pct")
 		.data(pie(pieData).filter((d) => d.endAngle - d.startAngle > 0.28))
 		.join("text")
@@ -129,7 +129,7 @@ function drawOverview(svg, data) {
 		.style("font-weight", "600")
 		.text((d) => `${((d.data.count / data.length) * 100).toFixed(0)}%`);
 
-	// tiny legend under the chart: color box + type name + count in parens
+	// legend below the chart: color swatch, type name, and count
 	const leg = svg.append("g").attr("transform", `translate(${margin.left}, ${h - 8})`);
 	pieData
 		.slice()
@@ -140,7 +140,7 @@ function drawOverview(svg, data) {
 			row.append("text").attr("x", 14).attr("y", 9).attr("fill", "#8b9cb3").style("font-size", "10px").text(`${d.key} (${d.count})`);
 		});
 
-	// lil caption so the prof knows what the colors mean
+	// caption at top explaining slice color encoding
 	svg
 		.append("text")
 		.attr("x", margin.left)
@@ -170,18 +170,18 @@ function drawScatter(svg, data) {
 		.nice()
 		.range([innerH, 0]);
 
-	// wrap plot stuff in a g shifted by margins (standard d3 pattern tbh)
+	// plot group translated by margins (standard d3 layout)
 	const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-	// x axis along the bottom
+	// x-axis along the bottom
 	g.append("g")
 		.attr("class", "axis")
 		.attr("transform", `translate(0,${innerH})`)
 		.call(d3.axisBottom(x).ticks(8));
-	// y axis on the left side
+	// y-axis on the left
 	g.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(8));
 
-	// label for x (attack)
+	// x-axis label (attack)
 	g.append("text")
 		.attr("x", innerW / 2)
 		.attr("y", innerH + 40)
@@ -190,7 +190,7 @@ function drawScatter(svg, data) {
 		.style("font-size", "12px")
 		.text("Attack");
 
-	// y label: rotate -90 or it literally clips off the svg lol
+	// rotate y-axis label -90 degrees so it fits in the left margin
 	g.append("text")
 		.attr("transform", "rotate(-90)")
 		.attr("x", -innerH / 2)
@@ -200,10 +200,10 @@ function drawScatter(svg, data) {
 		.style("font-size", "12px")
 		.text("Defense");
 
-	// dots live in their own g so the parallel chart can find .dots on hover
+	// dots in a separate group so the parallel chart can select .dots on hover
 	const dotLayer = g.append("g").attr("class", "dots");
 
-	// one dot = one pokemon, hover dims other lines and pops the matching polyline
+	// each circle is one pokemon; hover highlights the matching parallel-coordinate line
 	dotLayer
 		.selectAll("circle")
 		.data(data, (d) => d.uid)
@@ -230,7 +230,7 @@ function drawScatter(svg, data) {
 		.append("title")
 		.text((d) => `${d.name} (${d.type1})\nAtk ${d.Attack}, Def ${d.Defense}`);
 
-	// type legend on the right w tiny circles
+	// type legend on the right with colored circles
 	const legX = margin.left + innerW + 10;
 	const legY = margin.top + 6;
 	const leg = svg.append("g").attr("transform", `translate(${legX},${legY})`);
@@ -251,7 +251,7 @@ function drawParallel(svg, data) {
 	const innerW = Math.max(60, w - margin.left - margin.right);
 	const innerH = Math.max(60, h - margin.top - margin.bottom);
 
-	// parallel coords: each stat gets its own y scale bc raw hp vs speed isnt comparable
+	// each stat uses its own y-scale because hp and speed have different ranges
 	const yScales = {};
 	parallelDims.forEach((dim) => {
 		yScales[dim] = d3
@@ -261,10 +261,10 @@ function drawParallel(svg, data) {
 			.nice();
 	});
 
-	// x position of each vertical axis (the 6 columns)
+	// horizontal position of each vertical axis (six stat columns)
 	const xScale = d3.scalePoint().domain(parallelDims).range([0, innerW]).padding(0.48);
 
-	// d3.line turns the 6 points into one path d string
+	// d3.line connects the six stat values into one path string
 	const line = d3
 		.line()
 		.defined((d) => d[1] != null && !Number.isNaN(d[1]))
@@ -276,10 +276,10 @@ function drawParallel(svg, data) {
 		return line(pts);
 	}
 
-	// same translate trick as scatter (margins)
+	// plot group translated by margins, same as scatter plot
 	const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-	// draw every mon as a line but keep opacity low or its just gray mush
+	// one line per pokemon at low opacity to reduce overplotting
 	g.append("g")
 		.attr("class", "pc-lines")
 		.selectAll("path")
@@ -305,7 +305,7 @@ function drawParallel(svg, data) {
 		.append("title")
 		.text((d) => `${d.name}\n${parallelDims.map((k) => `${dimLabel[k]} ${d[k]}`).join(", ")}`);
 
-	// for each stat column: mini axis + label underneath
+	// for each stat column, draw a mini axis and label underneath
 	const axisG = g.append("g").attr("class", "axes");
 	parallelDims.forEach((dim) => {
 		const xv = xScale(dim);
@@ -325,7 +325,7 @@ function drawParallel(svg, data) {
 			.text(dimLabel[dim]);
 	});
 
-	// note for whoever grades: line color = type, hover is wired to scatter dots
+	// caption: line color is type group; hover is linked to the scatter plot
 	svg
 		.append("text")
 		.attr("x", margin.left)
@@ -336,7 +336,7 @@ function drawParallel(svg, data) {
 }
 
 function draw() {
-	// pull the 3 svgs from index.html by id
+	// select the three svg elements from index.html by id
 	const svgO = d3.select("#svg-overview");
 	const svgS = d3.select("#svg-scatter");
 	const svgP = d3.select("#svg-parallel");
@@ -349,7 +349,7 @@ function draw() {
 	drawParallel(svgP, processed);
 }
 
-// load csv over http (live server). then color scale + draw; resize uses debounced redraw
+// load csv over http (live server), build color scale, draw; debounce redraw on resize
 d3.csv(DATA_URL)
 	.then((raw) => {
 		processed = prepareRows(raw);
@@ -360,7 +360,7 @@ d3.csv(DATA_URL)
 	})
 	.catch((err) => {
 		console.error(err);
-		// if this blows up (wrong path or file://) show a message instead of nothing
+		// on load failure (wrong path or file://), show an error message on the page
 		d3.select("body")
 			.append("div")
 			.style("padding", "24px")
