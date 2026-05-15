@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hw2 - ds salaries</title>
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <h1>Data science salary dashboard (hw2)</h1>
+      <p class="subtitle">
+        Top chart = overview heatmap. Bottom left = scatter. Bottom right = parallel coordinates. You can brush the scatter
+        to filter the parallel chart.
+      </p>
+    </header>
+
+    <main id="dashboard">
+      <section id="panel-overview" class="panel"></section>
+      <section id="panel-scatter" class="panel"></section>
+      <section id="panel-parallel" class="panel"></section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>
