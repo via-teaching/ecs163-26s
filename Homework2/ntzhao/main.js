@@ -5,9 +5,9 @@ const useLargeLayout = windowWidth > 700;
 
 // Standard margin (applies to all vis)
 const margin = useLargeLayout
-  ? { top: 30, right: 40, bottom: 80, left: 50 }
+  ? { top: 30, right: 40, bottom: 100, left: 50 }
   : { top: 30, right: 40, bottom: 120, left: 50 };
-const headerHeight = 40;
+const headerHeight = 60;
 
 // Width allocated to legend box
 const legendWidth = 60;
@@ -22,8 +22,8 @@ const mobileVisHeight =
 
 // Height for the div wrapper of each visualization
 // Used to dynamically set wrapper height in this script.
-const visDivHeight = windowHeight / 2 - headerHeight;
-const mobileVisDivHeight = windowHeight / 3 - headerHeight;
+const visDivHeight = windowHeight / 2 - headerHeight / 2;
+const mobileVisDivHeight = windowHeight / 3 - headerHeight / 3;
 
 // Font size defaults to 12 on most screens
 const standardFontSize = useLargeLayout ? 12 : 10;
