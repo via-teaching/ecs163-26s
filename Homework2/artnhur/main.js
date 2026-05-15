@@ -217,6 +217,10 @@ function drawDashboard(data) {
     drawLineChart(data);
 }
 
+/*
+    Rationale: shows the relationship between multiple categorical variables in one place. Useful for insights like whether
+    certain years contribute more to certain burden levels.
+*/
 function drawAlluvial(data) {
     const panel = addPanel(
         flowPanel,
@@ -451,6 +455,10 @@ function alluvialPath(d) {
     return `M${x0},${y0} C${midX},${y0} ${midX},${y1} ${x1},${y1}`;
 }
 
+/*
+    Rationale: an overview, summarizes the dataset by demonstrating the overall distribution of symptom burden.
+    It helps the user understand the general makeup of the survey before looking at more detailed views.
+*/
 function drawDonut(data) {
     const panel = addPanel(
         donutPanel,
