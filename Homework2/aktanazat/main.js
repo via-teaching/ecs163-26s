@@ -350,7 +350,7 @@ function drawParallelCoordinates(data) {
   const isCompact = width < 520;
   const margin = isCompact
     ? { top: 26, right: 28, bottom: 24, left: 40 }
-    : { top: 34, right: 54, bottom: 34, left: 54 };
+    : { top: 34, right: 128, bottom: 34, left: 54 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
@@ -442,7 +442,7 @@ function drawParallelCoordinates(data) {
       .text("Parallel coordinates show the 180 highest-turnout measures; color is outcome.");
   }
 
-  drawOutcomeLegend(svg, width - (isCompact ? 82 : 168), isCompact ? 34 : 52, isCompact);
+  drawOutcomeLegend(svg, width - (isCompact ? 82 : 96), isCompact ? 34 : 96, isCompact);
 }
 
 function normalizeSponsor(value) {
