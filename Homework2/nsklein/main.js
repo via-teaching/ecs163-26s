@@ -408,7 +408,7 @@ d3.csv("data/mxmh_survey_results_rename.csv")
 				.attr("fill", "black")
 				.attr("text-anchor", "middle")
 				.attr("transform", "rotate(-90)")
-				.text("Ranking out of 10"),
+				.text("Average Ranking out of 10"),
 		);
 	})
 	.catch(function (error) {
