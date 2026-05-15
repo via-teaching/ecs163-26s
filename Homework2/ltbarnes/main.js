@@ -2,6 +2,10 @@ const width = window.innerWidth;
 const height = window.innerHeight;
 const colW = Math.floor(width / 3);
 
+d3.select("#main-svg")
+  .attr("width", width)
+  .attr("height", height);
+
 // Have to set before using
 let barMargin      = { top: 40, right: 20, bottom: 120, left: 55 };
 let scatterMargin  = { top: 40, right: 20, bottom: 55,  left: 55 };
@@ -47,28 +51,22 @@ function moveTip(evt) {
 function hideTip() { tip.style("opacity", 0); }
 
 // load data
-d3.csv("data/pokemon_alopez247.csv", function(d) {
+d3.csv("data/pokemon_alopez247.csv").then(function(data) {
 
   // Convert numeric values from strings
-  return {
-    Name:         d.Name,
-    Type_1:       d.Type_1,
-    Type_2:       d.Type_2,
-    HP:           +d.HP,
-    Attack:       +d.Attack,
-    Defense:      +d.Defense,
-    Sp_Atk:       +d.Sp_Atk,
-    Sp_Def:       +d.Sp_Def,
-    Speed:        +d.Speed,
-    Total:        +d.Total,
-    Generation:   +d.Generation,
-    isLegendary:   d.isLegendary === "True"
-  };
-
-}).then(function(data) {
+  data.forEach(function(d) {
+    d.HP          = +d.HP;
+    d.Attack      = +d.Attack;
+    d.Defense     = +d.Defense;
+    d.Sp_Atk      = +d.Sp_Atk;
+    d.Sp_Def      = +d.Sp_Def;
+    d.Speed       = +d.Speed;
+    d.Total       = +d.Total;
+    d.Generation  = +d.Generation;
+    d.isLegendary = d.isLegendary === "True";
+  });
 
   const svg = d3.select("svg");
-
   buildBarChart(svg, data);
   buildScatter(svg, data);
   buildParallel(svg, data);
