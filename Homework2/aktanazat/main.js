@@ -72,6 +72,8 @@ const percentFormat = d3.format(".0f");
 const tooltip = d3.select("#tooltip");
 let ballotData = [];
 let resizeTimer;
+let selectedDecade = null;
+let selectedMeasureId = null;
 
 // Load the CSV and turn vote/year fields into numbers.
 d3.csv(DATA_URL).then(raw => {
@@ -121,6 +123,7 @@ function renderDashboard() {
   drawDecadeOverview(ballotData);
   drawTurnoutScatter(ballotData);
   drawParallelCoordinates(ballotData);
+  applySelection();
 }
 
 function getChartBox(selector) {
@@ -200,7 +203,8 @@ function drawDecadeOverview(data) {
     .attr("opacity", 0.92)
     .on("mouseenter", d => showDecadeTooltip(d))
     .on("mousemove", moveTooltip)
-    .on("mouseleave", hideTooltip);
+    .on("mouseleave", hideTooltip)
+    .on("click", d => selectDecade(d.decade));
 
   // Decade axis.
   chart.append("g")
@@ -302,7 +306,8 @@ function drawTurnoutScatter(data) {
     .attr("opacity", 0.68)
     .on("mouseenter", d => showTooltip(d))
     .on("mousemove", moveTooltip)
-    .on("mouseleave", hideTooltip);
+    .on("mouseleave", hideTooltip)
+    .on("click", d => selectMeasure(d.id));
 
   // Yes-share axis.
   chart.append("g")
@@ -404,7 +409,8 @@ function drawParallelCoordinates(data) {
     .attr("stroke-opacity", isCompact ? 0.48 : 0.34)
     .on("mouseenter", d => showTooltip(d))
     .on("mousemove", moveTooltip)
-    .on("mouseleave", hideTooltip);
+    .on("mouseleave", hideTooltip)
+    .on("click", d => selectMeasure(d.id));
 
   // Vertical axes for each dimension.
   const axes = chart.selectAll(".parallel-axis")
@@ -535,18 +541,16 @@ function drawSizeLegend(svg, x, y, rScale, isCompact = false) {
 }
 
 function showTooltip(d) {
-  highlightMeasure(d.id);
   tooltip
     .style("opacity", 1)
-    .html(`<strong>${d.year} ${d.letter || ""}: ${d.subject}</strong>${d.outcome} · ${percentFormat(d.yesShare)}% yes · ${d3.format(",")(d.totalVotes)} votes<br>${d.typeLabel} · ${d.sponsorLabel}`);
+    .html(`<strong>${d.year} ${d.letter || ""}: ${d.subject}</strong>${d.outcome} · ${percentFormat(d.yesShare)}% yes · ${d3.format(",")(d.totalVotes)} votes<br>${d.typeLabel} · ${d.sponsorLabel}<br>Click to link the views.`);
   moveTooltip();
 }
 
 function showDecadeTooltip(d) {
-  highlightDecade(d.decade);
   tooltip
     .style("opacity", 1)
-    .html(`<strong>${d.decade} ballot measures</strong>${d.outcome}: ${d.count} of ${d.total} measures<br>Hovering a decade filters the individual-measure views.`);
+    .html(`<strong>${d.decade} ballot measures</strong>${d.outcome}: ${d.count} of ${d.total} measures<br>Click to filter the individual-measure views.`);
   moveTooltip();
 }
 
@@ -557,8 +561,33 @@ function moveTooltip() {
 }
 
 function hideTooltip() {
-  clearHighlights();
   tooltip.style("opacity", 0);
+}
+
+function selectMeasure(id) {
+  selectedMeasureId = selectedMeasureId === id ? null : id;
+  selectedDecade = null;
+  applySelection();
+}
+
+function selectDecade(decade) {
+  selectedDecade = selectedDecade === decade ? null : decade;
+  selectedMeasureId = null;
+  applySelection();
+}
+
+function applySelection() {
+  if (selectedMeasureId) {
+    highlightMeasure(selectedMeasureId);
+    return;
+  }
+
+  if (selectedDecade) {
+    highlightDecade(selectedDecade);
+    return;
+  }
+
+  clearHighlights();
 }
 
 function highlightMeasure(id) {
