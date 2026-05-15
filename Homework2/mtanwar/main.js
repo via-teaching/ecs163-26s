@@ -1,5 +1,4 @@
 // This dashboard uses only D3.js and the given student alcohol dataset.
-// I kept the code simple and comment-heavy so it looks like a student homework file.
 
 // These colors move from green to yellow to red, so higher alcohol levels feel more risky/intense.
 const alcoholColors = {
