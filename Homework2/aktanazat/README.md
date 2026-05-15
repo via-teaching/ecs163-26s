@@ -10,7 +10,7 @@ The dashboard has three views:
 2. A scatter plot comparing yes vote share against total votes. Color shows pass/fail, and point size also reflects turnout.
 3. A parallel coordinates plot for the highest-turnout measures. This is the advanced view and shows year, measure type, sponsor/source, yes share, and turnout together.
 
-The views are linked: hovering a decade in the overview filters the individual-measure views, and hovering an individual measure highlights its decade. This keeps the exploration flow connected instead of making three separate charts.
+The views are linked: clicking a decade in the overview filters the individual-measure views, and clicking an individual measure highlights its decade. This keeps the exploration flow connected instead of making three separate charts.
 
 Run locally from this folder with a static server:
 
