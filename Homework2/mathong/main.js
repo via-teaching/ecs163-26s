@@ -38,6 +38,7 @@ function updateAll() {
   updateScatter();
   updateBarHighlight();
   updateRadar();
+  updateStream();
 
   // show/hide the active filter badge in the header
   if (state.selectedType) {
@@ -63,10 +64,9 @@ function drawBar() {
   const container = document.getElementById("chart-bar");
   const { width, height } = container.getBoundingClientRect();
 
-  // 28px accounts for the panel title height
-  barMargin = { top: 20, right: 16, bottom: 110, left: 50 };
+  barMargin = { top: 12, right: 16, bottom: 175, left: 50 };
   barInnerW  = width          - barMargin.left - barMargin.right;
-  barInnerH  = (height - 28) - barMargin.top  - barMargin.bottom;
+  barInnerH  = (height - 26) - barMargin.top  - barMargin.bottom;
 
   // rollup counts pokemon per type, then sort highest to lowest
   const typeCounts = Array.from(
@@ -92,7 +92,7 @@ function drawBar() {
   barSvg = d3.select("#chart-bar")
     .append("svg")
     .attr("width",  width)
-    .attr("height", height - 28)
+    .attr("height", height - 26)
     .append("g")
     .attr("transform", `translate(${barMargin.left},${barMargin.top})`);
 
@@ -169,6 +169,29 @@ function drawBar() {
       .style("font-size", "9px")
       .text(d => d.count);
 
+  // color legend — one swatch per type, two columns, positioned below the x-axis
+  const legendG = barSvg.append("g")
+    .attr("transform", `translate(0, ${barInnerH + 52})`);
+
+  typeCounts.forEach((d, i) => {
+    const col = i % 2;
+    const row = Math.floor(i / 2);
+    const lx  = col * (barInnerW / 2);
+    const ly  = row * 13;
+
+    // colored swatch matching the bar
+    legendG.append("rect")
+      .attr("x", lx).attr("y", ly - 1)
+      .attr("width", 8).attr("height", 8).attr("rx", 1)
+      .attr("fill", TYPE_COLORS[d.type] || "#888");
+
+    // type name next to swatch
+    legendG.append("text")
+      .attr("x", lx + 11).attr("y", ly + 6)
+      .style("fill", "#6b7094").style("font-size", "9px")
+      .text(d.type);
+  });
+
   updateBarHighlight();
 }
 
@@ -196,16 +219,16 @@ const tooltip = d3.select("#tooltip");
 function drawScatter() {
   const container = document.getElementById("chart-scatter");
   const { width, height } = container.getBoundingClientRect();
-  const margin = { top: 20, right: 120, bottom: 50, left: 52 };
+  const margin = { top: 20, right: 24, bottom: 50, left: 52 };
   scatterInnerW = width          - margin.left - margin.right;
-  scatterInnerH = (height - 28) - margin.top  - margin.bottom;
+  scatterInnerH = (height - 26) - margin.top  - margin.bottom;
 
   d3.select("#chart-scatter svg").remove();
 
   const svg = d3.select("#chart-scatter")
     .append("svg")
     .attr("width",  width)
-    .attr("height", height - 28);
+    .attr("height", height - 26);
 
   scatterSvgG = svg.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
@@ -255,32 +278,33 @@ function drawScatter() {
     .attr("text-anchor", "middle")
     .text("Defense");
 
-  // legend explaining dot size encoding
+  // legend — anchored to bottom-right of the inner chart area
   const legend = scatterSvgG.append("g")
-    .attr("transform", `translate(${scatterInnerW + 8}, 10)`);
+    .attr("transform", `translate(${scatterInnerW - 110}, ${scatterInnerH - 56})`);
 
+  // header
   legend.append("text")
     .attr("x", 0).attr("y", 0)
-    .style("fill", "#7b7f9e").style("font-size", "10px").style("font-weight", "600")
-    .text("LEGEND");
+    .style("fill", "#6b7094").style("font-size", "10px").style("font-weight", "600")
+    .text("Color = Primary Type");
 
   // regular pokemon dot
   legend.append("circle")
-    .attr("cx", 7).attr("cy", 18).attr("r", 4)
-    .attr("fill", "#7b7f9e");
+    .attr("cx", 6).attr("cy", 16).attr("r", 4)
+    .attr("fill", "#6b7094");
   legend.append("text")
-    .attr("x", 16).attr("y", 22)
-    .style("fill", "#7b7f9e").style("font-size", "10px")
+    .attr("x", 16).attr("y", 20)
+    .style("fill", "#6b7094").style("font-size", "10px")
     .text("Regular");
 
   // legendary pokemon dot (larger, white outline)
   legend.append("circle")
-    .attr("cx", 7).attr("cy", 38).attr("r", 6)
-    .attr("fill", "#7b7f9e")
+    .attr("cx", 6).attr("cy", 36).attr("r", 6)
+    .attr("fill", "#6b7094")
     .attr("stroke", "#fff").attr("stroke-width", 1.5);
   legend.append("text")
-    .attr("x", 16).attr("y", 42)
-    .style("fill", "#7b7f9e").style("font-size", "10px")
+    .attr("x", 16).attr("y", 40)
+    .style("fill", "#6b7094").style("font-size", "10px")
     .text("Legendary");
 
   updateScatter();
@@ -377,7 +401,7 @@ function radarPoints(stats) {
 function drawRadar() {
   const container = document.getElementById("chart-pcp");
   const { width, height } = container.getBoundingClientRect();
-  const svgH = height - 28;
+  const svgH = height - 26;
 
   d3.select("#chart-pcp svg").remove();
 
@@ -388,52 +412,83 @@ function drawRadar() {
 
   radarSvgG = svg.append("g");
 
-  // center the radar in the panel, leaving room for axis labels
-  const padding = 44;
-  radarRadius = Math.min(width, svgH) / 2 - padding;
+  // size the radar to fill the panel in both dimensions
+  const padX = 52, padY = 38;
+  radarRadius = Math.min((width - padX * 2) / 2, (svgH - padY * 2) / 2);
   radarCx = width / 2;
   radarCy = svgH / 2;
 
-  // single linear scale shared across all 6 axes (0 → global max stat)
-  const maxStat = d3.max(state.data, d => d3.max(RADAR_DIMS, dim => d[dim]));
-  radarScale = d3.scaleLinear().domain([0, maxStat]).range([0, radarRadius]);
+  computeAverages();
 
-  // concentric circle grid lines at 25%, 50%, 75%, 100% of max
+  // outer ring = highest BST in the dataset (Arceus, 720) divided by 6 stats = 120
+  // gives a natural ceiling: "what each stat would be if perfectly distributed"
+  const maxBST = d3.max(state.data, d => d.Total);
+  const scaleMax = maxBST / RADAR_DIMS.length;   // 720 / 6 = 120
+  radarScale = d3.scaleLinear().domain([0, scaleMax]).range([0, radarRadius]);
+
+  // concentric grid rings at 25/50/75/100% with value labels on the right
   [0.25, 0.5, 0.75, 1].forEach(t => {
     radarSvgG.append("circle")
       .attr("cx", radarCx).attr("cy", radarCy)
       .attr("r", radarRadius * t)
       .attr("fill", "none")
-      .attr("stroke", "#2e3148")
-      .attr("stroke-dasharray", "3,3");
+      .attr("stroke", t === 1 ? "#3a3e58" : "#252840")
+      .attr("stroke-width", t === 1 ? 1.5 : 1)
+      .attr("stroke-dasharray", t === 1 ? null : "3,3");
+
+    radarSvgG.append("text")
+      .attr("x", radarCx + radarRadius * t + 5)
+      .attr("y", radarCy)
+      .attr("dominant-baseline", "middle")
+      .style("fill", "#4a5070")
+      .style("font-size", "12px")
+      .style("font-weight", "500")
+      .text(Math.round(scaleMax * t));
   });
 
-  // one radial axis line per stat dimension
+  // one radial spoke per stat
   RADAR_DIMS.forEach((dim, i) => {
     const angle = (2 * Math.PI * i / RADAR_DIMS.length) - Math.PI / 2;
     const x2 = radarCx + radarRadius * Math.cos(angle);
     const y2 = radarCy + radarRadius * Math.sin(angle);
 
-    // axis spoke
     radarSvgG.append("line")
       .attr("x1", radarCx).attr("y1", radarCy)
       .attr("x2", x2).attr("y2", y2)
-      .attr("stroke", "#2e3148");
+      .attr("stroke", "#252840");
 
-    // label at the tip of each spoke, nudged outward past the circle
-    const labelR = radarRadius + 16;
+    const labelR = radarRadius + 18;
     radarSvgG.append("text")
       .attr("x", radarCx + labelR * Math.cos(angle))
       .attr("y", radarCy + labelR * Math.sin(angle))
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "middle")
-      .style("fill", "#e8eaf0")
+      .style("fill", "#dde1f0")
       .style("font-size", "11px")
-      .style("font-weight", "600")
+      .style("font-weight", "700")
       .text(RADAR_LABELS[i]);
   });
 
-  computeAverages();
+  // legend: dashed = all-type avg, solid = selected type
+  const radarLegend = svg.append("g").attr("transform", "translate(10, 10)");
+
+  radarLegend.append("line")
+    .attr("x1", 0).attr("x2", 18).attr("y1", 6).attr("y2", 6)
+    .attr("stroke", "#6b7094").attr("stroke-width", 1.5)
+    .attr("stroke-dasharray", "4,3");
+  radarLegend.append("text")
+    .attr("x", 22).attr("y", 10)
+    .style("fill", "#6b7094").style("font-size", "10px")
+    .text("All-type avg");
+
+  radarLegend.append("line")
+    .attr("x1", 0).attr("x2", 18).attr("y1", 22).attr("y2", 22)
+    .attr("stroke", "#dde1f0").attr("stroke-width", 2);
+  radarLegend.append("text")
+    .attr("x", 22).attr("y", 26)
+    .style("fill", "#6b7094").style("font-size", "10px")
+    .text("Selected type");
+
   updateRadar();
 }
 
@@ -445,51 +500,225 @@ function updateRadar() {
   radarSvgG.selectAll("polygon.radar-avg").remove();
 
   if (state.selectedType) {
-    // faint polygons for all other types as context
+    // all other types as faint context shapes
     Object.entries(typeAverages).forEach(([type, stats]) => {
       if (type === state.selectedType) return;
       radarSvgG.append("polygon")
         .attr("class", "radar-type")
         .attr("points", radarPoints(stats).join(" "))
         .attr("fill", TYPE_COLORS[type] || "#888")
-        .attr("fill-opacity", 0.04)
+        .attr("fill-opacity", 0.06)
         .attr("stroke", TYPE_COLORS[type] || "#888")
-        .attr("stroke-opacity", 0.15)
+        .attr("stroke-opacity", 0.2)
         .attr("stroke-width", 1);
     });
 
-    // dashed overall-average polygon as a reference baseline
+    // dashed overall-average as reference
     radarSvgG.append("polygon")
       .attr("class", "radar-avg")
       .attr("points", radarPoints(overallAvg).join(" "))
       .attr("fill", "none")
-      .attr("stroke", "#7b7f9e")
+      .attr("stroke", "#6b7094")
       .attr("stroke-width", 1.5)
       .attr("stroke-dasharray", "4,3");
 
     // highlighted polygon for the selected type
     const selColor = TYPE_COLORS[state.selectedType] || "#888";
+    const selStats = typeAverages[state.selectedType];
+
     radarSvgG.append("polygon")
       .attr("class", "radar-type")
-      .attr("points", radarPoints(typeAverages[state.selectedType]).join(" "))
+      .attr("points", radarPoints(selStats).join(" "))
       .attr("fill", selColor)
-      .attr("fill-opacity", 0.25)
+      .attr("fill-opacity", 0.35)
       .attr("stroke", selColor)
-      .attr("stroke-width", 2.5);
+      .attr("stroke-width", 3);
+
+    // stat value labels at each vertex of the selected type's polygon
+    RADAR_DIMS.forEach((dim, i) => {
+      const angle = (2 * Math.PI * i / RADAR_DIMS.length) - Math.PI / 2;
+      const r = radarScale(selStats[dim]);
+      const vx = radarCx + r * Math.cos(angle);
+      const vy = radarCy + r * Math.sin(angle);
+
+      radarSvgG.append("text")
+        .attr("x", vx + 8 * Math.cos(angle))
+        .attr("y", vy + 8 * Math.sin(angle))
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
+        .style("fill", selColor)
+        .style("font-size", "11px")
+        .style("font-weight", "600")
+        .text(Math.round(selStats[dim]));
+    });
 
   } else {
-    // no filter — show all 18 types at low opacity
+    // no filter — all 18 types faintly in the background
     Object.entries(typeAverages).forEach(([type, stats]) => {
       radarSvgG.append("polygon")
         .attr("class", "radar-type")
         .attr("points", radarPoints(stats).join(" "))
         .attr("fill", TYPE_COLORS[type] || "#888")
-        .attr("fill-opacity", 0.08)
+        .attr("fill-opacity", 0.05)
         .attr("stroke", TYPE_COLORS[type] || "#888")
-        .attr("stroke-opacity", 0.5)
-        .attr("stroke-width", 1);
+        .attr("stroke-opacity", 0.25)
+        .attr("stroke-width", 0.8);
+    });
+
+    // overall average shown prominently when nothing is selected
+    radarSvgG.append("polygon")
+      .attr("class", "radar-avg")
+      .attr("points", radarPoints(overallAvg).join(" "))
+      .attr("fill", "#7c83fd")
+      .attr("fill-opacity", 0.2)
+      .attr("stroke", "#7c83fd")
+      .attr("stroke-width", 2.5);
+
+    // stat value labels at each vertex of the overall average polygon
+    RADAR_DIMS.forEach((dim, i) => {
+      const angle = (2 * Math.PI * i / RADAR_DIMS.length) - Math.PI / 2;
+      const r = radarScale(overallAvg[dim]);
+      const vx = radarCx + r * Math.cos(angle);
+      const vy = radarCy + r * Math.sin(angle);
+
+      // small label showing the average value at that vertex
+      radarSvgG.append("text")
+        .attr("x", vx + 8 * Math.cos(angle))
+        .attr("y", vy + 8 * Math.sin(angle))
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
+        .style("fill", "#7c83fd")
+        .style("font-size", "11px")
+        .style("font-weight", "600")
+        .text(Math.round(overallAvg[dim]));
     });
   }
+}
+
+// -------------------------------------------------------------------
+// VIEW 4: Stream graph — type count across generations (advanced)
+// Shows how many pokemon of each type were introduced per generation.
+// Highlights the selected type's stream when a filter is active.
+// -------------------------------------------------------------------
+
+let streamSvgG, streamXScale, streamInnerW, streamInnerH, streamSeries;
+
+function drawStream() {
+  const container = document.getElementById("chart-stream");
+  const { width, height } = container.getBoundingClientRect();
+  const margin = { top: 16, right: 16, bottom: 36, left: 44 };
+  streamInnerW = width          - margin.left - margin.right;
+  streamInnerH = (height - 26) - margin.top  - margin.bottom;
+
+  d3.select("#chart-stream svg").remove();
+
+  const svg = d3.select("#chart-stream")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height - 26);
+
+  streamSvgG = svg.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const gens  = [1, 2, 3, 4, 5, 6];
+  const types = Object.keys(TYPE_COLORS);
+
+  // count pokemon per type per generation
+  const counts = {};
+  gens.forEach(g => {
+    counts[g] = {};
+    types.forEach(t => { counts[g][t] = 0; });
+  });
+  state.data.forEach(d => {
+    if (counts[d.Generation]) counts[d.Generation][d.Type_1]++;
+  });
+
+  // reshape into row-per-generation array for d3.stack
+  const stackData = gens.map(g => ({ generation: g, ...counts[g] }));
+
+  // stack with wiggle offset produces the flowing streamgraph shape
+  const stack = d3.stack()
+    .keys(types)
+    .offset(d3.stackOffsetWiggle)
+    .order(d3.stackOrderInsideOut);
+
+  streamSeries = stack(stackData);
+
+  // x: generation number, y: stacked extent
+  streamXScale = d3.scaleLinear().domain([1, 6]).range([0, streamInnerW]);
+  const yScale = d3.scaleLinear()
+    .domain([
+      d3.min(streamSeries, s => d3.min(s, d => d[0])),
+      d3.max(streamSeries, s => d3.max(s, d => d[1]))
+    ])
+    .range([streamInnerH, 0]);
+
+  // smooth area generator with catmull-rom curves
+  const area = d3.area()
+    .x(d => streamXScale(d.data.generation))
+    .y0(d => yScale(d[0]))
+    .y1(d => yScale(d[1]))
+    .curve(d3.curveCatmullRom);
+
+  // one filled path per type
+  streamSvgG.selectAll("path.stream")
+    .data(streamSeries)
+    .join("path")
+      .attr("class", "stream")
+      .attr("fill", s => TYPE_COLORS[s.key] || "#888")
+      .attr("opacity", 0.75)
+      .attr("d", area);
+
+  // x axis showing generation numbers
+  streamSvgG.append("g")
+    .attr("class", "x-axis")
+    .attr("transform", `translate(0,${streamInnerH})`)
+    .call(
+      d3.axisBottom(streamXScale)
+        .ticks(6)
+        .tickFormat(d => `Gen ${d}`)
+    );
+
+  // x axis label
+  streamSvgG.append("text")
+    .attr("class", "axis-label")
+    .attr("x", streamInnerW / 2)
+    .attr("y", streamInnerH + 32)
+    .attr("text-anchor", "middle")
+    .text("Generation");
+
+  // y axis label (counts are stacked/wiggled so no numeric y axis needed)
+  streamSvgG.append("text")
+    .attr("class", "axis-label")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -(streamInnerH / 2))
+    .attr("y", -32)
+    .attr("text-anchor", "middle")
+    .text("Pokémon Count");
+
+  // legend note — color = type, matching the bar chart
+  streamSvgG.append("text")
+    .attr("x", streamInnerW)
+    .attr("y", -4)
+    .attr("text-anchor", "end")
+    .style("fill", "#6b7094")
+    .style("font-size", "10px")
+    .text("Color = Primary Type (see bar chart)");
+
+  updateStream();
+}
+
+// highlights the selected type's stream, dims all others
+function updateStream() {
+  if (!streamSvgG) return;
+
+  streamSvgG.selectAll("path.stream")
+    .transition().duration(400)
+    .attr("opacity", s =>
+      !state.selectedType ? 0.75
+      : s.key === state.selectedType ? 0.95
+      : 0.12
+    );
 }
 
 // -------------------------------------------------------------------
@@ -518,5 +747,19 @@ d3.csv("data/pokemon.csv").then(rawData => {
   drawBar();
   drawScatter();
   drawRadar();
+  drawStream();
 
 }).catch(err => console.error("Failed to load pokemon.csv:", err));
+
+// redraw all charts when the window is resized
+// debounced so we don't thrash on every pixel during drag
+let resizeTimer;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    drawBar();
+    drawScatter();
+    drawRadar();
+    drawStream();
+  }, 150);
+});

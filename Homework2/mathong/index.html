@@ -11,6 +11,7 @@
   <!-- Top header bar with dashboard title and active-filter badge -->
   <header id="dashboard-header">
     <h1>Pokémon Stats Dashboard</h1>
+    <span class="subtitle">721 Pokémon · Gen 1–6 · click a type to filter</span>
     <!-- Badge shown when a type filter is active; hidden by default -->
     <div id="filter-badge" class="hidden">
       Viewing: <span id="filter-label"></span>
@@ -34,6 +35,11 @@
     <!-- VIEW 3: Radar plot — advanced view showing avg stat profile per type -->
     <section id="chart-pcp" class="panel">
       <h2 class="panel-title">Avg Stat Profile by Type</h2>
+    </section>
+
+    <!-- VIEW 4: Stream graph — advanced view showing type counts across generations -->
+    <section id="chart-stream" class="panel">
+      <h2 class="panel-title">Type Distribution Across Generations</h2>
     </section>
 
   </main>
