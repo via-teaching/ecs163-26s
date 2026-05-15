@@ -1,18 +1,19 @@
 const windowWidth = window.innerWidth;
 const windowHeight = window.innerHeight;
 
+const useLargeLayout = windowWidth > 700;
+
 // Standard margin (applies to all vis)
-const margin =
-  windowWidth > 700
-    ? { top: 30, right: 40, bottom: 80, left: 50 }
-    : { top: 30, right: 40, bottom: 120, left: 50 };
+const margin = useLargeLayout
+  ? { top: 30, right: 40, bottom: 80, left: 50 }
+  : { top: 30, right: 40, bottom: 120, left: 50 };
 const headerHeight = 40;
 
 // Width allocated to legend box
 const legendWidth = 60;
 
 // Square size allocated to legend color
-const legendDotSize = windowWidth > 700 ? windowHeight * 0.02 : 10;
+const legendDotSize = useLargeLayout ? windowHeight * 0.02 : 10;
 
 // Height for each visualization
 const visHeight = windowHeight / 2 - margin.top - margin.bottom - headerHeight;
@@ -25,40 +26,37 @@ const visDivHeight = windowHeight / 2 - headerHeight;
 const mobileVisDivHeight = windowHeight / 3 - headerHeight;
 
 // Font size defaults to 12 on most screens
-const standardFontSize = windowWidth > 700 ? 12 : 10;
+const standardFontSize = useLargeLayout ? 12 : 10;
 
 const visSizes = {
   plot1: {
     left: 0,
     top: 0,
     margin,
-    width:
-      windowWidth > 700
-        ? windowWidth / 2 - margin.left - margin.right
-        : windowWidth - margin.left - margin.right,
-    height: windowWidth > 700 ? visHeight : mobileVisHeight,
+    width: useLargeLayout
+      ? windowWidth / 2 - margin.left - margin.right
+      : windowWidth - margin.left - margin.right,
+    height: useLargeLayout ? visHeight : mobileVisHeight,
     legendWidth,
   },
   plot2: {
     left: 0,
     top: 0,
     margin,
-    width:
-      windowWidth > 700
-        ? windowWidth / 2 - margin.left - margin.right
-        : windowWidth - margin.left - margin.right,
-    height: windowWidth > 700 ? visHeight : mobileVisHeight,
+    width: useLargeLayout
+      ? windowWidth / 2 - margin.left - margin.right
+      : windowWidth - margin.left - margin.right,
+    height: useLargeLayout ? visHeight : mobileVisHeight,
     legendWidth,
   },
   plot3: {
     left: 0,
     top: 0,
     margin,
-    width:
-      windowWidth > 700
-        ? windowWidth - margin.left - margin.right - legendWidth
-        : windowWidth - margin.left - margin.right,
-    height: windowWidth > 700 ? visHeight : mobileVisHeight,
+    width: useLargeLayout
+      ? windowWidth - margin.left - margin.right - legendWidth
+      : windowWidth - margin.left - margin.right,
+    height: useLargeLayout ? visHeight : mobileVisHeight,
     legendWidth,
   },
 };
@@ -501,18 +499,17 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
   // Add chart legend to illustrate genre colors
   // With added interactivity (hover to highlight certain genre)
   // Docs: https://d3-graph-gallery.com/graph/custom_legend.html
-  const legendRowLength =
-    windowWidth > 700
-      ? 1
-      : windowWidth > 500
-        ? genres.length / 4
-        : genres.length / 8;
+  const legendRowLength = useLargeLayout
+    ? 1
+    : windowWidth > 500
+      ? genres.length / 4
+      : genres.length / 8;
 
   const legend = g3
     .append("g")
     .attr(
       "transform",
-      `translate(${windowWidth > 700 ? visSizes.plot3.width - legendWidth : 0}, ${windowWidth > 700 ? 10 : visSizes.plot3.height + 80})`,
+      `translate(${useLargeLayout ? visSizes.plot3.width - legendWidth : 0}, ${useLargeLayout ? 10 : visSizes.plot3.height + 80})`,
     );
 
   // Create legend label
