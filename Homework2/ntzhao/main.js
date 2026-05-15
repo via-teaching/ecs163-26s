@@ -65,6 +65,31 @@ const genres = [
   "Video game music",
 ];
 
+// Statically define colors
+// Validation: https://projects.susielu.com/viz-palette?colors=%5B%22%2307072b%22%2C%22%23204fa7%22%2C%22%23ab90f0%22%2C%22%239f309c%22%2C%22%23ea9bd7%22%2C%22%23ffa5a5%22%2C%22%23fa6a36%22%2C%22%23ffcc00%22%2C%22%23a1d664%22%2C%22%23448040%22%2C%22%2342dca9%22%2C%22%235ab3fa%22%2C%22%23717171%22%2C%22%23b58f5d%22%2C%22%235e5e7f%22%2C%22%23743333%22%5D
+const colors = [
+  "#9f309c",
+  "#717171",
+  "#ffa5a5",
+  "#448040",
+  "#5e5e7f",
+  "#42dca9",
+  "#ea9bd7",
+  "#fa6a36",
+  "#07072b",
+  "#204fa7",
+  "#ab90f0",
+  "#5ab3fa",
+  "#a1d664",
+  "#b58f5d",
+  "#ffcc00",
+  "#743333",
+];
+
+// Scale chosen colors over chosen genres
+// Docs: https://d3js.org/d3-scale/ordinal
+var color = d3.scaleOrdinal().domain(genres).range(colors);
+
 /**
  * Given an array of objects, perform a linear regression with respect to two variables
  * and return the slope and intercept of the regression.
@@ -141,6 +166,12 @@ d3.csv("mxmh_survey_results.csv").then((rawData) => {
     counts.set(d["Fav genre"], counts.get(d["Fav genre"]) + 1),
   );
 
+  // Map counts into an array to pass in as data to bar creation
+  const countsArray = Array.from(counts).map(([genre, count]) => ({
+    genre,
+    count,
+  }));
+
   // Create element for bar chart
   const g1 = d3
     .select("#g1")
@@ -216,17 +247,15 @@ d3.csv("mxmh_survey_results.csv").then((rawData) => {
 
   // Bars
   g1.selectAll("mybar")
-    .data(data)
+    .data(countsArray)
     .enter()
     .append("rect")
-    .attr("x", (d) => barX(d["Fav genre"]))
-    .attr("y", (d) => barY(counts.get(d["Fav genre"])))
+    .attr("x", (d) => barX(d.genre))
+    .attr("y", (d) => barY(d.count))
     .attr("width", barX.bandwidth())
-    .attr(
-      "height",
-      (d) => visSizes.plot1.height - barY(counts.get(d["Fav genre"])),
-    )
-    .attr("fill", "#69b3a2");
+    .attr("height", (d) => visSizes.plot1.height - barY(d.count))
+    .attr("fill", (d) => color(d.genre))
+    .style("opacity", 0.75);
 
   // SCATTER PLOT
   // Docs: https://d3-graph-gallery.com/scatter.html
@@ -410,31 +439,6 @@ d3.csv("mxmh_survey_results.csv").then((rawData) => {
         return name;
     }
   }
-
-  // Statically define colors
-  // Validation: https://projects.susielu.com/viz-palette?colors=%5B%22%2307072b%22%2C%22%23204fa7%22%2C%22%23ab90f0%22%2C%22%239f309c%22%2C%22%23ea9bd7%22%2C%22%23ffa5a5%22%2C%22%23fa6a36%22%2C%22%23ffcc00%22%2C%22%23a1d664%22%2C%22%23448040%22%2C%22%2342dca9%22%2C%22%235ab3fa%22%2C%22%23717171%22%2C%22%23b58f5d%22%2C%22%235e5e7f%22%2C%22%23743333%22%5D
-  const colors = [
-    "#9f309c",
-    "#717171",
-    "#ffa5a5",
-    "#448040",
-    "#5e5e7f",
-    "#42dca9",
-    "#ea9bd7",
-    "#fa6a36",
-    "#07072b",
-    "#204fa7",
-    "#ab90f0",
-    "#5ab3fa",
-    "#a1d664",
-    "#b58f5d",
-    "#ffcc00",
-    "#743333",
-  ];
-
-  // Scale chosen colors over chosen genres
-  // Docs: https://d3js.org/d3-scale/ordinal
-  var color = d3.scaleOrdinal().domain(genres).range(colors);
 
   const size = 20;
 
