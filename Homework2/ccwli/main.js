@@ -6,22 +6,32 @@ const svg = d3.select("svg")
     .attr("width", width)
     .attr("height", height);
 
-// layout
+// responsive layout
+const padding = 60;
+const topRowHeight = Math.min(350, height * 0.42);
+
 let scatterMargin = {top: 50, right: 30, bottom: 60, left: 60};
-let scatterWidth = 250;
-let scatterHeight = 250; //sqaure
-let scatterLeft = 80;
-
 let distrMargin = {top: 50, right: 30, bottom: 60, left: 60};
-let distrTop = 50; 
-let distrWidth = 250; 
-let distrHeight = 250;
-let distrLeft = scatterLeft + scatterWidth + 150;
-
 let teamMargin = {top: 50, right: 20, bottom: 50, left: 80};
-let teamTop = 420; 
-let teamWidth = width - teamMargin.left - teamMargin.right -80;
-let teamHeight = 250;
+
+// top row charts
+let scatterWidth = width * 0.35;
+let scatterHeight = Math.min(280, topRowHeight * 0.7);
+
+let distrWidth = width * 0.35;
+let distrHeight = Math.min(280, topRowHeight * 0.7);
+
+// positions
+let scatterLeft = padding;
+
+let distrLeft = width * 0.52;
+let distrTop = 50;
+
+// bottom PCP
+let teamTop = scatterHeight + 140;
+
+let teamWidth = width * 0.82;
+let teamHeight = height * 0.3;
 
 // plots
 d3.csv("student-mat.csv").then(rawData =>{
@@ -43,6 +53,7 @@ d3.csv("student-mat.csv").then(rawData =>{
                           return {
                             'id': d.id,
                             'studytime': d.studytime,
+                            'failures': Number(d.failures),
                             'G3': d.G3,
                             'absences': d.absences,
                             'sex': d.sex,
@@ -66,10 +77,8 @@ d3.csv("student-mat.csv").then(rawData =>{
     g1.append("text")
     .attr("x", scatterWidth / 2)
     .attr("y", scatterHeight + 50)
-    .attr("font-size", "16px")
     .attr("text-anchor", "middle")
     .text("Study Time");
-
 
     // Y label
     g1.append("text")
@@ -79,6 +88,14 @@ d3.csv("student-mat.csv").then(rawData =>{
     .attr("text-anchor", "middle")
     .attr("transform", "rotate(-90)")
     .text("Final Grade (G3)");
+
+    //title
+    g1.append("text")
+    .attr("x", scatterWidth / 2)
+    .attr("y", -15)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "18px")
+    .text("Does More Study Time Improve Final Grades?");
 
     // X ticks
     const x1 = d3.scaleLinear()
@@ -107,8 +124,8 @@ d3.csv("student-mat.csv").then(rawData =>{
 
      //legend
 
-    const legend = svg.append("g")
-    .attr("transform", "translate(20,20)");
+    const legend = g1.append("g")
+        .attr("transform", "translate(10,-10)");
 
     legend.append("rect")
         .attr("width", 10)
@@ -137,8 +154,8 @@ d3.csv("student-mat.csv").then(rawData =>{
     const circles = g1.selectAll("circle").data(processedData);
 
     circles.enter().append("circle")
-         .attr("cx", d => x1(d.studytime))
-         .attr("cy", d => y1(d.G3))
+         .attr("cx", d =>x1(d.studytime) + (Math.random() - 0.5) * 15)
+         .attr("cy", d =>y1(d.G3) + (Math.random() - 0.5) * 10)
          .attr("r", 5)
          .attr("class", d => "scatter-dot dot-" + d.id)
          .attr("fill", d=> d.sex==='F'? '#ff69b4':'#4682b4')
@@ -188,7 +205,7 @@ d3.csv("student-mat.csv").then(rawData =>{
 
     const colorScale = d3.scaleSequential()
         .interpolator(d3.interpolateYlOrRd)
-        .domain([0, 20]);
+        .domain([20, 0]);
 
     // x axis
     g2.append('g')
@@ -209,6 +226,8 @@ d3.csv("student-mat.csv").then(rawData =>{
         .attr("width", x2.bandwidth())
         .attr("height", y2.bandwidth())
         .attr("fill", d => colorScale(d.avgG3))
+        .attr("stroke", "white")
+        .attr("stroke-width", 0.5)
 
         .on("mouseover", function(event, d) {
             tooltip
@@ -237,15 +256,15 @@ d3.csv("student-mat.csv").then(rawData =>{
         .attr("x", distrWidth / 2)
         .attr("y", -15)
         .attr("text-anchor", "middle")
-        .attr("font-size", "20px")
-        .text("Alcohol Consumption vs Final Grade (G3)");
+        .attr("font-size", "18px")
+        .text("Higher Alcohol Consumption is Associated with Lower Grades");
 
 
      // X label
     g2.append("text")
         .attr("x", distrWidth/2)
         .attr("y", distrHeight + 50)
-        .attr("font-size", "16px")
+        .attr("font-size", "15px")
         .attr("text-anchor", "middle")
         .text("Weekend Alcohol Consumption (Walc)");
 
@@ -254,7 +273,7 @@ d3.csv("student-mat.csv").then(rawData =>{
     g2.append("text")
         .attr("x", -(distrHeight/2))
         .attr("y", -40)
-        .attr("font-size", "16px")
+        .attr("font-size", "15px")
         .attr("text-anchor", "middle")
         .attr("transform", "rotate(-90)")
         .text("Workday Alcohol Consumption (Dalc)");
@@ -263,9 +282,9 @@ d3.csv("student-mat.csv").then(rawData =>{
     const legendHeight = 150;
     const legendWidth = 15;
 
-    const legendScale = d3.scaleLinear()
-        .domain([0, 20])
-        .range([legendHeight, 0]);
+    const legendScale = d3.scaleLinear() // dark for bad grade, light for good grade
+        .domain([20, 0])
+        .range([0, legendHeight]);
 
     const legendAxis = d3.axisRight(legendScale)
         .ticks(5);
@@ -275,18 +294,18 @@ d3.csv("student-mat.csv").then(rawData =>{
     const linearGradient = defs.append("linearGradient")
         .attr("id", "heatmap-gradient")
         .attr("x1", "0%")
-        .attr("y1", "100%")
+        .attr("y1", "0%")   // top
         .attr("x2", "0%")
-        .attr("y2", "0%");
+        .attr("y2", "100%"); // bottom
 
     // color stops
     linearGradient.selectAll("stop")
         .data([
-            {offset: "0%", color: d3.interpolateYlOrRd(0)},
+            {offset: "0%", color: d3.interpolateYlOrRd(0)},   // top, 20pt, light yellow
             {offset: "25%", color: d3.interpolateYlOrRd(0.25)},
             {offset: "50%", color: d3.interpolateYlOrRd(0.5)},
             {offset: "75%", color: d3.interpolateYlOrRd(0.75)},
-            {offset: "100%", color: d3.interpolateYlOrRd(1)}
+            {offset: "100%", color: d3.interpolateYlOrRd(1)}  // bottom, 0 pt, dark red
         ])
         .enter()
         .append("stop")
@@ -318,7 +337,15 @@ d3.csv("student-mat.csv").then(rawData =>{
     //Plot 3: Parallel Coordinates Plot
 
 
-    const dimensions = ['studytime', 'absences', 'Dalc', 'Walc', 'G3'];
+    const dimensions = [
+        'studytime',
+        'failures',
+        'absences',
+        'Walc',
+        'G3'
+    ];
+
+    
 
     // y scale
     const yScales = {};
@@ -341,17 +368,29 @@ d3.csv("student-mat.csv").then(rawData =>{
     const g3 = svg.append("g")
         .attr("width", teamWidth + teamMargin.left + teamMargin.right)
         .attr("height", teamHeight + teamMargin.top + teamMargin.bottom)
-        .attr("transform", `translate(${teamMargin.left}, ${teamTop})`);
+        .attr("transform",`translate(${teamMargin.left}, ${teamTop + teamMargin.top})`)
 
     // plot line
-    g3.selectAll("myPath")
+    const pcpLines = g3.selectAll(".line")
         .data(processedData)
-        .enter().append("path")
+        .enter()
+        .append("path")
         .attr("class", d => "line line-" + d.id)
         .attr("d", path)
         .style("fill", "none")
         .style("stroke", d => d.sex === 'F' ? '#ff69b4' : '#4682b4')
+        .style("stroke-width", 1.5)
         .style("opacity", 0.4);
+
+
+    // axis label
+    const axisLabels = {
+        studytime: "Study Time",
+        failures: "Past Failures",
+        absences: "Absences",
+        Walc: "Weekend Alcohol",
+        G3: "Final Grade"
+    };
 
     // y axis
     g3.selectAll("myAxis")
@@ -362,9 +401,112 @@ d3.csv("student-mat.csv").then(rawData =>{
         .append("text")
         .style("text-anchor", "middle")
         .attr("y", -10)
-        .text(d => d)
+        .text(d => axisLabels[d])
         .style("fill", "black")
         .style("font-size", "12px");
+
+
+    // brushing
+    g3.selectAll(".brush")
+        .data(dimensions)
+        .enter()
+        .append("g")
+        .attr("class", "brush")
+        .attr("transform", d => `translate(${xScalePCP(d)},0)`)
+        .each(function(dim) {
+
+            d3.select(this).call(
+                d3.brushY()
+                    .extent([
+                        [-10, 0],
+                        [10, teamHeight]
+                    ])
+                    .on("brush end", brushed)
+            );
+
+        });
+
+    function brushed() {
+
+        const activeBrushes = {};
+
+        g3.selectAll(".brush")
+            .each(function(dim) {
+
+                const selection = d3.brushSelection(this);
+
+                if (selection) {
+
+                    activeBrushes[dim] = selection.map(
+                        yScales[dim].invert
+                    );
+
+                }
+
+            });
+
+        pcpLines.style("display", function(d) {
+
+            return Object.keys(activeBrushes).every(dim => {
+
+                const range = activeBrushes[dim];
+
+                return d[dim] <= range[0]
+                    && d[dim] >= range[1];
+
+            })
+            ? null
+            : "none";
+
+        });
+
+        d3.selectAll(".scatter-dot")
+            .style("opacity", function(d) {
+
+                return Object.keys(activeBrushes).every(dim => {
+
+                    const range = activeBrushes[dim];
+
+                    return d[dim] <= range[0]
+                        && d[dim] >= range[1];
+
+                })
+                ? 1
+                : 0.08;
+
+            });
+
+    }
+
+    //heatmap & pcp  hover interaction, put it here because pcplines is defined before here
+    g2.selectAll("rect")
+        .on("mouseover", function(event, d) {
+
+            pcpLines
+                .style("opacity", 0.03);
+
+            pcpLines
+                .filter(p =>
+                    p.Walc === d.Walc &&
+                    p.Dalc === d.Dalc
+                )
+                .raise()
+                .style("opacity", 1)
+                .style("stroke", "lime")
+                .style("stroke-width", "3px");
+        })
+
+        .on("mouseout", function() {
+
+            pcpLines
+                .style("opacity", 0.4)
+                .style("stroke-width", "1.5px")
+                .style("stroke", d =>
+                    d.sex === 'F'
+                        ? '#ff69b4'
+                        : '#4682b4'
+                );
+        });
 
     // title
     g3.append("text")
@@ -372,7 +514,7 @@ d3.csv("student-mat.csv").then(rawData =>{
         .attr("y", -25)
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
-        .text("Multivariate Analysis: Factors impacting G3");
+        .text("Multivariate Analysis: Factors impacting final grade (G3)");
 
     // legend
 
@@ -409,29 +551,34 @@ d3.csv("student-mat.csv").then(rawData =>{
 function handleMouseOver(event,d) {
     // other dots and path darken
     d3.selectAll(".scatter-dot").style("opacity", 0.1);
-    d3.selectAll(".line").style("opacity", 0.05);
+    d3.selectAll(".line").style("opacity", 0.03)
 
     // highlight selected dot
     d3.select(this)
         .style("opacity", 1)
-        .attr("r", 8)
-        .style("stroke", "black");
+        .attr("r", 10)
+        .style("stroke", "black")
+        .style("stroke-width", "2px");
 
-    // highlight corresponding path
+    // highlight corresponding path using unique ID class
     d3.selectAll(".line-" + d.id)
+        .raise()// move line to the front
         .style("opacity", 1)
-        .style("stroke-width", "4px")
+        .style("stroke-width", "5px")
         .style("stroke", "orange");
 }
 
 // back to normal
 function handleMouseOut(event,d) {
+
+    //reset dots
     d3.selectAll(".scatter-dot")
         .style("opacity", 1)
         .attr("r", 5)
         .style("stroke", "none");
-        
-    d3.selectAll("path")
+    
+    //reset pcp lines
+    d3.selectAll(".line")
         .style("opacity", 0.4)
         .style("stroke-width", "1.5px")
         .style("stroke", d => d.sex === 'F' ? '#ff69b4' : '#4682b4');
