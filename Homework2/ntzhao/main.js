@@ -143,7 +143,7 @@ const layoutBottomRow = d3
   .style("height", `${visDivHeight}px`);
 
 // Parse data and make graphs
-d3.csv("mxmh_survey_results.csv").then((rawData) => {
+d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
   // Add additional column "Mental health challenges" summing Anxiety, Depression, and OCD values
   // Filter out outlier/impossible values
   const data = rawData
