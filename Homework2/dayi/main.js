@@ -1,10 +1,8 @@
 let globalData = [];
-let sankeyChart, barChart, histogramChart;
+let sankeyChart, barChart, scatterPlot;
 
 let globalFilter = {
-    salaryRange: null,
-    jobTitle: null,
-    sankeyNode: null
+    jobTitle: null
 };
 
 function getSalaryTier(salary) {
@@ -23,8 +21,7 @@ d3.csv("data/ds_salaries.csv").then(data => {
 
     sankeyChart = new SankeyChart("#top-half");
     barChart = new BarChart("#bottom-left");
-    histogramChart = new HistogramChart("#bottom-right");
-
+    scatterPlot = new scatterPlot("#bottom-right");
     updateViews();
 });
 
@@ -32,28 +29,13 @@ d3.csv("data/ds_salaries.csv").then(data => {
 function updateViews(triggerSource = null) {
     let filteredData = globalData;
 
-    // histogram group selection/brushing
-    if (globalFilter.salaryRange) {
-        filteredData = filteredData.filter(d => d.salary_in_usd >= globalFilter.salaryRange[0] && d.salary_in_usd <= globalFilter.salaryRange[1]);
-    }
-
     // bar chart selection
     if (globalFilter.jobTitle) {
         filteredData = filteredData.filter(d => d.job_title === globalFilter.jobTitle);
     }
 
-    // sankey node selection
-    if (globalFilter.sankeyNode) {
-        filteredData = filteredData.filter(d => {
-            let remoteStr = d.remote_ratio == 0 ? "0% Remote" : d.remote_ratio == 50 ? "50% Remote" : "100% Remote";
-            return d.experience_level === globalFilter.sankeyNode ||
-                d.company_size === globalFilter.sankeyNode ||
-                remoteStr === globalFilter.sankeyNode ||
-                getSalaryTier(d.salary_in_usd) === globalFilter.sankeyNode;
-        });
-    }
-
+    // Update charts that aren't the trigger source
     if (triggerSource !== "sankey") sankeyChart.update(filteredData);
     if (triggerSource !== "bar") barChart.update(filteredData);
-    if (triggerSource !== "hist") histogramChart.update(filteredData);
+    if (triggerSource !== "scatter") scatterPlot.update(filteredData);
 }
