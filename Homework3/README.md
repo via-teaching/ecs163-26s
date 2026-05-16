@@ -15,7 +15,7 @@ To implement interactions in your own visualizations, you may find the following
 These are some tutorials and explanations for using animation and transitions with D3.js:
 
 - [d3 animation](https://observablehq.com/@d3/learn-d3-animation)
-- [d3 animation and transitions](https://observablehq.com/@cesandoval/week-12-interaction-and-animation-d3-transitions-behavior)
+- [d3 animation and transitions](https://observablehq.com/@dchong/week-12-interaction-and-animation-d3-transitions-behavior)
 - [Another transition example](https://www.d3indepth.com/transitions/)
 
 Animations can help users see transitions from one state to the next and enable them to more easily track changes as parts of the visualizations move from one point to another.
