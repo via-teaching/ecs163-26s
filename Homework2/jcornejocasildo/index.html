@@ -21,27 +21,29 @@ W3Schools Grid Layout Module (https://www.w3schools.com/css/css_grid.asp )
   <div class="container">
     <div class="header">
       <h2>Student Mental Health</h2>
-	  <p> We will view what mental health condicition is more reported, how this differs by year, and the number of students who sought treament.</p>
+	  <p> This dashboard explores reported Depression, Anxiety, Panic Attacks, and treatment sought amongst students of different academic years.</p>
     </div>
 
     <div class="overview">
-		<h2> Distribution of Depression, Anxiety, and Panic Attacks faced amongst students</h2>
-	  <p> Bar Chart to show the number of students who face every mental health condition</p>
+		<h3> Overview: Reported Mental Health Conditions Amongst Students</h3>
+	  <p> Number of students who reported each mental health condition or treatment seeking.</p>
     <div id="overview-chart"></div>
     </div>
 
     <div class="focus">
-      <h3>Focus: Mental Health Patterns by Year/h3>
-      <p>How does a student;s year of study relate to depression/anxiety/panic attacks they face?</p>
+      <h3>Focus: Mental Health Patterns by Academic Year</h3>
+      <p> Percentage of students in each academic year who reported depression, anxiety, panic attacks, or treatment.</p>
       <div id="focus-chart"></div>
     </div>
 
     <div class="advanced">
       <h4>Advanced: Academic Year, Mental Health Concern, and Treatment Seeking</h4>
+      <p> Despite students having a "Mental Health Concern", only a small amount of those students recieved treatment. </p>
       <div id="advanced-chart"></div>
     </div>
   </div>
   	<script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
   	<script src="main.js"></script>
 	
 </body>
