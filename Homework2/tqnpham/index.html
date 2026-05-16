@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pokemon Dashboard</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body { font-family: sans-serif; display: grid; height: 95vh; grid-template-columns: 1fr 1fr; 
+				grid-template-rows: auto 1fr 1fr; gap: 20px; padding: 20px; }
+        .chart { position: relative;}
+        .title { font-weight: bold; text-align: center; margin-top: 10px; }
+        /*  chart spans the bottom row */
+        #advanced-view { grid-column: 1 / span 2; }
+		#page-header {grid-column: 1 / span 2; text-align: center; border-bottom: 2px solid #333;
+    					padding-bottom: 10px;}
+        svg { width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+	<h1 id="page-header"> Pokemon Statistics Visualization</h1>
+    <div id="bar-chart" class="chart"><div class="title">Pokemon Count by Type</div></div>
+    <div id="scatter-plot" class="chart"><div class="title">Attack vs. Defense Correlation</div></div>
+    <div id="advanced-view" class="chart"><div class="title">Base Stats (Parallel Coordinates)</div></div>
+    <script src="main.js"></script>
+</body>
+</html>
