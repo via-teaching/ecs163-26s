@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Cosmetics Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #fce4ec;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        /* Header bar */
+        #header {
+            background-color: #b9548c;
+            color: white;
+            padding: 8px 16px;
+            height: 56px;
+			text-align: center;
+        }
+
+        #header h1 {
+            font-size: 20px;
+            margin: 0 0 3px 0;
+        }
+
+        #header p {
+            font-size: 12px;
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        /* Dashboard with views */
+        #dashboard {
+            position: absolute;
+            top: 72px;
+            left: 0;
+            width: 100%;
+            bottom: 0;
+        }
+
+        /* Parallel coordinates plot */
+        #parallel-coordinates {
+            position: absolute;
+            left: 8px;
+            top: 0;
+            width: 54%;
+            bottom: 4px;
+        }
+
+        /* Bar chart */
+        #bar-chart {
+            position: absolute;
+            left: calc(54% + 16px);
+            top: 0;
+            right: 8px;
+            height: 48%;
+        }
+
+        /* Scatter plot */
+        #scatter-plot {
+            position: absolute;
+            left: calc(54% + 16px);
+            top: calc(48% + 8px);
+            right: 8px;
+            bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <h1>Skincare Cosmetics Dashboard</h1>
+        <p>
+            These three views explore skincare cosmetics in terms of skin type compatibility, price distribution, and
+			rankings from customers across different product types. The skin types consist of combination, dry, normal, oily,
+			and sensitive skin. The product types consist of cleanser, eye cream, face mask, moisturizer, sun protection, and
+			treatment.
+        </p>
+    </div>
+
+    <div id="dashboard">
+        <div id="parallel-coordinates"></div>
+        <div id="bar-chart"></div>
+        <div id="scatter-plot"></div>
+    </div>
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="main.js"></script>
+
+</body>
+</html>
