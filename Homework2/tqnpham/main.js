@@ -6,227 +6,167 @@ const colours = {
     steel: '#B7B7CE', fairy: '#D685AD'
 };
 
-// Helper function to get the color
-const getPokemonColor = (type) => {
-    if (!type) return "#ccc"; // Default gray if type is missing
-    return colours[type.toLowerCase()] || "#ccc";
+const pcLabelMap = {
+    "HP": "HP", "Attack": "Attack", "Defense": "Defense",
+    "Sp_Atk": "Special Attack", "Sp_Def": "Special Defense", "Speed": "Speed"
 };
 
-const labelMap = {
-    "HP": "HP",
-    "Attack": "Attack",
-    "Defense": "Defense",
-    "Sp_Atk": "Special Attack",
-    "Sp_Def": "Special Defense",
-    "Speed": "Speed"
-};
+const getPokemonColor = (type) => colours[type?.toLowerCase()] || "#ccc";
 
-d3.csv("pokemon_alopez247.csv").then( data => {
-    /* Processing data for bar chart*/
-    /*Count how many pokemnon are in each type, where v is the reducer by count*/
+d3.csv("pokemon_alopez247.csv").then(data => {
+    const render = () => {
+        d3.selectAll("svg").remove();
+        drawBarChart(data);
+        drawScatterPlot(data);
+        drawParallelCoordinates(data);
+    };
+
+    render();
+    window.addEventListener("resize", render);
+});
+
+function drawDashboard(data) {
+    // Clear everything before redrawing to prevent overflow/stacking
+    d3.selectAll("svg").remove();
+
+    drawBarChart(data);
+    drawScatterPlot(data);
+    drawParallelCoordinates(data);
+}
+
+function drawBarChart(data) {
+    const container = d3.select("#bar-chart").node().getBoundingClientRect();
+    const margins = {top: 50, right: 30, bottom: 100, left: 80};
+    const width = container.width - margins.left - margins.right;
+    const height = container.height - margins.top - margins.bottom;
+
+    const svg = d3.select("#bar-chart").append("svg")
+        .attr("width", "100%").attr("height", "100%")
+        .append("g").attr("transform", `translate(${margins.left},${margins.top})`);
+
     const typeCount = d3.rollup(data, v => v.length, d => d.Type_1);
     const chartData = Array.from(typeCount, ([type, count]) => ({type, count}));
 
-    /*Plot 1: Bar Chart*/
-    const barChartContatiner = d3.select("#bar-chart").node().getBoundingClientRect();
-    const barMargins = {top: 50, right: 30, bottom: 90, left: 60};
-    const barWidth = barChartContatiner.width - barMargins.left - barMargins.right;
-    const barHeight = barChartContatiner.height - barMargins.top - barMargins.bottom;
+    // X and Y scales
+    const x = d3.scaleBand().domain(chartData.map(d => d.type)).range([0, width]).padding(0.2);
+    const y = d3.scaleLinear().domain([0, d3.max(chartData, d => d.count)]).nice().range([height, 0]);
 
-    const svg = d3.select("#bar-chart")
-        .append("svg")
-        .attr("width", "100%")
-        .attr("height", "100%")
-        .append("g")
-        /* Move the coordinate from 0,0 top left to the coordinate of the margins*/
-        .attr("transform", `translate(${barMargins.left},${barMargins.top})`);
+    svg.selectAll(".bar").data(chartData).enter().append("rect")
+        .attr("x", d => x(d.type)).attr("y", d => y(d.count))
+        .attr("width", x.bandwidth()).attr("height", d => height - y(d.count))
+        .attr("fill", d => getPokemonColor(d.type));
+
+    // Drawing the scales
+    svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x))
+        .selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
     
-    // X scale
-    const xScale = d3.scaleBand()
-        .domain(chartData.map(d => d.type))
-        .range([0, barWidth])
-        .padding(0.2);
-    
-    // Y scale
-    const yScale = d3.scaleLinear()
-        .domain([0, d3.max(chartData, d => d.count) + 10])
-        .range([barHeight, 0])
+    svg.append("g").call(d3.axisLeft(y));
 
-    svg.selectAll(".bar").data(chartData)
-        .enter().append("rect")
-        .attr("class", "bar")
-        .attr("x", d => xScale(d.type))
-        .attr("y", d => yScale(d.count))
-        .attr("width", xScale.bandwidth())
-        .attr("height", d => barHeight - yScale(d.count))
-        .attr("fill", "steelblue");
-
-    // Add the X Axis
-    svg.append("g")
-        .attr("transform", `translate(0,${barHeight})`)
-        .call(d3.axisBottom(xScale))
-        .selectAll("text")
-        .attr("transform", "rotate(-45)") // Rotates labels so they don't overlap
-        .style("text-anchor", "end");
-
-    // Add the Y Axis
-    svg.append("g")
-        .call(d3.axisLeft(yScale));
-    
     // X-Axis Label
     svg.append("text")
-        .attr("x", barWidth / 2)
-        .attr("y", barHeight + barMargins.bottom - 35)
+        .attr("x", width / 2)
+        .attr("y", height + margins.bottom - 30)
         .attr("text-anchor", "middle")
-        .text("Pokemon Type");
+        .style("font-size", "12px")
+        .text("Types");
+    
+    // Y-Axis Label
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -margins.left + 30)
+        .attr("x", -height / 2)
+        .attr("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text("Number of Pokemon");
+}
+
+function drawScatterPlot(data) {
+    const container = d3.select("#scatter-plot").node().getBoundingClientRect();
+    const margins = {top: 50, right: 30, bottom: 80, left: 70};
+    const width = container.width - margins.left - margins.right;
+    const height = container.height - margins.top - margins.bottom;
+
+    const svg = d3.select("#scatter-plot").append("svg")
+        .attr("width", "100%").attr("height", "100%")
+        .append("g").attr("transform", `translate(${margins.left},${margins.top})`);
+
+    // X scale is categorical (Type)
+    const xScale = d3.scalePoint()
+        .domain(Object.keys(colours).map(t => t.charAt(0).toUpperCase() + t.slice(1)))
+        .range([0, width]).padding(0.5);
+
+    // Y scale is numerical
+    const yScale = d3.scaleLinear()
+        .domain([0, d3.max(data, d => +d.Catch_Rate)])
+        .range([height, 0]).nice();
+
+    // Draw dots
+    svg.selectAll("circle").data(data).enter().append("circle")
+        .attr("cx", d => xScale(d.Type_1))
+        .attr("cy", d => yScale(+d.Catch_Rate))
+        .attr("r", 4)
+        .style("fill", d => getPokemonColor(d.Type_1))
+        .style("opacity", 0.6);
+
+    // Drawing X and Y scales
+    svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale))
+        .selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
+    
+    svg.append("g").call(d3.axisLeft(yScale));
 
     // Y-Axis Label
     svg.append("text")
         .attr("transform", "rotate(-90)")
-        .attr("y", -barMargins.left + 25)
-        .attr("x", -barHeight / 2)
+        .attr("y", -margins.left + 25)
+        .attr("x", -height / 2)
         .attr("text-anchor", "middle")
-        .text("Number of Pokemon");
+        .style("font-size", "12px")
+        .text("Catch Rate");
 
-    
-
-    /* Plot 2: Scatter Plot */
-    const scatterContainer = d3.select("#scatter-plot").node().getBoundingClientRect();
-    const scatterMargins = {top: 50, right: 30, bottom: 80, left: 60};
-    const scatterWidth = scatterContainer.width - scatterMargins.left - scatterMargins.right;
-    const scatterHeight = scatterContainer.height - scatterMargins.top - scatterMargins.bottom;
-
-    const scatterSvg = d3.select("#scatter-plot")
-        .append("svg")
-        .attr("width", "100%")
-        .attr("height", "100%")
-        .append("g")
-        .attr("transform", `translate(${scatterMargins.left},${scatterMargins.top})`);
-
-    const xScatter = d3.scaleLinear()
-        .domain([0, d3.max(data, d => +d.Attack)])
-        .range([0, scatterWidth]);
-    
-    const yScatter = d3.scaleLinear()
-        .domain([0, d3.max(data, d => +d.Defense)])
-        .range([scatterHeight, 0]);
-    
-    scatterSvg.selectAll("circle")
-        .data(data)
-        .enter().append("circle")
-        .attr("cx", d => xScatter(+d.Attack))
-        .attr("cy", d => yScatter(+d.Defense))
-        .attr("r", 4)
-        .style("fill", "#0898e0cc")
-        .style("opacity", 0.5)
-    
-    // Add the X Axis
-    scatterSvg.append("g")
-        .attr("transform", `translate(0,${scatterHeight})`)
-        .call(d3.axisBottom(xScatter))
-
-    // Add the Y Axis
-    scatterSvg.append("g")
-        .call(d3.axisLeft(yScatter));
-
-    // X-label
-     scatterSvg.append("text")
-    .attr("x", scatterWidth / 2)
-    .attr("y", scatterHeight + 40)
-    .attr("text-anchor", "middle")
-    .text("Attack Stat");
-
-    // Y-label
-    scatterSvg.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", -35)
-        .attr("x", -(scatterHeight / 2))
+    // X-Axis Label
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", height + margins.bottom - 10)
         .attr("text-anchor", "middle")
-        .text("Defense Stat");
+        .style("font-size", "12px")
+        .text("Pokemon Type");
+}
+function drawParallelCoordinates(data) {
+    const container = d3.select("#advanced-view").node().getBoundingClientRect();
+    const margins = {top: 60, right: 180, bottom: 50, left: 50}; // Large right margin for legend
+    const width = container.width - margins.left - margins.right;
+    const height = container.height - margins.top - margins.bottom;
 
-    /* Plot 3: Parallel Coordinates */
-    const pcContainer = d3.select("#advanced-view").node().getBoundingClientRect();
-    const pcMargins = {top: 50, right:150, bottom: 50, left: 50};
-    const pcWidth = pcContainer.width - pcMargins.left - pcMargins.right;
-    const pcHeight = pcContainer.height - pcMargins.top - pcMargins.bottom;
+    const svg = d3.select("#advanced-view").append("svg")
+        .attr("width", "100%").attr("height", "100%")
+        .append("g").attr("transform", `translate(${margins.left},${margins.top})`);
 
-    const pcSvg = d3.select("#advanced-view")
-        .append("svg")
-        .attr("width", "100%")
-        .attr("height", "100%")
-        .append("g")
-        .attr("transform", `translate(${pcMargins.left},${pcMargins.top})`);
-    
-    // Dimensions for comparison
-    const dimensions = ["HP", "Attack", "Defense", "Sp_Atk", "Sp_Def", "Speed"];
-
-    // 2. For each dimension, build a corresponding Y linear scale
+    const dimensions = Object.keys(pcLabelMap);
     const yScales = {};
-    dimensions.forEach(name => {
-        yScales[name] = d3.scaleLinear()
-            .domain(d3.extent(data, d => +d[name])) // Get [min, max] for each stat
-            .range([pcHeight, 0])
-    });
+    dimensions.forEach(d => yScales[d] = d3.scaleLinear().domain(d3.extent(data, p => +p[d])).range([height, 0]));
 
-    // X scale
-    const xScalePC = d3.scalePoint()
-        .domain(dimensions)
-        .range([0, pcWidth]);
-    
-    // Function to draw the lines
-    const lineGenerator = d3.line();
-    function drawPath(d) {
-        return lineGenerator(dimensions.map(p => [xScalePC(p), yScales[p](d[p])]));
-    }
+    const xScale = d3.scalePoint().range([0, width]).domain(dimensions);
+    const line = d3.line();
 
-    // 5. Draw the lines
-    pcSvg.selectAll("myPath")
-        .data(data)
-        .enter().append("path")
-        .attr("d", drawPath)
-        .style("fill", "none")
-        .style("stroke", d => getPokemonColor(d.Type_1)) 
-        .style("opacity", 0.2);
+    // Draw Paths
+    svg.selectAll("path").data(data).enter().append("path")
+        .attr("d", d => line(dimensions.map(p => [xScale(p), yScales[p](d[p])])))
+        .style("fill", "none").style("stroke", d => getPokemonColor(d.Type_1)).style("opacity", 0.15);
 
-    // 6. Draw the vertical axes
-    pcSvg.selectAll("myAxis")
-        .data(dimensions).enter()
-        .append("g")
-        .attr("transform", d => `translate(${xScalePC(d)})`)
-        .each(function(d) { d3.select(this).call(d3.axisLeft().scale(yScales[d])); })
-        .append("text")
-        .style("text-anchor", "middle")
-        .attr("y", -15)
-        .text(d => labelMap[d])
-        .style("fill", "black")
-        .style("font-weight", "bold");
-    
-    // Add a Legend for the PC
-    const legendArea = pcSvg.append("g")
-        .attr("transform", `translate(${pcWidth + 20}, 0)`);
+    // Draw Axes
+    svg.selectAll("g.axis").data(dimensions).enter().append("g")
+        .attr("transform", d => `translate(${xScale(d)})`)
+        .each(function(d) { d3.select(this).call(d3.axisLeft(yScales[d])); })
+        .append("text").style("text-anchor", "middle").attr("y", -15)
+        .text(d => pcLabelMap[d]).style("fill", "black").style("font-weight", "bold");
 
-    const allTypesOrdered = Object.keys(colours);
-
-    allTypesOrdered.forEach((type, i) => {
-        // Split legends into 2 column, 9 labels/ column
-        const column = Math.floor(i / 9); 
+    // Two-Column Legend
+    const legend = svg.append("g").attr("transform", `translate(${width + 30}, 0)`);
+    Object.keys(colours).forEach((type, i) => {
+        const col = Math.floor(i / 9);
         const row = i % 9;
-        const xOffset = column * 70; // Adjust 70 based on the width of your type names
-        const yOffset = row * 20;
-
-        const legendRow = legendArea.append("g")
-            .attr("transform", `translate(${xOffset}, ${yOffset})`);
-
-        legendRow.append("rect")
-            .attr("width", 10)
-            .attr("height", 10)
-            .attr("fill", getPokemonColor(type));
-
-        legendRow.append("text")
-            .attr("x", 15)
-            .attr("y", 10)
-            .style("font-size", "10px")
-            .style("text-transform", "capitalize")
-            .text(type);
+        const g = legend.append("g").attr("transform", `translate(${col * 75}, ${row * 20})`);
+        g.append("rect").attr("width", 12).attr("height", 12).attr("fill", getPokemonColor(type));
+        g.append("text").attr("x", 18).attr("y", 10).style("font-size", "11px").text(type);
     });
-});
+}
