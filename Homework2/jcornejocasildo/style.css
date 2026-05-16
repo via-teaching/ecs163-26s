@@ -1,0 +1,100 @@
+body {
+  margin: 0;
+  font-family: Calibri, Arial, sans-serif;
+  overflow: hidden;
+}
+
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.container {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "overview focus"
+    "advanced advanced";
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: auto auto auto;
+  gap: 5px;
+  background-color: dodgerblue;
+  padding: 5px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.header,
+.overview,
+.focus,
+.advanced {
+  background-color: white;
+  border: 1px solid black;
+  padding: 12px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.header {
+  grid-area: header;
+  text-align: center;
+}
+
+.overview {
+  grid-area: overview;
+  overflow: visible;
+}
+
+.focus {
+  grid-area: focus;
+  overflow: visible;
+}
+
+.advanced {
+  grid-area: advanced;
+  text-align: center;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+#overview-chart,
+#focus-chart,
+#advanced-chart {
+  width: 100%;
+  overflow: visible;
+}
+
+
+#overview-chart svg,
+#focus-chart svg,
+#advanced-chart svg {
+  display: block;
+  height: auto;
+  overflow: visible;
+}
+
+#advanced-chart svg {
+  max-width: none;
+}
+
+svg text {
+  font-family: Calibri, Arial, sans-serif;
+}
+
+.chart-note,
+.insight {
+  font-size: 12px;
+  color: #444;
+  margin: 2px 0 4px 0;
+}
+
+@media (max-width: 800px) {
+  .container {
+    grid-template-areas:
+      "header"
+      "overview"
+      "focus"
+      "advanced";
+    grid-template-columns: 1fr;
+  }
+}
