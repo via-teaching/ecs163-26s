@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fitness Wearable Impact Survey Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --panel: rgba(255, 252, 247, 0.94);
+      --panel-border: rgba(84, 69, 53, 0.14);
+      --ink: #1f2933;
+      --muted: #5a6772;
+      --accent: #1f7a8c;
+      --shadow: 0 18px 45px rgba(63, 39, 19, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(222, 184, 135, 0.35), transparent 34%),
+        radial-gradient(circle at top right, rgba(77, 144, 142, 0.2), transparent 30%),
+        linear-gradient(180deg, #f7f2ea 0%, #efe7dc 100%);
+    }
+
+    body {
+      overflow: hidden;
+    }
+
+    .dashboard {
+      height: 100vh;
+      padding: 18px;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 4px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.7rem, 2.6vw, 2.5rem);
+      letter-spacing: 0.01em;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 10px 14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .controls label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .controls select {
+      border: 1px solid rgba(57, 84, 107, 0.18);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.95rem;
+      background: #fffdf9;
+      color: var(--ink);
+    }
+
+    .grid {
+      min-height: 0;
+      display: grid;
+      grid-template-rows: 1.05fr 1fr;
+      gap: 16px;
+    }
+
+    .bottom-row {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 16px;
+    }
+
+    .card {
+      min-height: 0;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 18px 20px 10px;
+    }
+
+    .card-header.with-legend {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .card-header-main {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 1.12rem;
+    }
+
+    .card-header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.35;
+    }
+
+    .viz {
+      min-height: 0;
+      position: relative;
+      padding: 0 10px 12px;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .axis text,
+    .legend text {
+      fill: var(--muted);
+      font-size: 12px;
+    }
+
+    .axis-title,
+    .section-label {
+      fill: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .chart-title {
+      fill: var(--ink);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .tooltip {
+      position: fixed;
+      pointer-events: none;
+      opacity: 0;
+      background: rgba(26, 31, 38, 0.94);
+      color: #f8fafc;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      line-height: 1.35;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+      transition: opacity 120ms ease;
+      max-width: 260px;
+      z-index: 10;
+    }
+
+    .density-legend {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      padding-top: 2px;
+    }
+
+    .density-legend-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .density-legend-bar {
+      width: 180px;
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #ffffd9 0%, #c7e9b4 40%, #41b6c4 70%, #081d58 100%);
+      box-shadow: inset 0 0 0 1px rgba(32, 45, 64, 0.08);
+    }
+
+    .density-legend-scale {
+      width: 180px;
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .footnote {
+      position: absolute;
+      right: 18px;
+      bottom: 12px;
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+
+    @media (max-width: 1100px) {
+      body {
+        overflow: auto;
+      }
+
+      .dashboard {
+        height: auto;
+        min-height: 100vh;
+      }
+
+      .grid {
+        grid-template-rows: minmax(420px, 48vh) auto;
+      }
+
+      .bottom-row {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        min-height: 430px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <div class="header">
+      <div>
+        <h1>Fitness Wearable Impact Survey Dashboard</h1>
+        <div class="subtitle">How wearable usage connects to motivation, well-being, and behavior change.</div>
+      </div>
+      <div class="controls">
+        <label for="frequency-filter">Wearable usage frequency</label>
+        <select id="frequency-filter"></select>
+      </div>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <div class="card-header with-legend">
+          <div class="card-header-main">
+            <h2>Overall Survey Response Patterns Across Wearable Impact Questions</h2>
+            <p>The heatmap acts as the overview layer, showing where responses cluster from strongly disagree through strongly agree.</p>
+          </div>
+          <div class="density-legend" id="density-legend">
+            <div class="density-legend-label">Response density</div>
+            <div class="density-legend-bar"></div>
+            <div class="density-legend-scale">
+              <span>0</span>
+              <span id="density-legend-max">0</span>
+            </div>
+          </div>
+        </div>
+        <div class="viz" id="heatmap"></div>
+      </section>
+
+      <div class="bottom-row">
+        <section class="card">
+          <div class="card-header">
+            <h2>How Fitness Wearables Influence Health and Fitness Behaviors</h2>
+            <p>The focus view compares which outcomes receive the strongest positive lift within the selected usage-frequency group.</p>
+          </div>
+          <div class="viz" id="stacked-bar"></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <h2>Flow From Wearable Usage to Motivation and Well-Being</h2>
+            <p>The Sankey diagram stays unfiltered so the overall relationship between usage, motivation, and well-being remains visible.</p>
+          </div>
+          <div class="viz" id="sankey">
+            <div class="footnote">All respondents shown</div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
