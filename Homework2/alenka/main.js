@@ -1,3 +1,5 @@
+// ECS 163 HW2 - Pokemon dashboard
+// Three views: heatmap, scatterplot, and parallel coordinates
 const svg = d3.select("svg");
 const dataPath = "data/pokemon_alopez247.csv";
 
