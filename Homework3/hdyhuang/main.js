@@ -182,8 +182,7 @@ function drawScatterPlot(data) {
 }
 
 
-// bar chart - pokemon count by type (overview)
-// x = Type_1, y = count, fill = avg Total stat (sequential color)
+// bar chart - pokemon count by type, stacked by generation (overview)
 function drawBarChart(data) {
 
 	// get container dimensions
@@ -191,8 +190,8 @@ function drawBarChart(data) {
 	var width = container.clientWidth;
 	var height = container.clientHeight;
 
-	// margins with extra bottom for rotated labels
-	var margin = { top: 40, right: 20, bottom: 70, left: 50 };
+	// margins with space for legend on right
+	var margin = { top: 40, right: 95, bottom: 70, left: 50 };
 	var innerW = width - margin.left - margin.right;
 	var innerH = height - margin.top - margin.bottom;
 
@@ -206,23 +205,38 @@ function drawBarChart(data) {
 	var g = svg.append("g")
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	// aggregate count per type, sorted descending
+	// generations 1-6
+	var generations = [1, 2, 3, 4, 5, 6];
+
+	// blend white → type color based on generation (gen1 lightest, gen6 full)
+	function genTypeColor(type, gen) {
+		var base = typeColorMap[type] || "#999";
+		var t = 0.25 + (gen - 1) * 0.15;
+		return d3.interpolate("#ffffff", base)(t);
+	}
+
+	// aggregate total count per type, sorted descending
 	var typeCounts = d3.rollups(data,
 		function(v) { return v.length; },
 		function(d) { return d.type1; }
 	);
 	typeCounts.sort(function(a, b) { return b[1] - a[1]; });
-
-	// aggregate average Total per type for color encoding
-	var typeAvgTotal = d3.rollups(data,
-		function(v) { return d3.mean(v, function(d) { return d.total; }); },
-		function(d) { return d.type1; }
-	);
-	var avgTotalMap = {};
-	typeAvgTotal.forEach(function(d) { avgTotalMap[d[0]] = d[1]; });
-
-	// sorted type names
 	var typeNames = typeCounts.map(function(d) { return d[0]; });
+
+	// build cross-tabulation: each type row has gen1..gen6 counts
+	var stackData = typeNames.map(function(type) {
+		var row = { type: type };
+		generations.forEach(function(gen) {
+			row["gen" + gen] = data.filter(function(d) {
+				return d.type1 === type && d.generation === gen;
+			}).length;
+		});
+		return row;
+	});
+
+	// d3 stack layout
+	var stackKeys = generations.map(function(gen) { return "gen" + gen; });
+	var series = d3.stack().keys(stackKeys)(stackData);
 
 	// x scale - band for types
 	var xScale = d3.scaleBand()
@@ -235,11 +249,6 @@ function drawBarChart(data) {
 		.domain([0, d3.max(typeCounts, function(d) { return d[1]; })])
 		.nice()
 		.range([innerH, 0]);
-
-	// color scale - sequential for avg Total
-	var avgValues = Object.values(avgTotalMap);
-	var colorScale = d3.scaleSequential(d3.interpolateYlOrRd)
-		.domain([d3.min(avgValues), d3.max(avgValues)]);
 
 	// draw x axis with rotated labels
 	g.append("g")
@@ -281,85 +290,78 @@ function drawBarChart(data) {
 		.attr("x", margin.left + innerW / 2)
 		.attr("y", 22)
 		.attr("text-anchor", "middle")
-		.text("Pokemon Count by Type (color = avg Total)");
+		.text("Pokemon Count by Type & Generation");
 
-	// draw bars
-	g.selectAll(".bar")
-		.data(typeCounts)
-		.enter()
-		.append("rect")
-		.attr("class", "bar")
-		.attr("x", function(d) { return xScale(d[0]); })
-		.attr("y", function(d) { return yScale(d[1]); })
-		.attr("width", xScale.bandwidth())
-		.attr("height", function(d) { return innerH - yScale(d[1]); })
-		.attr("fill", function(d) { return colorScale(avgTotalMap[d[0]]); })
-		.attr("rx", 2)
-		.attr("cursor", "pointer")
-		// tooltip on hover
-		.on("mouseover", function(event, d) {
-			tooltip.style("opacity", 1)
-				.html(
-					"<strong>" + d[0] + "</strong><br/>" +
-					"Count: " + d[1] + "<br/>" +
-					"Avg Total: " + avgTotalMap[d[0]].toFixed(0)
-				);
-		})
-		.on("mousemove", function(event) {
-			tooltip.style("left", (event.pageX + 12) + "px")
-				.style("top", (event.pageY - 28) + "px");
-		})
-		.on("mouseout", function() {
-			tooltip.style("opacity", 0);
-		});
+	// draw stacked bars
+	series.forEach(function(layer, layerIdx) {
+		g.selectAll(".bar-gen" + (layerIdx + 1))
+			.data(layer)
+			.enter()
+			.append("rect")
+			.attr("class", "bar")
+			.attr("x", function(d, i) { return xScale(typeNames[i]); })
+			.attr("y", function(d) { return yScale(d[1]); })
+			.attr("width", xScale.bandwidth())
+			.attr("height", function(d) { return yScale(d[0]) - yScale(d[1]); })
+			.attr("fill", function(d) { return genTypeColor(d.data.type, layerIdx + 1); })
+			.attr("cursor", "pointer")
+			// tooltip on hover
+			.on("mouseover", function(event, d) {
+				var count = d[1] - d[0];
+				tooltip.style("opacity", 1)
+					.html(
+						"<strong>" + d.data.type + "</strong><br/>" +
+						"Gen " + (layerIdx + 1) + ": " + count + " pokemon"
+					);
+			})
+			.on("mousemove", function(event) {
+				tooltip.style("left", (event.pageX + 12) + "px")
+					.style("top", (event.pageY - 28) + "px");
+			})
+			.on("mouseout", function() {
+				tooltip.style("opacity", 0);
+			});
+	});
 
-	// color legend (gradient bar for avg Total)
-	var legendW = 120;
-	var legendH = 10;
-	var legendX = innerW - legendW;
-	var legendY = -25;
+	// generation legend (merged vertical bar, gen6 top → gen1 bottom)
+	var legendG = svg.append("g")
+		.attr("transform", "translate(" + (width - 85) + "," + (margin.top + 5) + ")");
 
-	// gradient definition
-	var defs = svg.append("defs");
-	var linearGrad = defs.append("linearGradient")
-		.attr("id", "bar-legend-grad");
-	linearGrad.append("stop")
-		.attr("offset", "0%")
-		.attr("stop-color", colorScale(d3.min(avgValues)));
-	linearGrad.append("stop")
-		.attr("offset", "100%")
-		.attr("stop-color", colorScale(d3.max(avgValues)));
+	legendG.append("text")
+		.attr("x", 0).attr("y", -5)
+		.style("font-size", "11px")
+		.style("font-weight", "600")
+		.style("fill", "#555")
+		.text("Generation");
 
-	// legend group
-	var legendG = g.append("g")
-		.attr("transform", "translate(" + legendX + "," + legendY + ")");
+	var segH = 16;
+	var reversed = [6, 5, 4, 3, 2, 1];
+	reversed.forEach(function(gen, i) {
+		var t = 0.25 + (gen - 1) * 0.15;
+		// continuous bar segments with no gap
+		legendG.append("rect")
+			.attr("x", 0)
+			.attr("y", i * segH + 5)
+			.attr("width", 14)
+			.attr("height", segH)
+			.attr("fill", d3.interpolate("#ffffff", "#555")(t));
 
-	// gradient rect
+		// label on right
+		legendG.append("text")
+			.attr("x", 20)
+			.attr("y", i * segH + 5 + segH / 2 + 4)
+			.style("font-size", "10px")
+			.style("fill", "#555")
+			.text("Gen " + gen);
+	});
+
+	// rounded border around the merged bar
 	legendG.append("rect")
-		.attr("width", legendW)
-		.attr("height", legendH)
-		.attr("fill", "url(#bar-legend-grad)")
-		.attr("rx", 2);
-
-	// min label
-	legendG.append("text")
-		.attr("x", 0).attr("y", legendH + 12)
-		.style("font-size", "9px").style("fill", "#555")
-		.text(d3.min(avgValues).toFixed(0));
-
-	// max label
-	legendG.append("text")
-		.attr("x", legendW).attr("y", legendH + 12)
-		.attr("text-anchor", "end")
-		.style("font-size", "9px").style("fill", "#555")
-		.text(d3.max(avgValues).toFixed(0));
-
-	// legend title
-	legendG.append("text")
-		.attr("x", legendW / 2).attr("y", -3)
-		.attr("text-anchor", "middle")
-		.style("font-size", "9px").style("fill", "#555")
-		.text("Avg Total Stat");
+		.attr("x", 0).attr("y", 5)
+		.attr("width", 14).attr("height", segH * 6)
+		.attr("fill", "none")
+		.attr("stroke", "#ccc")
+		.attr("rx", 3);
 }
 
 
