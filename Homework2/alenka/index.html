@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Pokemon dashboard">
+  <title>Pokemon Dashboard</title>
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #f7f8fb;
+      color: #1f2933;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    svg {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    text {
+      fill: #1f2933;
+    }
+
+    .panel-bg {
+      fill: #ffffff;
+      stroke: #d8dee8;
+      stroke-width: 1;
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .subtitle,
+    .axis-label,
+    .legend-label,
+    .note {
+      font-size: 12px;
+      fill: #52606d;
+    }
+
+    .axis text {
+      font-size: 11px;
+      fill: #52606d;
+    }
+
+    .axis path,
+    .axis line {
+      stroke: #9aa5b1;
+      shape-rendering: crispEdges;
+    }
+
+    .heat-cell {
+      stroke: #ffffff;
+      stroke-width: 1;
+      cursor: pointer;
+    }
+
+    .heat-cell.active {
+      stroke: #111827;
+      stroke-width: 2.5;
+    }
+
+    .pokemon-dot {
+      stroke: #ffffff;
+      stroke-width: 0.8;
+      opacity: 0.82;
+    }
+
+    .legend-swatch {
+      stroke: #ffffff;
+      stroke-width: 0.8;
+    }
+
+    .parallel-line {
+      fill: none;
+      opacity: 0.32;
+      stroke-width: 1.1;
+    }
+  </style>
+</head>
+<body>
+  <svg aria-label="Pokemon visualization dashboard"></svg>
+
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
