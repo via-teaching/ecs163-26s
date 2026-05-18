@@ -20,6 +20,10 @@ var tooltip = d3.select("body")
 	.append("div")
 	.attr("class", "tooltip");
 
+// selection state
+var selectedType = null;
+var allData = null;
+
 // load csv and draw all views
 d3.csv("data/pokemon_alopez247.csv").then(function(rawData) {
 
@@ -42,6 +46,7 @@ d3.csv("data/pokemon_alopez247.csv").then(function(rawData) {
 		};
 	});
 
+	allData = data;
 	drawScatterPlot(data);
 	drawBarChart(data);
 	drawRadarChart(data);
@@ -320,6 +325,11 @@ function drawBarChart(data) {
 			})
 			.on("mouseout", function() {
 				tooltip.style("opacity", 0);
+			})
+			// click to select/deselect type
+			.on("click", function(event, d) {
+				selectedType = (selectedType === d.data.type) ? null : d.data.type;
+				updateSelection();
 			});
 	});
 
@@ -462,6 +472,7 @@ function drawRadarChart(data) {
 	// draw filled radar polygon
 	radarG.append("path")
 		.datum(avgStats)
+		.attr("class", "radar-polygon")
 		.attr("d", radarLine)
 		.attr("fill", "steelblue")
 		.attr("fill-opacity", 0.25)
@@ -495,10 +506,105 @@ function drawRadarChart(data) {
 
 	// info text
 	svg.append("text")
+		.attr("class", "radar-info")
 		.attr("x", centerX)
 		.attr("y", height - 10)
 		.attr("text-anchor", "middle")
 		.style("font-size", "12px")
 		.style("fill", "#888")
 		.text("All " + data.length + " Pokemon (average)");
+
+	// store radar config for dynamic updates
+	window.radarCfg = {
+		radarG: radarG,
+		radarLine: radarLine,
+		rScale: rScale,
+		angleSlice: angleSlice,
+		statKeys: statKeys,
+		svg: svg,
+		centerX: centerX,
+		height: height
+	};
+}
+
+
+// selection update: animate scatter, bar, and radar
+function updateSelection() {
+	var t = d3.transition().duration(400);
+
+	// scatter dots: matching type full, others faded
+	d3.selectAll(".dot")
+		.transition(t)
+		.attr("opacity", function(d) {
+			if (!selectedType) return 0.6;
+			return d.type1 === selectedType ? 0.85 : 0.06;
+		})
+		.attr("r", function(d) {
+			if (!selectedType) return 4;
+			return d.type1 === selectedType ? 5 : 3;
+		});
+
+	// bar chart: selected bar full, others dimmed
+	d3.selectAll(".bar")
+		.transition(t)
+		.attr("opacity", function(d) {
+			if (!selectedType) return 1;
+			return d.data.type === selectedType ? 1 : 0.2;
+		});
+
+	// radar chart: update polygon to selected type
+	updateRadar(t);
+}
+
+
+// recalculate and transition the radar polygon
+function updateRadar(t) {
+	var cfg = window.radarCfg;
+	var statKeys = cfg.statKeys;
+	var angleSlice = cfg.angleSlice;
+	var rScale = cfg.rScale;
+
+	// filter data
+	var subset = selectedType
+		? allData.filter(function(d) { return d.type1 === selectedType; })
+		: allData;
+
+	// compute new average stats
+	var newStats = statKeys.map(function(key) {
+		return { axis: key, value: d3.mean(subset, function(d) { return d[key]; }) };
+	});
+
+	// pick color
+	var fillColor = selectedType ? typeColorMap[selectedType] : "steelblue";
+
+	// transition polygon path
+	cfg.radarG.select(".radar-polygon")
+		.datum(newStats)
+		.transition(t)
+		.attr("d", cfg.radarLine)
+		.attr("fill", fillColor)
+		.attr("stroke", fillColor);
+
+	// transition vertex dots
+	cfg.radarG.selectAll(".radar-dot")
+		.data(newStats)
+		.transition(t)
+		.attr("cx", function(d, i) { return rScale(d.value) * Math.cos(angleSlice * i - Math.PI / 2); })
+		.attr("cy", function(d, i) { return rScale(d.value) * Math.sin(angleSlice * i - Math.PI / 2); })
+		.attr("fill", fillColor);
+
+	// transition value labels
+	cfg.radarG.selectAll(".radar-val")
+		.data(newStats)
+		.transition(t)
+		.attr("x", function(d, i) { return (rScale(d.value) + 12) * Math.cos(angleSlice * i - Math.PI / 2); })
+		.attr("y", function(d, i) { return (rScale(d.value) + 12) * Math.sin(angleSlice * i - Math.PI / 2); })
+		.text(function(d) { return d.value.toFixed(0); });
+
+	// update info text
+	var infoText = selectedType
+		? selectedType + " (" + subset.length + " Pokemon)"
+		: "All " + allData.length + " Pokemon (average)";
+
+	d3.select(".radar-info").text(infoText);
 }
