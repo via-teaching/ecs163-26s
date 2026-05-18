@@ -268,9 +268,9 @@ function drawBarChart(data) {
 	// x axis label
 	svg.append("text")
 		.attr("x", margin.left + innerW / 2)
-		.attr("y", height - 5)
+		.attr("y", height - 12)
 		.attr("text-anchor", "middle")
-		.style("font-size", "12px")
+		.style("font-size", "11px")
 		.style("fill", "#555")
 		.text("Pokemon Type");
 
