@@ -29,12 +29,21 @@ body {
 	border-bottom: 1px solid #ddd;
 }
 
-/* top row */
+/* top row: scatter plot */
 #top-row {
 	display: flex;
-	flex: 1;
+	flex: 5;
 	min-height: 0;
 	margin-top: 8px;
+}
+
+/* bottom row: bar chart + radar side by side */
+#bottom-row {
+	display: flex;
+	flex: 4;
+	min-height: 0;
+	margin-top: 10px;
+	gap: 10px;
 }
 
 /* chart container with card styling */
