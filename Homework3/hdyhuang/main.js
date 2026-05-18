@@ -1,5 +1,20 @@
 // pokemon visualization dashboard
 
+// canonical pokemon type colors
+var typeColorMap = {
+	Water: "#6390F0", Normal: "#A8A77A", Grass: "#7AC74C",
+	Bug: "#A6B91A", Psychic: "#F95587", Fire: "#EE8130",
+	Rock: "#B6A136", Electric: "#F7D02C", Ground: "#E2BF65",
+	Poison: "#A33EA1", Dark: "#705746", Fighting: "#C22E28",
+	Dragon: "#6F35FC", Ice: "#96D9D6", Ghost: "#735797",
+	Steel: "#B7B7CE", Fairy: "#D685AD", Flying: "#A98FF3"
+};
+
+// ordinal scale for type colors
+var typeColor = d3.scaleOrdinal()
+	.domain(Object.keys(typeColorMap))
+	.range(Object.values(typeColorMap));
+
 // shared tooltip
 var tooltip = d3.select("body")
 	.append("div")
@@ -41,8 +56,8 @@ function drawScatterPlot(data) {
 	var width = container.clientWidth;
 	var height = container.clientHeight;
 
-	// margins
-	var margin = { top: 40, right: 30, bottom: 50, left: 55 };
+	// margins with extra right for legend
+	var margin = { top: 40, right: 160, bottom: 50, left: 55 };
 	var innerW = width - margin.left - margin.right;
 	var innerH = height - margin.top - margin.bottom;
 
@@ -113,7 +128,7 @@ function drawScatterPlot(data) {
 		.attr("cx", function(d) { return xScale(d.attack); })
 		.attr("cy", function(d) { return yScale(d.defense); })
 		.attr("r", 4)
-		.attr("fill", "steelblue")
+		.attr("fill", function(d) { return typeColor(d.type1); })
 		.attr("opacity", 0.6)
 		.attr("stroke", "#fff")
 		.attr("stroke-width", 0.5)
@@ -133,6 +148,37 @@ function drawScatterPlot(data) {
 		.on("mouseout", function() {
 			tooltip.style("opacity", 0);
 		});
+
+	// type color legend (right side)
+	var types = Object.keys(typeColorMap);
+	var legendG = svg.append("g")
+		.attr("transform", "translate(" + (width - 150) + "," + (margin.top + 5) + ")");
+
+	// legend title
+	legendG.append("text")
+		.attr("x", 0).attr("y", -5)
+		.style("font-size", "11px")
+		.style("font-weight", "600")
+		.style("fill", "#555")
+		.text("Pokemon Type");
+
+	// one entry per type
+	types.forEach(function(type, i) {
+		// colored circle
+		legendG.append("circle")
+			.attr("cx", 6)
+			.attr("cy", i * 16 + 10)
+			.attr("r", 5)
+			.attr("fill", typeColorMap[type]);
+
+		// type name
+		legendG.append("text")
+			.attr("x", 16)
+			.attr("y", i * 16 + 14)
+			.style("font-size", "10px")
+			.style("fill", "#555")
+			.text(type);
+	});
 }
 
 
