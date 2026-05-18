@@ -22,6 +22,7 @@ var tooltip = d3.select("body")
 
 // selection and brush state
 var selectedType = null;
+var selectedPokemon = null;
 var allData = null;
 var brushedData = null;
 var scatterBrush = null;
@@ -119,13 +120,19 @@ function drawScatterPlot(data) {
 		.style("fill", "#555")
 		.text("Defense");
 
-	// chart title
-	svg.append("text")
+	// chart title with dynamic selection info
+	var scatterTitle = svg.append("text")
 		.attr("class", "chart-title")
 		.attr("x", margin.left + innerW / 2)
 		.attr("y", 22)
-		.attr("text-anchor", "middle")
-		.text("Attack vs Defense");
+		.attr("text-anchor", "middle");
+
+	scatterTitle.append("tspan").text("Attack vs Defense");
+	scatterTitle.append("tspan")
+		.attr("class", "scatter-info")
+		.style("font-weight", "400")
+		.style("fill", "#888")
+		.text("");
 
 	// draw scatter dots with default steelblue color
 	g.selectAll(".dot")
@@ -155,6 +162,11 @@ function drawScatterPlot(data) {
 		})
 		.on("mouseout", function() {
 			tooltip.style("opacity", 0);
+		})
+		// click dot to show individual pokemon on radar
+		.on("click", function(event, d) {
+			selectedPokemon = (selectedPokemon && selectedPokemon.name === d.name) ? null : d;
+			updateRadar(d3.transition().duration(400));
 		});
 
 	// type color legend (right side)
@@ -183,7 +195,7 @@ function drawScatterPlot(data) {
 		legendG.append("text")
 			.attr("x", 16)
 			.attr("y", i * 16 + 14)
-			.style("font-size", "10px")
+			.style("font-size", "12px")
 			.style("fill", "#555")
 			.text(type);
 	});
@@ -194,6 +206,7 @@ function drawScatterPlot(data) {
 		.extent([[0, 0], [innerW, innerH]])
 		.on("brush", function(event) {
 			if (!event.selection) return;
+			selectedPokemon = null;
 			var [[x0, y0], [x1, y1]] = event.selection;
 
 			// highlight dots inside brush, respect type filter
@@ -214,6 +227,7 @@ function drawScatterPlot(data) {
 				});
 		})
 		.on("end", function(event) {
+			selectedPokemon = null;
 			if (!event.selection) {
 				// brush cleared, revert to selection state
 				brushedData = null;
@@ -238,6 +252,9 @@ function drawScatterPlot(data) {
 	scatterBrushG = g.append("g")
 		.attr("class", "brush")
 		.call(brush);
+
+	// raise dots above brush overlay so hover/tooltip still works
+	g.selectAll(".dot").raise();
 }
 
 
@@ -317,7 +334,7 @@ function drawBarChart(data) {
 		.selectAll("text")
 		.attr("transform", "rotate(-40)")
 		.style("text-anchor", "end")
-		.style("font-size", "10px");
+		.style("font-size", "12px");
 
 	// draw y axis
 	g.append("g")
@@ -383,6 +400,7 @@ function drawBarChart(data) {
 			// click to select/deselect type
 			.on("click", function(event, d) {
 				selectedType = (selectedType === d.data.type) ? null : d.data.type;
+				selectedPokemon = null;
 				brushedData = null;
 				// clear brush on scatter
 				if (scatterBrushG && scatterBrush) scatterBrushG.call(scatterBrush.move, null);
@@ -417,7 +435,7 @@ function drawBarChart(data) {
 		legendG.append("text")
 			.attr("x", 20)
 			.attr("y", i * segH + 5 + segH / 2 + 4)
-			.style("font-size", "10px")
+			.style("font-size", "12px")
 			.style("fill", "#555")
 			.text("Gen " + gen);
 	});
@@ -448,13 +466,19 @@ function drawRadarChart(data) {
 		.attr("width", width)
 		.attr("height", height);
 
-	// chart title
-	svg.append("text")
+	// combined title + dynamic info (single line)
+	var titleG = svg.append("text")
 		.attr("class", "chart-title")
 		.attr("x", width / 2)
-		.attr("y", 22)
-		.attr("text-anchor", "middle")
-		.text("Average Stats Radar");
+		.attr("y", 20)
+		.attr("text-anchor", "middle");
+
+	titleG.append("tspan").text("Stats - ");
+	titleG.append("tspan")
+		.attr("class", "radar-info")
+		.style("font-weight", "400")
+		.style("fill", "#888")
+		.text("All " + data.length + " Pokemon (average)");
 
 	// radar config
 	var statKeys = ["hp", "attack", "defense", "spAtk", "spDef", "speed"];
@@ -561,16 +585,6 @@ function drawRadarChart(data) {
 		.style("fill", "#333")
 		.text(function(d) { return d.value.toFixed(0); });
 
-	// info text
-	svg.append("text")
-		.attr("class", "radar-info")
-		.attr("x", centerX)
-		.attr("y", height - 10)
-		.attr("text-anchor", "middle")
-		.style("font-size", "12px")
-		.style("fill", "#888")
-		.text("All " + data.length + " Pokemon (average)");
-
 	// store radar config for dynamic updates
 	window.radarCfg = {
 		radarG: radarG,
@@ -609,6 +623,10 @@ function updateSelection() {
 			return d.data.type === selectedType ? 1 : 0.2;
 		});
 
+	// update scatter title info
+	var scatterText = selectedType ? " - " + selectedType : "";
+	d3.select(".scatter-info").text(scatterText);
+
 	// radar chart: update polygon to selected type
 	updateRadar(t);
 }
@@ -621,29 +639,38 @@ function updateRadar(t) {
 	var angleSlice = cfg.angleSlice;
 	var rScale = cfg.rScale;
 
-	// priority: brushedData > selectedType > all
-	var subset;
+	// priority: selectedPokemon > brushedData > selectedType > all
+	var newStats;
 	var infoText;
 	var fillColor;
 
-	if (brushedData && brushedData.length > 0) {
-		subset = brushedData;
+	if (selectedPokemon) {
+		// single pokemon: show exact stats
+		newStats = statKeys.map(function(key) {
+			return { axis: key, value: selectedPokemon[key] };
+		});
+		fillColor = typeColorMap[selectedPokemon.type1] || "steelblue";
+		infoText = selectedPokemon.name + " (" + selectedPokemon.type1 + ")";
+	} else if (brushedData && brushedData.length > 0) {
+		newStats = statKeys.map(function(key) {
+			return { axis: key, value: d3.mean(brushedData, function(d) { return d[key]; }) };
+		});
 		fillColor = "#e65100";
-		infoText = "Brushed: " + subset.length + " Pokemon";
+		infoText = "Brushed: " + brushedData.length + " Pokemon";
 	} else if (selectedType) {
-		subset = allData.filter(function(d) { return d.type1 === selectedType; });
+		var subset = allData.filter(function(d) { return d.type1 === selectedType; });
+		newStats = statKeys.map(function(key) {
+			return { axis: key, value: d3.mean(subset, function(d) { return d[key]; }) };
+		});
 		fillColor = typeColorMap[selectedType];
 		infoText = selectedType + " (" + subset.length + " Pokemon)";
 	} else {
-		subset = allData;
+		newStats = statKeys.map(function(key) {
+			return { axis: key, value: d3.mean(allData, function(d) { return d[key]; }) };
+		});
 		fillColor = "steelblue";
 		infoText = "All " + allData.length + " Pokemon (average)";
 	}
-
-	// compute new average stats
-	var newStats = statKeys.map(function(key) {
-		return { axis: key, value: d3.mean(subset, function(d) { return d[key]; }) };
-	});
 
 	// transition polygon path
 	cfg.radarG.select(".radar-polygon")
@@ -671,4 +698,13 @@ function updateRadar(t) {
 
 	// update info text
 	d3.select(".radar-info").text(infoText);
+
+	// sync scatter title with current state
+	var scatterText = "";
+	if (selectedPokemon) {
+		scatterText = " - " + selectedPokemon.name;
+	} else if (selectedType) {
+		scatterText = " - " + selectedType;
+	}
+	d3.select(".scatter-info").text(scatterText);
 }
