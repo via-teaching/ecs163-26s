@@ -20,9 +20,12 @@ var tooltip = d3.select("body")
 	.append("div")
 	.attr("class", "tooltip");
 
-// selection state
+// selection and brush state
 var selectedType = null;
 var allData = null;
+var brushedData = null;
+var scatterBrush = null;
+var scatterBrushG = null;
 
 // load csv and draw all views
 d3.csv("data/pokemon_alopez247.csv").then(function(rawData) {
@@ -184,6 +187,57 @@ function drawScatterPlot(data) {
 			.style("fill", "#555")
 			.text(type);
 	});
+
+	// d3 brush for rectangular selection on scatter
+	scatterBrush = d3.brush();
+	var brush = scatterBrush
+		.extent([[0, 0], [innerW, innerH]])
+		.on("brush", function(event) {
+			if (!event.selection) return;
+			var [[x0, y0], [x1, y1]] = event.selection;
+
+			// highlight dots inside brush, respect type filter
+			d3.selectAll(".dot")
+				.attr("opacity", function(d) {
+					var cx = xScale(d.attack);
+					var cy = yScale(d.defense);
+					var inBrush = cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1;
+					var inType = !selectedType || d.type1 === selectedType;
+					return (inBrush && inType) ? 0.85 : 0.06;
+				})
+				.attr("r", function(d) {
+					var cx = xScale(d.attack);
+					var cy = yScale(d.defense);
+					var inBrush = cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1;
+					var inType = !selectedType || d.type1 === selectedType;
+					return (inBrush && inType) ? 5 : 3;
+				});
+		})
+		.on("end", function(event) {
+			if (!event.selection) {
+				// brush cleared, revert to selection state
+				brushedData = null;
+				updateSelection();
+				return;
+			}
+			var [[x0, y0], [x1, y1]] = event.selection;
+
+			// collect dots inside brush (respect type filter)
+			brushedData = allData.filter(function(d) {
+				var cx = xScale(d.attack);
+				var cy = yScale(d.defense);
+				var inBrush = cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1;
+				var inType = !selectedType || d.type1 === selectedType;
+				return inBrush && inType;
+			});
+
+			// update radar with brushed subset
+			updateRadar(d3.transition().duration(400));
+		});
+
+	scatterBrushG = g.append("g")
+		.attr("class", "brush")
+		.call(brush);
 }
 
 
@@ -329,6 +383,9 @@ function drawBarChart(data) {
 			// click to select/deselect type
 			.on("click", function(event, d) {
 				selectedType = (selectedType === d.data.type) ? null : d.data.type;
+				brushedData = null;
+				// clear brush on scatter
+				if (scatterBrushG && scatterBrush) scatterBrushG.call(scatterBrush.move, null);
 				updateSelection();
 			});
 	});
@@ -564,18 +621,29 @@ function updateRadar(t) {
 	var angleSlice = cfg.angleSlice;
 	var rScale = cfg.rScale;
 
-	// filter data
-	var subset = selectedType
-		? allData.filter(function(d) { return d.type1 === selectedType; })
-		: allData;
+	// priority: brushedData > selectedType > all
+	var subset;
+	var infoText;
+	var fillColor;
+
+	if (brushedData && brushedData.length > 0) {
+		subset = brushedData;
+		fillColor = "#e65100";
+		infoText = "Brushed: " + subset.length + " Pokemon";
+	} else if (selectedType) {
+		subset = allData.filter(function(d) { return d.type1 === selectedType; });
+		fillColor = typeColorMap[selectedType];
+		infoText = selectedType + " (" + subset.length + " Pokemon)";
+	} else {
+		subset = allData;
+		fillColor = "steelblue";
+		infoText = "All " + allData.length + " Pokemon (average)";
+	}
 
 	// compute new average stats
 	var newStats = statKeys.map(function(key) {
 		return { axis: key, value: d3.mean(subset, function(d) { return d[key]; }) };
 	});
-
-	// pick color
-	var fillColor = selectedType ? typeColorMap[selectedType] : "steelblue";
 
 	// transition polygon path
 	cfg.radarG.select(".radar-polygon")
@@ -602,9 +670,5 @@ function updateRadar(t) {
 		.text(function(d) { return d.value.toFixed(0); });
 
 	// update info text
-	var infoText = selectedType
-		? selectedType + " (" + subset.length + " Pokemon)"
-		: "All " + allData.length + " Pokemon (average)";
-
 	d3.select(".radar-info").text(infoText);
 }
