@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interactive D3 dashboard exploring the Sephora skincare catalog by price, rating, category, and skin-type suitability.">
+  <title>Skincare Catalog Dashboard</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="dashboard" aria-label="Skincare catalog visualization dashboard">
+    <header class="dashboard-header">
+      <div>
+        <p class="eyebrow">ECS 163 Homework 3</p>
+        <h1>Sephora skincare: price, rating, and fit</h1>
+      </div>
+      <p class="rationale">Start from the price-versus-rating overview of all 1,472 products. Drag to brush a region, wheel to zoom in on a price band (double-click resets), or click a product to pin it. The skin-type matrix and the brand ranking are focus views: they animate to the brushed subset so you can watch which categories and brands hold up as you move through price and rating.</p>
+    </header>
+
+    <section class="grid" aria-label="Three linked skincare charts">
+      <article class="panel" aria-labelledby="scatter-title">
+        <div class="panel-copy">
+          <p class="view-label">Overview &middot; brush, zoom, click</p>
+          <h2 id="scatter-title">Price vs. rating, by category</h2>
+        </div>
+        <svg id="scatter-chart" role="img" aria-label="Scatter plot of product price against rating, colored by category, with brushing and zooming"></svg>
+      </article>
+
+      <article class="panel" aria-labelledby="heatmap-title">
+        <div class="panel-copy">
+          <p class="view-label">Advanced &middot; animates on selection</p>
+          <h2 id="heatmap-title">Skin-type suitability matrix</h2>
+        </div>
+        <svg id="heatmap-chart" role="img" aria-label="Heatmap of product counts by category and skin type for the current selection"></svg>
+      </article>
+
+      <article class="panel wide-panel" aria-labelledby="bars-title">
+        <div class="panel-copy">
+          <p class="view-label">Focus &middot; reorders on selection</p>
+          <h2 id="bars-title">Top brands by mean rating</h2>
+        </div>
+        <svg id="bars-chart" role="img" aria-label="Horizontal bar chart of top brands by mean rating for the current selection"></svg>
+      </article>
+    </section>
+  </main>
+
+  <div id="tooltip" class="tooltip" aria-hidden="true"></div>
+
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
