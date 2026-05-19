@@ -132,9 +132,17 @@ function drawScatter(data) {
 
   svg.attr("viewBox", `0 0 ${width} ${height}`);
 
-  // Base scales; the zoom transform rescales copies of these.
-  const xBase = d3.scaleLinear().domain([0, d3.max(data, d => d.price)]).nice().range([0, innerWidth]);
-  const yBase = d3.scaleLinear().domain([0, d3.max(data, d => d.rank)]).nice().range([innerHeight, 0]);
+  // Base scales; the zoom transform rescales copies of these. The rating
+  // axis is padded to the data extent (ratings sit near 1 to 5), so the top
+  // row is not clipped by the plot frame and the empty 0 band is dropped.
+  const priceMax = d3.max(data, d => d.price);
+  const rExtent = d3.extent(data, d => d.rank);
+  const yPad = (rExtent[1] - rExtent[0]) * 0.06 || 0.3;
+  const xBase = d3.scaleLinear().domain([0, priceMax]).nice().range([0, innerWidth]);
+  const yBase = d3.scaleLinear()
+    .domain([Math.max(0, rExtent[0] - yPad), rExtent[1] + yPad])
+    .nice()
+    .range([innerHeight, 0]);
   let x = xBase;
   let y = yBase;
 
@@ -195,7 +203,7 @@ function drawScatter(data) {
   chart.append("text").attr("class", "axis-label")
     .attr("transform", "rotate(-90)")
     .attr("x", -innerHeight / 2).attr("y", isCompact ? -30 : -42)
-    .attr("text-anchor", "middle").text("User rating (0 to 5)");
+    .attr("text-anchor", "middle").text("User rating (1 to 5 scale)");
 
   // Usage annotation.
   chart.append("text").attr("class", "annotation")
