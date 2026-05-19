@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Interactive Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+<div class="dashboard">
+    <header>
+        <h1>⚡ Pokémon Stats Explorer - Interactive</h1>
+        <p class="subhead">Brush + Zoom on scatter plot | Animated filtering | Click bars or brush to explore</p>
+    </header>
+
+    <div class="grid-2col">
+        <!-- VIEW 1: BAR CHART -->
+        <div class="card">
+            <div class="card-header">
+                 Overview: Pokémon per Primary Type
+                <span class="badge">context</span>
+            </div>
+            <div id="bar-chart" class="viz-container"></div>
+            <div id="bar-legend" class="legend"></div>
+        </div>
+
+        <!-- VIEW 2: SCATTER PLOT with brushing + zoom/pan -->
+        <div class="card">
+            <div class="card-header">
+                 Focus: Attack vs Defense
+                <span class="badge">focus</span>
+                <span class="badge">brush + zoom</span>
+            </div>
+            <div id="scatter-plot" class="viz-container" style="position: relative;"></div>
+            <div class="note">Drag to brush | Scroll to zoom | Drag background to pan | Click bars to filter</div>
+        </div>
+    </div>
+
+    <!-- VIEW 3: PARALLEL COORDINATES -->
+    <div class="card full-width">
+        <div class="card-header">
+             Advanced: Multivariate Stat Profiles
+            <span class="badge">advanced</span>
+            <button id="reset-filter" class="reset-btn">⟳ Reset All Filters</button>
+        </div>
+        <div id="parallel-coords" class="viz-container"></div>
+        <div id="global-legend" class="legend"></div>
+    </div>
+
+    <footer>Interactions: Brushing & Zoom/Pan on scatter plot | Animated transitions on all views | Click any bar to filter by type</footer>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>

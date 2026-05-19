@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Dashboard | Focus + Context</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+<div class="dashboard">
+    <header>
+        <h1>⚡ Pokémon Stats Explorer</h1>
+        <p class="subhead">Overview by type → Focus on attack/defense → Advanced stat profiles (Parallel Coordinates)</p>
+    </header>
+
+    <div class="grid-2col">
+        <div class="card">
+            <div class="card-header">
+                 Overview: Pokémon per Primary Type
+            </div>
+            <div id="bar-chart" class="viz-container"></div>
+            <div id="bar-legend" class="legend"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                 Focus: Attack vs. Defense
+            </div>
+            <div id="scatter-plot" class="viz-container"></div>
+            <div class="note"> Hover points for details | Click bars above to filter by type</div>
+        </div>
+    </div>
+
+    <div class="card full-width">
+        <div class="card-header">
+             Advanced: Multivariate Stat Profiles (HP, Attack, Defense, Sp.Atk, Sp.Def, Speed)
+            <button id="reset-filter" class="reset-btn">⟳ Reset Filter</button>
+        </div>
+        <div id="parallel-coords" class="viz-container"></div>
+        <div id="global-legend" class="legend"></div>
+    </div>
+
+    <footer>Dashboard uses 3 distinct methods: Bar Chart (categorical), Scatter Plot (bivariate), Parallel Coordinates (multivariate). Click any bar to filter all views.</footer>
+</div>
+
+<script src="main.js"></script>   <!-- changed from script.js to main.js -->
+</body>
+</html>
