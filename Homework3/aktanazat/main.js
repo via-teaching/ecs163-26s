@@ -15,10 +15,10 @@ const categoryColor = d3.scaleOrdinal()
   .domain(CATEGORIES)
   .range(["#2a9d8f", "#e76f51", "#e9c46a", "#264653", "#8a5a83", "#4a7c59"]);
 
-// Sequential ramp for the heatmap. Per-cell mean ratings cluster tightly
-// (about 3.6 to 4.7), so the domain is clamped to that band for real
-// contrast instead of a near-uniform wash.
-const heatColor = d3.scaleLinear().domain([3.6, 4.7]).range(["#f1eee8", "#264653"]).clamp(true);
+// Sequential ramp for the heatmap. Cells encode within-category coverage
+// (share of the category's selected products that suit a skin type), which
+// spans the full 0 to 1, so the color channel actually carries information.
+const heatColor = d3.scaleLinear().domain([0, 1]).range(["#f1eee8", "#264653"]).clamp(true);
 // Cell opacity encodes sample size, so confidence is visible without hover:
 // a cell backed by few products reads as faint.
 const heatConfidence = d3.scaleSqrt().domain([0, 120]).range([0.4, 1]).clamp(true);
@@ -26,6 +26,7 @@ const EMPTY_FILL = "#f6f4ef"; // a cell with no products in the selection
 
 const money = d3.format("$,.0f");
 const oneDec = d3.format(".1f");
+const pct = d3.format(".0%");
 const tooltip = d3.select("#tooltip");
 const detail = d3.select("#detail");
 
@@ -285,10 +286,11 @@ function drawScatter(data) {
 }
 
 // ---------------------------------------------------------------------------
-// View 2 (advanced): category x skin-type matrix of MEAN RATING.
+// View 2 (advanced): category x skin-type matrix of COVERAGE SHARE.
 // Color and number tween on every selection change (filtering / timestep).
-// Mean rating, not raw count, so the matrix reads as "how well do products
-// here suit this skin type" instead of just "how many are left".
+// Each cell is the share of that category's selected products suited to the
+// skin type, so it answers "where are my options" and never goes circular
+// with a rating brush the way a mean-rating cell did.
 // ---------------------------------------------------------------------------
 function buildHeatmap() {
   const selector = "#heatmap-chart";
@@ -370,7 +372,7 @@ function buildHeatmap() {
   // Annotation tying the matrix to the brush and naming both encodings.
   chart.append("text").attr("class", "annotation")
     .attr("x", 0).attr("y", -10)
-    .text(isCompact ? "Color = mean rating · faint = few products" : "Color = mean rating in the brushed subset; fainter cells are backed by fewer products");
+    .text(isCompact ? "Color = % of category · faint = few products" : "Color = share of the category's brushed products that suit each skin type; fainter cells rest on fewer products");
 
   // Legend group anchored under the matrix.
   const legend = svg.append("g").attr("transform", `translate(${margin.left},${height - 14})`);
@@ -379,71 +381,73 @@ function buildHeatmap() {
   const defs = svg.append("defs");
   // Linear gradient that the swatch references by id.
   const grad = defs.append("linearGradient").attr("id", "heat-grad");
-  // Low-rating stop (light end of the ramp).
-  grad.append("stop").attr("offset", "0%").attr("stop-color", heatColor(3.6));
-  // High-rating stop (dark end of the ramp).
-  grad.append("stop").attr("offset", "100%").attr("stop-color", heatColor(4.7));
+  // Low-share stop (light end of the ramp).
+  grad.append("stop").attr("offset", "0%").attr("stop-color", heatColor(0));
+  // High-share stop (dark end of the ramp).
+  grad.append("stop").attr("offset", "100%").attr("stop-color", heatColor(1));
 
   // Legend swatch filled by the gradient.
   legend.append("rect").attr("width", Math.min(150, innerWidth)).attr("height", 8)
     .attr("fill", "url(#heat-grad)");
 
   // Legend low label.
-  legend.append("text").attr("class", "legend-label").attr("x", 0).attr("y", -4).text("rating 3.6");
+  legend.append("text").attr("class", "legend-label").attr("x", 0).attr("y", -4).text("0% of category");
 
   // Legend high label.
   legend.append("text").attr("class", "legend-label")
     .attr("x", Math.min(150, innerWidth)).attr("y", -4)
-    .attr("text-anchor", "end").text("4.7");
+    .attr("text-anchor", "end").text("100%");
 
-  // Recompute the mean rating per cell for the selection, then tween.
+  // Per cell: count the selected products in that (category, skin type), and
+  // the category's total in the selection, then color by their ratio.
   // animate is false on rebuilds, so the matrix snaps with no motion.
   heatmapUpdate = function (sel, animate) {
-    const acc = {};
-    cellKeys.forEach(k => { acc[`${k.cat}|${k.skin}`] = { sum: 0, n: 0 }; });
+    const cellN = {};
+    const catTotal = {};
+    cellKeys.forEach(k => { cellN[`${k.cat}|${k.skin}`] = 0; });
+    CATEGORIES.forEach(c => { catTotal[c] = 0; });
     sel.forEach(p => {
+      catTotal[p.label] += 1;
       SKIN_TYPES.forEach(skin => {
-        if (p.skin[skin] === 1) {
-          const a = acc[`${p.label}|${skin}`];
-          a.sum += p.rank;
-          a.n += 1;
-        }
+        if (p.skin[skin] === 1) cellN[`${p.label}|${skin}`] += 1;
       });
     });
-    const meanOf = d => {
-      const a = acc[`${d.cat}|${d.skin}`];
-      return a.n ? a.sum / a.n : null;
+    // Share of the category's selected products that suit this skin type.
+    const shareOf = d => {
+      const total = catTotal[d.cat];
+      return total ? cellN[`${d.cat}|${d.skin}`] / total : null;
     };
     const dur = animate ? 650 : 0;
 
-    // Cells ease to the new color (mean rating) and opacity (sample size),
-    // so both the score and its confidence read at a glance.
+    // Cells ease to the new color (coverage share) and opacity (sample size),
+    // so both the share and its confidence read at a glance.
     cells.transition().duration(dur).ease(d3.easeCubicInOut)
-      .attr("fill", d => { const m = meanOf(d); return m === null ? EMPTY_FILL : heatColor(m); })
-      .attr("opacity", d => { const a = acc[`${d.cat}|${d.skin}`]; return a.n === 0 ? 1 : heatConfidence(a.n); });
+      .attr("fill", d => { const s = shareOf(d); return s === null ? EMPTY_FILL : heatColor(s); })
+      .attr("opacity", d => { const n = cellN[`${d.cat}|${d.skin}`]; return n === 0 ? 1 : heatConfidence(n); });
 
-    // Labels roll to the new mean. White only when the cell renders truly
-    // dark, i.e. high rating AND high opacity; a faint cell stays dark text.
+    // Labels roll to the new percentage. White only when the cell renders
+    // truly dark, i.e. high share AND enough products behind it.
     cellText.transition().duration(dur).ease(d3.easeCubicInOut)
       .style("fill", d => {
-        const a = acc[`${d.cat}|${d.skin}`];
-        const m = meanOf(d);
-        return m !== null && m >= 4.2 && heatConfidence(a.n) > 0.75 ? "#ffffff" : "#111111";
+        const n = cellN[`${d.cat}|${d.skin}`];
+        const s = shareOf(d);
+        return s !== null && s >= 0.55 && heatConfidence(n) > 0.75 ? "#ffffff" : "#111111";
       })
       .tween("text", function (d) {
         const node = this;
-        const m = meanOf(d);
-        if (m === null) return t => { node.textContent = ""; };
-        const start = parseFloat(node.textContent) || 3.6;
-        const i = d3.interpolateNumber(start, m);
-        return t => { node.textContent = oneDec(i(t)); };
+        const s = shareOf(d);
+        if (s === null) return () => { node.textContent = ""; };
+        const start = (parseFloat(node.textContent) || 0) / 100;
+        const i = d3.interpolateNumber(start, s);
+        return t => { node.textContent = pct(i(t)); };
       });
 
-    // Cache count + mean for tooltips.
+    // Cache count, category total, and share for tooltips.
     cells.each(function (d) {
-      const a = acc[`${d.cat}|${d.skin}`];
-      d.value = a.n;
-      d.mean = a.n ? a.sum / a.n : null;
+      const total = catTotal[d.cat];
+      d.value = cellN[`${d.cat}|${d.skin}`];
+      d.catTotal = total;
+      d.share = total ? d.value / total : null;
     });
   };
 }
@@ -647,10 +651,12 @@ function showProductTooltip(d) {
 
 function showCellTooltip(d, node) {
   d3.select(node).classed("is-active", true);
-  const mean = d.mean === null || d.mean === undefined ? "no products" : `${oneDec(d.mean)}/5 over ${d.value} products`;
+  const body = d.share === null || d.share === undefined
+    ? "No products in this category for the current selection."
+    : `${pct(d.share)} of ${d.cat} (${d.value} of ${d.catTotal}) suit ${d.skin.toLowerCase()} skin.`;
   tooltip
     .style("opacity", 1)
-    .html(`<strong>${d.cat} · ${d.skin}</strong>Mean rating for ${d.skin.toLowerCase()} skin: ${mean}.`);
+    .html(`<strong>${d.cat} · ${d.skin}</strong>${body}`);
   moveTooltip();
 }
 

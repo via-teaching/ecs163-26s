@@ -7,7 +7,7 @@ Theme: explore how price relates to user rating across categories, then drill in
 Three views, following focus + context:
 
 1. **Overview — price vs. rating scatter.** Every product, colored by category. This is the context view and where interaction starts.
-2. **Advanced — skin-type suitability matrix.** Category by skin type; each cell is the mean rating of products in the current selection suited to that skin type, so the matrix reads as fit, not just volume.
+2. **Advanced — skin-type coverage matrix.** Category by skin type; each cell is the share of that category's selected products that suit the skin type, so the matrix shows where the options actually are.
 3. **Focus — top brands by mean rating.** Brands with at least three products in the selection, ranked by average rating.
 
 Interactions:
@@ -24,7 +24,7 @@ Animated transitions:
 Design rationale and tradeoffs:
 
 - The overview is a scatter because price and rating are both continuous and the question is how they trade off; category rides on color so the split is visible without a fourth view. It doubles as the context plot for brush and zoom.
-- The matrix encodes **mean rating, not product count**. Count mostly tracks how big a category is, which buries the actual question ("are products here good for this skin type"). Mean rating answers that directly; the count is still available on hover so sample size is not hidden.
+- The matrix encodes **within-category coverage share**, not raw count or mean rating. Raw count just tracks category size. Mean rating looked right but went circular: brushing the scatter on rating forced every cell to the same value. Share answers the real question ("for my skin type, where are the options") and stays informative under any brush; the absolute count drives cell opacity so confidence is visible, and the exact n is on hover.
 - The color domain is clamped to the band ratings actually occupy (3.6 to 4.7). The full 0 to 5 range would wash every cell to the same tone.
 - The brand ranking enforces a sample floor so a single five-star product cannot outrank a deep, consistent line. The floor steps down only as far as a small selection forces, and the annotation always states the floor in use, so the ranking is never mislabeled.
 - Pinning a point is the end of the drill-down: overview, then brushed subset, then one product in full. That is the focus+context payoff, not a fourth chart.
