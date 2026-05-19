@@ -165,6 +165,72 @@ svg {
   cursor: crosshair;
 }
 
+.detail-card {
+  position: fixed;
+  z-index: 12;
+  right: 20px;
+  bottom: 20px;
+  width: 300px;
+  max-width: calc(100vw - 32px);
+  padding: 16px 18px;
+  background: #111111;
+  color: #ffffff;
+  border: 1px solid #111111;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity 180ms ease-out, transform 180ms ease-out;
+}
+
+.detail-card.is-open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.detail-card p { margin: 0; }
+
+.detail-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #b9c4c2;
+}
+
+.detail-name {
+  margin-top: 4px;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+
+.detail-stats {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #e6e6e6;
+}
+
+.detail-skin {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #9fb0ad;
+}
+
+.detail-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
 .tooltip {
   position: fixed;
   z-index: 10;
@@ -187,7 +253,15 @@ svg {
 }
 
 @media (max-width: 900px) {
+  /* Stacked single column; let the page scroll instead of clipping charts. */
+  html,
+  body { height: auto; }
+
   .dashboard {
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
     gap: 8px;
     padding: 10px;
   }
@@ -204,7 +278,7 @@ svg {
   }
 
   .grid {
-    grid-template-rows: minmax(0, 0.4fr) minmax(0, 0.3fr) minmax(0, 0.3fr);
+    grid-template-rows: repeat(3, minmax(280px, 46vh));
     gap: 8px;
   }
 
@@ -236,6 +310,20 @@ svg {
   .legend-label,
   .annotation,
   .cell-count { font-size: 9px; }
+}
+
+/* Short viewports (landscape phones, small windows): scroll, never clip. */
+@media (max-height: 620px) {
+  html,
+  body { height: auto; }
+
+  .dashboard {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .grid { grid-auto-rows: minmax(260px, 1fr); }
 }
 
 @media (max-width: 480px) {

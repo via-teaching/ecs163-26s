@@ -1,6 +1,6 @@
 // D3 dashboard for ECS 163 Homework 3 (interactivity + animated transitions).
 // Dataset: Sephora skincare catalog (Kaggle: kingabzpro/cosmetics-datasets).
-// Only D3 v5 is used; every element added by D3 is commented below.
+// Only D3 v5 is loaded. Every element D3 adds to the DOM has a comment above it.
 
 const DATA_URL = "data/cosmetics.csv";
 
@@ -15,17 +15,19 @@ const categoryColor = d3.scaleOrdinal()
   .domain(CATEGORIES)
   .range(["#2a9d8f", "#e76f51", "#e9c46a", "#264653", "#8a5a83", "#4a7c59"]);
 
-// Sequential ramp for the heatmap: neutral paper to dark slate.
-const heatColor = d3.scaleLinear().range(["#f1eee8", "#264653"]);
+// Sequential ramp for the heatmap. Ratings sit in roughly 3 to 5, so the
+// domain is clamped there to keep the color contrast meaningful.
+const heatColor = d3.scaleLinear().domain([3, 5]).range(["#f1eee8", "#264653"]).clamp(true);
+const EMPTY_FILL = "#f6f4ef"; // a cell with no products in the selection
 
 const money = d3.format("$,.0f");
 const oneDec = d3.format(".1f");
 const tooltip = d3.select("#tooltip");
+const detail = d3.select("#detail");
 
 let products = [];           // parsed, filtered product rows
-let pinnedId = null;         // product locked by a click, or null
+let pinned = null;           // product locked by a click, or null
 let brushDomain = null;      // {price:[lo,hi], rank:[lo,hi]} in data space, or null
-let zoomTransform = d3.zoomIdentity; // current scatter zoom/pan transform
 let suppressBrush = false;   // guards programmatic brush.move calls
 let resizeTimer;
 
@@ -52,7 +54,7 @@ d3.csv(DATA_URL).then(raw => {
         Sensitive: +d.Sensitive
       }
     }))
-    // Rank 0 means "not yet rated"; those rows would pile on the axis and add no insight.
+    // Rank 0 means "not yet rated"; those rows would pile on the axis at 0.
     .filter(d => CATEGORIES.indexOf(d.label) !== -1 && Number.isFinite(d.price) && d.rank > 0);
 
   renderAll();
@@ -84,22 +86,23 @@ function currentSelection() {
   return products.filter(d => d.price >= p0 && d.price <= p1 && d.rank >= r0 && d.rank <= r1);
 }
 
-// Push the current selection into all three views.
+// Push the current selection into all three views and the detail card.
 function refresh() {
   const sel = currentSelection();
   scatterHighlight(sel);
   heatmapUpdate(sel);
   barsUpdate(sel);
+  renderDetail();
 }
 
 function getChartBox(selector) {
   const bounds = document.querySelector(selector).getBoundingClientRect();
-  return { width: Math.max(320, bounds.width), height: Math.max(200, bounds.height) };
+  return { width: Math.max(300, bounds.width), height: Math.max(150, bounds.height) };
 }
 
 // ---------------------------------------------------------------------------
-// View 1 (overview/context): price vs. rating scatter.
-// Interactions: d3-brush selection, wheel pan/zoom, double-click reset, click-to-pin.
+// View 1 (overview / context): price vs. rating scatter.
+// Interactions: d3-brush selection, wheel d3-zoom, double-click reset, click-to-pin.
 // ---------------------------------------------------------------------------
 function drawScatter(data) {
   const selector = "#scatter-chart";
@@ -108,50 +111,39 @@ function drawScatter(data) {
 
   const { width, height } = getChartBox(selector);
   const isCompact = width < 520;
+  // Compact screens reserve top space for a two-row legend + the annotation
+  // so neither sits over the points.
   const margin = isCompact
-    ? { top: 16, right: 16, bottom: 36, left: 44 }
-    : { top: 20, right: 150, bottom: 48, left: 58 };
+    ? { top: 58, right: 14, bottom: 34, left: 42 }
+    : { top: 20, right: 150, bottom: 46, left: 56 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
   svg.attr("viewBox", `0 0 ${width} ${height}`);
 
   // Base scales; the zoom transform rescales copies of these.
-  const xBase = d3.scaleLinear()
-    .domain([0, d3.max(data, d => d.price)]).nice()
-    .range([0, innerWidth]);
-  const yBase = d3.scaleLinear()
-    .domain([0, d3.max(data, d => d.rank)]).nice()
-    .range([innerHeight, 0]);
-
+  const xBase = d3.scaleLinear().domain([0, d3.max(data, d => d.price)]).nice().range([0, innerWidth]);
+  const yBase = d3.scaleLinear().domain([0, d3.max(data, d => d.rank)]).nice().range([innerHeight, 0]);
   let x = xBase;
   let y = yBase;
 
-  // Clip path so zoomed-in points never spill outside the plot frame.
-  svg.append("defs").append("clipPath")
-    .attr("id", "scatter-clip")
-    .append("rect")
-    .attr("width", innerWidth)
-    .attr("height", innerHeight);
+  // Clip-path rect so zoomed-in points never spill outside the plot frame.
+  svg.append("defs").append("clipPath").attr("id", "scatter-clip")
+    .append("rect").attr("width", innerWidth).attr("height", innerHeight);
 
   // Plot group inset by the margins.
-  const chart = svg.append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+  const chart = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-  // Horizontal gridlines for rating.
-  const gridG = chart.append("g")
-    .attr("class", "gridline")
+  // Horizontal gridlines for the rating axis.
+  const gridG = chart.append("g").attr("class", "gridline")
     .call(d3.axisLeft(y).ticks(5).tickSize(-innerWidth).tickFormat(""));
 
-  // Transparent capture rect: keeps wheel-zoom active even over empty space.
-  chart.append("rect")
-    .attr("class", "zoom-capture")
-    .attr("width", innerWidth)
-    .attr("height", innerHeight);
+  // Transparent rect so the wheel keeps zooming even over empty space.
+  chart.append("rect").attr("class", "zoom-capture")
+    .attr("width", innerWidth).attr("height", innerHeight);
 
   // Clipped layer holding one circle per product.
-  const pointsLayer = chart.append("g")
-    .attr("clip-path", "url(#scatter-clip)");
+  const pointsLayer = chart.append("g").attr("clip-path", "url(#scatter-clip)");
 
   // Circles: x = price, y = rating, fill = category.
   const points = pointsLayer.selectAll("circle")
@@ -169,54 +161,41 @@ function drawScatter(data) {
     .on("mouseenter", d => showProductTooltip(d))
     .on("mousemove", moveTooltip)
     .on("mouseleave", hideTooltip)
-    .on("click", d => pinProduct(d.id));
+    .on("click", d => pinProduct(d));
 
   // Bottom axis: price.
-  const xAxisG = chart.append("g")
-    .attr("class", "axis")
+  const xAxisG = chart.append("g").attr("class", "axis")
     .attr("transform", `translate(0,${innerHeight})`)
     .call(d3.axisBottom(x).ticks(isCompact ? 4 : 6).tickFormat(money));
 
   // Left axis: rating.
-  const yAxisG = chart.append("g")
-    .attr("class", "axis")
+  const yAxisG = chart.append("g").attr("class", "axis")
     .call(d3.axisLeft(y).ticks(5));
 
   // x-axis label.
-  chart.append("text")
-    .attr("class", "axis-label")
-    .attr("x", innerWidth / 2)
-    .attr("y", innerHeight + (isCompact ? 30 : 40))
-    .attr("text-anchor", "middle")
-    .text("Price (USD)");
+  chart.append("text").attr("class", "axis-label")
+    .attr("x", innerWidth / 2).attr("y", innerHeight + (isCompact ? 30 : 38))
+    .attr("text-anchor", "middle").text("Price (USD)");
 
   // y-axis label.
-  chart.append("text")
-    .attr("class", "axis-label")
+  chart.append("text").attr("class", "axis-label")
     .attr("transform", "rotate(-90)")
-    .attr("x", -innerHeight / 2)
-    .attr("y", isCompact ? -32 : -42)
-    .attr("text-anchor", "middle")
-    .text("User rating (0 to 5)");
+    .attr("x", -innerHeight / 2).attr("y", isCompact ? -30 : -42)
+    .attr("text-anchor", "middle").text("User rating (0 to 5)");
 
   // Usage annotation.
-  chart.append("text")
-    .attr("class", "annotation")
-    .attr("x", 0)
-    .attr("y", -6)
-    .text(isCompact ? "Drag = brush · wheel = zoom · 2-click = reset" : "Drag to brush a subset · scroll to zoom · double-click to reset · click a point to pin it");
+  chart.append("text").attr("class", "annotation")
+    .attr("x", 0).attr("y", -6)
+    .text(isCompact ? "Drag = brush · wheel = zoom · 2-click = reset" : "Drag to brush a subset · scroll to zoom · double-click to reset · click a point to pin its detail");
 
-  // Category color legend (full-width screens only, to the right of the plot).
-  if (!isCompact) drawCategoryLegend(svg, width - margin.right + 24, margin.top + 6);
+  // Category color legend (kept on every screen size so the colors stay readable).
+  drawCategoryLegend(svg, width, margin, isCompact);
 
   // Brush layer sits above the points so a drag draws a selection rectangle.
-  const brush = d3.brush()
-    .extent([[0, 0], [innerWidth, innerHeight]])
-    .on("end", brushEnded);
+  const brush = d3.brush().extent([[0, 0], [innerWidth, innerHeight]]).on("end", brushEnded);
 
-  const brushG = chart.append("g")
-    .attr("class", "brush")
-    .call(brush);
+  // Group that hosts the brush overlay and handles.
+  const brushG = chart.append("g").attr("class", "brush").call(brush);
 
   // Translate the pixel brush extent into data space so it survives zooming.
   function brushEnded() {
@@ -229,18 +208,18 @@ function drawScatter(data) {
         price: [x.invert(s[0][0]), x.invert(s[1][0])],
         rank: [y.invert(s[1][1]), y.invert(s[0][1])]
       };
-      pinnedId = null;
+      pinned = null;
     }
     refresh();
   }
 
-  // Zoom rescales both axes (pan-and-zoom "camera"); wheel only, so it never
-  // fights the brush drag. Direct manipulation, so no easing here.
-  const zoom = d3.zoom()
-    .scaleExtent([1, 10])
+  // Wheel-only zoom so it never fights the brush drag. Direct manipulation,
+  // so the points track the cursor with no easing.
+  const zoom = d3.zoom().scaleExtent([1, 12])
     .filter(() => d3.event.type === "wheel")
     .on("zoom", zoomed);
 
+  // Attach the zoom behavior to the SVG.
   svg.call(zoom);
   svg.on("dblclick.zoom", null);
 
@@ -250,40 +229,44 @@ function drawScatter(data) {
   });
 
   function zoomed() {
-    zoomTransform = d3.event.transform;
-    x = zoomTransform.rescaleX(xBase);
-    y = zoomTransform.rescaleY(yBase);
+    x = d3.event.transform.rescaleX(xBase);
+    y = d3.event.transform.rescaleY(yBase);
 
     // Reposition every point under the new camera.
     points.attr("cx", d => x(d.price)).attr("cy", d => y(d.rank));
 
-    // Rescale axes and gridlines to match.
+    // Rescale the price axis.
     xAxisG.call(d3.axisBottom(x).ticks(isCompact ? 4 : 6).tickFormat(money));
+    // Rescale the rating axis.
     yAxisG.call(d3.axisLeft(y).ticks(5));
+    // Rescale the gridlines to match.
     gridG.call(d3.axisLeft(y).ticks(5).tickSize(-innerWidth).tickFormat(""));
 
-    // Zoom is navigation: clear any brush so selection is re-made in the new view.
-    if (brushDomain || d3.brushSelection(brushG.node())) {
+    // The brush is stored in data space, so it survives zoom: move the
+    // rectangle to the new pixel coords and keep the same selection.
+    if (brushDomain) {
+      const [p0, p1] = brushDomain.price;
+      const [r0, r1] = brushDomain.rank;
       suppressBrush = true;
-      brushG.call(brush.move, null);
+      brushG.call(brush.move, [[x(p0), y(r1)], [x(p1), y(r0)]]);
       suppressBrush = false;
-      brushDomain = null;
-      refresh();
     }
   }
 
-  // Reapply the scatter highlight whenever the selection changes.
+  // Reapply scatter muting + the pinned ring whenever the selection changes.
   scatterHighlight = function (sel) {
     const inSet = new Set(sel.map(d => d.id));
     points
       .classed("is-muted", d => brushDomain ? !inSet.has(d.id) : false)
-      .classed("is-pinned", d => d.id === pinnedId);
+      .classed("is-pinned", d => pinned !== null && d.id === pinned.id);
   };
 }
 
 // ---------------------------------------------------------------------------
-// View 2 (advanced): category x skin-type heatmap.
-// Animated transition: cells tween fill color and counts on every selection change.
+// View 2 (advanced): category x skin-type matrix of MEAN RATING.
+// Color and number tween on every selection change (filtering / timestep).
+// Mean rating, not raw count, so the matrix reads as "how well do products
+// here suit this skin type" instead of just "how many are left".
 // ---------------------------------------------------------------------------
 function buildHeatmap() {
   const selector = "#heatmap-chart";
@@ -293,8 +276,8 @@ function buildHeatmap() {
   const { width, height } = getChartBox(selector);
   const isCompact = width < 520;
   const margin = isCompact
-    ? { top: 22, right: 14, bottom: 28, left: 78 }
-    : { top: 30, right: 30, bottom: 52, left: 104 };
+    ? { top: 22, right: 12, bottom: 30, left: 80 }
+    : { top: 28, right: 28, bottom: 52, left: 104 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
@@ -305,13 +288,13 @@ function buildHeatmap() {
   const yScale = d3.scaleBand().domain(CATEGORIES).range([0, innerHeight]).padding(0.06);
 
   // Plot group inset by the margins.
-  const chart = svg.append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+  const chart = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-  // One rect per (category, skin type) cell, keyed so it persists across updates.
+  // Keyed cell list so every rect and label persists across updates.
   const cellKeys = [];
   CATEGORIES.forEach(cat => SKIN_TYPES.forEach(skin => cellKeys.push({ cat, skin })));
 
+  // One rect per (category, skin type) cell.
   const cells = chart.selectAll("rect.heat-cell")
     .data(cellKeys, d => `${d.cat}|${d.skin}`)
     .enter()
@@ -321,16 +304,16 @@ function buildHeatmap() {
     .attr("y", d => yScale(d.cat))
     .attr("width", xScale.bandwidth())
     .attr("height", yScale.bandwidth())
-    .attr("fill", heatColor(0))
+    .attr("fill", EMPTY_FILL)
     .attr("stroke", "#ffffff")
     .on("mouseenter", function (d) { showCellTooltip(d, this); })
     .on("mousemove", moveTooltip)
-    .on("mouseleave", function (d) {
+    .on("mouseleave", function () {
       d3.select(this).classed("is-active", false);
       hideTooltip();
     });
 
-  // In-cell count labels (updated with a counting tween).
+  // In-cell mean-rating labels (updated with a counting tween).
   const cellText = chart.selectAll("text.cell-count")
     .data(cellKeys, d => `${d.cat}|${d.skin}`)
     .enter()
@@ -339,101 +322,102 @@ function buildHeatmap() {
     .attr("x", d => xScale(d.skin) + xScale.bandwidth() / 2)
     .attr("y", d => yScale(d.cat) + yScale.bandwidth() / 2 + 4)
     .attr("text-anchor", "middle")
-    .text("0");
+    .text("");
 
   // Bottom axis: skin types.
-  chart.append("g")
-    .attr("class", "axis")
+  chart.append("g").attr("class", "axis")
     .attr("transform", `translate(0,${innerHeight})`)
     .call(d3.axisBottom(xScale).tickSize(0));
 
   // Left axis: categories.
-  chart.append("g")
-    .attr("class", "axis")
+  chart.append("g").attr("class", "axis")
     .call(d3.axisLeft(yScale).tickSize(0));
 
   // x-axis label.
-  chart.append("text")
-    .attr("class", "axis-label")
-    .attr("x", innerWidth / 2)
-    .attr("y", innerHeight + (isCompact ? 24 : 36))
-    .attr("text-anchor", "middle")
-    .text("Skin type");
+  chart.append("text").attr("class", "axis-label")
+    .attr("x", innerWidth / 2).attr("y", innerHeight + (isCompact ? 22 : 34))
+    .attr("text-anchor", "middle").text("Skin type");
+
+  // y-axis label.
+  chart.append("text").attr("class", "axis-label")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -innerHeight / 2).attr("y", -margin.left + 14)
+    .attr("text-anchor", "middle").text("Product category");
 
   // Annotation tying the matrix to the brush.
-  chart.append("text")
-    .attr("class", "annotation")
-    .attr("x", 0)
-    .attr("y", -10)
-    .text(isCompact ? "Counts follow the brushed subset" : "Cell = products in the brushed subset suited to that skin type; color tweens as you brush");
+  chart.append("text").attr("class", "annotation")
+    .attr("x", 0).attr("y", -10)
+    .text(isCompact ? "Mean rating in the brushed subset" : "Mean rating of products suited to each skin type, in the brushed subset; color tweens as you brush");
 
-  // Sequential color legend (gradient swatch with min/max ticks).
-  const legend = svg.append("g")
-    .attr("transform", `translate(${margin.left},${height - 16})`);
+  // Legend group anchored under the matrix.
+  const legend = svg.append("g").attr("transform", `translate(${margin.left},${height - 14})`);
 
   // Gradient definition for the legend swatch.
   const grad = svg.append("defs").append("linearGradient").attr("id", "heat-grad");
-  grad.append("stop").attr("offset", "0%").attr("stop-color", heatColor(0));
-  grad.append("stop").attr("offset", "100%").attr("stop-color", heatColor(1));
+  // Low-rating stop (light end of the ramp).
+  grad.append("stop").attr("offset", "0%").attr("stop-color", heatColor(3));
+  // High-rating stop (dark end of the ramp).
+  grad.append("stop").attr("offset", "100%").attr("stop-color", heatColor(5));
 
   // Legend swatch.
-  legend.append("rect")
-    .attr("width", Math.min(160, innerWidth))
-    .attr("height", 8)
+  legend.append("rect").attr("width", Math.min(150, innerWidth)).attr("height", 8)
     .attr("fill", "url(#heat-grad)");
 
   // Legend low label.
-  legend.append("text").attr("class", "legend-label").attr("x", 0).attr("y", -4).text("fewer");
+  legend.append("text").attr("class", "legend-label").attr("x", 0).attr("y", -4).text("rating 3");
 
   // Legend high label.
-  legend.append("text")
-    .attr("class", "legend-label")
-    .attr("x", Math.min(160, innerWidth))
-    .attr("y", -4)
-    .attr("text-anchor", "end")
-    .text("more products");
+  legend.append("text").attr("class", "legend-label")
+    .attr("x", Math.min(150, innerWidth)).attr("y", -4)
+    .attr("text-anchor", "end").text("5");
 
-  // Recompute counts for the selection and tween cells + labels.
+  // Recompute the mean rating per cell for the selection, then tween.
   heatmapUpdate = function (sel) {
-    const counts = {};
-    cellKeys.forEach(k => { counts[`${k.cat}|${k.skin}`] = 0; });
+    const acc = {};
+    cellKeys.forEach(k => { acc[`${k.cat}|${k.skin}`] = { sum: 0, n: 0 }; });
     sel.forEach(p => {
       SKIN_TYPES.forEach(skin => {
-        if (p.skin[skin] === 1) counts[`${p.label}|${skin}`] += 1;
+        if (p.skin[skin] === 1) {
+          const a = acc[`${p.label}|${skin}`];
+          a.sum += p.rank;
+          a.n += 1;
+        }
       });
     });
-
-    const maxCount = d3.max(Object.values(counts)) || 1;
-    heatColor.domain([0, maxCount]);
+    const meanOf = d => {
+      const a = acc[`${d.cat}|${d.skin}`];
+      return a.n ? a.sum / a.n : null;
+    };
 
     // Cells ease to the new color (filtering / timestep transition).
-    cells.transition()
-      .duration(650)
-      .ease(d3.easeCubicInOut)
-      .attr("fill", d => heatColor(counts[`${d.cat}|${d.skin}`]));
+    cells.transition().duration(650).ease(d3.easeCubicInOut)
+      .attr("fill", d => { const m = meanOf(d); return m === null ? EMPTY_FILL : heatColor(m); });
 
-    // Labels count up/down to the new value and flip to white on dark cells
-    // so high counts stay legible against the deep end of the ramp.
-    cellText.transition()
-      .duration(650)
-      .ease(d3.easeCubicInOut)
-      .style("fill", d => counts[`${d.cat}|${d.skin}`] / maxCount > 0.55 ? "#ffffff" : "#111111")
+    // Labels roll to the new mean and flip to white on the dark cells.
+    cellText.transition().duration(650).ease(d3.easeCubicInOut)
+      .style("fill", d => { const m = meanOf(d); return m !== null && m >= 4.4 ? "#ffffff" : "#111111"; })
       .tween("text", function (d) {
         const node = this;
-        const start = +node.textContent || 0;
-        const end = counts[`${d.cat}|${d.skin}`];
-        const i = d3.interpolateRound(start, end);
-        return t => { node.textContent = i(t); };
+        const m = meanOf(d);
+        if (m === null) return t => { if (t === 1) node.textContent = ""; };
+        const start = parseFloat(node.textContent) || 3;
+        const i = d3.interpolateNumber(start, m);
+        return t => { node.textContent = oneDec(i(t)); };
       });
 
-    // Cache counts for tooltips.
-    cells.each(function (d) { d.value = counts[`${d.cat}|${d.skin}`]; });
+    // Cache count + mean for tooltips.
+    cells.each(function (d) {
+      const a = acc[`${d.cat}|${d.skin}`];
+      d.value = a.n;
+      d.mean = a.n ? a.sum / a.n : null;
+    });
   };
 }
 
 // ---------------------------------------------------------------------------
 // View 3 (focus): top brands by mean rating.
-// Animated transition: bars reorder (slide) and grow/shrink on every selection.
+// Bars reorder, grow in, and shrink out on every selection change
+// (ordering + filtering) with slow-in slow-out easing.
 // ---------------------------------------------------------------------------
 function buildBars() {
   const selector = "#bars-chart";
@@ -443,11 +427,12 @@ function buildBars() {
   const { width, height } = getChartBox(selector);
   const isCompact = width < 520;
   const margin = isCompact
-    ? { top: 18, right: 44, bottom: 34, left: 96 }
-    : { top: 20, right: 64, bottom: 42, left: 150 };
+    ? { top: 18, right: 44, bottom: 32, left: 92 }
+    : { top: 20, right: 64, bottom: 40, left: 150 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
   const topN = isCompact ? 8 : 12;
+  const minSample = 3; // ignore brands with too few products to rank fairly
 
   svg.attr("viewBox", `0 0 ${width} ${height}`);
 
@@ -456,18 +441,15 @@ function buildBars() {
   const yScale = d3.scaleBand().range([0, innerHeight]).padding(0.18);
 
   // Plot group inset by the margins.
-  const chart = svg.append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+  const chart = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
   // Vertical gridlines for rating.
-  chart.append("g")
-    .attr("class", "gridline")
+  chart.append("g").attr("class", "gridline")
     .attr("transform", `translate(0,${innerHeight})`)
     .call(d3.axisBottom(xScale).ticks(5).tickSize(-innerHeight).tickFormat(""));
 
   // Static bottom axis: rating.
-  chart.append("g")
-    .attr("class", "axis")
+  chart.append("g").attr("class", "axis")
     .attr("transform", `translate(0,${innerHeight})`)
     .call(d3.axisBottom(xScale).ticks(5));
 
@@ -476,57 +458,58 @@ function buildBars() {
 
   // Layer holding the bars.
   const barsLayer = chart.append("g");
-
   // Layer holding the value labels.
   const labelLayer = chart.append("g");
 
   // x-axis label.
-  chart.append("text")
-    .attr("class", "axis-label")
-    .attr("x", innerWidth / 2)
-    .attr("y", innerHeight + (isCompact ? 28 : 36))
-    .attr("text-anchor", "middle")
-    .text("Mean user rating");
+  chart.append("text").attr("class", "axis-label")
+    .attr("x", innerWidth / 2).attr("y", innerHeight + (isCompact ? 26 : 34))
+    .attr("text-anchor", "middle").text("Mean user rating");
 
   // Annotation describing the reordering animation.
-  chart.append("text")
-    .attr("class", "annotation")
-    .attr("x", 0)
-    .attr("y", -6)
-    .text(isCompact ? `Top ${topN} brands · reorders on brush` : `Top ${topN} brands by product count, ranked by mean rating; bars reorder as you brush`);
+  chart.append("text").attr("class", "annotation")
+    .attr("x", 0).attr("y", -6)
+    .text(isCompact ? `Top ${topN} brands · ≥${minSample} products` : `Brands with at least ${minSample} products in the selection, top ${topN} by mean rating; bars reorder as you brush`);
 
   barsUpdate = function (sel) {
-    // Aggregate per brand, keep the most-stocked brands, rank by mean rating.
-    const byBrand = d3.nest()
+    // Aggregate per brand, keep brands with enough products, rank by mean rating.
+    let byBrand = d3.nest()
       .key(d => d.brand)
-      .rollup(v => ({
-        count: v.length,
-        meanRank: d3.mean(v, d => d.rank),
-        meanPrice: d3.mean(v, d => d.price)
-      }))
+      .rollup(v => ({ count: v.length, meanRank: d3.mean(v, d => d.rank), meanPrice: d3.mean(v, d => d.price) }))
       .entries(sel)
       .map(e => ({ brand: e.key, count: e.value.count, meanRank: e.value.meanRank, meanPrice: e.value.meanPrice }))
-      .sort((a, b) => d3.descending(a.count, b.count))
-      .slice(0, topN)
-      .sort((a, b) => d3.descending(a.meanRank, b.meanRank));
+      .filter(d => d.count >= minSample);
 
+    // Tiny selections rarely clear the sample floor; fall back so the view
+    // is never blank.
+    if (byBrand.length === 0) {
+      byBrand = d3.nest()
+        .key(d => d.brand)
+        .rollup(v => ({ count: v.length, meanRank: d3.mean(v, d => d.rank), meanPrice: d3.mean(v, d => d.price) }))
+        .entries(sel)
+        .map(e => ({ brand: e.key, count: e.value.count, meanRank: e.value.meanRank, meanPrice: e.value.meanPrice }));
+    }
+
+    byBrand = byBrand.sort((a, b) => d3.descending(a.meanRank, b.meanRank)).slice(0, topN);
     yScale.domain(byBrand.map(d => d.brand));
-    const t = d3.transition().duration(750).ease(d3.easeCubicInOut);
+
+    const t = d3.transition().duration(720).ease(d3.easeCubicInOut);
+
+    // Cancel any in-flight tweens so an interrupted exit can never get stuck
+    // in the DOM at width 0.
+    barsLayer.selectAll("rect.brand-bar").interrupt();
+    labelLayer.selectAll("text.bar-value").interrupt();
 
     // Left axis slides its labels into the new order.
     yAxisG.transition(t).call(d3.axisLeft(yScale).tickSize(0));
 
-    // BARS: object constancy by brand so updates animate position + length.
+    // BARS, keyed by brand for object constancy.
     const bars = barsLayer.selectAll("rect.brand-bar").data(byBrand, d => d.brand);
 
-    // Exit: shrink to zero width and fade before removal (filtering out).
-    bars.exit()
-      .transition(t)
-      .attr("width", 0)
-      .attr("opacity", 0)
-      .remove();
+    // Exit: shrink to zero width, fade, then remove (filtering out).
+    bars.exit().transition(t).attr("width", 0).attr("opacity", 0).remove();
 
-    // Enter: start collapsed at the right row, then grow with the merged update.
+    // Enter: a new bar starts collapsed at its target row.
     const barsEnter = bars.enter()
       .append("rect")
       .attr("class", "brand-bar")
@@ -538,14 +521,13 @@ function buildBars() {
       .attr("fill", "#264653");
 
     // Update + enter: slide to the new row (ordering) and tween width (value).
-    barsEnter.merge(bars)
-      .transition(t)
+    barsEnter.merge(bars).transition(t)
       .attr("y", d => yScale(d.brand))
       .attr("height", yScale.bandwidth())
       .attr("width", d => xScale(d.meanRank))
       .attr("opacity", 0.9);
 
-    // VALUE LABELS: mirror the bars so the group moves with common fate.
+    // VALUE LABELS, keyed to move with their bars (common fate).
     const labels = labelLayer.selectAll("text.bar-value").data(byBrand, d => d.brand);
 
     // Exit labels fade out with their bars.
@@ -555,10 +537,11 @@ function buildBars() {
     const labelsEnter = labels.enter()
       .append("text")
       .attr("class", "bar-value legend-label")
+      .attr("x", 4)
       .attr("y", d => yScale(d.brand) + yScale.bandwidth() / 2 + 4)
       .attr("opacity", 0);
 
-    // Update + enter: follow the bar and show "rating · n products".
+    // Update + enter: follow the bar, show "rating · n products".
     labelsEnter.merge(labels)
       .text(d => `${oneDec(d.meanRank)} · ${d.count}`)
       .transition(t)
@@ -569,58 +552,84 @@ function buildBars() {
 }
 
 // Shared category color legend used by the scatter view.
-function drawCategoryLegend(svg, x, y) {
-  // Legend group anchored to the right of the plot.
-  const legend = svg.append("g").attr("transform", `translate(${x},${y})`);
+function drawCategoryLegend(svg, width, margin, isCompact) {
+  // Compact screens get a single wrapped row at the top; wide screens get a
+  // vertical key to the right of the plot.
+  const legend = svg.append("g")
+    .attr("transform", isCompact
+      ? `translate(${margin.left},6)`
+      : `translate(${width - margin.right + 24},${margin.top + 6})`);
 
-  // One row (swatch + label) per category.
+  // One group (swatch + label) per category.
   const row = legend.selectAll("g")
     .data(CATEGORIES)
     .enter()
     .append("g")
-    .attr("transform", (d, i) => `translate(0,${i * 19})`);
+    .attr("transform", (d, i) => isCompact
+      ? `translate(${(i % 3) * 92},${Math.floor(i / 3) * 15})`
+      : `translate(0,${i * 19})`);
 
   // Color swatch.
   row.append("rect")
-    .attr("width", 11)
-    .attr("height", 11)
+    .attr("width", isCompact ? 9 : 11)
+    .attr("height", isCompact ? 9 : 11)
     .attr("fill", d => categoryColor(d));
 
   // Category label.
   row.append("text")
     .attr("class", "legend-label")
-    .attr("x", 16)
-    .attr("y", 10)
+    .attr("x", isCompact ? 13 : 16)
+    .attr("y", isCompact ? 8 : 10)
     .text(d => d);
+}
+
+// Detail card: the focus end of the drill-down for a single pinned product.
+function renderDetail() {
+  if (!pinned) {
+    detail.classed("is-open", false).attr("aria-hidden", "true").html("");
+    return;
+  }
+  const fits = SKIN_TYPES.filter(s => pinned.skin[s] === 1);
+  detail
+    .classed("is-open", true)
+    .attr("aria-hidden", "false")
+    .html(
+      `<button class="detail-close" aria-label="Close detail">×</button>` +
+      `<p class="detail-eyebrow">${pinned.label}</p>` +
+      `<p class="detail-name">${pinned.brand} — ${pinned.name}</p>` +
+      `<p class="detail-stats">${money(pinned.price)} · ${oneDec(pinned.rank)}/5 rating</p>` +
+      `<p class="detail-skin">Suited to: ${fits.length ? fits.join(", ") : "no skin type flagged"}</p>`
+    );
+  // Close button clears the pin.
+  detail.select(".detail-close").on("click", () => { pinned = null; refresh(); });
 }
 
 function showProductTooltip(d) {
   tooltip
     .style("opacity", 1)
-    .html(`<strong>${d.brand} — ${d.name}</strong>${d.label} · ${money(d.price)} · ${oneDec(d.rank)}/5<br>Click to pin across the views.`);
+    .html(`<strong>${d.brand} — ${d.name}</strong>${d.label} · ${money(d.price)} · ${oneDec(d.rank)}/5<br>Click to pin its detail.`);
   moveTooltip();
 }
 
 function showCellTooltip(d, node) {
   d3.select(node).classed("is-active", true);
+  const mean = d.mean === null || d.mean === undefined ? "no products" : `${oneDec(d.mean)}/5 over ${d.value} products`;
   tooltip
     .style("opacity", 1)
-    .html(`<strong>${d.cat} · ${d.skin}</strong>${d.value || 0} products in the current selection suit ${d.skin.toLowerCase()} skin.`);
+    .html(`<strong>${d.cat} · ${d.skin}</strong>Mean rating for ${d.skin.toLowerCase()} skin: ${mean}.`);
   moveTooltip();
 }
 
 function moveTooltip() {
-  tooltip
-    .style("left", `${d3.event.clientX}px`)
-    .style("top", `${d3.event.clientY}px`);
+  tooltip.style("left", `${d3.event.clientX}px`).style("top", `${d3.event.clientY}px`);
 }
 
 function hideTooltip() {
   tooltip.style("opacity", 0);
 }
 
-// Click pins (or unpins) a single product and re-applies the highlight.
-function pinProduct(id) {
-  pinnedId = pinnedId === id ? null : id;
-  scatterHighlight(currentSelection());
+// Click pins (or unpins) a product and opens the detail card.
+function pinProduct(d) {
+  pinned = pinned && pinned.id === d.id ? null : d;
+  refresh();
 }
