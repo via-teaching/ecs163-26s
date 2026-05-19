@@ -22,6 +22,7 @@ var tooltip = d3.select("body")
 
 // selection and brush state
 var selectedType = null;
+var selectedGen = null;
 var selectedPokemon = null;
 var allData = null;
 var brushedData = null;
@@ -118,19 +119,13 @@ function drawScatterPlot(data) {
 		.style("fill", "#555")
 		.text("Defense");
 
-	// chart title with dynamic selection info
-	var scatterTitle = svg.append("text")
+	// chart title with static hint
+	svg.append("text")
 		.attr("class", "chart-title")
 		.attr("x", margin.left + innerW / 2)
 		.attr("y", 22)
-		.attr("text-anchor", "middle");
-
-	scatterTitle.append("tspan").text("Attack vs Defense");
-	scatterTitle.append("tspan")
-		.attr("class", "scatter-info")
-		.style("font-weight", "400")
-		.style("fill", "#888")
-		.text("");
+		.attr("text-anchor", "middle")
+		.text("Attack vs Defense");
 
 	// draw scatter dots with default steelblue color
 	g.selectAll(".dot")
@@ -147,8 +142,9 @@ function drawScatterPlot(data) {
 		.attr("stroke-width", 0.5)
 		// tooltip on hover (white card with shadow)
 		.on("mouseover", function(event, d) {
-			// skip faded dots (filtered by type or outside brush)
+			// skip faded dots (filtered by type, gen, or outside brush)
 			if (selectedType && d.type1 !== selectedType) return;
+			if (selectedGen && d.generation !== selectedGen) return;
 			if (brushedData && brushedData.indexOf(d) === -1) return;
 			var typeStr = d.type1 + (d.type2 ? " / " + d.type2 : "");
 			var color = typeColorMap[d.type1] || "#333";
@@ -171,6 +167,7 @@ function drawScatterPlot(data) {
 		.on("click", function(event, d) {
 			event.stopPropagation();
 			if (selectedType && d.type1 !== selectedType) return;
+			if (selectedGen && d.generation !== selectedGen) return;
 			if (brushedData && brushedData.indexOf(d) === -1) return;
 			selectedPokemon = (selectedPokemon && selectedPokemon.name === d.name) ? null : d;
 			updateRadar(d3.transition().duration(400));
@@ -216,21 +213,23 @@ function drawScatterPlot(data) {
 			selectedPokemon = null;
 			var [[x0, y0], [x1, y1]] = event.selection;
 
-			// highlight dots inside brush, respect type filter
+			// highlight dots inside brush, respect type and gen filter
 			d3.selectAll(".dot")
 				.attr("opacity", function(d) {
 					var cx = xScale(d.attack);
 					var cy = yScale(d.defense);
 					var inBrush = cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1;
-					var inType = !selectedType || d.type1 === selectedType;
-					return (inBrush && inType) ? 0.85 : 0.06;
+					var inFilter = (!selectedType || d.type1 === selectedType)
+						&& (!selectedGen || d.generation === selectedGen);
+					return (inBrush && inFilter) ? 0.85 : 0.06;
 				})
 				.attr("r", function(d) {
 					var cx = xScale(d.attack);
 					var cy = yScale(d.defense);
 					var inBrush = cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1;
-					var inType = !selectedType || d.type1 === selectedType;
-					return (inBrush && inType) ? 5 : 3;
+					var inFilter = (!selectedType || d.type1 === selectedType)
+						&& (!selectedGen || d.generation === selectedGen);
+					return (inBrush && inFilter) ? 5 : 3;
 				});
 		})
 		.on("end", function(event) {
@@ -243,13 +242,14 @@ function drawScatterPlot(data) {
 			}
 			var [[x0, y0], [x1, y1]] = event.selection;
 
-			// collect dots inside brush (respect type filter)
+			// collect dots inside brush (respect type and gen filter)
 			brushedData = allData.filter(function(d) {
 				var cx = xScale(d.attack);
 				var cy = yScale(d.defense);
 				var inBrush = cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1;
-				var inType = !selectedType || d.type1 === selectedType;
-				return inBrush && inType;
+				var inFilter = (!selectedType || d.type1 === selectedType)
+					&& (!selectedGen || d.generation === selectedGen);
+				return inBrush && inFilter;
 			});
 
 			// update radar with brushed subset
@@ -344,9 +344,9 @@ function drawBarChart(data) {
 		.style("text-anchor", "end")
 		.style("font-size", "12px");
 
-	// draw y axis
-	g.append("g")
-		.attr("class", "axis")
+	// draw y axis (keep reference for rescaling)
+	var yAxisG = g.append("g")
+		.attr("class", "axis bar-y-axis")
 		.call(d3.axisLeft(yScale).ticks(6));
 
 	// x axis label
@@ -376,9 +376,12 @@ function drawBarChart(data) {
 		.attr("text-anchor", "middle")
 		.text("Pokemon Count by Type & Generation");
 
-	// draw stacked bars
+	// draw stacked bars, tag each rect with its generation
 	series.forEach(function(layer, layerIdx) {
-		g.selectAll(".bar-gen" + (layerIdx + 1))
+		var gen = layerIdx + 1;
+		layer.forEach(function(d) { d.gen = gen; });
+
+		g.selectAll(".bar-gen" + gen)
 			.data(layer)
 			.enter()
 			.append("rect")
@@ -387,7 +390,7 @@ function drawBarChart(data) {
 			.attr("y", function(d) { return yScale(d[1]); })
 			.attr("width", xScale.bandwidth())
 			.attr("height", function(d) { return yScale(d[0]) - yScale(d[1]); })
-			.attr("fill", function(d) { return genTypeColor(d.data.type, layerIdx + 1); })
+			.attr("fill", function(d) { return genTypeColor(d.data.type, gen); })
 			.attr("cursor", "pointer")
 			// tooltip on hover
 			.on("mouseover", function(event, d) {
@@ -395,7 +398,7 @@ function drawBarChart(data) {
 				tooltip.style("opacity", 1)
 					.html(
 						"<strong>" + d.data.type + "</strong><br/>" +
-						"Gen " + (layerIdx + 1) + ": " + count + " pokemon"
+						"Gen " + d.gen + ": " + count + " pokemon"
 					);
 			})
 			.on("mousemove", function(event) {
@@ -405,13 +408,23 @@ function drawBarChart(data) {
 			.on("mouseout", function() {
 				tooltip.style("opacity", 0);
 			})
-			// click to select/deselect type
+			// click: first click selects type, second click selects generation
 			.on("click", function(event, d) {
 				event.stopPropagation();
-				selectedType = (selectedType === d.data.type) ? null : d.data.type;
+				var clickedType = d.data.type;
+				var clickedGen = d.gen;
+
+				if (selectedType === clickedType) {
+					// same type: toggle generation drill-down
+					selectedGen = (selectedGen === clickedGen) ? null : clickedGen;
+				} else {
+					// new type: select it, reset gen
+					selectedType = clickedType;
+					selectedGen = null;
+				}
+
 				selectedPokemon = null;
 				brushedData = null;
-				// clear brush on scatter
 				if (scatterBrushG && scatterBrush) scatterBrushG.call(scatterBrush.move, null);
 				updateSelection();
 			});
@@ -456,6 +469,13 @@ function drawBarChart(data) {
 		.attr("fill", "none")
 		.attr("stroke", "#ccc")
 		.attr("rx", 3);
+
+	// store bar config for dynamic y-axis rescaling
+	window.barCfg = {
+		yScale: yScale,
+		yAxisG: yAxisG,
+		typeCounts: typeCounts
+	};
 }
 
 
@@ -617,24 +637,46 @@ function drawRadarChart(data) {
 function updateSelection() {
 	var t = d3.transition().duration(400);
 
-	// scatter dots: matching type full, others faded
+	// scatter dots: respect both selectedType and selectedGen
 	d3.selectAll(".dot")
 		.transition(t)
 		.attr("opacity", function(d) {
 			if (!selectedType) return 0.6;
-			return d.type1 === selectedType ? 0.85 : 0.06;
+			if (d.type1 !== selectedType) return 0.06;
+			if (selectedGen && d.generation !== selectedGen) return 0.1;
+			return 0.85;
 		})
 		.attr("r", function(d) {
 			if (!selectedType) return 4;
-			return d.type1 === selectedType ? 5 : 3;
+			if (d.type1 !== selectedType) return 3;
+			if (selectedGen && d.generation !== selectedGen) return 3;
+			return 5;
 		});
 
-	// bar chart: selected bar full, others dimmed
+	// bar chart: rescale y-axis to selected type, highlight gen
+	if (window.barCfg) {
+		var bCfg = window.barCfg;
+		var newMax;
+		if (selectedType) {
+			// find count for selected type and rescale y to 100%
+			var typeEntry = bCfg.typeCounts.find(function(tc) { return tc[0] === selectedType; });
+			newMax = typeEntry ? typeEntry[1] : d3.max(bCfg.typeCounts, function(d) { return d[1]; });
+		} else {
+			newMax = d3.max(bCfg.typeCounts, function(d) { return d[1]; });
+		}
+		bCfg.yScale.domain([0, newMax]).nice();
+		bCfg.yAxisG.transition(t).call(d3.axisLeft(bCfg.yScale).ticks(6));
+	}
+
 	d3.selectAll(".bar")
 		.transition(t)
+		.attr("y", function(d) { return window.barCfg.yScale(d[1]); })
+		.attr("height", function(d) { return window.barCfg.yScale(d[0]) - window.barCfg.yScale(d[1]); })
 		.attr("opacity", function(d) {
 			if (!selectedType) return 1;
-			return d.data.type === selectedType ? 1 : 0.2;
+			if (d.data.type !== selectedType) return 0.15;
+			if (selectedGen && d.gen !== selectedGen) return 0.35;
+			return 1;
 		});
 
 	// radar chart: update polygon to selected type
@@ -668,12 +710,17 @@ function updateRadar(t) {
 		fillColor = "#e65100";
 		infoText = "Brushed: " + brushedData.length + " Pokemon";
 	} else if (selectedType) {
-		var subset = allData.filter(function(d) { return d.type1 === selectedType; });
+		// filter by type, and optionally by generation
+		var subset = allData.filter(function(d) {
+			return d.type1 === selectedType && (!selectedGen || d.generation === selectedGen);
+		});
 		newStats = statKeys.map(function(key) {
 			return { axis: key, value: d3.mean(subset, function(d) { return d[key]; }) };
 		});
 		fillColor = typeColorMap[selectedType];
-		infoText = selectedType + " (" + subset.length + " Pokemon)";
+		infoText = selectedGen
+			? selectedType + " Gen " + selectedGen + " (" + subset.length + ")"
+			: selectedType + " (" + subset.length + " Pokemon)";
 	} else {
 		newStats = statKeys.map(function(key) {
 			return { axis: key, value: d3.mean(allData, function(d) { return d[key]; }) };
@@ -710,21 +757,13 @@ function updateRadar(t) {
 	d3.select(".radar-info")
 		.text(infoText)
 		.style("fill", fillColor);
-
-	// sync scatter title with current state
-	var scatterText = "";
-	if (selectedPokemon) {
-		scatterText = " - " + selectedPokemon.name;
-	} else if (selectedType) {
-		scatterText = " - " + selectedType;
-	}
-	d3.select(".scatter-info").text(scatterText);
 }
 
 
 // reset all selections back to default
 function resetAll() {
 	selectedType = null;
+	selectedGen = null;
 	selectedPokemon = null;
 	brushedData = null;
 	if (scatterBrushG && scatterBrush) scatterBrushG.call(scatterBrush.move, null);
