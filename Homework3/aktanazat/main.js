@@ -66,10 +66,8 @@ d3.csv(DATA_URL).then(raw => {
 // Rebuild every view on resize so panels keep their proportions and never overlap.
 window.addEventListener("resize", () => {
   window.clearTimeout(resizeTimer);
-  resizeTimer = window.setTimeout(() => {
-    renderAll();
-    refresh();
-  }, 170);
+  // renderAll already repaints the current selection with no animation.
+  resizeTimer = window.setTimeout(renderAll, 170);
 });
 
 function renderAll() {
@@ -480,10 +478,9 @@ function buildBars() {
     .attr("x", innerWidth / 2).attr("y", innerHeight + (isCompact ? 26 : 34))
     .attr("text-anchor", "middle").text("Mean user rating");
 
-  // Annotation describing the reordering animation.
-  chart.append("text").attr("class", "annotation")
-    .attr("x", 0).attr("y", -6)
-    .text(isCompact ? `Top ${topN} brands · ≥${minSample} products` : `Brands with at least ${minSample} products in the selection, top ${topN} by mean rating; bars reorder as you brush`);
+  // Annotation; its text is rewritten each update to state the real threshold.
+  const annotation = chart.append("text").attr("class", "annotation")
+    .attr("x", 0).attr("y", -6);
 
   // Roll selection rows up to one record per brand.
   const aggregate = rows => d3.nest()
@@ -495,12 +492,20 @@ function buildBars() {
   // animate is false on rebuilds, so a resize repaints instantly with no
   // motion (avoids the uninformative animation the brief warns of).
   barsUpdate = function (sel, animate) {
-    // Brands with enough products to rank fairly; fall back to all brands so
-    // a tiny selection never blanks the view.
-    let byBrand = aggregate(sel).filter(d => d.count >= minSample);
-    if (byBrand.length === 0) byBrand = aggregate(sel);
+    // Step the sample floor down only as far as needed, and report the floor
+    // actually used so a small selection is never ranked dishonestly.
+    let used = minSample;
+    let byBrand = aggregate(sel).filter(d => d.count >= used);
+    while (byBrand.length === 0 && used > 1) {
+      used -= 1;
+      byBrand = aggregate(sel).filter(d => d.count >= used);
+    }
     byBrand = byBrand.sort((a, b) => d3.descending(a.meanRank, b.meanRank)).slice(0, topN);
     yScale.domain(byBrand.map(d => d.brand));
+
+    annotation.text(isCompact
+      ? `Top ${topN} · ≥${used} products`
+      : `Brands with ≥${used} products in the selection, top ${topN} by mean rating; bars reorder as you brush`);
 
     const dur = animate ? 720 : 0;
     const t = d3.transition().duration(dur).ease(d3.easeCubicInOut);
@@ -514,22 +519,25 @@ function buildBars() {
     // Exit: remove filtered-out bars at once so stale nodes can never pile up.
     bars.exit().remove();
 
-    // Enter: a new bar starts collapsed at its target row, then grows.
+    // Enter: a new bar appears at its true width and row, only faded in. It is
+    // never parked at width 0, so an interrupted transition can't strand it.
     const barsEnter = bars.enter()
       .append("rect")
       .attr("class", "brand-bar")
       .attr("x", 0)
       .attr("y", d => yScale(d.brand))
       .attr("height", yScale.bandwidth())
-      .attr("width", 0)
-      .attr("opacity", 0.9)
+      .attr("width", d => xScale(d.meanRank))
+      .attr("opacity", 0)
       .attr("fill", "#264653");
 
-    // Update + enter: slide to the new row (ordering) and tween width (value).
+    // Update + enter: fade in, slide to the new row (ordering), tween width
+    // from the current value (value change), all interruption-safe.
     barsEnter.merge(bars).transition(t)
       .attr("y", d => yScale(d.brand))
       .attr("height", yScale.bandwidth())
-      .attr("width", d => xScale(d.meanRank));
+      .attr("width", d => xScale(d.meanRank))
+      .attr("opacity", 0.9);
 
     // VALUE LABELS, keyed to move with their bars (common fate).
     const labels = labelLayer.selectAll("text.bar-value").data(byBrand, d => d.brand);
@@ -537,20 +545,21 @@ function buildBars() {
     // Exit: remove dropped labels immediately, matching the bars.
     labels.exit().remove();
 
-    // Enter labels at the new row.
+    // Enter labels at their true position, faded in (never stranded at x=4).
     const labelsEnter = labels.enter()
       .append("text")
       .attr("class", "bar-value legend-label")
-      .attr("x", 4)
+      .attr("x", d => xScale(d.meanRank) + 6)
       .attr("y", d => yScale(d.brand) + yScale.bandwidth() / 2 + 4)
-      .attr("opacity", 1);
+      .attr("opacity", 0);
 
     // Update + enter: follow the bar, show "rating · n products".
     labelsEnter.merge(labels)
       .text(d => `${oneDec(d.meanRank)} · ${d.count}`)
       .transition(t)
       .attr("x", d => xScale(d.meanRank) + 6)
-      .attr("y", d => yScale(d.brand) + yScale.bandwidth() / 2 + 4);
+      .attr("y", d => yScale(d.brand) + yScale.bandwidth() / 2 + 4)
+      .attr("opacity", 1);
   };
 }
 

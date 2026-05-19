@@ -21,6 +21,14 @@ Animated transitions:
 - Matrix cells tween fill color and the in-cell rating rolls to its new value as the brush moves (filtering / timestep).
 - The brand bars reorder and slide to their new ranks, growing in and shrinking out, on every selection change (ordering / filtering), with slow-in slow-out easing.
 
+Design rationale and tradeoffs:
+
+- The overview is a scatter because price and rating are both continuous and the question is how they trade off; category rides on color so the split is visible without a fourth view. It doubles as the context plot for brush and zoom.
+- The matrix encodes **mean rating, not product count**. Count mostly tracks how big a category is, which buries the actual question ("are products here good for this skin type"). Mean rating answers that directly; the count is still available on hover so sample size is not hidden.
+- The color domain is clamped to the band ratings actually occupy (3.6 to 4.7). The full 0 to 5 range would wash every cell to the same tone.
+- The brand ranking enforces a sample floor so a single five-star product cannot outrank a deep, consistent line. The floor steps down only as far as a small selection forces, and the annotation always states the floor in use, so the ranking is never mislabeled.
+- Pinning a point is the end of the drill-down: overview, then brushed subset, then one product in full. That is the focus+context payoff, not a fourth chart.
+
 Only D3 v5 is used.
 
 Run locally from this folder:
