@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" style="width:100%;height:100%;">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Music & Mental Health Dashboard</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<!-- dashboard header -->
+	<div id="dashboard-title">Music & Mental Health Survey Dashboard</div>
+
+	<!-- top row with bar chart and scatter plot side by side -->
+	<div id="top-row">
+		<div id="bar-chart" class="chart-container"></div>
+		<div id="heatmap" class="chart-container"></div>
+	</div>
+
+	<!-- bottom row with sankey diagram full width -->
+	<div id="bottom-row">
+		<div id="sankey-diagram" class="chart-container"></div>
+	</div>
+
+	<!-- d3 core -->
+	<script src="https://d3js.org/d3.v7.min.js"></script>
+	<!-- d3-sankey plugin for sankey diagram -->
+	<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12/dist/d3-sankey.min.js"></script>
+	<script src="main.js"></script>
+</body>
+</html>
