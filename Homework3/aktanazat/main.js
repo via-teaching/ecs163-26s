@@ -1,6 +1,4 @@
-// D3 dashboard for ECS 163 Homework 3 (interactivity + animated transitions).
-// Dataset: Sephora skincare catalog (Kaggle: kingabzpro/cosmetics-datasets).
-// Only D3 v5 is loaded. Every element D3 adds to the DOM has a comment above it.
+// ECS 163 Homework 3. Dataset: Sephora skincare (Kaggle kingabzpro/cosmetics-datasets).
 
 const DATA_URL = "data/cosmetics.csv";
 
@@ -15,12 +13,9 @@ const categoryColor = d3.scaleOrdinal()
   .domain(CATEGORIES)
   .range(["#2a9d8f", "#e76f51", "#e9c46a", "#264653", "#8a5a83", "#4a7c59"]);
 
-// Sequential ramp for the heatmap. Cells encode within-category coverage
-// (share of the category's selected products that suit a skin type), which
-// spans the full 0 to 1, so the color channel actually carries information.
+// Heatmap color = within-category coverage share (0 to 1).
 const heatColor = d3.scaleLinear().domain([0, 1]).range(["#f1eee8", "#264653"]).clamp(true);
-// Cell opacity encodes sample size, so confidence is visible without hover:
-// a cell backed by few products reads as faint.
+// Heatmap opacity = supporting product count, so confidence shows without hover.
 const heatConfidence = d3.scaleSqrt().domain([0, 120]).range([0.4, 1]).clamp(true);
 const EMPTY_FILL = "#f6f4ef"; // a cell with no products in the selection
 
@@ -70,7 +65,6 @@ d3.csv(DATA_URL).then(raw => {
 // Rebuild every view on resize so panels keep their proportions and never overlap.
 window.addEventListener("resize", () => {
   window.clearTimeout(resizeTimer);
-  // renderAll already repaints the current selection with no animation.
   resizeTimer = window.setTimeout(renderAll, 170);
 });
 
@@ -78,9 +72,8 @@ function renderAll() {
   drawScatter(products);
   buildHeatmap();
   buildBars();
-  // A rebuild is layout, not a data change, so paint the final state with no
-  // tween. Animating here would be the uninformative motion the brief warns of.
-  refresh(false);
+  refresh(false); // rebuild is layout-only; no tween
+
 }
 
 // Products implied by the current brush (or all products when nothing is brushed).
@@ -91,8 +84,7 @@ function currentSelection() {
   return products.filter(d => d.price >= p0 && d.price <= p1 && d.rank >= r0 && d.rank <= r1);
 }
 
-// Push the current selection into all three views and the detail card.
-// animate is true only for user-driven selection changes, never for rebuilds.
+// Fan the current selection out to every view. animate only on user changes.
 function refresh(animate = true) {
   const sel = currentSelection();
   scatterHighlight(sel);
@@ -101,8 +93,8 @@ function refresh(animate = true) {
   renderDetail();
 }
 
-// Size a chart from its panel, whose box the CSS grid fixes. Measuring the
-// SVG instead lets a momentarily inflated SVG feed back a runaway box.
+// Size from the grid-fixed panel, not the SVG, or an inflated SVG feeds back
+// a runaway box on resize.
 function getChartBox(selector) {
   const svgNode = d3.select(selector).node();
   const panel = svgNode.closest(".panel");
@@ -338,7 +330,7 @@ function buildHeatmap() {
       hideTooltip();
     });
 
-  // In-cell mean-rating labels (updated with a counting tween).
+  // In-cell coverage-percentage labels (updated with a counting tween).
   const cellText = chart.selectAll("text.cell-count")
     .data(cellKeys, d => `${d.cat}|${d.skin}`)
     .enter()
@@ -651,7 +643,7 @@ function showProductTooltip(d) {
 
 function showCellTooltip(d, node) {
   d3.select(node).classed("is-active", true);
-  const body = d.share === null || d.share === undefined
+  const body = d.share == null
     ? "No products in this category for the current selection."
     : `${pct(d.share)} of ${d.cat} (${d.value} of ${d.catTotal}) suit ${d.skin.toLowerCase()} skin.`;
   tooltip
