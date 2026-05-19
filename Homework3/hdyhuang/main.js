@@ -135,7 +135,7 @@ function drawScatterPlot(data) {
 		.attr("class", "dot")
 		.attr("cx", function(d) { return xScale(d.attack); })
 		.attr("cy", function(d) { return yScale(d.defense); })
-		.attr("r", 4)
+		.attr("r", 5)
 		.attr("fill", function(d) { return typeColor(d.type1); })
 		.attr("opacity", 0.6)
 		.attr("stroke", "#fff")
@@ -148,6 +148,7 @@ function drawScatterPlot(data) {
 			if (brushedData && brushedData.indexOf(d) === -1) return;
 			var typeStr = d.type1 + (d.type2 ? " / " + d.type2 : "");
 			var color = typeColorMap[d.type1] || "#333";
+			d3.select(this).transition("hover").duration(75).attr("r", 10).attr("opacity", 1);
 			tooltip.style("opacity", 1)
 				.html(
 					'<div style="font-size:15px;font-weight:700;color:' + color + '">' + d.name + '</div>' +
@@ -160,7 +161,10 @@ function drawScatterPlot(data) {
 			tooltip.style("left", (event.pageX + 12) + "px")
 				.style("top", (event.pageY - 28) + "px");
 		})
-		.on("mouseout", function() {
+		.on("mouseout", function(event, d) {
+			// restore dot size based on current selection state
+			var isActive = selectedType ? (d.type1 === selectedType && (!selectedGen || d.generation === selectedGen)) : true;
+			d3.select(this).transition("hover").duration(75).attr("r", isActive ? 5 : 4).attr("opacity", isActive ? 0.6 : 0.06);
 			tooltip.style("opacity", 0);
 		})
 		// click dot to show individual pokemon on radar (only if not filtered out)
@@ -229,7 +233,7 @@ function drawScatterPlot(data) {
 					var inBrush = cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1;
 					var inFilter = (!selectedType || d.type1 === selectedType)
 						&& (!selectedGen || d.generation === selectedGen);
-					return (inBrush && inFilter) ? 5 : 3;
+					return (inBrush && inFilter) ? 7 : 4;
 				});
 		})
 		.on("end", function(event) {
@@ -335,11 +339,11 @@ function drawBarChart(data) {
 		.range([innerH, 0]);
 
 	// draw x axis with rotated labels
-	g.append("g")
-		.attr("class", "axis")
+	var xAxisG = g.append("g")
+		.attr("class", "axis bar-x-axis")
 		.attr("transform", "translate(0," + innerH + ")")
-		.call(d3.axisBottom(xScale))
-		.selectAll("text")
+		.call(d3.axisBottom(xScale));
+	xAxisG.selectAll("text")
 		.attr("transform", "rotate(-40)")
 		.style("text-anchor", "end")
 		.style("font-size", "12px");
@@ -392,7 +396,7 @@ function drawBarChart(data) {
 			.attr("height", function(d) { return yScale(d[0]) - yScale(d[1]); })
 			.attr("fill", function(d) { return genTypeColor(d.data.type, gen); })
 			.attr("cursor", "pointer")
-			// tooltip on hover
+			// tooltip on hover, bold axis label, widen gen bar if type selected
 			.on("mouseover", function(event, d) {
 				var count = d[1] - d[0];
 				tooltip.style("opacity", 1)
@@ -400,13 +404,31 @@ function drawBarChart(data) {
 						"<strong>" + d.data.type + "</strong><br/>" +
 						"Gen " + d.gen + ": " + count + " pokemon"
 					);
+				// bold the matching x-axis label with transition
+				xAxisG.selectAll("text")
+					.transition("hover").duration(75)
+					.style("font-weight", function(t) { return t === d.data.type ? "700" : null; });
+				// widen this gen segment when type is already selected
+				if (selectedType && d.data.type === selectedType) {
+					var bw = xScale.bandwidth();
+					d3.select(this).transition("hover").duration(75)
+						.attr("x", xScale(d.data.type) - bw * 0.15)
+						.attr("width", bw * 1.3);
+				}
 			})
 			.on("mousemove", function(event) {
 				tooltip.style("left", (event.pageX + 12) + "px")
 					.style("top", (event.pageY - 28) + "px");
 			})
-			.on("mouseout", function() {
+			.on("mouseout", function(event, d) {
 				tooltip.style("opacity", 0);
+				// restore axis label weight with transition
+				xAxisG.selectAll("text").transition("hover").duration(75)
+					.style("font-weight", null);
+				// restore bar width with transition
+				d3.select(this).transition("hover").duration(75)
+					.attr("x", xScale(d.data.type))
+					.attr("width", xScale.bandwidth());
 			})
 			// click: first click selects type, second click selects generation
 			.on("click", function(event, d) {
@@ -647,10 +669,10 @@ function updateSelection() {
 			return 0.85;
 		})
 		.attr("r", function(d) {
-			if (!selectedType) return 4;
-			if (d.type1 !== selectedType) return 3;
-			if (selectedGen && d.generation !== selectedGen) return 3;
-			return 5;
+			if (!selectedType) return 5;
+			if (d.type1 !== selectedType) return 4;
+			if (selectedGen && d.generation !== selectedGen) return 4;
+			return 7;
 		});
 
 	// bar chart: rescale y-axis to selected type, highlight gen
