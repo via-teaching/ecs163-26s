@@ -19,6 +19,9 @@ const categoryColor = d3.scaleOrdinal()
 // (about 3.6 to 4.7), so the domain is clamped to that band for real
 // contrast instead of a near-uniform wash.
 const heatColor = d3.scaleLinear().domain([3.6, 4.7]).range(["#f1eee8", "#264653"]).clamp(true);
+// Cell opacity encodes sample size, so confidence is visible without hover:
+// a cell backed by few products reads as faint.
+const heatConfidence = d3.scaleSqrt().domain([0, 120]).range([0.4, 1]).clamp(true);
 const EMPTY_FILL = "#f6f4ef"; // a cell with no products in the selection
 
 const money = d3.format("$,.0f");
@@ -97,11 +100,15 @@ function refresh(animate = true) {
   renderDetail();
 }
 
-// Measure a chart's box through D3's selection so the sizing stays in the
-// D3 flow; floors keep scales valid mid-resize reflow.
+// Size a chart from its panel, whose box the CSS grid fixes. Measuring the
+// SVG instead lets a momentarily inflated SVG feed back a runaway box.
 function getChartBox(selector) {
-  const bounds = d3.select(selector).node().getBoundingClientRect();
-  return { width: Math.max(300, bounds.width), height: Math.max(150, bounds.height) };
+  const svgNode = d3.select(selector).node();
+  const panel = svgNode.closest(".panel");
+  const copy = panel.querySelector(".panel-copy");
+  const width = panel.clientWidth - 2;                              // minus borders
+  const height = panel.clientHeight - (copy ? copy.offsetHeight : 0) - 2;
+  return { width: Math.max(300, width), height: Math.max(150, height) };
 }
 
 // ---------------------------------------------------------------------------
@@ -352,10 +359,10 @@ function buildHeatmap() {
     .attr("x", -innerHeight / 2).attr("y", -margin.left + 14)
     .attr("text-anchor", "middle").text("Product category");
 
-  // Annotation tying the matrix to the brush.
+  // Annotation tying the matrix to the brush and naming both encodings.
   chart.append("text").attr("class", "annotation")
     .attr("x", 0).attr("y", -10)
-    .text(isCompact ? "Mean rating in the brushed subset" : "Mean rating of products suited to each skin type, in the brushed subset; color tweens as you brush");
+    .text(isCompact ? "Color = mean rating · faint = few products" : "Color = mean rating in the brushed subset; fainter cells are backed by fewer products");
 
   // Legend group anchored under the matrix.
   const legend = svg.append("g").attr("transform", `translate(${margin.left},${height - 14})`);
@@ -401,13 +408,20 @@ function buildHeatmap() {
     };
     const dur = animate ? 650 : 0;
 
-    // Cells ease to the new color (filtering / timestep transition).
+    // Cells ease to the new color (mean rating) and opacity (sample size),
+    // so both the score and its confidence read at a glance.
     cells.transition().duration(dur).ease(d3.easeCubicInOut)
-      .attr("fill", d => { const m = meanOf(d); return m === null ? EMPTY_FILL : heatColor(m); });
+      .attr("fill", d => { const m = meanOf(d); return m === null ? EMPTY_FILL : heatColor(m); })
+      .attr("opacity", d => { const a = acc[`${d.cat}|${d.skin}`]; return a.n === 0 ? 1 : heatConfidence(a.n); });
 
-    // Labels roll to the new mean and flip to white on the dark cells.
+    // Labels roll to the new mean. White only when the cell renders truly
+    // dark, i.e. high rating AND high opacity; a faint cell stays dark text.
     cellText.transition().duration(dur).ease(d3.easeCubicInOut)
-      .style("fill", d => { const m = meanOf(d); return m !== null && m >= 4.2 ? "#ffffff" : "#111111"; })
+      .style("fill", d => {
+        const a = acc[`${d.cat}|${d.skin}`];
+        const m = meanOf(d);
+        return m !== null && m >= 4.2 && heatConfidence(a.n) > 0.75 ? "#ffffff" : "#111111";
+      })
       .tween("text", function (d) {
         const node = this;
         const m = meanOf(d);
