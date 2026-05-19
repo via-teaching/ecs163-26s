@@ -4,7 +4,7 @@ const height = window.innerHeight;
 
 // Margins
 const margins = {
-  top: 40,
+  top: 50,
   bottom: 40,
   left: 80,
   right: 50,
@@ -63,13 +63,15 @@ const typeColors = d3
   .domain(Object.keys(typeColorDict))
   .range(Object.values(typeColorDict));
 
-d3.select("#bar-svg")
+// d3.select("#bar-svg")
+//   .style("height", `${chartDims.bar.height}px`)
+//   .style("width", `${chartDims.bar.width}px`);
+d3.select(".left-col")
+  .style("height", `${chartDims.parallel.height}px`)
+  .style("width", `${chartDims.parallel.width}px`);
+d3.select(".right-top")
   .style("height", `${chartDims.bar.height}px`)
   .style("width", `${chartDims.bar.width}px`);
-
-d3.select(".right-top")
-  .style("height", `${chartDims.scatter.height}px`)
-  .style("width", `${chartDims.scatter.width}px`);
 d3.select(".right-bot")
   .style("height", `${chartDims.scatter.height}px`)
   .style("width", `${chartDims.scatter.width}px`);
@@ -100,7 +102,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     ),
     ([Type_1, freq]) => ({ Type_1, freq }),
   );
-  console.log("barData", barData);
+  // console.log("barData", barData);
 
   // Create x and y axis
 
@@ -180,4 +182,95 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
 
   // Bar title
   rect.append("title").text((d) => `Type 1: ${d.Type_1}\nFrequency: ${d.freq}`);
+
+  // plot 2: Scatterplot
+
+  // Select the scatter-svg
+  const scatterSvg = d3
+    .selectAll("#scatter-svg")
+    .append("g")
+    .attr("width", chartDims.scatter.width)
+    .attr("height", chartDims.scatter.height);
+  // .attr("viewbox", "-5 -5 10 10");
+
+  const scatterData = data.map((d) => ({
+    Total: d.Total,
+    Catch_Rate: parseInt(d.Catch_Rate),
+    Type_1: d.Type_1,
+  }));
+
+  // Create x and y axis
+
+  // Compute x axis
+  const scatterX1 = d3
+    .scaleLinear()
+    .domain([0, Math.round(d3.max(scatterData, (d) => d.Total) / 50 + 1) * 50])
+    .range([margins.left, margins.left + chartDims.scatter.innerWidth]);
+
+  // Draw x axis
+  scatterSvg
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${0}, ${margins.top + chartDims.scatter.innerHeight})`,
+    )
+    .call(d3.axisBottom(scatterX1))
+    .selectAll("text")
+    .attr("transform", `translate(0, 0) rotate(0)`)
+    .attr("text-anchor", "center");
+
+  // Label x axis
+  scatterSvg
+    .append("text")
+    .attr("x", chartDims.scatter.width / 2)
+    .attr("y", chartDims.scatter.height - 5)
+    .attr("font-size", "14px")
+    .attr("text-anchor", "middle")
+    .text("Total Stats");
+  console.log(
+    "max catch rate",
+    d3.max(scatterData, (d) => d.Catch_Rate),
+  );
+  // Compute y axis
+  const scatterY1 = d3
+    .scaleLinear()
+    .domain([0, d3.max(scatterData, (d) => d.Catch_Rate)])
+    .range([margins.top + chartDims.scatter.innerHeight, margins.top]);
+
+  // Draw y axis
+  scatterSvg
+    .append("g")
+    .attr("transform", `translate(${margins.left}, ${0})`)
+    .call(d3.axisLeft(scatterY1))
+    .selectAll("text")
+    .attr("transform", `translate(0, 0) rotate(0)`)
+    .attr("text-anchor", "end");
+
+  // Label y axis
+  scatterSvg
+    .append("text")
+    .attr(
+      "transform",
+      `translate(${margins.left - 30}, ${margins.top + chartDims.scatter.innerHeight / 2}) rotate(-90)`,
+    )
+    .attr("text-anchor", "middle")
+    .attr("font-size", "14px")
+    .text("Catch Rate %");
+
+  // Draw circles
+  const r = 5;
+  const circles = scatterSvg
+    .append("g")
+    .classed("mark", true)
+    .selectAll("circle")
+    .data(scatterData)
+    .join("circle")
+    .classed("mark-circle", true)
+    .attr("cx", (d) => scatterX1(d.Total))
+    .attr("cy", (d) => scatterY1(d.Catch_Rate))
+    .attr("r", (d) => r)
+    .style("fill", (d) => typeColors(d.Type_1))
+    .style("fill-opacity", 0.7)
+    .style("stroke", "black")
+    .style("stroke-width", 0.8);
 });
