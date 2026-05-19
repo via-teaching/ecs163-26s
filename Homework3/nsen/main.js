@@ -6,8 +6,8 @@ const height = window.innerHeight;
 const margins = {
   top: 40,
   bottom: 40,
-  left: 30,
-  right: 30,
+  left: 80,
+  right: 50,
 };
 
 // Title Height
@@ -37,7 +37,136 @@ const chartDims = {
   },
 };
 
-// Load the dataset
+const typeColorDict = {
+  Grass: "#8cc260",
+  Fire: "#e38643",
+  Water: "#748cc8",
+  Bug: "#abb542",
+  Normal: "#a8a67d",
+  Poison: "#924a96",
+  Electric: "#f3d153",
+  Ground: "#dbbf75",
+  Fairy: "#ffffff",
+  Fighting: "#b13d30",
+  Psychic: "#e66289",
+  Rock: "#b2a04a",
+  Ghost: "#6d5b95",
+  Ice: "#a5d7d8",
+  Dragon: "#524e9b",
+  Dark: "#6c594a",
+  Steel: "#b8b9ce",
+  Flying: "#a192c9",
+};
+
+const typeColors = d3
+  .scaleOrdinal()
+  .domain(Object.keys(typeColorDict))
+  .range(Object.values(typeColorDict));
+
+// Load the dataset and build svg's
 d3.csv("data/pokemon_data.csv").then((rawData) => {
   console.log("rawData", rawData);
+
+  // Reassign in case processing is needed later
+  const data = rawData;
+  // console.log("data", data);
+
+  // plot 1: Bar chart
+
+  // Select the bar-svg
+  const barSvg = d3
+    .selectAll("#bar-svg")
+    .append("g")
+    .attr("width", chartDims.bar.width)
+    .attr("height", chartDims.bar.height);
+
+  // Reduce data to Type_1 frequencies
+  const barData = Array.from(
+    d3.rollup(
+      data,
+      (v) => v.length,
+      (d) => d.Type_1,
+    ),
+    ([Type_1, freq]) => ({ Type_1, freq }),
+  );
+  console.log("barData", barData);
+
+  // Create x and y axis
+
+  // Compute x axis
+  const barX1 = d3
+    .scaleBand()
+    .domain(barData.map((d) => d.Type_1))
+    .range([margins.left, margins.left + chartDims.bar.innerWidth])
+    .padding(0.08);
+
+  // Draw x axis
+  barSvg
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${0}, ${margins.top + chartDims.bar.innerHeight})`,
+    )
+    .call(d3.axisBottom(barX1))
+    .selectAll("text")
+    .attr("transform", `translate(0, 0) rotate(0)`)
+    .attr("text-anchor", "center");
+
+  // Label x axis
+  barSvg
+    .append("text")
+    .attr("x", chartDims.bar.width / 2)
+    .attr("y", chartDims.bar.height)
+    .attr("font-size", "14px")
+    .attr("text-anchor", "middle")
+    .text("Type 1");
+
+  // Compute y axis
+  const barY1 = d3
+    .scaleLinear()
+    .domain([0, d3.max(barData, (d) => d.freq)])
+    .range([margins.top + chartDims.bar.innerHeight, margins.top]);
+
+  // Draw y axis
+  barSvg
+    .append("g")
+    .attr("transform", `translate(${margins.left}, ${0})`)
+    .call(d3.axisLeft(barY1))
+    .selectAll("text")
+    .attr("transform", `translate(0, 0) rotate(0)`)
+    .attr("text-anchor", "end");
+
+  // Label y axis
+  barSvg
+    .append("text")
+    .attr(
+      "transform",
+      `translate(${margins.left - 30}, ${margins.top + chartDims.bar.innerHeight / 2}) rotate(-90)`,
+    )
+    .attr("text-anchor", "middle")
+    .attr("font-size", "14px")
+    .text("Frequency");
+
+  // Draw bars
+  const barColor = "#77ACA2";
+  const highlightColor = "orange";
+  const rect = barSvg
+    .append("g")
+    .classed("mark", true)
+    .selectAll("rect")
+    .data(barData)
+    .join("rect")
+    .attr("x", (d) => barX1(d.Type_1))
+    .attr("y", (d) => barY1(d.freq))
+    .attr("width", barX1.bandwidth())
+    .attr(
+      "height",
+      (d) => margins.top + chartDims.bar.innerHeight - barY1(d.freq),
+    )
+    .style("fill", (d) => typeColors(d.Type_1))
+    .attr("stroke", "black")
+    .attr("stroke-width", 1);
+
+  // Bar title
+  rect.append("title").text((d) => `Type 1: ${d.Type_1}\nFrequency: ${d.freq}`);
 });
