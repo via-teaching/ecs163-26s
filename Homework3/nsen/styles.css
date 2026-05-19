@@ -4,8 +4,8 @@
 }
 
 .right-col {
-	display: flex;
-	flex-direction: col;
+	/* display: flex;
+	flex-direction: col; */
 }
 
 .chart {

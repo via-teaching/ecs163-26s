@@ -11,7 +11,7 @@ const margins = {
 };
 
 // Title Height
-const headerHeight = 40;
+const headerHeight = 100;
 const keyHeight = 40;
 
 // Dimensions for all three charts
@@ -62,6 +62,17 @@ const typeColors = d3
   .scaleOrdinal()
   .domain(Object.keys(typeColorDict))
   .range(Object.values(typeColorDict));
+
+d3.select("#bar-svg")
+  .style("height", `${chartDims.bar.height}px`)
+  .style("width", `${chartDims.bar.width}px`);
+
+d3.select(".right-top")
+  .style("height", `${chartDims.scatter.height}px`)
+  .style("width", `${chartDims.scatter.width}px`);
+d3.select(".right-bot")
+  .style("height", `${chartDims.scatter.height}px`)
+  .style("width", `${chartDims.scatter.width}px`);
 
 // Load the dataset and build svg's
 d3.csv("data/pokemon_data.csv").then((rawData) => {
@@ -116,7 +127,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
   barSvg
     .append("text")
     .attr("x", chartDims.bar.width / 2)
-    .attr("y", chartDims.bar.height)
+    .attr("y", chartDims.bar.height - 5)
     .attr("font-size", "14px")
     .attr("text-anchor", "middle")
     .text("Type 1");
