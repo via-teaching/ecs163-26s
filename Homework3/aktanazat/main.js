@@ -15,9 +15,10 @@ const categoryColor = d3.scaleOrdinal()
   .domain(CATEGORIES)
   .range(["#2a9d8f", "#e76f51", "#e9c46a", "#264653", "#8a5a83", "#4a7c59"]);
 
-// Sequential ramp for the heatmap. Ratings sit in roughly 3 to 5, so the
-// domain is clamped there to keep the color contrast meaningful.
-const heatColor = d3.scaleLinear().domain([3, 5]).range(["#f1eee8", "#264653"]).clamp(true);
+// Sequential ramp for the heatmap. Per-cell mean ratings cluster tightly
+// (about 3.6 to 4.7), so the domain is clamped to that band for real
+// contrast instead of a near-uniform wash.
+const heatColor = d3.scaleLinear().domain([3.6, 4.7]).range(["#f1eee8", "#264653"]).clamp(true);
 const EMPTY_FILL = "#f6f4ef"; // a cell with no products in the selection
 
 const money = d3.format("$,.0f");
@@ -75,7 +76,9 @@ function renderAll() {
   drawScatter(products);
   buildHeatmap();
   buildBars();
-  refresh();
+  // A rebuild is layout, not a data change, so paint the final state with no
+  // tween. Animating here would be the uninformative motion the brief warns of.
+  refresh(false);
 }
 
 // Products implied by the current brush (or all products when nothing is brushed).
@@ -87,16 +90,19 @@ function currentSelection() {
 }
 
 // Push the current selection into all three views and the detail card.
-function refresh() {
+// animate is true only for user-driven selection changes, never for rebuilds.
+function refresh(animate = true) {
   const sel = currentSelection();
   scatterHighlight(sel);
-  heatmapUpdate(sel);
-  barsUpdate(sel);
+  heatmapUpdate(sel, animate);
+  barsUpdate(sel, animate);
   renderDetail();
 }
 
+// Measure a chart's box through D3's selection so the sizing stays in the
+// D3 flow; floors keep scales valid mid-resize reflow.
 function getChartBox(selector) {
-  const bounds = document.querySelector(selector).getBoundingClientRect();
+  const bounds = d3.select(selector).node().getBoundingClientRect();
   return { width: Math.max(300, bounds.width), height: Math.max(150, bounds.height) };
 }
 
@@ -127,9 +133,12 @@ function drawScatter(data) {
   let x = xBase;
   let y = yBase;
 
-  // Clip-path rect so zoomed-in points never spill outside the plot frame.
-  svg.append("defs").append("clipPath").attr("id", "scatter-clip")
-    .append("rect").attr("width", innerWidth).attr("height", innerHeight);
+  // Defs container for the scatter clip-path.
+  const scatterDefs = svg.append("defs");
+  // Clip-path keyed so the points layer can reference it.
+  const clip = scatterDefs.append("clipPath").attr("id", "scatter-clip");
+  // Clip rectangle: zoomed-in points never spill past the plot frame.
+  clip.append("rect").attr("width", innerWidth).attr("height", innerHeight);
 
   // Plot group inset by the margins.
   const chart = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
@@ -275,9 +284,10 @@ function buildHeatmap() {
 
   const { width, height } = getChartBox(selector);
   const isCompact = width < 520;
+  // Extra compact bottom space so the gradient legend clears the x labels.
   const margin = isCompact
-    ? { top: 22, right: 12, bottom: 30, left: 80 }
-    : { top: 28, right: 28, bottom: 52, left: 104 };
+    ? { top: 22, right: 12, bottom: 50, left: 80 }
+    : { top: 28, right: 28, bottom: 56, left: 104 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
@@ -352,27 +362,30 @@ function buildHeatmap() {
   // Legend group anchored under the matrix.
   const legend = svg.append("g").attr("transform", `translate(${margin.left},${height - 14})`);
 
-  // Gradient definition for the legend swatch.
-  const grad = svg.append("defs").append("linearGradient").attr("id", "heat-grad");
+  // Defs container for the legend gradient.
+  const defs = svg.append("defs");
+  // Linear gradient that the swatch references by id.
+  const grad = defs.append("linearGradient").attr("id", "heat-grad");
   // Low-rating stop (light end of the ramp).
-  grad.append("stop").attr("offset", "0%").attr("stop-color", heatColor(3));
+  grad.append("stop").attr("offset", "0%").attr("stop-color", heatColor(3.6));
   // High-rating stop (dark end of the ramp).
-  grad.append("stop").attr("offset", "100%").attr("stop-color", heatColor(5));
+  grad.append("stop").attr("offset", "100%").attr("stop-color", heatColor(4.7));
 
-  // Legend swatch.
+  // Legend swatch filled by the gradient.
   legend.append("rect").attr("width", Math.min(150, innerWidth)).attr("height", 8)
     .attr("fill", "url(#heat-grad)");
 
   // Legend low label.
-  legend.append("text").attr("class", "legend-label").attr("x", 0).attr("y", -4).text("rating 3");
+  legend.append("text").attr("class", "legend-label").attr("x", 0).attr("y", -4).text("rating 3.6");
 
   // Legend high label.
   legend.append("text").attr("class", "legend-label")
     .attr("x", Math.min(150, innerWidth)).attr("y", -4)
-    .attr("text-anchor", "end").text("5");
+    .attr("text-anchor", "end").text("4.7");
 
   // Recompute the mean rating per cell for the selection, then tween.
-  heatmapUpdate = function (sel) {
+  // animate is false on rebuilds, so the matrix snaps with no motion.
+  heatmapUpdate = function (sel, animate) {
     const acc = {};
     cellKeys.forEach(k => { acc[`${k.cat}|${k.skin}`] = { sum: 0, n: 0 }; });
     sel.forEach(p => {
@@ -388,19 +401,20 @@ function buildHeatmap() {
       const a = acc[`${d.cat}|${d.skin}`];
       return a.n ? a.sum / a.n : null;
     };
+    const dur = animate ? 650 : 0;
 
     // Cells ease to the new color (filtering / timestep transition).
-    cells.transition().duration(650).ease(d3.easeCubicInOut)
+    cells.transition().duration(dur).ease(d3.easeCubicInOut)
       .attr("fill", d => { const m = meanOf(d); return m === null ? EMPTY_FILL : heatColor(m); });
 
     // Labels roll to the new mean and flip to white on the dark cells.
-    cellText.transition().duration(650).ease(d3.easeCubicInOut)
-      .style("fill", d => { const m = meanOf(d); return m !== null && m >= 4.4 ? "#ffffff" : "#111111"; })
+    cellText.transition().duration(dur).ease(d3.easeCubicInOut)
+      .style("fill", d => { const m = meanOf(d); return m !== null && m >= 4.2 ? "#ffffff" : "#111111"; })
       .tween("text", function (d) {
         const node = this;
         const m = meanOf(d);
-        if (m === null) return t => { if (t === 1) node.textContent = ""; };
-        const start = parseFloat(node.textContent) || 3;
+        if (m === null) return t => { node.textContent = ""; };
+        const start = parseFloat(node.textContent) || 3.6;
         const i = d3.interpolateNumber(start, m);
         return t => { node.textContent = oneDec(i(t)); };
       });
@@ -471,34 +485,25 @@ function buildBars() {
     .attr("x", 0).attr("y", -6)
     .text(isCompact ? `Top ${topN} brands · ≥${minSample} products` : `Brands with at least ${minSample} products in the selection, top ${topN} by mean rating; bars reorder as you brush`);
 
-  barsUpdate = function (sel) {
-    // Aggregate per brand, keep brands with enough products, rank by mean rating.
-    let byBrand = d3.nest()
-      .key(d => d.brand)
-      .rollup(v => ({ count: v.length, meanRank: d3.mean(v, d => d.rank), meanPrice: d3.mean(v, d => d.price) }))
-      .entries(sel)
-      .map(e => ({ brand: e.key, count: e.value.count, meanRank: e.value.meanRank, meanPrice: e.value.meanPrice }))
-      .filter(d => d.count >= minSample);
+  // Roll selection rows up to one record per brand.
+  const aggregate = rows => d3.nest()
+    .key(d => d.brand)
+    .rollup(v => ({ count: v.length, meanRank: d3.mean(v, d => d.rank) }))
+    .entries(rows)
+    .map(e => ({ brand: e.key, count: e.value.count, meanRank: e.value.meanRank }));
 
-    // Tiny selections rarely clear the sample floor; fall back so the view
-    // is never blank.
-    if (byBrand.length === 0) {
-      byBrand = d3.nest()
-        .key(d => d.brand)
-        .rollup(v => ({ count: v.length, meanRank: d3.mean(v, d => d.rank), meanPrice: d3.mean(v, d => d.price) }))
-        .entries(sel)
-        .map(e => ({ brand: e.key, count: e.value.count, meanRank: e.value.meanRank, meanPrice: e.value.meanPrice }));
-    }
-
+  // animate is false on rebuilds, so a resize repaints instantly with no
+  // motion (avoids the uninformative animation the brief warns of).
+  barsUpdate = function (sel, animate) {
+    // Brands with enough products to rank fairly; fall back to all brands so
+    // a tiny selection never blanks the view.
+    let byBrand = aggregate(sel).filter(d => d.count >= minSample);
+    if (byBrand.length === 0) byBrand = aggregate(sel);
     byBrand = byBrand.sort((a, b) => d3.descending(a.meanRank, b.meanRank)).slice(0, topN);
     yScale.domain(byBrand.map(d => d.brand));
 
-    const t = d3.transition().duration(720).ease(d3.easeCubicInOut);
-
-    // Cancel any in-flight tweens so an interrupted exit can never get stuck
-    // in the DOM at width 0.
-    barsLayer.selectAll("rect.brand-bar").interrupt();
-    labelLayer.selectAll("text.bar-value").interrupt();
+    const dur = animate ? 720 : 0;
+    const t = d3.transition().duration(dur).ease(d3.easeCubicInOut);
 
     // Left axis slides its labels into the new order.
     yAxisG.transition(t).call(d3.axisLeft(yScale).tickSize(0));
@@ -506,10 +511,10 @@ function buildBars() {
     // BARS, keyed by brand for object constancy.
     const bars = barsLayer.selectAll("rect.brand-bar").data(byBrand, d => d.brand);
 
-    // Exit: shrink to zero width, fade, then remove (filtering out).
-    bars.exit().transition(t).attr("width", 0).attr("opacity", 0).remove();
+    // Exit: remove filtered-out bars at once so stale nodes can never pile up.
+    bars.exit().remove();
 
-    // Enter: a new bar starts collapsed at its target row.
+    // Enter: a new bar starts collapsed at its target row, then grows.
     const barsEnter = bars.enter()
       .append("rect")
       .attr("class", "brand-bar")
@@ -524,14 +529,13 @@ function buildBars() {
     barsEnter.merge(bars).transition(t)
       .attr("y", d => yScale(d.brand))
       .attr("height", yScale.bandwidth())
-      .attr("width", d => xScale(d.meanRank))
-      .attr("opacity", 0.9);
+      .attr("width", d => xScale(d.meanRank));
 
     // VALUE LABELS, keyed to move with their bars (common fate).
     const labels = labelLayer.selectAll("text.bar-value").data(byBrand, d => d.brand);
 
-    // Exit labels fade out with their bars.
-    labels.exit().transition(t).attr("opacity", 0).remove();
+    // Exit: remove dropped labels immediately, matching the bars.
+    labels.exit().remove();
 
     // Enter labels at the new row.
     const labelsEnter = labels.enter()
@@ -539,15 +543,14 @@ function buildBars() {
       .attr("class", "bar-value legend-label")
       .attr("x", 4)
       .attr("y", d => yScale(d.brand) + yScale.bandwidth() / 2 + 4)
-      .attr("opacity", 0);
+      .attr("opacity", 1);
 
     // Update + enter: follow the bar, show "rating · n products".
     labelsEnter.merge(labels)
       .text(d => `${oneDec(d.meanRank)} · ${d.count}`)
       .transition(t)
       .attr("x", d => xScale(d.meanRank) + 6)
-      .attr("y", d => yScale(d.brand) + yScale.bandwidth() / 2 + 4)
-      .attr("opacity", 1);
+      .attr("y", d => yScale(d.brand) + yScale.bandwidth() / 2 + 4);
   };
 }
 
