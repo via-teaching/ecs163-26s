@@ -70,11 +70,12 @@ function drawScatterPlot(data) {
 	var innerW = width - margin.left - margin.right;
 	var innerH = height - margin.top - margin.bottom;
 
-	// create svg
+	// create svg (click empty space to reset)
 	var svg = d3.select("#scatter-plot")
 		.append("svg")
 		.attr("width", width)
-		.attr("height", height);
+		.attr("height", height)
+		.on("click", function() { resetAll(); });
 
 	// offset group
 	var g = svg.append("g")
@@ -147,13 +148,19 @@ function drawScatterPlot(data) {
 		.attr("opacity", 0.6)
 		.attr("stroke", "#fff")
 		.attr("stroke-width", 0.5)
-		// tooltip on hover
+		// tooltip on hover (white card with shadow)
 		.on("mouseover", function(event, d) {
+			// skip faded dots (filtered by type or outside brush)
+			if (selectedType && d.type1 !== selectedType) return;
+			if (brushedData && brushedData.indexOf(d) === -1) return;
+			var typeStr = d.type1 + (d.type2 ? " / " + d.type2 : "");
+			var color = typeColorMap[d.type1] || "#333";
 			tooltip.style("opacity", 1)
 				.html(
-					"<strong>" + d.name + "</strong><br/>" +
-					"Type: " + d.type1 + (d.type2 ? " / " + d.type2 : "") + "<br/>" +
-					"Attack: " + d.attack + " | Defense: " + d.defense
+					'<div style="font-size:15px;font-weight:700;color:' + color + '">' + d.name + '</div>' +
+					'<div style="font-size:12px;color:' + color + '">' + typeStr + '</div>' +
+					'<div style="font-size:12px;color:#555">Gen ' + d.generation + '</div>' +
+					'<div style="font-size:12px;color:#555">Attack: ' + d.attack + ' · Defense: ' + d.defense + '</div>'
 				);
 		})
 		.on("mousemove", function(event) {
@@ -163,8 +170,11 @@ function drawScatterPlot(data) {
 		.on("mouseout", function() {
 			tooltip.style("opacity", 0);
 		})
-		// click dot to show individual pokemon on radar
+		// click dot to show individual pokemon on radar (only if not filtered out)
 		.on("click", function(event, d) {
+			event.stopPropagation();
+			if (selectedType && d.type1 !== selectedType) return;
+			if (brushedData && brushedData.indexOf(d) === -1) return;
 			selectedPokemon = (selectedPokemon && selectedPokemon.name === d.name) ? null : d;
 			updateRadar(d3.transition().duration(400));
 		});
@@ -271,11 +281,12 @@ function drawBarChart(data) {
 	var innerW = width - margin.left - margin.right;
 	var innerH = height - margin.top - margin.bottom;
 
-	// create svg
+	// create svg (click empty space to reset)
 	var svg = d3.select("#bar-chart")
 		.append("svg")
 		.attr("width", width)
-		.attr("height", height);
+		.attr("height", height)
+		.on("click", function() { resetAll(); });
 
 	// offset group
 	var g = svg.append("g")
@@ -399,6 +410,7 @@ function drawBarChart(data) {
 			})
 			// click to select/deselect type
 			.on("click", function(event, d) {
+				event.stopPropagation();
 				selectedType = (selectedType === d.data.type) ? null : d.data.type;
 				selectedPokemon = null;
 				brushedData = null;
@@ -460,25 +472,33 @@ function drawRadarChart(data) {
 	var width = container.clientWidth;
 	var height = container.clientHeight;
 
-	// create svg
+	// create svg (click empty space to reset)
 	var svg = d3.select("#radar-chart")
 		.append("svg")
 		.attr("width", width)
-		.attr("height", height);
+		.attr("height", height)
+		.on("click", function() { resetAll(); });
 
-	// combined title + dynamic info (single line)
-	var titleG = svg.append("text")
+	// title top-left (two lines: small label + big dynamic name)
+	svg.append("text")
 		.attr("class", "chart-title")
-		.attr("x", width / 2)
+		.attr("x", 12)
 		.attr("y", 20)
-		.attr("text-anchor", "middle");
-
-	titleG.append("tspan").text("Stats - ");
-	titleG.append("tspan")
-		.attr("class", "radar-info")
-		.style("font-weight", "400")
+		.attr("text-anchor", "start")
+		.style("font-size", "13px")
 		.style("fill", "#888")
-		.text("All " + data.length + " Pokemon (average)");
+		.text("Stats");
+
+	// dynamic subtitle (bigger, bold, colored)
+	svg.append("text")
+		.attr("class", "radar-info")
+		.attr("x", 12)
+		.attr("y", 40)
+		.attr("text-anchor", "start")
+		.style("font-size", "17px")
+		.style("font-weight", "700")
+		.style("fill", "steelblue")
+		.text("All " + data.length + " Pokemon");
 
 	// radar config
 	var statKeys = ["hp", "attack", "defense", "spAtk", "spDef", "speed"];
@@ -486,10 +506,11 @@ function drawRadarChart(data) {
 	var numAxes = 6;
 	var angleSlice = (2 * Math.PI) / numAxes;
 
-	// radar dimensions
-	var radius = Math.min(width, height - 60) / 2 - 40;
-	var centerX = width / 2;
-	var centerY = height / 2 + 10;
+	// radar dimensions - shifted to right half
+	var radarSize = Math.min(width * 0.55, height - 30);
+	var radius = radarSize / 2 - 40;
+	var centerX = width * 0.57;
+	var centerY = height / 2 + 5;
 
 	// radial scale
 	var rScale = d3.scaleLinear()
@@ -696,8 +717,10 @@ function updateRadar(t) {
 		.attr("y", function(d, i) { return (rScale(d.value) + 12) * Math.sin(angleSlice * i - Math.PI / 2); })
 		.text(function(d) { return d.value.toFixed(0); });
 
-	// update info text
-	d3.select(".radar-info").text(infoText);
+	// update info text and its color
+	d3.select(".radar-info")
+		.text(infoText)
+		.style("fill", fillColor);
 
 	// sync scatter title with current state
 	var scatterText = "";
@@ -707,4 +730,14 @@ function updateRadar(t) {
 		scatterText = " - " + selectedType;
 	}
 	d3.select(".scatter-info").text(scatterText);
+}
+
+
+// reset all selections back to default
+function resetAll() {
+	selectedType = null;
+	selectedPokemon = null;
+	brushedData = null;
+	if (scatterBrushG && scatterBrush) scatterBrushG.call(scatterBrush.move, null);
+	updateSelection();
 }
