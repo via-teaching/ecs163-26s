@@ -291,15 +291,16 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     "Sp_Def",
     "Speed",
   ];
-	const parallelData = data.map((d) => ({
+	
+  const parallelData = data.map((d) => ({
     Total: parseInt(d.Total),
-		HP: parseInt(d.HP),
-		Attack: parseInt(d.Attack),
-		Defense: parseInt(d.Defense),
-		Sp_Atk: parseInt(d.Sp_Atk),
-		Sp_Def: parseInt(d.Sp_Def),
-		Speed: parseInt(d.Speed),
-		Type_1: d.Type_1,
+    HP: parseInt(d.HP),
+    Attack: parseInt(d.Attack),
+    Defense: parseInt(d.Defense),
+    Sp_Atk: parseInt(d.Sp_Atk),
+    Sp_Def: parseInt(d.Sp_Def),
+    Speed: parseInt(d.Speed),
+    Type_1: d.Type_1,
   }));
 
   // Create the horizontal axis scale for each key
@@ -367,4 +368,39 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
         .attr("stroke-linejoin", "round")
         .attr("stroke", "white"),
     );
+
+  // Create the brush behavior.
+  const deselectedColor = "#c8d7bd";
+  const brushHeight = 50;
+  const brush = d3
+    .brushX()
+    .extent([
+      [margins.left, -(brushHeight / 2)],
+      [margins.left + chartDims.parallel.innerWidth, brushHeight / 2],
+    ])
+    .on("start brush end", brushed);
+
+  axes.call(brush);
+
+  const selections = new Map();
+
+  function brushed({ selection }, key) {
+    if (selection === null) selections.delete(key);
+    else selections.set(key, selection.map(parallelXAxis.get(key).invert));
+    const selected = [];
+    path.each(function (d) {
+      const active = Array.from(selections).every(
+        ([key, [min, max]]) => d[key] >= min && d[key] <= max,
+      );
+      d3.select(this).style(
+        "stroke",
+        active ? typeColors(d.Type_1) : deselectedColor,
+      );
+      if (active) {
+        d3.select(this).raise();
+        selected.push(d);
+      }
+    });
+    parallelSvg.property("value", selected).dispatch("input");
+  }
 });
