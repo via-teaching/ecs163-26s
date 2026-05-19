@@ -1,4 +1,4 @@
-// pokemon visualization dashboard
+// pokémon visualization dashboard
 
 // canonical pokemon type colors
 var typeColorMap = {
