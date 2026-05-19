@@ -63,9 +63,6 @@ const typeColors = d3
   .domain(Object.keys(typeColorDict))
   .range(Object.values(typeColorDict));
 
-// d3.select("#bar-svg")
-//   .style("height", `${chartDims.bar.height}px`)
-//   .style("width", `${chartDims.bar.width}px`);
 d3.select(".left-col")
   .style("height", `${chartDims.parallel.height}px`)
   .style("width", `${chartDims.parallel.width}px`);
@@ -194,7 +191,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
   // .attr("viewbox", "-5 -5 10 10");
 
   const scatterData = data.map((d) => ({
-    Total: d.Total,
+    Total: parseInt(d.Total),
     Catch_Rate: parseInt(d.Catch_Rate),
     Type_1: d.Type_1,
   }));
@@ -273,4 +270,101 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .style("fill-opacity", 0.7)
     .style("stroke", "black")
     .style("stroke-width", 0.8);
+
+  // plot 3: Parallel Coordinates Plot
+  // Source: https://observablehq.com/@d3/brushable-parallel-coordinates?collection=@d3/d3-brush
+
+  // Select the parallel-svg
+  const parallelSvg = d3
+    .selectAll("#parallel-svg")
+    .append("g")
+    .attr("width", chartDims.parallel.width)
+    .attr("height", chartDims.parallel.height);
+
+  // All relevant keys for the chart
+  const keys = [
+    "Total",
+    "HP",
+    "Attack",
+    "Defense",
+    "Sp_Atk",
+    "Sp_Def",
+    "Speed",
+  ];
+	const parallelData = data.map((d) => ({
+    Total: parseInt(d.Total),
+		HP: parseInt(d.HP),
+		Attack: parseInt(d.Attack),
+		Defense: parseInt(d.Defense),
+		Sp_Atk: parseInt(d.Sp_Atk),
+		Sp_Def: parseInt(d.Sp_Def),
+		Speed: parseInt(d.Speed),
+		Type_1: d.Type_1,
+  }));
+
+  // Create the horizontal axis scale for each key
+  const parallelXAxis = new Map(
+    Array.from(keys, (key) => [
+      key,
+      d3.scaleLinear(
+        d3.extent(parallelData, (d) => d[key]),
+        [margins.left, margins.left + chartDims.parallel.innerWidth],
+      ),
+    ]),
+  );
+
+  // Create the vertical scale
+  const parallelYAxis = d3.scalePoint(keys, [
+    margins.top + keyHeight,
+    chartDims.parallel.height - margins.bottom,
+  ]);
+
+  //Create the lines
+  const line = d3
+    .line()
+    .defined(([, value]) => value != null)
+    .x(([key, value]) => parallelXAxis.get(key)(value))
+    .y(([key]) => parallelYAxis(key));
+
+  const path = parallelSvg
+    .append("g")
+    .attr("fill", "none")
+    .attr("stroke-width", 1.5)
+    .attr("stroke-opacity", 0.4)
+    .selectAll("path")
+    .data(parallelData)
+    .join("path")
+    .attr("stroke", (d) => typeColors(d.Type_1))
+    .attr("d", (d) => line(d3.cross(keys, [d], (key, d) => [key, d[key]])))
+    .call((path) => path.append("title").text((d) => d.name));
+
+  // Append the axis for each key.
+  const axes = parallelSvg
+    .append("g")
+    .selectAll("g")
+    .data(keys)
+    .join("g")
+    .attr("transform", (d) => `translate(0,${parallelYAxis(d)})`)
+    .each(function (d) {
+      d3.select(this).call(d3.axisBottom(parallelXAxis.get(d)));
+    })
+    .call((g) =>
+      g
+        .append("text")
+        .attr("x", margins.left)
+        .attr("y", -6)
+        .attr("text-anchor", "start")
+        .attr("fill", "currentColor")
+        .text((d) => d),
+    )
+    .call((g) =>
+      g
+        .selectAll("text")
+        .clone(true)
+        .lower()
+        .attr("fill", "none")
+        .attr("stroke-width", 5)
+        .attr("stroke-linejoin", "round")
+        .attr("stroke", "white"),
+    );
 });
