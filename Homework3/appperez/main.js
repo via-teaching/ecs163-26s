@@ -31,6 +31,23 @@ let pieMargin = { top: 20, right: 20, bottom: 20, left: 20 },
 d3.csv("data/fitness_data.csv").then((rawData) => {
   const svg = d3.select("svg").attr("font-family", "sans-serif");
 
+  const questionToAlias = new Map([
+    ["Has using a fitness wearable influenced your decision? [To exercise more?]", "Did wearable influenced person to exercise?"],
+    [ "Do you think that the fitness wearable has made exercising more enjoyable?", "Was the exercise more enjoyable?"],
+    ["How often do you exercise in a week?", "Exercise weekly frequency."],
+    ["Do you feel that the fitness wearable has improved your overall well-being?", "Impact on well-being."]
+  ])
+
+  // Inverting the map made above
+  const aliasToQuestion = (() => {
+    let map = new Map()
+    for ([k, v] of questionToAlias) {
+      map.set(v, k)
+    }
+
+    return map
+  }) ()
+
   // used to show information when hovering over things
   const tooltip = d3.select("body")
   .append("div")
@@ -85,14 +102,20 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
         "Do you think that the fitness wearable has made exercising more enjoyable?"
       ];
     processed_datum["Exercise weekly frequency."] =
-      "Exercises " + d["How often do you exercise in a week?"].toLowerCase();
+      "Exercises: " + d["How often do you exercise in a week?"];
 
+    processed_datum["Impact on well-being."] = 
+    "Improved Wellbeing: " +
+    d[
+      "Do you feel that the fitness wearable has improved your overall well-being?"
+    ]
     return processed_datum;
   }); // These are the columns that we are focusing on for the sankey
   filteredData["columns"] = [
     "Did wearable influenced person to exercise?",
     "Was the exercise more enjoyable?",
     "Exercise weekly frequency.",
+    "Impact on well-being."
   ];
 
   // Docs used for learning to how to create the diagram: https://observablehq.com/@d3/parallel-sets
@@ -157,7 +180,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
   const color = d3
     .scaleOrdinal()
     .domain(filteredData.columns)
-    .range(["#5fc067", "#9ae885", "#c3d6a6"]);
+    .range([ "#c3d6a6", "#5fc067", "#9ae885"]);
 
   // The actual creating of the sankey diagram
   const sankey = d3
@@ -169,13 +192,27 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
         b.columnName == "Exercise weekly frequency."
       ) {
         const orderMap = {
-          "Exercises 5 or more times a week": 1,
-          "Exercises 3-4 times a week": 2,
-          "Exercises 1-2 times a week": 3,
-          "Exercises less than once a week": 4,
+          "Exercises: 5 or more times a week": 1,
+          "Exercises: 3-4 times a week": 2,
+          "Exercises: 1-2 times a week": 3,
+          "Exercises: Less than once a week": 4,
         };
         return orderMap[a.name] - orderMap[b.name];
       }
+
+      if (
+        a.columnName == "Impact on well-being." &&
+        b.columnName == "Impact on well-being."
+      ) {
+        const orderMap = {
+          "Improved Wellbeing: Strongly agree": 1,
+          "Improved Wellbeing: Agree": 2,
+          "Improved Wellbeing: Neutral": 3,
+          "Improved Wellbeing: Disagree": 4,
+        };
+        return orderMap[a.name] - orderMap[b.name];
+      }
+
     })
     .linkSort(null)
     .nodeWidth(4)
@@ -249,19 +286,11 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
     .selectAll("g")
     .data(links)
     .join("path")
-    .on("mouseover", function(event, d) {
-      const [x, y] = d3.pointer(event)
-      d3.select(this).style("stroke-opacity", 0.7)
-      tooltip
-      .html(`${d.names.join(" → ")}\n${d.value.toLocaleString()}/30`)
-      .style("visibility", "visible")
-      .style("left", (x + 30) + "px")
-      .style("top", y + "px")
-    })
     .on("mousemove", function(event, d) {
       const [x, y] = d3.pointer(event)
       d3.select(this).style("stroke-opacity", 0.7)
       tooltip
+      .html(`${d.names.join(" → ")}\n(${d.value.toLocaleString()}/30)`)
       .style("visibility", "visible")
       .style("left", (x + 30) + "px")
       .style("top", y + "px")
@@ -272,18 +301,41 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       tooltip
       .style("visibility", "hidden")
     })
+    .transition()
+    .duration(5000)
+    .ease(d3.easeLinear)
+    .attrTween("stroke-dasharray", function() {
+      const length = this.getTotalLength();
+      return d3.interpolate(`0,${length}`, `${length},${length}`);
+    })
     .attr("d", d3.sankeyLinkHorizontal())
     .attr("stroke", (d) => color(d.names[0]))
     .attr("stroke-width", (d) => d.width)
     .style("mix-blend-mode", "multiply")
-    .append("title")
-    .text((d) => `${d.names.join(" → ")}\n(${d.value.toLocaleString()})`);
 
   // The titles inside the streams
   g1.append("g")
     .selectAll("text")
     .data(nodes)
     .join("text")
+    .on("mouseover", function(event, d) {
+      let pieColumnFilter = aliasToQuestion.get(d.columnName)
+      let pieColumnResponse = d.name.split(":")[1].trim()
+      updatePie(pieColumnFilter, pieColumnResponse)
+    })
+    .on("mousemove", function(event, d) {
+      const [x, y] = d3.pointer(event)
+      d3.select(this).style("fill", "blue")
+      tooltip
+      .html(`${d.columnName}`)
+      .style("visibility", "visible")
+      .style("left", (x + 30) + "px")
+      .style("top", y + "px")
+    })
+    .on("mouseout", function(event, d) {
+      d3.select(this).style("fill", "black")
+      tooltip.style("visibility", "hidden")
+    })
     .attr("x", (d) => (d.x0 < sankeyWidth / 2 ? d.x1 + 6 : d.x0 - 6))
     .attr("y", (d) => (d.y1 + d.y0) / 2)
     .attr("font-size", sankeyWidth < 800 ? 6 : 12)
@@ -438,110 +490,169 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
     .attr("font-size", 12)
     .attr("font-weight", "bold")
     .text("How frequently respondents used their wearables");
-  
-  // Title of y axis
-  svg
+    
+    // Title of y axis
+    svg
     .append("text")
     .attr("text-anchor", "middle")
     .attr("font-size", 12)
     .attr("font-weight", "bold")
     .attr("transform", `translate(${stackedBarMargin.left/2}, ${stackedBarTop + stackedBarHeight/2 - stackedBarMargin.bottom}) rotate(-90)`)
     .text("Number of people ");
+    
+    // At last, add a pie chart
+  const pieKeys = ["Male", "Female", "Prefer not to say"]
+  const pieColor = d3
+    .scaleOrdinal()
+    .domain(keys)
+    .range([ "#2986cc", "#c90076", "#cccccc"]);
 
-  // At last, add a pie chart
-  const pieData = (() => {
-    // we are going to look at what proportions of users who agree or strongly agreed
-    // wearables influenced a change in diet, also said wearables influenced decision to exercise
-    const processed_data = {};
-    const filteredData = rawData.filter((d) => {
-      let response =
-        d[
-          "Has using a fitness wearable influenced your decision? [To change your diet?]"
-        ];
-      return response == "Agree" || response == "Strongly agree";
-    });
-
-    let responseCounts = new Map([
-      ["Agree", 0],
-      ["Strongly agree", 0],
-      ["Neutral", 0],
-    ]);
-
-    filteredData.forEach((d) => {
-      let influence =
-        d[
-          "Has using a fitness wearable influenced your decision? [To exercise more?]"
-        ];
-      responseCounts.set(influence, responseCounts.get(influence) + 1);
-    });
-
-    for (const [k, v] of responseCounts) {
-      processed_data[k] = v;
-    }
-    return processed_data;
-  })();
-
-  const dataPrepper = d3.pie().value((d) => d[1]);
-  const piePreppedData = dataPrepper(Object.entries(pieData));
-
-  // The canvas where the pie chart will be painted
   const svg2 = svg
-    .append("svg")
-    .attr("x", pieLeft)
-    .attr("y", pieTop)
-    .attr("height", pieHeight)
-    .attr("width", pieWidth);
+  .append("svg")
+  .attr("x", pieLeft)
+  .attr("y", pieTop)
+  .attr("height", pieHeight)
+  .attr("width", pieWidth);
 
-  const radius = Math.min(pieWidth, pieHeight) / 4;
-  const arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
+  const radius = Math.min(pieWidth, pieHeight) / 3;
 
   const pieGroup = svg2
     .append("g")
-    .attr("transform", `translate(${pieWidth / 2}, ${pieHeight / 2})`);
+    .attr("transform", `translate(${pieWidth / 2}, ${pieHeight / 2 + pieMargin.top})`);
+      
+  const titleFO = svg2
+    .append("foreignObject")
+    .attr("width", pieWidth)
+    .attr("height", 70)
+    .attr("x", 0)
+    .attr("y", 0)
+    .append("xhtml:div")
+    .style("font-weight", "bold")
+    .style("text-anchor", "middle")
+    .style("font-size", width > 1000 ? 11 : 9);
 
-  // The actual slices of data
-  pieGroup
-    .selectAll("slices")
-    .data(piePreppedData)
-    .join("path")
-    .attr("d", arcGenerator)
-    .attr("fill", (d) => color(d.data[0]));
+  // Adding in the legend
+  svg2.selectAll("mydots")
+  .data(pieKeys)
+  .enter()
+  .append("circle")
+    .attr("cx", 90)
+    .attr("cy", function(d,i){ return pieHeight/2 + i*25}) 
+    .attr("r", 7)
+    .style("fill", function(d){ return pieColor(d)})
 
-  // The titles for each of the slices of data
-  pieGroup
-    .selectAll("slices")
-    .data(piePreppedData)
-    .join("text")
-    .text((d) =>  d.data[0])
-    .attr("transform", (d) => {
-      const mid = (d.startAngle + d.endAngle) / 2 - Math.PI/2;
-      const r = radius;// outer radius
-      return `translate(${Math.cos(mid) * r}, ${Math.sin(mid) * r})`
-    })
-    .attr("text-anchor", "middle")
-    .attr("font-size", radius > 50 ? 14 : 8);
-  
-  // Top title
-  svg2
+// Add one dot in the legend for each name.
+  svg2.selectAll("mylabels")
+    .data(pieKeys)
+    .enter()
     .append("text")
-    .attr("x", pieWidth / 2)
-    .attr("y", 30)
-    .attr("font-weight", "bold")
-    .attr("text-anchor", "middle")
-    .attr("font-size", width > 1000 ? 11 : 9)
-    .text(
-      "From users who also agreed, or strongly agreed the wearable influence diet habits...",
-    );
+      .attr("x", 100)
+      .attr("y", function(d,i){ return pieHeight/2 + i*25}) 
+      .style("fill", function(d){ return pieColor(d)})
+      .text(function(d){ return d})
+      .attr("text-anchor", "left")
+      .style("alignment-baseline", "middle")
+
+  function updatePie(columnFilter, columnResponse) {
+    const arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
+
+    const pieData = (() => {
+      // we are going to look at what proportions of users who agree or strongly agreed
+      // wearables influenced a change in diet, also said wearables influenced decision to exercise
+      const processed_data = {};
+      const filteredData = rawData.filter((d) => {
+        let response =
+          d[
+            columnFilter
+          ];
+        return response == columnResponse;
+      });
   
-  // Bottom title
-  svg2
-    .append("text")
-    .attr("x", pieWidth / 2)
-    .attr("y", pieHeight - pieMargin.bottom * 2)
-    .attr("font-weight", "bold")
-    .attr("text-anchor", "middle")
-    .attr("font-size", width > 1000 ? 11 : 9)
-    .text("over 50% also agreed it influenced their decision to exercise!");
+      let responseCounts = new Map([
+        ["Male", 0],
+        ["Female", 0],
+        ["Prefer not to say", 0],
+      ]);
+  
+      filteredData.forEach((d) => {
+        let influence =
+          d[
+            "What is your gender?"
+          ];
+        responseCounts.set(influence, responseCounts.get(influence) + 1);
+      });
+  
+      for (const [k, v] of responseCounts) {
+        processed_data[k] = v;
+      }
+      return processed_data;
+    })();
+
+    const total = Object.values(pieData).reduce(((total, num) => total + num), 0)
+    
+    const dataPrepper = d3.pie().
+    value((d) => d[1])
+    .sort(function(a, b) { return d3.ascending(a.key, b.key);} )
+    const piePreppedData = dataPrepper(Object.entries(pieData));
+
+    // The actual slices of data
+    const slices = pieGroup.selectAll("path")
+      .data(piePreppedData);
+
+    slices
+      .join("path")
+      .on("mousemove", function(event, d) {
+        const [x, y] = d3.pointer(event)
+        d3.select(this).style("fill-opacity", 0.7)
+        tooltip
+        .style("visibility", "visible")
+        .html(`${d.value}/${total} (${(d.value/30 * 100).toFixed(2)}%)`)
+        .style("left", (x + pieLeft + pieWidth/2 + 10) + "px")
+        .style("top", (y + pieTop + pieHeight/2 - 30) + "px")
+
+      })
+      .on("mouseout", function(event, d) {
+        d3.select(this).style("fill-opacity", 1)
+        tooltip
+        .style("visibility", "hidden")
+      })
+      .transition()
+      .duration(1000)
+      // Implementation came from https://stackoverflow.com/questions/78210697/d3-js-error-transition-arc-path-attribute-d-expected-arc-flag-0-or-1
+      .attrTween("d", function(d) {
+        const i = d3.interpolate(this._current || d, d);
+        this._current = i(1);
+        return t => arcGenerator(i(t));
+      })
+      .attr("fill", (d) => pieColor(d.data[0]))
+      .attr("stroke", "white")
+      .style("stroke-width", "5px")
+      .style("opacity", 1);
+  
+    // The titles for each of the slices of data
+    pieGroup
+      .selectAll("text")
+      .data(piePreppedData)
+      .join("text")
+      .transition()
+      .duration(1000)
+      .text((d) => d.value == 0 ? "" : d.data[0])
+      .attr("transform", (d) => {
+        const mid = (d.startAngle + d.endAngle) / 2 - Math.PI/2;
+        const r = radius * 0.7;// outer radius
+        return `translate(${Math.cos(mid) * r}, ${Math.sin(mid) * r})`
+      })
+      .attr("text-anchor", "middle")
+      .attr("font-size", radius > 50 ? 14 : 8);
+  
+    // Top title
+    titleFO.html(
+        "Gender Distribution for those who answered: \"" + columnFilter + "\" with \"" + columnResponse + "\""
+      ); // Width restriction;
+  }
+
+  updatePie("Has using a fitness wearable influenced your decision? [To change your diet?]", "Strongly agree")
+
 
   // Add the legend (used by all the charts)
   const legendKeys = [
