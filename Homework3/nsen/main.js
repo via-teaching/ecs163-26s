@@ -166,6 +166,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .selectAll("rect")
     .data(barData)
     .join("rect")
+		.attr("class", "bars")
     .attr("x", (d) => barX1(d.Type_1))
     .attr("y", (d) => barY1(d.freq))
     .attr("width", barX1.bandwidth())
@@ -267,7 +268,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .attr("cy", (d) => scatterY1(d.Catch_Rate))
     .attr("r", (d) => r)
     .style("fill", (d) => typeColors(d.Type_1))
-    .style("fill-opacity", 0.7)
+    .style("fill-opacity", 0.9)
     .style("stroke", "black")
     .style("stroke-width", 0.8);
 
@@ -291,7 +292,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     "Sp_Def",
     "Speed",
   ];
-	
+
   const parallelData = data.map((d) => ({
     Total: parseInt(d.Total),
     HP: parseInt(d.HP),
@@ -403,4 +404,29 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     });
     parallelSvg.property("value", selected).dispatch("input");
   }
+
+	// Create type filtering behavior
+	const activeCategories = new Set(Object.keys(typeColorDict));
+
+	const bars = barSvg
+		.selectAll(".bars")
+		.on("click", function (event, d) {
+			console.log("event", event, "d", d)
+			if (activeCategories.has(d.Type_1)) {
+				activeCategories.delete(d.Type_1);
+				d3.select(this).style("opacity", 0.3);
+			} else {
+				activeCategories.add(d.Type_1);
+				d3.select(this).style("opacity", 1);
+			}
+			scatterSelect(d.Type_1)
+	})
+
+	function scatterSelect(type) {
+		const dots = scatterSvg
+			.selectAll(".mark-circle")
+			.style("fill-opacity", (d) => activeCategories.has(d.Type_1) ? 0.9 : 0)
+			.style("stroke-width", (d) => activeCategories.has(d.Type_1) ? 0.8 : 0)
+			console.log("dots", dots)
+	}
 });
