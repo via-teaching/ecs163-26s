@@ -127,7 +127,6 @@ svg {
 }
 
 .cell-count {
-  fill: var(--ink);
   font-size: 11px;
   font-weight: 600;
   pointer-events: none;

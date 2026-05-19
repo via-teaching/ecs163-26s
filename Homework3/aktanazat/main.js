@@ -412,10 +412,12 @@ function buildHeatmap() {
       .ease(d3.easeCubicInOut)
       .attr("fill", d => heatColor(counts[`${d.cat}|${d.skin}`]));
 
-    // Labels count up/down to the new value over the same window.
+    // Labels count up/down to the new value and flip to white on dark cells
+    // so high counts stay legible against the deep end of the ramp.
     cellText.transition()
       .duration(650)
       .ease(d3.easeCubicInOut)
+      .style("fill", d => counts[`${d.cat}|${d.skin}`] / maxCount > 0.55 ? "#ffffff" : "#111111")
       .tween("text", function (d) {
         const node = this;
         const start = +node.textContent || 0;
