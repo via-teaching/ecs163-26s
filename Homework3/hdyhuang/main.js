@@ -34,19 +34,16 @@ d3.csv("data/pokemon_alopez247.csv").then(function(rawData) {
 	// parse numeric fields
 	var data = rawData.map(function(d, i) {
 		return {
-			index: i,
 			name: d.Name,
 			type1: d.Type_1,
 			type2: d.Type_2 || "",
-			total: +d.Total,
 			hp: +d.HP,
 			attack: +d.Attack,
 			defense: +d.Defense,
 			spAtk: +d.Sp_Atk,
 			spDef: +d.Sp_Def,
 			speed: +d.Speed,
-			generation: +d.Generation,
-			isLegendary: d.isLegendary === "True"
+			generation: +d.Generation
 		};
 	});
 
@@ -503,8 +500,7 @@ function drawRadarChart(data) {
 	// radar config
 	var statKeys = ["hp", "attack", "defense", "spAtk", "spDef", "speed"];
 	var statLabels = ["HP", "Attack", "Defense", "Sp Atk", "Sp Def", "Speed"];
-	var numAxes = 6;
-	var angleSlice = (2 * Math.PI) / numAxes;
+	var angleSlice = (2 * Math.PI) / statKeys.length;
 
 	// radar dimensions - shifted to right half
 	var radarSize = Math.min(width * 0.55, height - 30);
@@ -612,10 +608,7 @@ function drawRadarChart(data) {
 		radarLine: radarLine,
 		rScale: rScale,
 		angleSlice: angleSlice,
-		statKeys: statKeys,
-		svg: svg,
-		centerX: centerX,
-		height: height
+		statKeys: statKeys
 	};
 }
 
@@ -643,10 +636,6 @@ function updateSelection() {
 			if (!selectedType) return 1;
 			return d.data.type === selectedType ? 1 : 0.2;
 		});
-
-	// update scatter title info
-	var scatterText = selectedType ? " - " + selectedType : "";
-	d3.select(".scatter-info").text(scatterText);
 
 	// radar chart: update polygon to selected type
 	updateRadar(t);
