@@ -34,7 +34,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
   const questionToAlias = new Map([
     [
       "Has using a fitness wearable influenced your decision? [To exercise more?]",
-      "Did wearable influenced person to exercise?",
+      "Did wearable influence person to exercise?",
     ],
     [
       "Do you think that the fitness wearable has made exercising more enjoyable?",
@@ -57,7 +57,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
     return map;
   })();
 
-  // used to show information when hovering over things
+  // used to show information when hovering over things, will be made hidden on mouseout and visible on mouseover
   const tooltip = d3
     .select("body")
     .append("div")
@@ -80,6 +80,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
 
     .attr("width", width);
 
+  // Title for the sankey
   const title = svg
     .append("text")
     .attr("x", width / 2)
@@ -89,6 +90,16 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
     .attr("font-weight", 900)
     .text("How has fitness wearables influenced these 30 people?");
 
+  // A little hint so people know that they can double click
+  const note = svg
+    .append("text")
+    .attr("x", sankeyLeft + sankeyMargin.left)
+    .attr("y", height / 2 + sankeyMargin.bottom + 25)
+    .attr("text-anchor", "start")
+    .attr("font-size", width > 1200 ? 11 : 7)
+    .text("*Double click on the sankey streams to zoom in!");
+
+  // The container for the sankey diagram
   const g1 = svg
     .append("g")
     .attr("width", sankeyWidth + sankeyMargin.left + sankeyMargin.right)
@@ -98,7 +109,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
   // Sankey data
   const filteredData = rawData.map((d) => {
     processed_datum = {};
-    processed_datum["Did wearable influenced person to exercise?"] =
+    processed_datum["Did wearable influence person to exercise?"] =
       "Influence more exercise: " +
       d[
         "Has using a fitness wearable influenced your decision? [To exercise more?]"
@@ -121,7 +132,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
 
   // Removing from here will allow us to achieve a "zoom in" effect with the sankey
   const sankeyDefaultColumns = [
-    "Did wearable influenced person to exercise?",
+    "Did wearable influence person to exercise?",
     "Was the exercise more enjoyable?",
     "Exercise weekly frequency.",
     "Impact on well-being.",
@@ -160,7 +171,8 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       "#cad1c0",
     ]);
 
-  let zoomedIn = false;
+  // Everything from before has to be in this function so that we can have animation
+  zoomedIn = false;
   function updateSankey(columns) {
     // A sankey diagram needs a graph
     // The overall sankey diagram should have the following flow
@@ -289,17 +301,22 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       return data;
     })();
 
+    // Title for the node categories (appears under the black lines)
     g1.selectAll("text.col-title")
       .data(colTitleData, (d) => d.columnName)
       .join("text")
-      .on("mouseover", function(event, d) {
-        let question = aliasToQuestion.get(d.columnName)
-        console.log(question)
-        updateStackedBar(question)
+      // Some interaction so people know they are hovering over a title
+      .on("mouseover", function (event, d) {
+        let question = aliasToQuestion.get(d.columnName);
+        d3.select(this).attr("fill", "blue");
+        updateStackedBar(question);
+      })
+      .on("mouseout", function (event, d) {
+        d3.select(this).attr("fill", "black");
       })
       .attr("class", "col-title")
       .attr("x", (d) => d.x0)
-      .attr("y", sankeyHeight + 5)
+      .attr("y", sankeyHeight + 10)
       .attr("text-anchor", (d, i) => {
         if (i == 0) {
           return "start";
@@ -313,6 +330,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       .attr("font-weight", "bold")
       .text((d) => d.columnName);
 
+    // Each node which comes out of the black bars
     g1.selectAll("rect.node")
       .data(nodes, (d) => d.name)
       .join("rect")
@@ -332,11 +350,13 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
         else t.text(`User\n(${d.value.toLocaleString()})`);
       });
 
+    // The streams
     g1.selectAll("path.link")
       .data(links, (d) => `${d.source.name}→${d.target.name}`)
       .join("path")
       .attr("class", "link")
       .attr("fill", "none")
+      // Some interaction so people know they are hovering over a title
       .on("mousemove", function (event, d) {
         const [x, y] = d3.pointer(event);
         d3.select(this).style("stroke-opacity", 0.7);
@@ -350,6 +370,9 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
         d3.select(this).style("stroke-opacity", 1);
         tooltip.style("visibility", "hidden");
       })
+      // This creates our "zoom in effect"
+      // Originally this was attempted using d3 zoom but the "camera" would always cut something off so
+      // I found this work around to be the best
       .on("dblclick", function (event, d) {
         if (zoomedIn) {
           updateSankey(sankeyDefaultColumns);
@@ -371,6 +394,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       .data(nodes, (d) => d.name)
       .join("text")
       .attr("class", "node-label")
+      // More interaction for the titles inside the sankey diagram
       .on("mouseover", function (event, d) {
         let pieColumnFilter = aliasToQuestion.get(d.columnName);
         let pieColumnResponse = d.name.split(":")[1].trim();
@@ -396,13 +420,14 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       .attr("text-anchor", (d) => (d.x0 < sankeyWidth / 2 ? "start" : "end"))
       .text((d) => `${d.name} (${d.value.toLocaleString()})`);
 
-    // Now for the legend
-    // Add the legend (used by all the charts)
+    // Now for the legend, this is has to change to reflect any changes made to the sankey diagram
+    // when the user is interacting with it
     const legendKeys = [...new Set(filteredData.map((d) => d[columns[0]]))];
     const legendX = sankeyLeft + 200;
     const legendY = 15;
     let size = 20;
 
+    // Legend for the sankey diagram which appears on the top of the page
     const legend = svg
       .selectAll("g.legend")
       .data([null])
@@ -441,20 +466,21 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       .style("alignment-baseline", "middle");
   }
 
+  // This is what the user will see on load
   updateSankey(sankeyDefaultColumns);
 
   // Stacked bar chart
   // Help from: https://observablehq.com/@d3/stacked-bar-chart/2
-  
+  // The default question the user will see when loading up the website
   const question =
     "Do you feel that the fitness wearable has improved your overall well-being?";
   function updateStackedBar(question) {
-    
+    // Filtering out the data based on the specific question given
     const stackedBarData = (() => {
       processed_datum = {};
       responsesCounts = new d3.InternMap([], JSON.stringify);
       processed_data = [];
-  
+
       // make all possible combinations
       const questionResponses = new Set();
       const ageFrequencies = new Set();
@@ -464,13 +490,13 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
         questionResponses.add(response);
         ageFrequencies.add(ageFrequency);
       });
-  
+
       for (const response of questionResponses) {
         for (const ageFrequency of ageFrequencies) {
           responsesCounts.set([ageFrequency, response], 0);
         }
       }
-  
+
       rawData.forEach((d) => {
         const response = d[question];
         const ageFrequency = d["What is your age?"];
@@ -478,49 +504,61 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
         key = [ageFrequency, response];
         responsesCounts.set(key, responsesCounts.get(key) + 1);
       });
-  
+
       for (const [k, v] of responsesCounts) {
         processed_data.push({ response: k[1], ageFrequency: k[0], count: v });
       }
-  
+
       return processed_data;
     })();
-  
+
     // will be used by the stack function to access the data
     const indexMap = d3.index(
       stackedBarData,
       (d) => d.response,
       (d) => d.ageFrequency,
     );
-  
-    // The "categories mentioned earlier"
+
     const responses = d3.union(stackedBarData.map((d) => d.response));
-    const ageGroup = d3.union(stackedBarData.map((d) => d.ageFrequency));
-  
+    // Age group is going to be static
+    const ageGroup = ["Under 18", "18-24", "25-34", "35-44", "45-54", "55-64"];
+
+    // Used to make the stacked bars
     const series = d3
       .stack()
-      .keys(["Under 18", "18-24", "25-34", "35-44", "45-54", "55-64"])
+      .keys(ageGroup)
       .value(([, D], key) => (D.get(key) && D.get(key).count) || 0)(indexMap);
-  
+
+    // Used to color code the stacked bars
     const stackedBarColor = d3
       .scaleOrdinal()
-      .domain(["Under 18", "18-24", "25-34", "35-44", "45-54", "55-64"])
-      .range(["#BCD2E8", "#91BAD6", "#73A5C6", "#528AAE", "#2E5984", "#1E3F66"]);
+      .domain(ageGroup)
+      .range([
+        "#BCD2E8",
+        "#91BAD6",
+        "#73A5C6",
+        "#528AAE",
+        "#2E5984",
+        "#1E3F66",
+      ]);
 
+    // This will be used for ordering
+    // Ex strongly agree should come before agree which comes before neutral...
     const stackedBarOrderMap = {
-            "5 or more times a week": 1,
-            "3-4 times a week": 2,
-            "1-2 times a week": 3,
-            "Less than once a week": 4,
-            "Strongly agree": 1,
-            "Agree": 2,
-            "Neutral": 3,
-            "Disagree": 4,
-          };
+      "5 or more times a week": 1,
+      "3-4 times a week": 2,
+      "1-2 times a week": 3,
+      "Less than once a week": 4,
+      "Strongly agree": 1,
+      Agree: 2,
+      Neutral: 3,
+      Disagree: 4,
+    };
 
+    const sortedResponses = [...responses].sort((a, b) => {
+      return stackedBarOrderMap[a] - stackedBarOrderMap[b];
+    });
 
-    const sortedResponses = [...responses].sort((a, b) => { return stackedBarOrderMap[a] - stackedBarOrderMap[b]})
-  
     // Again, order the data so that the story makes more sense
     // Creating the X-axis boundaries in the svg
     const x = d3
@@ -531,16 +569,16 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
         stackedBarWidth - stackedBarMargin.right - 60,
       ])
       .padding(0.1);
-  
+
     // Creating the Y-axis boundaries in the svg
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(series, (d) => d3.max(d, (d) => d[1])) + 1])
+      .domain([0, 16])
       .rangeRound([
         stackedBarHeight * 2 - stackedBarMargin.bottom,
         stackedBarTop,
       ]);
-  
+
     // Adding in the bars
     svg
       .selectAll("g.bars")
@@ -551,28 +589,28 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       .selectAll("rect")
       .data((D) => D.map((d) => ((d.key = D.key), d)))
       .join("rect")
-      .on("mousemove", function(event, d) {
+      .on("mousemove", function (event, d) {
         const [x, y] = d3.pointer(event);
         d3.select(this).style("fill-opacity", 0.7);
         tooltip
           .style("visibility", "visible")
           .html(
-            `Response: ${d.data[0]}\n${d.key}<br>Count: ${d.data[1].get(d.key).count}`
+            `Response: ${d.data[0]}\n${d.key}<br>Count: ${d.data[1].get(d.key).count}`,
           )
-          .style("left", (x + 10) + "px")
-          .style("top", (y - 40 )+ "px");
+          .style("left", x + 10 + "px")
+          .style("top", y - 40 + "px");
       })
-      .on("mouseout", function(event, d) {
+      .on("mouseout", function (event, d) {
         d3.select(this).style("fill-opacity", 1);
-        tooltip.style("visibility", "hidden")
+        tooltip.style("visibility", "hidden");
       })
       .transition()
       .duration(600)
       .attr("x", (d) => x(d.data[0]))
       .attr("y", (d) => y(d[1]))
       .attr("height", (d) => y(d[0]) - y(d[1]))
-      .attr("width", x.bandwidth())
-      
+      .attr("width", x.bandwidth());
+
     // Line for the X-axis
     svg
       .selectAll("g.stacked-bar-x-axis-line")
@@ -584,7 +622,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
         `translate(0,${stackedBarHeight * 2 - stackedBarMargin.bottom})`,
       )
       .call(d3.axisBottom(x).tickSizeOuter(0));
-  
+
     // Line of the Y-axis
     svg
       .selectAll("g.stacked-bar-y-axis-line")
@@ -593,12 +631,24 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       .attr("class", "stacked-bar-y-axis-line")
       .attr("transform", `translate(${stackedBarMargin.left + 3}, 0)`)
       .call(d3.axisLeft(y).ticks(null, "s"));
-  
+
     // Title for stack bar plot
     svg
       .selectAll("text.stacked-bar-title")
       .data([null])
       .join("text")
+      // Interaction for the title
+      .on("mousemove", function (event, d) {
+        const [x, y] = d3.pointer(event);
+        tooltip
+          .style("visibility", "visible")
+          .html(`Hover over the node categories and see how this changes!`)
+          .style("left", x + 10 + "px")
+          .style("top", y - 40 + "px");
+      })
+      .on("mouseout", function (event, d) {
+        tooltip.style("visibility", "hidden");
+      })
       .attr("class", "stacked-bar-title")
       .attr("x", stackedBarWidth / 2)
       .attr("y", height / 2 + titleBarHeight * 2)
@@ -606,7 +656,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       .attr("font-size", width > 1100 ? 16 : 12)
       .attr("font-weight", "bold")
       .text("Age Distribution");
-  
+
     // Title of x axis
     svg
       .selectAll("text.stacked-bar-x-axis-title")
@@ -619,6 +669,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       .attr("font-size", 12)
       .attr("font-weight", "bold")
       .text(`Responses for "${questionToAlias.get(question)}"`);
+
     // Title of y axis
     svg
       .selectAll("text.stacked-bar-y-axis-title")
@@ -633,53 +684,56 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
         `translate(${stackedBarMargin.left / 2}, ${stackedBarTop + stackedBarHeight / 2 - stackedBarMargin.bottom}) rotate(-90)`,
       )
       .text("Number of responses");
-    
-      // at last the legend
-      // Adding in the legend
-  svg
-    .selectAll("mydots")
-    .data(ageGroup)
-    .enter()
-    .append("circle")
-    .attr("cx", stackedBarWidth - 100)
-    .attr("cy", function (d, i) {
-      return stackedBarTop + 50 + i * 25;
-    })
-    .attr("r", 5)
-    .style("fill", function (d) {
-      return stackedBarColor(d);
-    });
 
-  // Add one dot in the legend for each name.
-  svg
-    .selectAll("mylabels")
-    .data(ageGroup)
-    .enter()
-    .append("text")
-    .attr("x", stackedBarWidth  - 90)
-    .attr("y", function (d, i) {
-      return stackedBarTop + 50 + i * 25;
-    })
-    .style("fill", function (d) {
-      return stackedBarColor(d);
-    })
-    .text(function (d) {
-      return d;
-    })
-    .attr("text-anchor", "start")
-    .style("alignment-baseline", "middle")
-    .style("font-size", "16px");
+    // at last the legend
+    // Adding in the legend
+    svg
+      .selectAll("mydots")
+      .data(ageGroup)
+      .enter()
+      .append("circle")
+      .attr("cx", stackedBarWidth - 100)
+      .attr("cy", function (d, i) {
+        return stackedBarTop + 50 + i * 25;
+      })
+      .attr("r", 5)
+      .style("fill", function (d) {
+        return stackedBarColor(d);
+      });
+
+    // Add one dot in the legend for each name.
+    svg
+      .selectAll("mylabels")
+      .data(ageGroup)
+      .enter()
+      .append("text")
+      .attr("x", stackedBarWidth - 90)
+      .attr("y", function (d, i) {
+        return stackedBarTop + 50 + i * 25;
+      })
+      .style("fill", function (d) {
+        return stackedBarColor(d);
+      })
+      .text(function (d) {
+        return d;
+      })
+      .attr("text-anchor", "start")
+      .style("alignment-baseline", "middle")
+      .style("font-size", "16px");
   }
 
-  updateStackedBar(question)
+  updateStackedBar(question);
 
   // At last, add a pie chart
+
+  // Keys and color codings
   const pieKeys = ["Male", "Female", "Prefer not to say"];
   const pieColor = d3
     .scaleOrdinal()
     .domain(pieKeys)
     .range(["#2986cc", "#c90076", "#cccccc"]);
 
+  // Container for the pie chart
   const svg2 = svg
     .append("svg")
     .attr("x", pieLeft)
@@ -689,6 +743,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
 
   const radius = Math.min(pieWidth, pieHeight) / 3;
 
+  // Grouping all the svgs for the pie chart
   const pieGroup = svg2
     .append("g")
     .attr(
@@ -696,12 +751,27 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       `translate(${pieWidth / 2}, ${pieHeight / 2 + pieMargin.top})`,
     );
 
+  // Title for the pie chart which needs to be dynamic
   const titleFO = svg2
-    .append("foreignObject")
+    .append("foreignObject") // Text had to be wrapped in this foreign object so that it wouldn't go off the page
     .attr("width", pieWidth)
-    .attr("height", 70)
+    .attr("height", 60)
     .attr("x", 0)
     .attr("y", 0)
+    // Interaction for the title
+    .on("mousemove", function (event, d) {
+      const [x, y] = d3.pointer(event);
+      tooltip
+        .style("visibility", "visible")
+        .html(
+          `Hover over the node titles in the sankey and see how this changes!`,
+        )
+        .style("left", x + pieLeft + "px")
+        .style("top", y + pieTop - 50 + "px");
+    })
+    .on("mouseout", function (event, d) {
+      tooltip.style("visibility", "hidden");
+    })
     .append("xhtml:div")
     .style("font-weight", "bold")
     .style("text-anchor", "middle")
@@ -713,7 +783,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
     .data(pieKeys)
     .enter()
     .append("circle")
-    .attr("cx", 610)
+    .attr("cx", pieWidth - 40)
     .attr("cy", function (d, i) {
       return pieHeight / 2 - 50 + i * 25;
     })
@@ -728,9 +798,9 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
     .data(pieKeys)
     .enter()
     .append("text")
-    .attr("x", 600)
+    .attr("x", pieWidth - 50)
     .attr("y", function (d, i) {
-      return pieHeight / 2  - 50 + i * 25;
+      return pieHeight / 2 - 50 + i * 25;
     })
     .style("fill", function (d) {
       return pieColor(d);
@@ -742,6 +812,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
     .style("alignment-baseline", "middle")
     .style("font-size", "16px");
 
+  // Everything moved into an update function so that animation would work
   function updatePie(columnFilter, columnResponse) {
     const arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
 
@@ -771,6 +842,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       return processed_data;
     })();
 
+    // To help calculate percentages
     const total = Object.values(pieData).reduce((total, num) => total + num, 0);
 
     const dataPrepper = d3
@@ -786,6 +858,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
 
     slices
       .join("path")
+      // For interaction
       .on("mousemove", function (event, d) {
         const [x, y] = d3.pointer(event);
         d3.select(this).style("fill-opacity", 0.7);
@@ -804,6 +877,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       .transition()
       .duration(1000)
       // Implementation came from https://stackoverflow.com/questions/78210697/d3-js-error-transition-arc-path-attribute-d-expected-arc-flag-0-or-1
+      // Without this that animation transitions wouldn't work
       .attrTween("d", function (d) {
         const i = d3.interpolate(this._current || d, d);
         this._current = i(1);
@@ -837,9 +911,10 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
         '" with "' +
         columnResponse +
         '"',
-    ); // Width restriction;
+    );
   }
 
+  // The pie chart users will see when the webpage is first loaded
   updatePie(
     "Has using a fitness wearable influenced your decision? [To change your diet?]",
     "Strongly agree",
