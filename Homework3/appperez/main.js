@@ -23,7 +23,7 @@ stackedBarHeight = height / 2;
 
 let pieLeft = width / 2,
   pieTop = height / 2 + titleBarHeight * 2;
-let pieMargin = { top: 20, right: 20, bottom: 20, left: 20 },
+let pieMargin = { top: 20, right: 0, bottom: 20, left: 0 },
   pieWidth = width / 2 - pieMargin.left - pieMargin.right,
   pieHeight = height / 2 - pieMargin.top - pieMargin.bottom - titleBarHeight;
 
@@ -160,7 +160,7 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       "#cad1c0",
     ]);
 
-  let zoomedIn = false
+  let zoomedIn = false;
   function updateSankey(columns) {
     // A sankey diagram needs a graph
     // The overall sankey diagram should have the following flow
@@ -292,6 +292,11 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
     g1.selectAll("text.col-title")
       .data(colTitleData, (d) => d.columnName)
       .join("text")
+      .on("mouseover", function(event, d) {
+        let question = aliasToQuestion.get(d.columnName)
+        console.log(question)
+        updateStackedBar(question)
+      })
       .attr("class", "col-title")
       .attr("x", (d) => d.x0)
       .attr("y", sankeyHeight + 5)
@@ -347,13 +352,13 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
       })
       .on("dblclick", function (event, d) {
         if (zoomedIn) {
-          updateSankey(sankeyDefaultColumns)
-          zoomedIn = false
+          updateSankey(sankeyDefaultColumns);
+          zoomedIn = false;
         } else {
           updateSankey([d.source.columnName, d.target.columnName]);
-          zoomedIn = true
+          zoomedIn = true;
         }
-      }) 
+      })
       .transition()
       .duration(600)
       .attr("d", d3.sankeyLinkHorizontal())
@@ -393,210 +398,286 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
 
     // Now for the legend
     // Add the legend (used by all the charts)
-  const legendKeys = [...new Set(filteredData.map(d => d[columns[0]]))];
-  const legendX = sankeyLeft + 200;
-  const legendY = 15;
-  let size = 20;
+    const legendKeys = [...new Set(filteredData.map((d) => d[columns[0]]))];
+    const legendX = sankeyLeft + 200;
+    const legendY = 15;
+    let size = 20;
 
-  const legend = svg.selectAll("g.legend").data([null]).join("g").attr("class", "legend");
-  legend
-    .selectAll("rect.legend-swatch")
-    .data(legendKeys)
-    .join("rect")
-    .attr("class", "legend-swatch")
-    .attr("y", legendY)
-    .attr("x", function (d, i) {
-      return legendX + i * (size + 300);
-    })
-    .attr("width", size)
-    .attr("height", size)
-    .style("fill", function (d) {
-      return color(d);
-    });
+    const legend = svg
+      .selectAll("g.legend")
+      .data([null])
+      .join("g")
+      .attr("class", "legend");
+    legend
+      .selectAll("rect.legend-swatch")
+      .data(legendKeys)
+      .join("rect")
+      .attr("class", "legend-swatch")
+      .attr("y", legendY)
+      .attr("x", function (d, i) {
+        return legendX + i * (size + 300);
+      })
+      .attr("width", size)
+      .attr("height", size)
+      .style("fill", function (d) {
+        return color(d);
+      });
 
-  legend
-    .selectAll("text.legend-label")
-    .data(legendKeys)
-    .join("text")
-    .attr("class", "legend-label")
-    .attr("y", legendY + size * 1.4)
-    .attr("x", function (d, i) {
-      return legendX + i * (size + 300) + size / 2;
-    }) // 100 is where the first dot appears. 25 is the distance between dots
-    .text(function (d) {
-      return d;
-    })
-    .attr("font-size", 10)
-    .attr("font-weight", "bold")
-    .attr("text-anchor", "middle")
-    .style("alignment-baseline", "middle");
+    legend
+      .selectAll("text.legend-label")
+      .data(legendKeys)
+      .join("text")
+      .attr("class", "legend-label")
+      .attr("y", legendY + size * 1.4)
+      .attr("x", function (d, i) {
+        return legendX + i * (size + 300) + size / 2;
+      }) // 100 is where the first dot appears. 25 is the distance between dots
+      .text(function (d) {
+        return d;
+      })
+      .attr("font-size", 10)
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "middle")
+      .style("alignment-baseline", "middle");
   }
 
   updateSankey(sankeyDefaultColumns);
 
   // Stacked bar chart
   // Help from: https://observablehq.com/@d3/stacked-bar-chart/2
-
-  // Each bar is going to present the amount of response in each category
-  // The bar will be broken up into parts based on how many people in each category
-  // also said that the wearable influenced them to exercise
-  const stackedBarData = (() => {
-    processed_datum = {};
-    responsesCounts = new d3.InternMap([], JSON.stringify);
-    processed_data = [];
-
-    // make all possible combinations
-    const influences = new Set();
-    const useFrequencies = new Set();
-    rawData.forEach((d) => {
-      const influence =
-        "Influence more exercise: " +
-        (
-          d[
-            "Has using a fitness wearable influenced your decision? [To exercise more?]"
-          ] || ""
-        ).trim();
-      const useFrequency =
-        d["How frequently do you use your fitness wearable?"];
-      influences.add(influence);
-      useFrequencies.add(useFrequency);
-    });
-
-    for (const influence of influences) {
-      for (const useFrequency of useFrequencies) {
-        responsesCounts.set([influence, useFrequency], 0);
+  
+  const question =
+    "Do you feel that the fitness wearable has improved your overall well-being?";
+  function updateStackedBar(question) {
+    
+    const stackedBarData = (() => {
+      processed_datum = {};
+      responsesCounts = new d3.InternMap([], JSON.stringify);
+      processed_data = [];
+  
+      // make all possible combinations
+      const questionResponses = new Set();
+      const ageFrequencies = new Set();
+      rawData.forEach((d) => {
+        const response = d[question];
+        const ageFrequency = d["What is your age?"];
+        questionResponses.add(response);
+        ageFrequencies.add(ageFrequency);
+      });
+  
+      for (const response of questionResponses) {
+        for (const ageFrequency of ageFrequencies) {
+          responsesCounts.set([ageFrequency, response], 0);
+        }
       }
-    }
+  
+      rawData.forEach((d) => {
+        const response = d[question];
+        const ageFrequency = d["What is your age?"];
+        // influence is key[0] and frequency is key[1]
+        key = [ageFrequency, response];
+        responsesCounts.set(key, responsesCounts.get(key) + 1);
+      });
+  
+      for (const [k, v] of responsesCounts) {
+        processed_data.push({ response: k[1], ageFrequency: k[0], count: v });
+      }
+  
+      return processed_data;
+    })();
+  
+    // will be used by the stack function to access the data
+    const indexMap = d3.index(
+      stackedBarData,
+      (d) => d.response,
+      (d) => d.ageFrequency,
+    );
+  
+    // The "categories mentioned earlier"
+    const responses = d3.union(stackedBarData.map((d) => d.response));
+    const ageGroup = d3.union(stackedBarData.map((d) => d.ageFrequency));
+  
+    const series = d3
+      .stack()
+      .keys(["Under 18", "18-24", "25-34", "35-44", "45-54", "55-64"])
+      .value(([, D], key) => (D.get(key) && D.get(key).count) || 0)(indexMap);
+  
+    const stackedBarColor = d3
+      .scaleOrdinal()
+      .domain(["Under 18", "18-24", "25-34", "35-44", "45-54", "55-64"])
+      .range(["#BCD2E8", "#91BAD6", "#73A5C6", "#528AAE", "#2E5984", "#1E3F66"]);
 
-    rawData.forEach((d) => {
-      influence =
-        "Influence more exercise: " +
-        d[
-          "Has using a fitness wearable influenced your decision? [To exercise more?]"
-        ];
-      useFrequency = d["How frequently do you use your fitness wearable?"];
-      // influence is key[0] and frequency is key[1]
-      key = [influence, useFrequency];
-      responsesCounts.set(key, responsesCounts.get(key) + 1);
+    const stackedBarOrderMap = {
+            "5 or more times a week": 1,
+            "3-4 times a week": 2,
+            "1-2 times a week": 3,
+            "Less than once a week": 4,
+            "Strongly agree": 1,
+            "Agree": 2,
+            "Neutral": 3,
+            "Disagree": 4,
+          };
+
+
+    const sortedResponses = [...responses].sort((a, b) => { return stackedBarOrderMap[a] - stackedBarOrderMap[b]})
+  
+    // Again, order the data so that the story makes more sense
+    // Creating the X-axis boundaries in the svg
+    const x = d3
+      .scaleBand()
+      .domain(sortedResponses)
+      .range([
+        stackedBarLeft + stackedBarMargin.left,
+        stackedBarWidth - stackedBarMargin.right - 60,
+      ])
+      .padding(0.1);
+  
+    // Creating the Y-axis boundaries in the svg
+    const y = d3
+      .scaleLinear()
+      .domain([0, d3.max(series, (d) => d3.max(d, (d) => d[1])) + 1])
+      .rangeRound([
+        stackedBarHeight * 2 - stackedBarMargin.bottom,
+        stackedBarTop,
+      ]);
+  
+    // Adding in the bars
+    svg
+      .selectAll("g.bars")
+      .data(series)
+      .join("g")
+      .attr("class", "bars")
+      .attr("fill", (d) => stackedBarColor(d.key))
+      .selectAll("rect")
+      .data((D) => D.map((d) => ((d.key = D.key), d)))
+      .join("rect")
+      .on("mousemove", function(event, d) {
+        const [x, y] = d3.pointer(event);
+        d3.select(this).style("fill-opacity", 0.7);
+        tooltip
+          .style("visibility", "visible")
+          .html(
+            `Response: ${d.data[0]}\n${d.key}<br>Count: ${d.data[1].get(d.key).count}`
+          )
+          .style("left", (x + 10) + "px")
+          .style("top", (y - 40 )+ "px");
+      })
+      .on("mouseout", function(event, d) {
+        d3.select(this).style("fill-opacity", 1);
+        tooltip.style("visibility", "hidden")
+      })
+      .transition()
+      .duration(600)
+      .attr("x", (d) => x(d.data[0]))
+      .attr("y", (d) => y(d[1]))
+      .attr("height", (d) => y(d[0]) - y(d[1]))
+      .attr("width", x.bandwidth())
+      
+    // Line for the X-axis
+    svg
+      .selectAll("g.stacked-bar-x-axis-line")
+      .data([null])
+      .join("g")
+      .attr("class", "stacked-bar-x-axis-line")
+      .attr(
+        "transform",
+        `translate(0,${stackedBarHeight * 2 - stackedBarMargin.bottom})`,
+      )
+      .call(d3.axisBottom(x).tickSizeOuter(0));
+  
+    // Line of the Y-axis
+    svg
+      .selectAll("g.stacked-bar-y-axis-line")
+      .data([null])
+      .join("g")
+      .attr("class", "stacked-bar-y-axis-line")
+      .attr("transform", `translate(${stackedBarMargin.left + 3}, 0)`)
+      .call(d3.axisLeft(y).ticks(null, "s"));
+  
+    // Title for stack bar plot
+    svg
+      .selectAll("text.stacked-bar-title")
+      .data([null])
+      .join("text")
+      .attr("class", "stacked-bar-title")
+      .attr("x", stackedBarWidth / 2)
+      .attr("y", height / 2 + titleBarHeight * 2)
+      .attr("text-anchor", "middle")
+      .attr("font-size", width > 1100 ? 16 : 12)
+      .attr("font-weight", "bold")
+      .text("Age Distribution");
+  
+    // Title of x axis
+    svg
+      .selectAll("text.stacked-bar-x-axis-title")
+      .data([null])
+      .join("text")
+      .attr("class", "stacked-bar-x-axis-title")
+      .attr("x", stackedBarWidth / 2)
+      .attr("y", stackedBarTop + stackedBarHeight - 80)
+      .attr("text-anchor", "middle")
+      .attr("font-size", 12)
+      .attr("font-weight", "bold")
+      .text(`Responses for "${questionToAlias.get(question)}"`);
+    // Title of y axis
+    svg
+      .selectAll("text.stacked-bar-y-axis-title")
+      .data([null])
+      .join("text")
+      .attr("class", "stacked-bar-y-axis-title")
+      .attr("text-anchor", "middle")
+      .attr("font-size", 12)
+      .attr("font-weight", "bold")
+      .attr(
+        "transform",
+        `translate(${stackedBarMargin.left / 2}, ${stackedBarTop + stackedBarHeight / 2 - stackedBarMargin.bottom}) rotate(-90)`,
+      )
+      .text("Number of responses");
+    
+      // at last the legend
+      // Adding in the legend
+  svg
+    .selectAll("mydots")
+    .data(ageGroup)
+    .enter()
+    .append("circle")
+    .attr("cx", stackedBarWidth - 100)
+    .attr("cy", function (d, i) {
+      return stackedBarTop + 50 + i * 25;
+    })
+    .attr("r", 5)
+    .style("fill", function (d) {
+      return stackedBarColor(d);
     });
 
-    for (const [k, v] of responsesCounts) {
-      processed_data.push({ influence: k[0], useFrequency: k[1], count: v });
-    }
-
-    return processed_data;
-  })();
-
-  // will be used by the stack function to access the data
-  const indexMap = d3.index(
-    stackedBarData,
-    (d) => d.useFrequency,
-    (d) => d.influence,
-  );
-
-  // The "categories mentioned earlier"
-  const keys = d3.union(stackedBarData.map((d) => d.influence));
-
-  const series = d3
-    .stack()
-    .keys(keys)
-    .order((series) => d3.range(series.length).reverse())
-    .value(([, D], key) => (D.get(key) && D.get(key).count) || 0)(indexMap);
-
-  // Again, order the data so that the story makes more sense
-  const freqOrder = ["Rarely", "1-2 times a week", "3-4 times a week", "Daily"];
-
-  // Creating the X-axis boundaries in the svg
-  const x = d3
-    .scaleBand()
-    .domain(freqOrder)
-    .range([
-      stackedBarLeft + stackedBarMargin.left,
-      stackedBarWidth - stackedBarMargin.right,
-    ])
-    .padding(0.1);
-
-  // Creating the Y-axis boundaries in the svg
-  const y = d3
-    .scaleLinear()
-    .domain([0, d3.max(series, (d) => d3.max(d, (d) => d[1])) + 1])
-    .rangeRound([
-      stackedBarHeight * 2 - stackedBarMargin.bottom,
-      stackedBarTop,
-    ]);
-
-  // Adding in the bars
+  // Add one dot in the legend for each name.
   svg
-    .append("g")
-    .selectAll()
-    .data(series)
-    .join("g")
-    .attr("fill", (d) => color(d.key))
-    .selectAll("rect")
-    .data((D) => D.map((d) => ((d.key = D.key), d)))
-    .join("rect")
-    .attr("x", (d) => x(d.data[0]))
-    .attr("y", (d) => y(d[1]))
-    .attr("height", (d) => y(d[0]) - y(d[1]))
-    .attr("width", x.bandwidth())
-    .append("title")
-    .text(
-      (d) =>
-        `Exercise Frequency: ${d.data[0]}\n${d.key}\nCount: ${d.data[1].get(d.key).count}`,
-    );
-
-  // Line for the X-axis
-  svg
-    .append("g")
-    .attr(
-      "transform",
-      `translate(0,${stackedBarHeight * 2 - stackedBarMargin.bottom})`,
-    )
-    .call(d3.axisBottom(x).tickSizeOuter(0));
-
-  // Line of the Y-axis
-  svg
-    .append("g")
-    .attr("transform", `translate(${stackedBarMargin.left + 3}, 0)`)
-    .call(d3.axisLeft(y).ticks(null, "s"));
-
-  // Title for stack bar plot
-  svg
+    .selectAll("mylabels")
+    .data(ageGroup)
+    .enter()
     .append("text")
-    .attr("x", stackedBarWidth / 2)
-    .attr("y", height / 2 + titleBarHeight * 2)
-    .attr("text-anchor", "middle")
-    .attr("font-size", width > 1100 ? 16 : 12)
-    .attr("font-weight", "bold")
-    .text("How often did the influenced users wear their wearables?");
+    .attr("x", stackedBarWidth  - 90)
+    .attr("y", function (d, i) {
+      return stackedBarTop + 50 + i * 25;
+    })
+    .style("fill", function (d) {
+      return stackedBarColor(d);
+    })
+    .text(function (d) {
+      return d;
+    })
+    .attr("text-anchor", "start")
+    .style("alignment-baseline", "middle")
+    .style("font-size", "16px");
+  }
 
-  // Title of x axis
-  svg
-    .append("text")
-    .attr("x", stackedBarWidth / 2)
-    .attr("y", stackedBarTop + stackedBarHeight - 80)
-    .attr("text-anchor", "middle")
-    .attr("font-size", 12)
-    .attr("font-weight", "bold")
-    .text("How frequently respondents used their wearables");
-
-  // Title of y axis
-  svg
-    .append("text")
-    .attr("text-anchor", "middle")
-    .attr("font-size", 12)
-    .attr("font-weight", "bold")
-    .attr(
-      "transform",
-      `translate(${stackedBarMargin.left / 2}, ${stackedBarTop + stackedBarHeight / 2 - stackedBarMargin.bottom}) rotate(-90)`,
-    )
-    .text("Number of people ");
+  updateStackedBar(question)
 
   // At last, add a pie chart
   const pieKeys = ["Male", "Female", "Prefer not to say"];
   const pieColor = d3
     .scaleOrdinal()
-    .domain(keys)
+    .domain(pieKeys)
     .range(["#2986cc", "#c90076", "#cccccc"]);
 
   const svg2 = svg
@@ -632,11 +713,11 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
     .data(pieKeys)
     .enter()
     .append("circle")
-    .attr("cx", 90)
+    .attr("cx", 610)
     .attr("cy", function (d, i) {
-      return pieHeight / 2 + 100 + i * 25;
+      return pieHeight / 2 - 50 + i * 25;
     })
-    .attr("r", 7)
+    .attr("r", 5)
     .style("fill", function (d) {
       return pieColor(d);
     });
@@ -647,9 +728,9 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
     .data(pieKeys)
     .enter()
     .append("text")
-    .attr("x", 100)
+    .attr("x", 600)
     .attr("y", function (d, i) {
-      return pieHeight / 2 + 100 + i * 25;
+      return pieHeight / 2  - 50 + i * 25;
     })
     .style("fill", function (d) {
       return pieColor(d);
@@ -657,8 +738,9 @@ d3.csv("data/fitness_data.csv").then((rawData) => {
     .text(function (d) {
       return d;
     })
-    .attr("text-anchor", "left")
-    .style("alignment-baseline", "middle");
+    .attr("text-anchor", "end")
+    .style("alignment-baseline", "middle")
+    .style("font-size", "16px");
 
   function updatePie(columnFilter, columnResponse) {
     const arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
