@@ -101,6 +101,16 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
   );
   // console.log("barData", barData);
 
+  // Plot Title
+  barSvg
+    .append("text")
+    .attr("x", chartDims.bar.width / 2)
+    .attr("y", margins.top - 20)
+    .attr("text-anchor", "middle")
+    .style("font-size", "16px")
+    .style("font-weight", "bold")
+    .text("Type 1 vs Frequency");
+
   // Create x and y axis
 
   // Compute x axis
@@ -166,7 +176,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .selectAll("rect")
     .data(barData)
     .join("rect")
-		.attr("class", "bars")
+    .attr("class", "bars")
     .attr("x", (d) => barX1(d.Type_1))
     .attr("y", (d) => barY1(d.freq))
     .attr("width", barX1.bandwidth())
@@ -196,6 +206,16 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     Catch_Rate: parseInt(d.Catch_Rate),
     Type_1: d.Type_1,
   }));
+
+  // Plot Title
+  scatterSvg
+    .append("text")
+    .attr("x", chartDims.scatter.width / 2)
+    .attr("y", margins.top - 20)
+    .attr("text-anchor", "middle")
+    .style("font-size", "16px")
+    .style("font-weight", "bold")
+    .text("Total Stats vs Catch Rate %");
 
   // Create x and y axis
 
@@ -304,6 +324,16 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     Type_1: d.Type_1,
   }));
 
+  // Plot Title
+  parallelSvg
+    .append("text")
+    .attr("x", chartDims.parallel.width / 2)
+    .attr("y", margins.top + keyHeight - 20)
+    .attr("text-anchor", "middle")
+    .style("font-size", "16px")
+    .style("font-weight", "bold")
+    .text("Distribution of Base Stats");
+
   // Create the horizontal axis scale for each key
   const parallelXAxis = new Map(
     Array.from(keys, (key) => [
@@ -405,28 +435,26 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     parallelSvg.property("value", selected).dispatch("input");
   }
 
-	// Create type filtering behavior
-	const activeCategories = new Set(Object.keys(typeColorDict));
+  // Create type filtering behavior
+  const activeCategories = new Set(Object.keys(typeColorDict));
 
-	const bars = barSvg
-		.selectAll(".bars")
-		.on("click", function (event, d) {
-			console.log("event", event, "d", d)
-			if (activeCategories.has(d.Type_1)) {
-				activeCategories.delete(d.Type_1);
-				d3.select(this).style("opacity", 0.3);
-			} else {
-				activeCategories.add(d.Type_1);
-				d3.select(this).style("opacity", 1);
-			}
-			scatterSelect(d.Type_1)
-	})
+  const bars = barSvg.selectAll(".bars").on("click", function (event, d) {
+    console.log("event", event, "d", d);
+    if (activeCategories.has(d.Type_1)) {
+      activeCategories.delete(d.Type_1);
+      d3.select(this).style("opacity", 0.3);
+    } else {
+      activeCategories.add(d.Type_1);
+      d3.select(this).style("opacity", 1);
+    }
+    scatterSelect(d.Type_1);
+  });
 
-	function scatterSelect(type) {
-		const dots = scatterSvg
-			.selectAll(".mark-circle")
-			.style("fill-opacity", (d) => activeCategories.has(d.Type_1) ? 0.9 : 0)
-			.style("stroke-width", (d) => activeCategories.has(d.Type_1) ? 0.8 : 0)
-			console.log("dots", dots)
-	}
+  function scatterSelect(type) {
+    const dots = scatterSvg
+      .selectAll(".mark-circle")
+      .style("fill-opacity", (d) => (activeCategories.has(d.Type_1) ? 0.9 : 0))
+      .style("stroke-width", (d) => (activeCategories.has(d.Type_1) ? 0.8 : 0));
+    console.log("dots", dots);
+  }
 });
