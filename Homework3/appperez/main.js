@@ -1,0 +1,922 @@
+let abFilter = 25;
+const width = window.innerWidth;
+const height = window.innerHeight;
+
+let sankeyLeft = 0,
+  sankeyTop = 0;
+let sankeyMargin = { top: 50, right: 50, bottom: 15, left: 20 },
+  sankeyWidth = width - sankeyMargin.left * 2 - sankeyMargin.right * 2,
+  sankeyHeight = height / 2 - sankeyMargin.top - sankeyMargin.bottom;
+
+let titleBarHeight = 35;
+
+let stackedBarLeft = 0,
+  stackedBarTop = height / 2 + titleBarHeight * 2;
+let stackedBarMargin = {
+    top: height / 2 + titleBarHeight + sankeyMargin.bottom + 80,
+    right: 70,
+    bottom: 40,
+    left: 50,
+  },
+  stackedBarWidth = width / 2;
+stackedBarHeight = height / 2;
+
+let pieLeft = width / 2,
+  pieTop = height / 2 + titleBarHeight * 2;
+let pieMargin = { top: 20, right: 0, bottom: 20, left: 0 },
+  pieWidth = width / 2 - pieMargin.left - pieMargin.right,
+  pieHeight = height / 2 - pieMargin.top - pieMargin.bottom - titleBarHeight;
+
+// plots
+d3.csv("data/fitness_data.csv").then((rawData) => {
+  const svg = d3.select("svg").attr("font-family", "sans-serif");
+
+  const questionToAlias = new Map([
+    [
+      "Has using a fitness wearable influenced your decision? [To exercise more?]",
+      "Did wearable influence person to exercise?",
+    ],
+    [
+      "Do you think that the fitness wearable has made exercising more enjoyable?",
+      "Was the exercise more enjoyable?",
+    ],
+    ["How often do you exercise in a week?", "Exercise weekly frequency."],
+    [
+      "Do you feel that the fitness wearable has improved your overall well-being?",
+      "Impact on well-being.",
+    ],
+  ]);
+
+  // Inverting the map made above
+  const aliasToQuestion = (() => {
+    let map = new Map();
+    for ([k, v] of questionToAlias) {
+      map.set(v, k);
+    }
+
+    return map;
+  })();
+
+  // used to show information when hovering over things, will be made hidden on mouseout and visible on mouseover
+  const tooltip = d3
+    .select("body")
+    .append("div")
+    .style("position", "absolute")
+    .style("visibility", "hidden")
+    .style("font-family", "sans-serif")
+    .style("font-size", "12px")
+    .style("background-color", "white")
+    .style("border", "1px solid #ccc")
+    .style("padding", "10px")
+    .style("border-radius", "10px");
+
+  const titleBar = svg
+    .append("rect")
+    .attr("x", 0)
+    .attr("y", height / 2 + sankeyMargin.bottom)
+    .attr("height", titleBarHeight)
+    .attr("opacity", 0.3)
+    .attr("fill", "#e5b83e")
+
+    .attr("width", width);
+
+  // Title for the sankey
+  const title = svg
+    .append("text")
+    .attr("x", width / 2)
+    .attr("y", height / 2 + sankeyMargin.bottom + 25)
+    .attr("text-anchor", "middle")
+    .attr("font-size", 24)
+    .attr("font-weight", 900)
+    .text("How has fitness wearables influenced these 30 people?");
+
+  // A little hint so people know that they can double click
+  const note = svg
+    .append("text")
+    .attr("x", sankeyLeft + sankeyMargin.left)
+    .attr("y", height / 2 + sankeyMargin.bottom + 25)
+    .attr("text-anchor", "start")
+    .attr("font-size", width > 1200 ? 11 : 7)
+    .text("*Double click on the sankey streams to zoom in!");
+
+  // The container for the sankey diagram
+  const g1 = svg
+    .append("g")
+    .attr("width", sankeyWidth + sankeyMargin.left + sankeyMargin.right)
+    .attr("height", sankeyHeight + sankeyMargin.top + sankeyMargin.bottom)
+    .attr("transform", `translate(${sankeyMargin.left}, ${sankeyMargin.top})`);
+
+  // Sankey data
+  const filteredData = rawData.map((d) => {
+    processed_datum = {};
+    processed_datum["Did wearable influence person to exercise?"] =
+      "Influence more exercise: " +
+      d[
+        "Has using a fitness wearable influenced your decision? [To exercise more?]"
+      ];
+    processed_datum["Was the exercise more enjoyable?"] =
+      "Makes exercise enjoyable: " +
+      d[
+        "Do you think that the fitness wearable has made exercising more enjoyable?"
+      ];
+    processed_datum["Exercise weekly frequency."] =
+      "Exercises: " + d["How often do you exercise in a week?"];
+
+    processed_datum["Impact on well-being."] =
+      "Improved Wellbeing: " +
+      d[
+        "Do you feel that the fitness wearable has improved your overall well-being?"
+      ];
+    return processed_datum;
+  }); // These are the columns that we are focusing on for the sankey
+
+  // Removing from here will allow us to achieve a "zoom in" effect with the sankey
+  const sankeyDefaultColumns = [
+    "Did wearable influence person to exercise?",
+    "Was the exercise more enjoyable?",
+    "Exercise weekly frequency.",
+    "Impact on well-being.",
+  ];
+
+  // These colors will be used throughout the whole visualization
+  // The main idea is we are exploring how people have been influenced to exercise more have
+  // also been influenced to do other things as well
+  const color = d3
+    .scaleOrdinal()
+    .domain([
+      "Influence more exercise: Strongly agree",
+      "Influence more exercise: Agree",
+      "Influence more exercise: Neutral",
+      "Makes exercise enjoyable: Strongly agree",
+      "Makes exercise enjoyable: Agree",
+      "Makes exercise enjoyable: Neutral",
+      "Makes exercise enjoyable: Disagree",
+      "Exercises: 5 or more times a week",
+      "Exercises: 3-4 times a week",
+      "Exercises: 1-2 times a week",
+      "Exercises: Less than once a week",
+    ])
+    // [ "#c3d6a6", "#5fc067", "#9ae885"])
+    .range([
+      "#5fc067",
+      "#9ae885",
+      "#c3d6a6",
+      "#5fc067",
+      "#9ae885",
+      "#c3d6a6",
+      "#e9c9c6",
+      "#5fc067",
+      "#9ae885",
+      "#c3d6a6",
+      "#cad1c0",
+    ]);
+
+  // Everything from before has to be in this function so that we can have animation
+  zoomedIn = false;
+  function updateSankey(columns) {
+    // A sankey diagram needs a graph
+    // The overall sankey diagram should have the following flow
+
+    // First we will process only the data we need for the sankey diagram
+
+    filteredData["columns"] = columns;
+
+    // Docs used for learning to how to create the diagram: https://observablehq.com/@d3/parallel-sets
+    // This graph being created will be used by the sankey diagram
+    // The flow will be: Influence to exercise more -> More enjoyable ->  Exercise frequency
+    graph = (() => {
+      const keys = filteredData.columns;
+      let index = 0;
+      const nodes = [];
+      const nodeByKey = new d3.InternMap([], JSON.stringify);
+      const indexByKey = new d3.InternMap([], JSON.stringify);
+      const edges = [];
+
+      for (const k of keys) {
+        for (const d of filteredData) {
+          const key = [k, d[k]];
+          if (nodeByKey.has(key)) {
+            continue;
+          }
+
+          const node = { name: d[k], columnName: k };
+          nodes.push(node); // make a list of all the nodes
+          nodeByKey.set(key, node);
+          indexByKey.set(key, index++);
+        }
+      }
+
+      for (let i = 1; i < keys.length; i++) {
+        const a = keys[i - 1];
+        const b = keys[i];
+
+        const prefix = keys.slice(0, i + 1);
+        const edgeByKey = new d3.InternMap([], JSON.stringify);
+
+        for (const d of filteredData) {
+          const names = prefix.map((k) => d[k]); // the answers for each of the questions
+
+          let edge = edgeByKey.get(names);
+
+          if (edge) {
+            edge.value += 1;
+            continue;
+          }
+
+          edge = {
+            source: indexByKey.get([a, d[a]]),
+            target: indexByKey.get([b, d[b]]),
+            names: names,
+            value: 1,
+          };
+
+          edges.push(edge);
+          edgeByKey.set(names, edge);
+        }
+      }
+      return { nodes, edges };
+    })();
+
+    // The actual creating of the sankey diagram
+    const sankey = d3
+      .sankey()
+      // The nodes should have a specific order so that the story flows nicely
+      .nodeSort((a, b) => {
+        if (
+          a.columnName == "Exercise weekly frequency." &&
+          b.columnName == "Exercise weekly frequency."
+        ) {
+          const orderMap = {
+            "Exercises: 5 or more times a week": 1,
+            "Exercises: 3-4 times a week": 2,
+            "Exercises: 1-2 times a week": 3,
+            "Exercises: Less than once a week": 4,
+          };
+          return orderMap[a.name] - orderMap[b.name];
+        }
+
+        if (
+          a.columnName == "Impact on well-being." &&
+          b.columnName == "Impact on well-being."
+        ) {
+          const orderMap = {
+            "Improved Wellbeing: Strongly agree": 1,
+            "Improved Wellbeing: Agree": 2,
+            "Improved Wellbeing: Neutral": 3,
+            "Improved Wellbeing: Disagree": 4,
+          };
+          return orderMap[a.name] - orderMap[b.name];
+        }
+      })
+      .linkSort(null)
+      .nodeWidth(4)
+      .nodePadding(10)
+      .extent([
+        [0, 5],
+        [sankeyWidth + 100, sankeyHeight - 5],
+      ]);
+    // Preparing our nodes and links for the sankey diagram
+    const { nodes, links } = sankey({
+      nodes: graph.nodes.map((d) => ({ ...d })),
+      links: graph.edges.map((d) => ({ ...d })),
+    });
+
+    // To append the column labels
+    colTitleData = (() => {
+      const data = [];
+      const seen = new Set();
+
+      for (const node of nodes) {
+        if (seen.has(node.columnName)) {
+          continue;
+        }
+        seen.add(node.columnName);
+        data.push({
+          x0: node["x0"],
+          x1: node["x1"],
+          columnName: node.columnName,
+        });
+      }
+
+      return data;
+    })();
+
+    // Title for the node categories (appears under the black lines)
+    g1.selectAll("text.col-title")
+      .data(colTitleData, (d) => d.columnName)
+      .join("text")
+      // Some interaction so people know they are hovering over a title
+      .on("mouseover", function (event, d) {
+        let question = aliasToQuestion.get(d.columnName);
+        d3.select(this).attr("fill", "blue");
+        updateStackedBar(question);
+      })
+      .on("mouseout", function (event, d) {
+        d3.select(this).attr("fill", "black");
+      })
+      .attr("class", "col-title")
+      .attr("x", (d) => d.x0)
+      .attr("y", sankeyHeight + 10)
+      .attr("text-anchor", (d, i) => {
+        if (i == 0) {
+          return "start";
+        } else if (i == colTitleData.length - 1) {
+          return "end";
+        } else {
+          return "middle";
+        }
+      })
+      .attr("font-size", sankeyWidth < 800 ? 8 : 14)
+      .attr("font-weight", "bold")
+      .text((d) => d.columnName);
+
+    // Each node which comes out of the black bars
+    g1.selectAll("rect.node")
+      .data(nodes, (d) => d.name)
+      .join("rect")
+      .attr("class", "node")
+      .transition()
+      .duration(600)
+      .attr("x", (d) => d.x0)
+      .attr("y", (d) => d.y0)
+      .attr("height", (d) => d.y1 - d.y0)
+      .attr("width", (d) => d.x1 - d.x0)
+      .each(function (d) {
+        const t = d3.select(this).select("title");
+        if (t.empty())
+          d3.select(this)
+            .append("title")
+            .text(`User\n(${d.value.toLocaleString()})`);
+        else t.text(`User\n(${d.value.toLocaleString()})`);
+      });
+
+    // The streams
+    g1.selectAll("path.link")
+      .data(links, (d) => `${d.source.name}→${d.target.name}`)
+      .join("path")
+      .attr("class", "link")
+      .attr("fill", "none")
+      // Some interaction so people know they are hovering over a title
+      .on("mousemove", function (event, d) {
+        const [x, y] = d3.pointer(event);
+        d3.select(this).style("stroke-opacity", 0.7);
+        tooltip
+          .html(`${d.names.join(" → ")}\n(${d.value.toLocaleString()}/30)`)
+          .style("visibility", "visible")
+          .style("left", x + 30 + "px")
+          .style("top", y + "px");
+      })
+      .on("mouseout", function () {
+        d3.select(this).style("stroke-opacity", 1);
+        tooltip.style("visibility", "hidden");
+      })
+      // This creates our "zoom in effect"
+      // Originally this was attempted using d3 zoom but the "camera" would always cut something off so
+      // I found this work around to be the best
+      .on("dblclick", function (event, d) {
+        if (zoomedIn) {
+          updateSankey(sankeyDefaultColumns);
+          zoomedIn = false;
+        } else {
+          updateSankey([d.source.columnName, d.target.columnName]);
+          zoomedIn = true;
+        }
+      })
+      .transition()
+      .duration(600)
+      .attr("d", d3.sankeyLinkHorizontal())
+      .attr("stroke", (d) => color(d.names[0]))
+      .attr("stroke-width", (d) => d.width)
+      .style("mix-blend-mode", "multiply");
+
+    // The titles inside the streams
+    g1.selectAll("text.node-label")
+      .data(nodes, (d) => d.name)
+      .join("text")
+      .attr("class", "node-label")
+      // More interaction for the titles inside the sankey diagram
+      .on("mouseover", function (event, d) {
+        let pieColumnFilter = aliasToQuestion.get(d.columnName);
+        let pieColumnResponse = d.name.split(":")[1].trim();
+        updatePie(pieColumnFilter, pieColumnResponse);
+      })
+      .on("mousemove", function (event) {
+        const [x, y] = d3.pointer(event);
+        d3.select(this).style("fill", "blue");
+        tooltip
+          .style("visibility", "visible")
+          .style("left", x + 30 + "px")
+          .style("top", y + "px");
+      })
+      .on("mouseout", function () {
+        d3.select(this).style("fill", "black");
+        tooltip.style("visibility", "hidden");
+      })
+      .transition()
+      .duration(600)
+      .attr("x", (d) => (d.x0 < sankeyWidth / 2 ? d.x1 + 6 : d.x0 - 6))
+      .attr("y", (d) => (d.y1 + d.y0) / 2)
+      .attr("font-size", sankeyWidth < 800 ? 6 : 12)
+      .attr("text-anchor", (d) => (d.x0 < sankeyWidth / 2 ? "start" : "end"))
+      .text((d) => `${d.name} (${d.value.toLocaleString()})`);
+
+    // Now for the legend, this is has to change to reflect any changes made to the sankey diagram
+    // when the user is interacting with it
+    const legendKeys = [...new Set(filteredData.map((d) => d[columns[0]]))];
+    const legendX = sankeyLeft + 200;
+    const legendY = 15;
+    let size = 20;
+
+    // Legend for the sankey diagram which appears on the top of the page
+    const legend = svg
+      .selectAll("g.legend")
+      .data([null])
+      .join("g")
+      .attr("class", "legend");
+    legend
+      .selectAll("rect.legend-swatch")
+      .data(legendKeys)
+      .join("rect")
+      .attr("class", "legend-swatch")
+      .attr("y", legendY)
+      .attr("x", function (d, i) {
+        return legendX + i * (size + 300);
+      })
+      .attr("width", size)
+      .attr("height", size)
+      .style("fill", function (d) {
+        return color(d);
+      });
+
+    legend
+      .selectAll("text.legend-label")
+      .data(legendKeys)
+      .join("text")
+      .attr("class", "legend-label")
+      .attr("y", legendY + size * 1.4)
+      .attr("x", function (d, i) {
+        return legendX + i * (size + 300) + size / 2;
+      }) // 100 is where the first dot appears. 25 is the distance between dots
+      .text(function (d) {
+        return d;
+      })
+      .attr("font-size", 10)
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "middle")
+      .style("alignment-baseline", "middle");
+  }
+
+  // This is what the user will see on load
+  updateSankey(sankeyDefaultColumns);
+
+  // Stacked bar chart
+  // Help from: https://observablehq.com/@d3/stacked-bar-chart/2
+  // The default question the user will see when loading up the website
+  const question =
+    "Do you feel that the fitness wearable has improved your overall well-being?";
+  function updateStackedBar(question) {
+    // Filtering out the data based on the specific question given
+    const stackedBarData = (() => {
+      processed_datum = {};
+      responsesCounts = new d3.InternMap([], JSON.stringify);
+      processed_data = [];
+
+      // make all possible combinations
+      const questionResponses = new Set();
+      const ageFrequencies = new Set();
+      rawData.forEach((d) => {
+        const response = d[question];
+        const ageFrequency = d["What is your age?"];
+        questionResponses.add(response);
+        ageFrequencies.add(ageFrequency);
+      });
+
+      for (const response of questionResponses) {
+        for (const ageFrequency of ageFrequencies) {
+          responsesCounts.set([ageFrequency, response], 0);
+        }
+      }
+
+      rawData.forEach((d) => {
+        const response = d[question];
+        const ageFrequency = d["What is your age?"];
+        // influence is key[0] and frequency is key[1]
+        key = [ageFrequency, response];
+        responsesCounts.set(key, responsesCounts.get(key) + 1);
+      });
+
+      for (const [k, v] of responsesCounts) {
+        processed_data.push({ response: k[1], ageFrequency: k[0], count: v });
+      }
+
+      return processed_data;
+    })();
+
+    // will be used by the stack function to access the data
+    const indexMap = d3.index(
+      stackedBarData,
+      (d) => d.response,
+      (d) => d.ageFrequency,
+    );
+
+    const responses = d3.union(stackedBarData.map((d) => d.response));
+    // Age group is going to be static
+    const ageGroup = ["Under 18", "18-24", "25-34", "35-44", "45-54", "55-64"];
+
+    // Used to make the stacked bars
+    const series = d3
+      .stack()
+      .keys(ageGroup)
+      .value(([, D], key) => (D.get(key) && D.get(key).count) || 0)(indexMap);
+
+    // Used to color code the stacked bars
+    const stackedBarColor = d3
+      .scaleOrdinal()
+      .domain(ageGroup)
+      .range([
+        "#BCD2E8",
+        "#91BAD6",
+        "#73A5C6",
+        "#528AAE",
+        "#2E5984",
+        "#1E3F66",
+      ]);
+
+    // This will be used for ordering
+    // Ex strongly agree should come before agree which comes before neutral...
+    const stackedBarOrderMap = {
+      "5 or more times a week": 1,
+      "3-4 times a week": 2,
+      "1-2 times a week": 3,
+      "Less than once a week": 4,
+      "Strongly agree": 1,
+      Agree: 2,
+      Neutral: 3,
+      Disagree: 4,
+    };
+
+    const sortedResponses = [...responses].sort((a, b) => {
+      return stackedBarOrderMap[a] - stackedBarOrderMap[b];
+    });
+
+    // Again, order the data so that the story makes more sense
+    // Creating the X-axis boundaries in the svg
+    const x = d3
+      .scaleBand()
+      .domain(sortedResponses)
+      .range([
+        stackedBarLeft + stackedBarMargin.left,
+        stackedBarWidth - stackedBarMargin.right - 60,
+      ])
+      .padding(0.1);
+
+    // Creating the Y-axis boundaries in the svg
+    const y = d3
+      .scaleLinear()
+      .domain([0, 16])
+      .rangeRound([
+        stackedBarHeight * 2 - stackedBarMargin.bottom,
+        stackedBarTop,
+      ]);
+
+    // Adding in the bars
+    svg
+      .selectAll("g.bars")
+      .data(series)
+      .join("g")
+      .attr("class", "bars")
+      .attr("fill", (d) => stackedBarColor(d.key))
+      .selectAll("rect")
+      .data((D) => D.map((d) => ((d.key = D.key), d)))
+      .join("rect")
+      .on("mousemove", function (event, d) {
+        const [x, y] = d3.pointer(event);
+        d3.select(this).style("fill-opacity", 0.7);
+        tooltip
+          .style("visibility", "visible")
+          .html(
+            `Response: ${d.data[0]}\n${d.key}<br>Count: ${d.data[1].get(d.key).count}`,
+          )
+          .style("left", x + 10 + "px")
+          .style("top", y - 40 + "px");
+      })
+      .on("mouseout", function (event, d) {
+        d3.select(this).style("fill-opacity", 1);
+        tooltip.style("visibility", "hidden");
+      })
+      .transition()
+      .duration(600)
+      .attr("x", (d) => x(d.data[0]))
+      .attr("y", (d) => y(d[1]))
+      .attr("height", (d) => y(d[0]) - y(d[1]))
+      .attr("width", x.bandwidth());
+
+    // Line for the X-axis
+    svg
+      .selectAll("g.stacked-bar-x-axis-line")
+      .data([null])
+      .join("g")
+      .attr("class", "stacked-bar-x-axis-line")
+      .attr(
+        "transform",
+        `translate(0,${stackedBarHeight * 2 - stackedBarMargin.bottom})`,
+      )
+      .call(d3.axisBottom(x).tickSizeOuter(0));
+
+    // Line of the Y-axis
+    svg
+      .selectAll("g.stacked-bar-y-axis-line")
+      .data([null])
+      .join("g")
+      .attr("class", "stacked-bar-y-axis-line")
+      .attr("transform", `translate(${stackedBarMargin.left + 3}, 0)`)
+      .call(d3.axisLeft(y).ticks(null, "s"));
+
+    // Title for stack bar plot
+    svg
+      .selectAll("text.stacked-bar-title")
+      .data([null])
+      .join("text")
+      // Interaction for the title
+      .on("mousemove", function (event, d) {
+        const [x, y] = d3.pointer(event);
+        tooltip
+          .style("visibility", "visible")
+          .html(`Hover over the node categories and see how this changes!`)
+          .style("left", x + 10 + "px")
+          .style("top", y - 40 + "px");
+      })
+      .on("mouseout", function (event, d) {
+        tooltip.style("visibility", "hidden");
+      })
+      .attr("class", "stacked-bar-title")
+      .attr("x", stackedBarWidth / 2)
+      .attr("y", height / 2 + titleBarHeight * 2)
+      .attr("text-anchor", "middle")
+      .attr("font-size", width > 1100 ? 16 : 12)
+      .attr("font-weight", "bold")
+      .text("Age Distribution");
+
+    // Title of x axis
+    svg
+      .selectAll("text.stacked-bar-x-axis-title")
+      .data([null])
+      .join("text")
+      .attr("class", "stacked-bar-x-axis-title")
+      .attr("x", stackedBarWidth / 2)
+      .attr("y", stackedBarTop + stackedBarHeight - 80)
+      .attr("text-anchor", "middle")
+      .attr("font-size", 12)
+      .attr("font-weight", "bold")
+      .text(`Responses for "${questionToAlias.get(question)}"`);
+
+    // Title of y axis
+    svg
+      .selectAll("text.stacked-bar-y-axis-title")
+      .data([null])
+      .join("text")
+      .attr("class", "stacked-bar-y-axis-title")
+      .attr("text-anchor", "middle")
+      .attr("font-size", 12)
+      .attr("font-weight", "bold")
+      .attr(
+        "transform",
+        `translate(${stackedBarMargin.left / 2}, ${stackedBarTop + stackedBarHeight / 2 - stackedBarMargin.bottom}) rotate(-90)`,
+      )
+      .text("Number of responses");
+
+    // at last the legend
+    // Adding in the legend
+    svg
+      .selectAll("mydots")
+      .data(ageGroup)
+      .enter()
+      .append("circle")
+      .attr("cx", stackedBarWidth - 100)
+      .attr("cy", function (d, i) {
+        return stackedBarTop + 50 + i * 25;
+      })
+      .attr("r", 5)
+      .style("fill", function (d) {
+        return stackedBarColor(d);
+      });
+
+    // Add one dot in the legend for each name.
+    svg
+      .selectAll("mylabels")
+      .data(ageGroup)
+      .enter()
+      .append("text")
+      .attr("x", stackedBarWidth - 90)
+      .attr("y", function (d, i) {
+        return stackedBarTop + 50 + i * 25;
+      })
+      .style("fill", function (d) {
+        return stackedBarColor(d);
+      })
+      .text(function (d) {
+        return d;
+      })
+      .attr("text-anchor", "start")
+      .style("alignment-baseline", "middle")
+      .style("font-size", "16px");
+  }
+
+  updateStackedBar(question);
+
+  // At last, add a pie chart
+
+  // Keys and color codings
+  const pieKeys = ["Male", "Female", "Prefer not to say"];
+  const pieColor = d3
+    .scaleOrdinal()
+    .domain(pieKeys)
+    .range(["#2986cc", "#c90076", "#cccccc"]);
+
+  // Container for the pie chart
+  const svg2 = svg
+    .append("svg")
+    .attr("x", pieLeft)
+    .attr("y", pieTop)
+    .attr("height", pieHeight)
+    .attr("width", pieWidth);
+
+  const radius = Math.min(pieWidth, pieHeight) / 3;
+
+  // Grouping all the svgs for the pie chart
+  const pieGroup = svg2
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${pieWidth / 2}, ${pieHeight / 2 + pieMargin.top})`,
+    );
+
+  // Title for the pie chart which needs to be dynamic
+  const titleFO = svg2
+    .append("foreignObject") // Text had to be wrapped in this foreign object so that it wouldn't go off the page
+    .attr("width", pieWidth)
+    .attr("height", 60)
+    .attr("x", 0)
+    .attr("y", 0)
+    // Interaction for the title
+    .on("mousemove", function (event, d) {
+      const [x, y] = d3.pointer(event);
+      tooltip
+        .style("visibility", "visible")
+        .html(
+          `Hover over the node titles in the sankey and see how this changes!`,
+        )
+        .style("left", x + pieLeft + "px")
+        .style("top", y + pieTop - 50 + "px");
+    })
+    .on("mouseout", function (event, d) {
+      tooltip.style("visibility", "hidden");
+    })
+    .append("xhtml:div")
+    .style("font-weight", "bold")
+    .style("text-anchor", "middle")
+    .style("font-size", width > 1000 ? 11 : 9);
+
+  // Adding in the legend
+  svg2
+    .selectAll("mydots")
+    .data(pieKeys)
+    .enter()
+    .append("circle")
+    .attr("cx", pieWidth - 40)
+    .attr("cy", function (d, i) {
+      return pieHeight / 2 - 50 + i * 25;
+    })
+    .attr("r", 5)
+    .style("fill", function (d) {
+      return pieColor(d);
+    });
+
+  // Add one dot in the legend for each name.
+  svg2
+    .selectAll("mylabels")
+    .data(pieKeys)
+    .enter()
+    .append("text")
+    .attr("x", pieWidth - 50)
+    .attr("y", function (d, i) {
+      return pieHeight / 2 - 50 + i * 25;
+    })
+    .style("fill", function (d) {
+      return pieColor(d);
+    })
+    .text(function (d) {
+      return d;
+    })
+    .attr("text-anchor", "end")
+    .style("alignment-baseline", "middle")
+    .style("font-size", "16px");
+
+  // Everything moved into an update function so that animation would work
+  function updatePie(columnFilter, columnResponse) {
+    const arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
+
+    const pieData = (() => {
+      // we are going to look at what proportions of users who agree or strongly agreed
+      // wearables influenced a change in diet, also said wearables influenced decision to exercise
+      const processed_data = {};
+      const filteredData = rawData.filter((d) => {
+        let response = d[columnFilter];
+        return response == columnResponse;
+      });
+
+      let responseCounts = new Map([
+        ["Male", 0],
+        ["Female", 0],
+        ["Prefer not to say", 0],
+      ]);
+
+      filteredData.forEach((d) => {
+        let influence = d["What is your gender?"];
+        responseCounts.set(influence, responseCounts.get(influence) + 1);
+      });
+
+      for (const [k, v] of responseCounts) {
+        processed_data[k] = v;
+      }
+      return processed_data;
+    })();
+
+    // To help calculate percentages
+    const total = Object.values(pieData).reduce((total, num) => total + num, 0);
+
+    const dataPrepper = d3
+      .pie()
+      .value((d) => d[1])
+      .sort(function (a, b) {
+        return d3.ascending(a.key, b.key);
+      });
+    const piePreppedData = dataPrepper(Object.entries(pieData));
+
+    // The actual slices of data
+    const slices = pieGroup.selectAll("path").data(piePreppedData);
+
+    slices
+      .join("path")
+      // For interaction
+      .on("mousemove", function (event, d) {
+        const [x, y] = d3.pointer(event);
+        d3.select(this).style("fill-opacity", 0.7);
+        tooltip
+          .style("visibility", "visible")
+          .html(
+            `${d.value}/${total} (${((d.value / total) * 100).toFixed(2)}%)`,
+          )
+          .style("left", x + pieLeft + pieWidth / 2 + 10 + "px")
+          .style("top", y + pieTop + pieHeight / 2 - 30 + "px");
+      })
+      .on("mouseout", function (event, d) {
+        d3.select(this).style("fill-opacity", 1);
+        tooltip.style("visibility", "hidden");
+      })
+      .transition()
+      .duration(1000)
+      // Implementation came from https://stackoverflow.com/questions/78210697/d3-js-error-transition-arc-path-attribute-d-expected-arc-flag-0-or-1
+      // Without this that animation transitions wouldn't work
+      .attrTween("d", function (d) {
+        const i = d3.interpolate(this._current || d, d);
+        this._current = i(1);
+        return (t) => arcGenerator(i(t));
+      })
+      .attr("fill", (d) => pieColor(d.data[0]))
+      .attr("stroke", "white")
+      .style("stroke-width", "5px")
+      .style("opacity", 1);
+
+    // The titles for each of the slices of data
+    pieGroup
+      .selectAll("text")
+      .data(piePreppedData)
+      .join("text")
+      .transition()
+      .duration(1000)
+      .text((d) => (d.value == 0 ? "" : d.data[0]))
+      .attr("transform", (d) => {
+        const mid = (d.startAngle + d.endAngle) / 2 - Math.PI / 2;
+        const r = radius * 0.7; // outer radius
+        return `translate(${Math.cos(mid) * r}, ${Math.sin(mid) * r})`;
+      })
+      .attr("text-anchor", "middle")
+      .attr("font-size", radius > 50 ? 14 : 8);
+
+    // Top title
+    titleFO.html(
+      'Gender Distribution for those who answered: "' +
+        columnFilter +
+        '" with "' +
+        columnResponse +
+        '"',
+    );
+  }
+
+  // The pie chart users will see when the webpage is first loaded
+  updatePie(
+    "Has using a fitness wearable influenced your decision? [To change your diet?]",
+    "Strongly agree",
+  );
+});
