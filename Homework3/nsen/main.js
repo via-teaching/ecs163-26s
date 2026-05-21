@@ -12,7 +12,7 @@ const margins = {
 
 // Title Height
 const headerHeight = 100;
-const keyHeight = 40;
+const keyHeight = 10;
 
 // Dimensions for all three charts
 const chartDims = {
@@ -81,6 +81,9 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
   const data = rawData;
   // console.log("data", data);
 
+  // Create type filtering behavior
+  const activeCategories = new Set(Object.keys(typeColorDict));
+
   // plot 1: Bar chart
 
   // Select the bar-svg
@@ -130,6 +133,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .call(d3.axisBottom(barX1))
     .selectAll("text")
     .attr("transform", `translate(0, 0) rotate(0)`)
+    .attr("font-size", `${chartDims.bar.innerWidth / 1210}rem`)
     .attr("text-anchor", "center");
 
   // Label x axis
@@ -205,6 +209,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     Total: parseInt(d.Total),
     Catch_Rate: parseInt(d.Catch_Rate),
     Type_1: d.Type_1,
+    Number: d.Number,
   }));
 
   // Plot Title
@@ -245,10 +250,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .attr("font-size", "14px")
     .attr("text-anchor", "middle")
     .text("Total Stats");
-  console.log(
-    "max catch rate",
-    d3.max(scatterData, (d) => d.Catch_Rate),
-  );
+
   // Compute y axis
   const scatterY1 = d3
     .scaleLinear()
@@ -322,6 +324,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     Sp_Def: parseInt(d.Sp_Def),
     Speed: parseInt(d.Speed),
     Type_1: d.Type_1,
+    Number: d.Number,
   }));
 
   // Plot Title
@@ -366,7 +369,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .selectAll("path")
     .data(parallelData)
     .join("path")
-    .attr("stroke", (d) => typeColors(d.Type_1))
+    .attr("stroke", (d) => activeCategories.has(d.Type_1) ? typeColors(d.Type_1) : deselectedColor)
     .attr("d", (d) => line(d3.cross(keys, [d], (key, d) => [key, d[key]])))
     .call((path) => path.append("title").text((d) => d.name));
 
@@ -414,29 +417,33 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
   axes.call(brush);
 
   const selections = new Map();
+  let activePoints = new Set(rawData.map(d => d.Number));
 
   function brushed({ selection }, key) {
     if (selection === null) selections.delete(key);
     else selections.set(key, selection.map(parallelXAxis.get(key).invert));
     const selected = [];
+    activePoints = new Set();
     path.each(function (d) {
       const active = Array.from(selections).every(
         ([key, [min, max]]) => d[key] >= min && d[key] <= max,
       );
       d3.select(this).style(
         "stroke",
-        active ? typeColors(d.Type_1) : deselectedColor,
+        active && activeCategories.has(d.Type_1) ? typeColors(d.Type_1) : deselectedColor,
       );
       if (active) {
         d3.select(this).raise();
         selected.push(d);
+        activePoints.add(d.Number);
       }
     });
+    // console.log("selections", selections)
+    scatterSelect();
     parallelSvg.property("value", selected).dispatch("input");
   }
 
-  // Create type filtering behavior
-  const activeCategories = new Set(Object.keys(typeColorDict));
+
 
   const bars = barSvg.selectAll(".bars").on("click", function (event, d) {
     console.log("event", event, "d", d);
@@ -447,14 +454,22 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
       activeCategories.add(d.Type_1);
       d3.select(this).style("opacity", 1);
     }
-    scatterSelect(d.Type_1);
+
+    path.each(function (d) {
+      d3.select(this).style(
+        "stroke",
+        activePoints.has(d.Number) && activeCategories.has(d.Type_1) ? typeColors(d.Type_1) : deselectedColor,
+      );
+    })
+    scatterSelect();
   });
 
-  function scatterSelect(type) {
+  function scatterSelect() {
+    console.log("activePoints", activePoints)
     const dots = scatterSvg
       .selectAll(".mark-circle")
-      .style("fill-opacity", (d) => (activeCategories.has(d.Type_1) ? 0.9 : 0))
-      .style("stroke-width", (d) => (activeCategories.has(d.Type_1) ? 0.8 : 0));
-    console.log("dots", dots);
+      .style("fill-opacity", (d) => (activeCategories.has(d.Type_1) && activePoints.has(d.Number) ? 0.9 : 0))
+      .style("stroke-width", (d) => (activeCategories.has(d.Type_1) && activePoints.has(d.Number) ? 0.8 : 0));
+    // console.log("dots", dots);
   }
 });
