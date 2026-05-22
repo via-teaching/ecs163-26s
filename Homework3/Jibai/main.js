@@ -48,7 +48,7 @@ let dashboardState = {
   salaryRange: null
 };
 
-// Tooltip. 
+// Tooltip.
 const tooltip = d3.select("body")
   .append("div")
   .attr("class", "tooltip");
@@ -201,7 +201,7 @@ function drawHeatmap(data) {
     .call(d3.axisLeft(y).tickFormat(d => experienceLabels[d]).tickSizeOuter(0));
 
   // Click a cell to focus the other views.
-  g.selectAll("rect")
+  const cellsSelection = g.selectAll("rect")
     .data(cells)
     .join("rect")
     .attr("class", "heatmap-cell")
@@ -213,7 +213,7 @@ function drawHeatmap(data) {
     .attr("fill", d => color(d.avgSalary))
     .attr("stroke", "#111827")
     .attr("stroke-width", d => isSelectedCell(d) ? 3 : 0)
-    .attr("opacity", d => getCellOpacity(d))
+    .attr("opacity", 1)
     .on("click", function(event, d) {
       if (isSelectedCell(d)) {
         dashboardState.selectedCell = null;
@@ -243,8 +243,14 @@ function drawHeatmap(data) {
       tooltip.style("opacity", 0);
     });
 
+  // Fade cells that are outside the current selection.
+  cellsSelection.transition()
+    .duration(450)
+    .ease(d3.easeCubicOut)
+    .attr("opacity", d => getCellOpacity(d));
+
   // Add salary labels inside the cells.
-  g.selectAll(".cell-label")
+  const labels = g.selectAll(".cell-label")
     .data(cells)
     .join("text")
     .attr("class", "cell-label")
@@ -252,8 +258,13 @@ function drawHeatmap(data) {
     .attr("y", d => y(d.experienceLevel) + y.bandwidth() / 2 + 4)
     .attr("text-anchor", "middle")
     .attr("fill", d => getTextColor(color(d.avgSalary)))
-    .attr("opacity", d => getCellOpacity(d))
+    .attr("opacity", 1)
     .text(d => formatSalaryShort(d.avgSalary));
+
+  labels.transition()
+    .duration(450)
+    .ease(d3.easeCubicOut)
+    .attr("opacity", d => getCellOpacity(d));
 
   svg.append("text")
     .attr("class", "axis-label")
@@ -379,13 +390,21 @@ function drawDistribution(data) {
     .attr("x1", 0)
     .attr("x2", chartWidth)
     .attr("y1", 0)
-    .attr("y2", 0);
+    .attr("y2", 0)
+    .attr("opacity", 0)
+    .transition()
+    .duration(500)
+    .attr("opacity", 1);
 
   // Draw the distribution shapes.
   groups.append("path")
     .attr("class", "density-area")
     .attr("d", d => area(d.density))
     .attr("fill", d => experienceColors[d.experienceLevel])
+    .attr("opacity", 0)
+    .transition()
+    .duration(650)
+    .ease(d3.easeCubicOut)
     .attr("opacity", 0.55);
 
   groups.append("path")
@@ -393,14 +412,23 @@ function drawDistribution(data) {
     .attr("d", d => line(d.density))
     .attr("fill", "none")
     .attr("stroke", d => experienceColors[d.experienceLevel])
-    .attr("stroke-width", 2.2);
+    .attr("stroke-width", 2.2)
+    .attr("opacity", 0)
+    .transition()
+    .duration(650)
+    .ease(d3.easeCubicOut)
+    .attr("opacity", 1);
 
   // Mark median salary for each group.
   groups.append("circle")
     .attr("cx", d => x(d.median))
     .attr("cy", 0)
-    .attr("r", 4.5)
-    .attr("fill", "#111827");
+    .attr("r", 0)
+    .attr("fill", "#111827")
+    .transition()
+    .duration(650)
+    .ease(d3.easeCubicOut)
+    .attr("r", 4.5);
 
   svg.append("text")
     .attr("class", "axis-label")
@@ -502,7 +530,11 @@ function drawSalaryFlow(data) {
     .attr("x", d => d.x)
     .attr("y", -18)
     .attr("text-anchor", "middle")
-    .text(d => d.label);
+    .attr("opacity", 0)
+    .text(d => d.label)
+    .transition()
+    .duration(450)
+    .attr("opacity", 1);
 
   // Draw links behind the nodes.
   g.append("g")
@@ -512,7 +544,8 @@ function drawSalaryFlow(data) {
     .attr("class", "flow-link")
     .attr("d", d => flowPath(d))
     .attr("stroke", d => flowTypeColors[nodes[d.source].type])
-    .attr("stroke-width", d => Math.max(1, d.width))
+    .attr("stroke-width", 0)
+    .style("opacity", 0)
     .on("mousemove", function(event, d) {
       tooltip
         .style("opacity", 1)
@@ -525,7 +558,12 @@ function drawSalaryFlow(data) {
     })
     .on("mouseleave", function() {
       tooltip.style("opacity", 0);
-    });
+    })
+    .transition()
+    .duration(700)
+    .ease(d3.easeCubicOut)
+    .attr("stroke-width", d => Math.max(1, d.width))
+    .style("opacity", 0.28);
 
   const nodeGroups = g.append("g")
     .selectAll(".flow-node")
@@ -536,9 +574,9 @@ function drawSalaryFlow(data) {
   // Draw flow nodes as vertical blocks.
   nodeGroups.append("rect")
     .attr("x", d => d.x0)
-    .attr("y", d => d.y0)
+    .attr("y", d => (d.y0 + d.y1) / 2)
     .attr("width", d => d.x1 - d.x0)
-    .attr("height", d => Math.max(6, d.y1 - d.y0))
+    .attr("height", 0)
     .attr("rx", 5)
     .attr("fill", d => flowTypeColors[d.type])
     .on("mousemove", function(event, d) {
@@ -553,14 +591,24 @@ function drawSalaryFlow(data) {
     })
     .on("mouseleave", function() {
       tooltip.style("opacity", 0);
-    });
+    })
+    .transition()
+    .duration(700)
+    .ease(d3.easeCubicOut)
+    .attr("y", d => d.y0)
+    .attr("height", d => Math.max(6, d.y1 - d.y0));
 
   nodeGroups.append("text")
     .attr("class", "flow-node-label")
     .attr("x", d => d.layer === 0 ? d.x0 - 10 : d.x1 + 10)
     .attr("y", d => (d.y0 + d.y1) / 2 + 4)
     .attr("text-anchor", d => d.layer === 0 ? "end" : "start")
-    .text(d => d.label);
+    .attr("opacity", 0)
+    .text(d => d.label)
+    .transition()
+    .delay(200)
+    .duration(450)
+    .attr("opacity", 1);
 
   svg.append("text")
     .attr("class", "note-label")
