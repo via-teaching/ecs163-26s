@@ -119,21 +119,34 @@ function getFilteredData() {
 }
 
 function updateSummary(selectedData, filteredData) {
-  let text = "Showing all records";
+  const allCount = allData.length.toLocaleString();
+  const selectedCount = selectedData.length.toLocaleString();
+  const filteredCount = filteredData.length.toLocaleString();
+
+  if (!dashboardState.selectedCell && !dashboardState.salaryRange) {
+    d3.select("#selection-summary").text(`Showing all ${allCount} records`);
+    return;
+  }
+
+  const summaryParts = [];
 
   if (dashboardState.selectedCell) {
     const exp = experienceLabels[dashboardState.selectedCell.experienceLevel];
     const size = companySizeLabels[dashboardState.selectedCell.companySize];
-    text = `Selected: ${exp}, ${size} company`;
+
+    summaryParts.push(`Selected: ${exp}, ${size} company`);
   }
 
   if (dashboardState.salaryRange) {
-    text += ` | Salary brush: ${formatSalaryShort(dashboardState.salaryRange[0])} to ${formatSalaryShort(dashboardState.salaryRange[1])}`;
+    const low = formatSalary(dashboardState.salaryRange[0]);
+    const high = formatSalary(dashboardState.salaryRange[1]);
+
+    summaryParts.push(`Salary range: ${low} to ${high}`);
   }
 
-  text += ` | Records shown: ${filteredData.length} of ${selectedData.length}`;
+  summaryParts.push(`Records: ${filteredCount} of ${selectedCount}`);
 
-  d3.select("#selection-summary").text(text);
+  d3.select("#selection-summary").text(summaryParts.join(" | "));
 }
 
 function drawHeatmap(data) {
@@ -235,7 +248,7 @@ function drawHeatmap(data) {
         .html(`
           <strong>${experienceLabels[d.experienceLevel]} / ${companySizeLabels[d.companySize]}</strong><br>
           Avg salary: ${formatSalary(d.avgSalary)}<br>
-          Records: ${d.count}<br>
+          Records: ${d.count.toLocaleString()}<br>
           Click to focus this group
         `);
     })
@@ -553,7 +566,7 @@ function drawSalaryFlow(data) {
         .style("top", `${event.pageY - 28}px`)
         .html(`
           <strong>${nodes[d.source].label} → ${nodes[d.target].label}</strong><br>
-          Records: ${d.value}
+          Records: ${d.value.toLocaleString()}
         `);
     })
     .on("mouseleave", function() {
@@ -586,7 +599,7 @@ function drawSalaryFlow(data) {
         .style("top", `${event.pageY - 28}px`)
         .html(`
           <strong>${d.label}</strong><br>
-          Records: ${d.value}
+          Records: ${d.value.toLocaleString()}
         `);
     })
     .on("mouseleave", function() {
@@ -614,7 +627,7 @@ function drawSalaryFlow(data) {
     .attr("class", "note-label")
     .attr("x", margin.left)
     .attr("y", 18)
-    .text(`Flow width shows number of records. Showing ${data.length} records.`);
+    .text(`Flow width shows number of records. Showing ${data.length.toLocaleString()} records.`);
 
   drawFlowLegend(svg, width, margin, d3.max(links, d => d.value));
 }
@@ -793,7 +806,7 @@ function drawFlowLegend(svg, width, margin, maxValue) {
       .attr("class", "legend-label")
       .attr("x", 42)
       .attr("y", 12)
-      .text(value);
+      .text(value.toLocaleString());
   });
 }
 
