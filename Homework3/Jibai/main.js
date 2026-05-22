@@ -277,6 +277,11 @@ function drawDistribution(data) {
   const svg = d3.select("#distribution");
   svg.selectAll("*").remove();
 
+  if (data.length === 0) {
+    drawNoData(svg, "No salary records match the current selection.");
+    return;
+  }
+
   const width = svg.node().clientWidth;
   const height = svg.node().clientHeight;
 
@@ -381,21 +386,7 @@ function drawDistribution(data) {
     .attr("class", "density-area")
     .attr("d", d => area(d.density))
     .attr("fill", d => experienceColors[d.experienceLevel])
-    .attr("opacity", 0.55)
-    .on("mousemove", function(event, d) {
-      tooltip
-        .style("opacity", 1)
-        .style("left", `${event.pageX + 12}px`)
-        .style("top", `${event.pageY - 28}px`)
-        .html(`
-          <strong>${experienceLabels[d.experienceLevel]}</strong><br>
-          Median salary: ${formatSalary(d.median)}<br>
-          Records shown: ${d.count}
-        `);
-    })
-    .on("mouseleave", function() {
-      tooltip.style("opacity", 0);
-    });
+    .attr("opacity", 0.55);
 
   groups.append("path")
     .attr("class", "density-line")
@@ -422,14 +413,52 @@ function drawDistribution(data) {
     .attr("class", "note-label")
     .attr("x", margin.left)
     .attr("y", 20)
-    .text("Dots mark median salary. Top 1% salaries are trimmed for readability.");
+    .text("Drag across the chart to filter the flow view. Dots mark median salary.");
 
   drawDistributionLegend(svg, width, margin, displayOrder);
+  addSalaryBrush(svg, x, margin, chartWidth, chartHeight);
+}
+
+function addSalaryBrush(svg, x, margin, chartWidth, chartHeight) {
+  // Brush a salary range to filter the flow view.
+  const brush = d3.brushX()
+    .extent([[0, 0], [chartWidth, chartHeight]])
+    .on("end", function(event) {
+      if (!event.sourceEvent) {
+        return;
+      }
+
+      if (!event.selection) {
+        dashboardState.salaryRange = null;
+      } else {
+        dashboardState.salaryRange = event.selection.map(x.invert).sort(d3.ascending);
+      }
+
+      const selectedData = getSelectedData();
+      const filteredData = getFilteredData();
+
+      drawSalaryFlow(filteredData);
+      updateSummary(selectedData, filteredData);
+    });
+
+  const brushGroup = svg.append("g")
+    .attr("class", "brush")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`)
+    .call(brush);
+
+  if (dashboardState.salaryRange) {
+    brushGroup.call(brush.move, dashboardState.salaryRange.map(x));
+  }
 }
 
 function drawSalaryFlow(data) {
   const svg = d3.select("#flow");
   svg.selectAll("*").remove();
+
+  if (data.length === 0) {
+    drawNoData(svg, "No records match the current salary range.");
+    return;
+  }
 
   const width = svg.node().clientWidth;
   const height = svg.node().clientHeight;
@@ -449,7 +478,7 @@ function drawSalaryFlow(data) {
   const links = flowData.links;
 
   // Position nodes and links for the flow layout.
-  layoutFlow(nodes, links, chartWidth, chartHeight);
+  const valueScale = layoutFlow(nodes, links, chartWidth, chartHeight);
 
   const g = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
@@ -537,9 +566,9 @@ function drawSalaryFlow(data) {
     .attr("class", "note-label")
     .attr("x", margin.left)
     .attr("y", 18)
-    .text("Flow width shows number of records. Salary tiers are based on salary in USD.");
+    .text(`Flow width shows number of records. Showing ${data.length} records.`);
 
-  drawFlowLegend(svg, width, margin);
+  drawFlowLegend(svg, width, margin, valueScale, d3.max(links, d => d.value));
 }
 
 function layoutFlow(nodes, links, chartWidth, chartHeight) {
@@ -571,7 +600,7 @@ function layoutFlow(nodes, links, chartWidth, chartHeight) {
   const valueScale = d3.min(layerScales);
 
   // Stack nodes within each layer.
-  layers.forEach(([layer, layerNodes]) => {
+  layers.forEach(([, layerNodes]) => {
     const orderedNodes = sortFlowNodes(layerNodes);
     const totalHeight = d3.sum(orderedNodes, d => d.value * valueScale) + (orderedNodes.length - 1) * nodeGap;
     let y = (chartHeight - totalHeight) / 2;
@@ -613,6 +642,8 @@ function layoutFlow(nodes, links, chartWidth, chartHeight) {
     source.sourceOffset += width;
     target.targetOffset += width;
   });
+
+  return valueScale;
 }
 
 function sortFlowNodes(nodes) {
@@ -642,7 +673,7 @@ function flowPath(d) {
   `;
 }
 
-function drawFlowLegend(svg, width, margin) {
+function drawFlowLegend(svg, width, margin, valueScale, maxValue) {
   const legend = svg.append("g")
     .attr("transform", `translate(${width - 145}, ${margin.top + 8})`);
 
@@ -685,12 +716,12 @@ function drawFlowLegend(svg, width, margin) {
     .text("Flow width");
 
   const samples = [
-    { label: "50", width: 4 },
-    { label: "250", width: 11 },
-    { label: "700", width: 20 }
+    Math.max(1, Math.round(maxValue * 0.12)),
+    Math.max(1, Math.round(maxValue * 0.4)),
+    Math.max(1, Math.round(maxValue))
   ];
 
-  samples.forEach((sample, i) => {
+  [...new Set(samples)].forEach((value, i) => {
     const row = widthLegend.append("g")
       .attr("transform", `translate(0, ${i * 20})`);
 
@@ -700,14 +731,14 @@ function drawFlowLegend(svg, width, margin) {
       .attr("y1", 7)
       .attr("y2", 7)
       .attr("stroke", "#94a3b8")
-      .attr("stroke-width", sample.width)
+      .attr("stroke-width", Math.min(22, Math.max(3, value * valueScale)))
       .attr("opacity", 0.45);
 
     row.append("text")
       .attr("class", "legend-label")
       .attr("x", 40)
       .attr("y", 10)
-      .text(sample.label);
+      .text(value);
   });
 }
 
@@ -871,6 +902,18 @@ function drawHeatmapLegend(svg, color, width, height, margin) {
     .attr("x", legendX - 5)
     .attr("y", legendY - 8)
     .text("Avg salary");
+}
+
+function drawNoData(svg, message) {
+  const width = svg.node().clientWidth;
+  const height = svg.node().clientHeight;
+
+  svg.append("text")
+    .attr("class", "no-data-label")
+    .attr("x", width / 2)
+    .attr("y", height / 2)
+    .attr("text-anchor", "middle")
+    .text(message);
 }
 
 function isSelectedCell(d) {

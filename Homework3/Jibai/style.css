@@ -169,6 +169,17 @@ svg {
   fill: #64748b;
 }
 
+.brush .overlay {
+  cursor: crosshair;
+}
+
+.brush .selection {
+  fill: #334155;
+  fill-opacity: 0.16;
+  stroke: #334155;
+  stroke-width: 1;
+}
+
 .flow-link {
   fill: none;
   opacity: 0.28;
@@ -193,4 +204,9 @@ svg {
   font-size: 12px;
   font-weight: bold;
   fill: #374151;
+}
+
+.no-data-label {
+  font-size: 14px;
+  fill: #64748b;
 }
