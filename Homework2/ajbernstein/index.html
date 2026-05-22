@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pokemon Dashboard</title>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+
+  <div class="header">
+    <h1>Pokémon Analytics Dashboard</h1>
+    <p>
+      Exploring Pokémon types, combat stats, and legendary distributions.
+    </p>
+  </div>
+
+  <div class="dashboard">
+
+    <div class="chart-container" id="bar-container">
+      <h2>Pokémon by Primary Type</h2>
+      <svg id="bar-chart"></svg>
+    </div>
+
+    <div class="chart-container" id="scatter-container">
+      <h2>Attack vs Defense</h2>
+      <svg id="scatter-plot"></svg>
+    </div>
+
+    <div class="chart-container wide" id="parallel-container">
+      <h2>Parallel Coordinates — Advanced Visualization</h2>
+      <svg id="parallel-chart"></svg>
+    </div>
+
+  </div>
+
+  <div class="tooltip"></div>
+
+  <script src="main.js"></script>
+</body>
+</html>
