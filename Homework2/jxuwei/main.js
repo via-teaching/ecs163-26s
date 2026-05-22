@@ -31,6 +31,8 @@ function dataProcessor(d) {
         success: +d.success === 1 ? "Successful" : "Unsuccessful",
         attackType: d.attacktype1_txt || "Unknown",
         region: d.region_txt || "Unknown",
+        country: d.country_txt || "Unknown",
+        year: d.iyear ? +d.iyear : null,
         nkill: nkill,
         latitude: d.latitude ? +d.latitude : null,
         longitude: d.longitude ? +d.longitude : null,
@@ -125,11 +127,16 @@ function drawMap(world, data) {
     // Pre-calculate projections for performance
     const projectedPoints = [];
     data.forEach(d => {
-        if (d.latitude && d.longitude) {
+        if (d.latitude && d.longitude && d.year) {
             const coords = projection([d.longitude, d.latitude]);
-            if (coords) projectedPoints.push({ x: coords[0], y: coords[1] });
+            if (coords) projectedPoints.push({ x: coords[0], y: coords[1], year: d.year });
         }
     });
+
+    // Sort chronologically for cumulative rendering
+    projectedPoints.sort((a, b) => a.year - b.year);
+
+    let currentMapIndex = projectedPoints.length; // start fully drawn
 
     function drawPoints(transform) {
         context.clearRect(0, 0, mapArea.w, mapArea.h - 60);
@@ -145,7 +152,8 @@ function drawMap(world, data) {
         const halfSize = size / 2;
 
         context.beginPath();
-        for (let i = 0; i < projectedPoints.length; i++) {
+        const limit = Math.min(projectedPoints.length, Math.floor(currentMapIndex));
+        for (let i = 0; i < limit; i++) {
             const px = projectedPoints[i].x * k + tx;
             const py = projectedPoints[i].y * k + ty;
             
@@ -175,6 +183,147 @@ function drawMap(world, data) {
 
     // Initial canvas draw
     drawPoints(d3.zoomIdentity);
+
+    // Timelapse UI group
+    const timelapseGroup = g.append("g")
+        .attr("transform", `translate(${mapArea.w / 2 - 150}, ${mapArea.h - 110})`);
+
+    // Background panel for UI
+    timelapseGroup.append("rect")
+        .attr("width", 300)
+        .attr("height", 40)
+        .attr("rx", 5)
+        .attr("fill", "rgba(0, 0, 0, 0.7)")
+        .attr("stroke", "gray");
+
+    // Play/Pause button
+    const playBtn = timelapseGroup.append("g")
+        .style("cursor", "pointer")
+        .attr("transform", "translate(10, 10)");
+        
+    playBtn.append("rect")
+        .attr("width", 55)
+        .attr("height", 20)
+        .attr("rx", 3)
+        .attr("fill", "#444");
+        
+    const playText = playBtn.append("text")
+        .attr("x", 27.5)
+        .attr("y", 14)
+        .attr("text-anchor", "middle")
+        .style("font-size", "12px")
+        .style("fill", "white")
+        .text("▶ Play");
+
+    // Year display
+    const yearDisplay = timelapseGroup.append("text")
+        .attr("x", 150)
+        .attr("y", 24)
+        .attr("text-anchor", "middle")
+        .style("font-size", "14px")
+        .style("font-weight", "bold")
+        .style("fill", "white")
+        .text("Year: 2017");
+
+    // Slider track
+    const sliderWidth = 280;
+    timelapseGroup.append("line")
+        .attr("x1", 10)
+        .attr("y1", 35)
+        .attr("x2", 10 + sliderWidth)
+        .attr("y2", 35)
+        .attr("stroke", "gray")
+        .attr("stroke-width", 4)
+        .attr("stroke-linecap", "round");
+        
+    // Slider progress
+    const sliderProgress = timelapseGroup.append("line")
+        .attr("x1", 10)
+        .attr("y1", 35)
+        .attr("x2", 10 + sliderWidth)
+        .attr("y2", 35)
+        .attr("stroke", "tomato")
+        .attr("stroke-width", 4)
+        .attr("stroke-linecap", "round");
+
+    // Slider handle
+    const handle = timelapseGroup.append("circle")
+        .attr("cx", 10 + sliderWidth)
+        .attr("cy", 35)
+        .attr("r", 6)
+        .attr("fill", "white")
+        .style("cursor", "grab");
+
+    let animationTimer = null;
+
+    function updateSliderVisuals() {
+        const progress = currentMapIndex / projectedPoints.length;
+        const cx = 10 + (progress * sliderWidth);
+        handle.attr("cx", cx);
+        sliderProgress.attr("x2", cx);
+        
+        const currentDataPoint = projectedPoints[Math.min(Math.floor(currentMapIndex), projectedPoints.length - 1)];
+        if (currentDataPoint) {
+            yearDisplay.text(`Year: ${currentDataPoint.year}`);
+        }
+    }
+
+    // Drag behavior for manual scrubbing
+    handle.call(d3.drag()
+        .on("start", () => {
+            if (animationTimer) {
+                animationTimer.stop();
+                animationTimer = null;
+                playText.text("▶ Play");
+            }
+        })
+        .on("drag", (event) => {
+            let cx = Math.max(10, Math.min(10 + sliderWidth, event.x));
+            handle.attr("cx", cx);
+            sliderProgress.attr("x2", cx);
+            const progress = (cx - 10) / sliderWidth;
+            currentMapIndex = progress * projectedPoints.length;
+            updateSliderVisuals();
+            drawPoints(d3.zoomTransform(mapContainer.node()));
+        })
+    );
+
+    // Play button logic
+    playBtn.on("click", () => {
+        if (animationTimer) {
+            // Pause
+            animationTimer.stop();
+            animationTimer = null;
+            playText.text("▶ Play");
+        } else {
+            // Play
+            if (currentMapIndex >= projectedPoints.length - 1) {
+                currentMapIndex = 0; // Restart if at end
+            }
+            playText.text("⏸ Pause");
+            
+            const duration = 15000; // 15 seconds
+            const totalPoints = projectedPoints.length;
+            const pointsPerMs = totalPoints / duration;
+            
+            let lastTime = d3.now();
+            animationTimer = d3.timer(() => {
+                const now = d3.now();
+                const delta = now - lastTime;
+                lastTime = now;
+                
+                currentMapIndex += delta * pointsPerMs;
+                if (currentMapIndex >= totalPoints) {
+                    currentMapIndex = totalPoints;
+                    animationTimer.stop();
+                    animationTimer = null;
+                    playText.text("▶ Play");
+                }
+                updateSliderVisuals();
+                drawPoints(d3.zoomTransform(mapContainer.node()));
+            });
+        }
+    });
 
     // Visual Zoom Controls
     const zoomControls = g.append("g")
@@ -220,55 +369,131 @@ function drawMap(world, data) {
 }
 
 // Chart 2: Pie chart showing regional deaths
+let pieChartGroup = null;
+let pieSelectedRegion = null;
+
+const regionColors = [
+    "crimson", "darkorange", "gold", "forestgreen", "teal",
+    "dodgerblue", "mediumpurple", "hotpink", "sienna", "darkgray",
+    "mediumaquamarine", "khaki"
+];
+const regionColorScale = d3.scaleOrdinal(regionColors);
+
 function drawPieChart(data) {
-    // Define main svg group
-    const g = svg.append("g")
-        .attr("transform", `translate(${pieArea.x + pieArea.w / 3}, ${pieArea.y + pieArea.h / 2 + 30})`);
+    if (!pieChartGroup) {
+        pieChartGroup = svg.append("g")
+            .attr("transform", `translate(${pieArea.x + pieArea.w / 3}, ${pieArea.y + pieArea.h / 2 + 30})`);
+            
+        const radius = Math.min(pieArea.w, pieArea.h) / 2.5;
 
-    // Aggregate data (death tolls per region)
-    const aggregated = d3.rollups(data, v => d3.sum(v, d => d.nkill), d => d.region)
-        .sort((a, b) => b[1] - a[1]);
+        // Chart label
+        pieChartGroup.append("text")
+            .attr("class", "chart-title")
+            .attr("y", -radius - 40)
+            .text("Fatalities by Region");
 
-    // Perform calculations for arcs relative to aggregated data
+        // Subtitle instruction
+        pieChartGroup.append("text")
+            .attr("class", "chart-subtitle")
+            .attr("y", -radius - 20)
+            .attr("text-anchor", "middle")
+            .style("font-size", "12px")
+            .style("fill", "lightgray")
+            .text("(Click on a region to see its country breakdown)");
+
+        // Back button (hidden initially)
+        pieChartGroup.append("text")
+            .attr("class", "back-button")
+            .attr("text-anchor", "middle")
+            .attr("dy", "0.35em")
+            .style("cursor", "pointer")
+            .style("fill", "white")
+            .style("font-size", "14px")
+            .style("visibility", "hidden")
+            .text("↩ Back")
+            .on("mouseover", function() { d3.select(this).style("fill", "dodgerblue"); })
+            .on("mouseout", function() { d3.select(this).style("fill", "white"); })
+            .on("click", () => {
+                pieSelectedRegion = null;
+                updatePieChart(data);
+                tooltip.style("visibility", "hidden");
+            });
+            
+        pieChartGroup.append("g").attr("class", "arcs");
+        pieChartGroup.append("g").attr("class", "legend")
+            .attr("transform", `translate(${radius + 40}, -${radius})`);
+    }
+
+    updatePieChart(data);
+}
+
+function updatePieChart(data) {
     const radius = Math.min(pieArea.w, pieArea.h) / 2.5;
-    const pie = d3.pie().value(d => d[1]);
     const arc = d3.arc().innerRadius(radius * 0.5).outerRadius(radius);
+    const pie = d3.pie().value(d => d[1]).sort((a, b) => b[1] - a[1]);
 
-    // Exactly 12 named CSS colors for the 12 regions in the dataset
-    const customColors = [
-        "crimson",
-        "darkorange",
-        "gold",
-        "forestgreen",
-        "teal",
-        "dodgerblue",
-        "mediumpurple",
-        "hotpink",
-        "sienna",
-        "darkgray",
-        "mediumaquamarine",
-        "khaki"
-    ];
-    const color = d3.scaleOrdinal(customColors);
+    let aggregated, color;
 
-    // Draw arcs based on relative size
-    const arcs = g.selectAll(".arc")
-        .data(pie(aggregated))
-        .enter().append("g");
+    if (!pieSelectedRegion) {
+        aggregated = d3.rollups(data, v => d3.sum(v, d => d.nkill), d => d.region)
+            .sort((a, b) => b[1] - a[1]);
+        color = regionColorScale;
+        pieChartGroup.select(".chart-title").text("Fatalities by Region");
+        pieChartGroup.select(".chart-subtitle").text("(Click on a region to see its country breakdown)");
+        pieChartGroup.select(".back-button").style("visibility", "hidden");
+    } else {
+        const filteredData = data.filter(d => d.region === pieSelectedRegion);
+        aggregated = d3.rollups(filteredData, v => d3.sum(v, d => d.nkill), d => d.country)
+            .sort((a, b) => b[1] - a[1]);
+        if (aggregated.length > 15) {
+            const others = aggregated.slice(14).reduce((sum, d) => sum + d[1], 0);
+            aggregated = aggregated.slice(0, 14);
+            aggregated.push(["Other", others]);
+        }
+        color = d3.scaleOrdinal(d3.schemeTableau10);
+        pieChartGroup.select(".chart-title").text(`Fatalities in ${pieSelectedRegion}`);
+        pieChartGroup.select(".chart-subtitle").text("");
+        pieChartGroup.select(".back-button").style("visibility", "visible");
+    }
 
-    arcs.append("path")
-        .attr("d", arc)
-        .attr("fill", d => color(d.data[0]))
+    const pieData = pie(aggregated);
+    const arcsGroup = pieChartGroup.select(".arcs");
+
+    // DATA JOIN
+    const arcs = arcsGroup.selectAll("path")
+        .data(pieData, d => d.data[0]);
+
+    // EXIT
+    arcs.exit()
+        .transition().duration(500)
+        .style("opacity", 0)
+        .remove();
+
+    // UPDATE
+    arcs.transition().duration(500)
+        .style("opacity", 1)
+        .attrTween("d", function(d) {
+            const i = d3.interpolate(this._current || d, d);
+            this._current = i(1);
+            return function(t) { return arc(i(t)); };
+        })
+        .attr("fill", (d, i) => pieSelectedRegion ? color(i) : color(d.data[0]));
+
+    // ENTER
+    arcs.enter().append("path")
+        .attr("fill", (d, i) => pieSelectedRegion ? color(i) : color(d.data[0]))
         .attr("stroke", "black")
         .style("stroke-width", "2px")
         .style("cursor", "pointer")
-
-        // Used to define tooltip events
+        .style("opacity", 0)
+        .each(function(d) { 
+            this._current = { startAngle: d.endAngle, endAngle: d.endAngle }; 
+        }) 
         .on("mouseover", function (event, d) {
             d3.select(this).style("opacity", 0.8);
             tooltip.style("visibility", "visible")
-                .html(`<strong>Region:</strong> ${d.data[0]}<br/>
-                          <strong>Total Fatalities:</strong> ${formatComma(d.data[1])}`);
+                .html(`<strong>${pieSelectedRegion ? 'Country' : 'Region'}:</strong> ${d.data[0]}<br/>
+                       <strong>Total Fatalities:</strong> ${formatComma(d.data[1])}`);
         })
         .on("mousemove", function (event) {
             tooltip.style("top", (event.pageY - 10) + "px")
@@ -277,32 +502,47 @@ function drawPieChart(data) {
         .on("mouseout", function () {
             d3.select(this).style("opacity", 1);
             tooltip.style("visibility", "hidden");
+        })
+        .on("click", function(event, d) {
+            if (!pieSelectedRegion && d.data[0] !== "Unknown" && d.data[0] !== "Other") {
+                pieSelectedRegion = d.data[0];
+                updatePieChart(data);
+                tooltip.style("visibility", "hidden");
+            }
+        })
+        .transition().duration(500)
+        .style("opacity", 1)
+        .attrTween("d", function(d) {
+            const i = d3.interpolate(this._current, d);
+            this._current = i(1);
+            return function(t) { return arc(i(t)); };
         });
 
-    // Chart label
-    g.append("text")
-        .attr("class", "chart-title")
-        .attr("y", -radius - 40)
-        .text("Fatalities by Region");
+    // Update Legend
+    const legendGroup = pieChartGroup.select(".legend");
+    const legendItems = legendGroup.selectAll("g")
+        .data(aggregated, d => d[0]);
 
-    // Legend
-    const legend = g.append("g").attr("transform", `translate(${radius + 40}, -${radius})`);
-    aggregated.forEach((d, i) => {
-        const legendRow = legend.append("g")
-            .attr("transform", `translate(0, ${i * 18})`);
+    legendItems.exit().remove();
 
-        legendRow.append("rect")
-            .attr("width", 12)
-            .attr("height", 12)
-            .attr("fill", color(d[0]));
+    const legendEnter = legendItems.enter().append("g");
+    legendEnter.append("rect")
+        .attr("width", 12)
+        .attr("height", 12);
+    legendEnter.append("text")
+        .attr("x", 20)
+        .attr("y", 10)
+        .style("font-size", "11px")
+        .attr("fill", "lightgray");
 
-        legendRow.append("text")
-            .attr("x", 20)
-            .attr("y", 10)
-            .text(`${d[0]} (${formatComma(d[1])})`)
-            .style("font-size", "11px")
-            .attr("fill", "lightgray");
-    });
+    const legendUpdate = legendEnter.merge(legendItems)
+        .attr("transform", (d, i) => `translate(0, ${i * 18})`);
+
+    legendUpdate.select("rect")
+        .attr("fill", (d, i) => pieSelectedRegion ? color(i) : color(d[0]));
+
+    legendUpdate.select("text")
+        .text(d => `${d[0]} (${formatComma(d[1])})`);
 }
 
 // Chart 3: Sankey chart showing progression of attacks
@@ -351,7 +591,7 @@ function drawSankey(data) {
     const sankey = d3.sankey()
         .nodeWidth(20)
         .nodePadding(12)
-        .extent([[0, 20], [sankeyArea.w, sankeyArea.h - 20]])
+        .extent([[0, 45], [sankeyArea.w, sankeyArea.h - 20]])
         .nodeSort((a, b) => {
             if (deathCountBins.includes(a.name) && deathCountBins.includes(b.name)) {
                 return deathCountBins.indexOf(a.name) - deathCountBins.indexOf(b.name);
@@ -497,6 +737,15 @@ function drawSankey(data) {
     // Chart label 
     g.append("text").attr("class", "chart-title").attr("x", sankeyArea.w / 2).attr("y", 0)
         .text("Attack Lifecycle: Method → Outcome → Fatalities");
+
+    // Subtitle instruction
+    g.append("text")
+        .attr("x", sankeyArea.w / 2)
+        .attr("y", 22)
+        .attr("text-anchor", "middle")
+        .style("font-size", "12px")
+        .style("fill", "lightgray")
+        .text("(Click on any node to isolate its specific flow)");
 
     // Rectangles for successful vs unsuccessful nodes
     nodeElements.append("rect")
