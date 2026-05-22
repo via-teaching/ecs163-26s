@@ -1,0 +1,397 @@
+:root {
+  --cream: #ede0d4;
+  --sand: #e6ccb2;
+  --tan: #ddb892;
+  --rose-brown: #b08968;
+  --brown: #7f5539;
+  --copper: #9c6644;
+  --ink: #39251a;
+  --muted: #6b4c3b;
+  --card: rgba(237, 224, 212, 0.86);
+  --shadow: 0 18px 40px rgba(127, 85, 57, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(221, 184, 146, 0.62), transparent 34rem),
+    linear-gradient(135deg, var(--cream), var(--sand));
+}
+
+.dashboard-shell {
+  width: min(1480px, 96vw);
+  height: 100vh;
+  margin: 0 auto;
+  padding: 18px 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) minmax(210px, 27vh);
+  gap: 14px;
+}
+
+.dashboard-header,
+.focus-card,
+.context-card {
+  border: 1px solid rgba(127, 85, 57, 0.16);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: center;
+  border-radius: 26px;
+  padding: 18px 24px;
+}
+
+.eyebrow,
+.chart-kicker {
+  margin: 0 0 4px;
+  color: var(--copper);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 6px;
+  font-size: clamp(1.5rem, 2.6vw, 2.6rem);
+  line-height: 1.05;
+}
+
+.subtitle {
+  max-width: 950px;
+  margin-bottom: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.controls {
+  min-width: 180px;
+  display: grid;
+  gap: 8px;
+  font-weight: 800;
+  color: var(--brown);
+}
+
+select {
+  border: 1px solid rgba(127, 85, 57, 0.26);
+  background: #fff9f3;
+  color: var(--ink);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font: inherit;
+  font-weight: 700;
+}
+
+.focus-card {
+  min-height: 0;
+  border-radius: 28px;
+  padding: 16px 18px 18px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.chart-meta {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 4px 10px;
+}
+
+.chart-meta h2,
+.mini-card-header h3 {
+  margin: 0;
+}
+
+.chart-hint {
+  max-width: 340px;
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  text-align: right;
+}
+
+.chart-area {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.context-grid {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.context-card {
+  min-height: 0;
+  border-radius: 24px;
+  padding: 12px 14px 14px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.context-card:hover,
+.context-card:focus-within {
+  transform: translateY(-2px);
+  border-color: rgba(127, 85, 57, 0.44);
+  box-shadow: 0 22px 46px rgba(127, 85, 57, 0.22);
+}
+
+.mini-card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 2px 8px;
+}
+
+.mini-card-header h3 {
+  font-size: 1rem;
+}
+
+.tooltip {
+  position: fixed;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 10;
+  max-width: 260px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(57, 37, 26, 0.94);
+  color: #fffaf4;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  box-shadow: 0 12px 30px rgba(57, 37, 26, 0.25);
+  transition: opacity 120ms ease;
+}
+
+.axis text,
+.legend text,
+.annotation,
+.parallel-label {
+  fill: var(--muted);
+  font-size: 12px;
+}
+
+.axis path,
+.axis line,
+.parallel-axis path,
+.parallel-axis line {
+  stroke: rgba(127, 85, 57, 0.28);
+}
+
+.grid line {
+  stroke: rgba(127, 85, 57, 0.12);
+}
+
+.grid path {
+  display: none;
+}
+
+.axis-title,
+.chart-title-svg {
+  fill: var(--brown);
+  font-weight: 800;
+}
+
+.bar-label {
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .dashboard-shell {
+    height: auto;
+    min-height: 100vh;
+    grid-template-rows: auto 58vh auto;
+  }
+
+  .dashboard-header,
+  .chart-meta,
+  .mini-card-header {
+    display: block;
+  }
+
+  .chart-hint {
+    text-align: left;
+    margin-top: 8px;
+  }
+
+  .context-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .context-card {
+    min-height: 230px;
+  }
+}
+
+@media (max-width: 1150px) {
+  .subtitle {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .dashboard-header {
+    padding: 14px 20px;
+  }
+
+  h1 {
+    font-size: clamp(1.45rem, 2.4vw, 2.2rem);
+  }
+}
+
+.subtitle-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  max-width: 950px;
+}
+
+.subtitle-row .subtitle {
+  flex: 1;
+}
+
+.description-toggle {
+  display: none;
+  border: 0;
+  background: transparent;
+  color: var(--copper);
+  font: inherit;
+  font-size: 1.1rem;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0 3px;
+}
+
+.description-toggle:hover {
+  color: var(--brown);
+}
+
+.description-toggle.is-expanded {
+  transform: rotate(180deg);
+}
+
+.subtitle.is-expanded {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow: visible;
+}
+
+@media (max-width: 1150px) {
+  .subtitle-row {
+    align-items: flex-end;
+  }
+
+  .description-toggle {
+    display: inline-block;
+    flex: 0 0 auto;
+  }
+
+  .subtitle {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .dashboard-header {
+    padding: 14px 20px;
+  }
+
+  h1 {
+    font-size: clamp(1.45rem, 2.4vw, 2.2rem);
+  }
+}
+
+/* --- HW3 interaction badges --- */
+
+/* shown when a rectangular brush selection is active on the scatter plot */
+.brush-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: rgba(156, 102, 68, 0.14);
+  border: 1px solid rgba(156, 102, 68, 0.36);
+  color: var(--copper);
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+.brush-badge.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* shown when a student line is pinned in the parallel coordinates view */
+.pin-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: rgba(182, 70, 95, 0.12);
+  border: 1px solid rgba(182, 70, 95, 0.36);
+  color: #b6465f;
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+.pin-label.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* d3 brush overlay rect — remove the default blue fill */
+.brush .selection {
+  fill: rgba(156, 102, 68, 0.15);
+  stroke: var(--copper);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+
+.brush .handle {
+  fill: var(--copper);
+  opacity: 0.55;
+}
