@@ -1,0 +1,80 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background: #111827;
+  color: white;
+  padding: 20px;
+}
+
+
+.header {
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.header p {
+  color: #d1d5db;
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 420px 450px;
+  gap: 20px;
+  width: 100%;
+  height: calc(100vh - 120px);
+}
+
+
+.chart-container {
+  background: #1f2937;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.chart-container h2 {
+  margin-bottom: 12px;
+  font-size: 20px;
+}
+
+.wide {
+  grid-column: span 2;
+}
+
+
+svg {
+  width: 100%;
+  height: 100%;
+}
+
+.tooltip {
+  position: absolute;
+  background: rgba(0,0,0,0.9);
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-size: 14px;
+}
+
+.axis-label {
+  fill: white;
+  font-size: 13px;
+}
+
+.legend {
+  font-size: 12px;
+  fill: white;
+}
