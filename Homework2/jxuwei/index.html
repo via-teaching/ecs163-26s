@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>GTD Analysis Dashboard</title>
+
+    <!-- D3.js import -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- Used to help display the map view -->
+    <script src="https://unpkg.com/topojson@3"></script>
+
+    <!-- Used to assist with rendering the advanced sankey graph -->
+    <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+
+    <!-- Inline CSS style guide -->
+    <style>
+        body {
+            margin: 0;
+            background-color: black;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        #main-svg {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: bold;
+            fill: white;
+            text-anchor: middle;
+        }
+
+        .node rect {
+            stroke: white;
+            stroke-width: 1px;
+        }
+
+        .node text {
+            fill: whitesmoke;
+            font-size: 10px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .link {
+            fill: none;
+            stroke: gray;
+            stroke-opacity: 0.3;
+        }
+
+        .link:hover {
+            stroke-opacity: 0.7;
+            stroke: red;
+        }
+
+        .tooltip {
+            position: absolute;
+            padding: 10px;
+            background: black;
+            color: white;
+            border: 1px solid gray;
+            border-radius: 4px;
+            pointer-events: none;
+            font-size: 13px;
+            visibility: hidden;
+            z-index: 10;
+        }
+    </style>
+
+</head>
+
+<body>
+    <svg id="main-svg"></svg>
+    <script src="main.js"></script>
+</body>
+
+</html>
