@@ -506,7 +506,7 @@ function drawSalaryFlow(data) {
   const links = flowData.links;
 
   // Position nodes and links for the flow layout.
-  const valueScale = layoutFlow(nodes, links, chartWidth, chartHeight);
+  layoutFlow(nodes, links, chartWidth, chartHeight);
 
   const g = svg.append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
@@ -616,7 +616,7 @@ function drawSalaryFlow(data) {
     .attr("y", 18)
     .text(`Flow width shows number of records. Showing ${data.length} records.`);
 
-  drawFlowLegend(svg, width, margin, valueScale, d3.max(links, d => d.value));
+  drawFlowLegend(svg, width, margin, d3.max(links, d => d.value));
 }
 
 function layoutFlow(nodes, links, chartWidth, chartHeight) {
@@ -690,8 +690,6 @@ function layoutFlow(nodes, links, chartWidth, chartHeight) {
     source.sourceOffset += width;
     target.targetOffset += width;
   });
-
-  return valueScale;
 }
 
 function sortFlowNodes(nodes) {
@@ -721,7 +719,7 @@ function flowPath(d) {
   `;
 }
 
-function drawFlowLegend(svg, width, margin, valueScale, maxValue) {
+function drawFlowLegend(svg, width, margin, maxValue) {
   const legend = svg.append("g")
     .attr("transform", `translate(${width - 145}, ${margin.top + 8})`);
 
@@ -769,23 +767,32 @@ function drawFlowLegend(svg, width, margin, valueScale, maxValue) {
     Math.max(1, Math.round(maxValue))
   ];
 
-  [...new Set(samples)].forEach((value, i) => {
+  const uniqueSamples = [...new Set(samples)];
+
+  // Scale legend lines separately so they stay readable after filtering.
+  const legendWidth = d3.scaleLinear()
+    .domain([0, maxValue])
+    .range([3, 18]);
+
+  const rowGap = 30;
+
+  uniqueSamples.forEach((value, i) => {
     const row = widthLegend.append("g")
-      .attr("transform", `translate(0, ${i * 20})`);
+      .attr("transform", `translate(0, ${i * rowGap})`);
 
     row.append("line")
       .attr("x1", 0)
       .attr("x2", 30)
-      .attr("y1", 7)
-      .attr("y2", 7)
+      .attr("y1", 8)
+      .attr("y2", 8)
       .attr("stroke", "#94a3b8")
-      .attr("stroke-width", Math.min(22, Math.max(3, value * valueScale)))
+      .attr("stroke-width", legendWidth(value))
       .attr("opacity", 0.45);
 
     row.append("text")
       .attr("class", "legend-label")
-      .attr("x", 40)
-      .attr("y", 10)
+      .attr("x", 42)
+      .attr("y", 12)
       .text(value);
   });
 }
