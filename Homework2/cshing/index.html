@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Alcohol Consumption Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="dashboard-shell">
+    <header class="dashboard-header">
+      <section>
+        <p class="eyebrow">Student Alcohol Consumption</p>
+        <h1>Alcohol, Lifestyle, and Academic Performance</h1>
+        <p class="subtitle">
+          This dashboard explores how weekday and weekend drinking patterns connect with final
+          grades, study habits, social activity, and absences across the Math and Portuguese
+          student datasets. Use the scatter plot to compare alcohol use and grades, the grouped bar
+          chart to compare study-time and alcohol groups, and the parallel coordinates chart to
+          follow one student profile across several variables.
+        </p>
+      </section>
+
+      <section class="controls" aria-label="Dashboard controls">
+        <label for="subjectFilter">Dataset</label>
+        <select id="subjectFilter">
+          <option value="combined">Combined</option>
+          <option value="math">Math</option>
+          <option value="portuguese">Portuguese</option>
+        </select>
+      </section>
+    </header>
+
+    <section class="focus-card">
+      <div class="chart-meta">
+        <div>
+          <p id="focusKicker" class="chart-kicker">Overview</p>
+          <h2 id="focusTitle">Alcohol Use Index vs Final Grade</h2>
+        </div>
+        <p id="focusHint" class="chart-hint">Click either chart below to swap it into this larger focus view.</p>
+      </div>
+      <div id="focusChart" class="chart-area focus-area" role="img" aria-label="Large focus visualization"></div>
+    </section>
+
+    <section class="context-grid" aria-label="Context charts that can be swapped into focus view">
+      <article class="context-card" data-chart-slot="0">
+        <div class="mini-card-header">
+          <p class="chart-kicker">Context View</p>
+          <h3 id="miniTitle0">Parallel Coordinates</h3>
+        </div>
+        <div id="miniChart0" class="chart-area mini-area" role="button" tabindex="0" aria-label="Swap first small chart into focus view"></div>
+      </article>
+
+      <article class="context-card" data-chart-slot="1">
+        <div class="mini-card-header">
+          <p class="chart-kicker">Context View</p>
+          <h3 id="miniTitle1">Grouped Grade Bars</h3>
+        </div>
+        <div id="miniChart1" class="chart-area mini-area" role="button" tabindex="0" aria-label="Swap second small chart into focus view"></div>
+      </article>
+    </section>
+  </main>
+
+  <div id="tooltip" class="tooltip" aria-hidden="true"></div>
+
+  <!-- D3 is used for the visualization requirement. -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="main.js"></script>
+</body>
+</html>
