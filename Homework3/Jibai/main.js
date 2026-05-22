@@ -41,16 +41,30 @@ const flowTypeColors = {
   salary: "#fdb462"
 };
 
+let allData = [];
+
+let dashboardState = {
+  selectedCell: null,
+  salaryRange: null
+};
+
 // Tooltip. 
 const tooltip = d3.select("body")
   .append("div")
   .attr("class", "tooltip");
 
+// Reset all filters.
+d3.select("#reset-button").on("click", function() {
+  dashboardState.selectedCell = null;
+  dashboardState.salaryRange = null;
+  renderDashboard();
+});
+
 d3.csv(dataPath).then(rawData => {
   console.log("Raw data:", rawData);
 
   // Clean the main columns.
-  const data = rawData.map(d => ({
+  allData = rawData.map(d => ({
     workYear: +d.work_year,
     experienceLevel: d.experience_level,
     employmentType: d.employment_type,
@@ -62,15 +76,65 @@ d3.csv(dataPath).then(rawData => {
     companySize: d.company_size
   })).filter(d => !isNaN(d.salaryUsd));
 
-  console.log("Cleaned data:", data);
-  console.log("Number of rows:", data.length);
+  console.log("Cleaned data:", allData);
+  console.log("Number of rows:", allData.length);
 
-  drawHeatmap(data);
-  drawDistribution(data);
-  drawSalaryFlow(data);
+  renderDashboard();
 }).catch(error => {
   console.error("The CSV did not load correctly:", error);
 });
+
+function renderDashboard() {
+  const selectedData = getSelectedData();
+  const filteredData = getFilteredData();
+
+  drawHeatmap(allData);
+  drawDistribution(selectedData);
+  drawSalaryFlow(filteredData);
+  updateSummary(selectedData, filteredData);
+}
+
+function getSelectedData() {
+  if (!dashboardState.selectedCell) {
+    return allData;
+  }
+
+  return allData.filter(d =>
+    d.experienceLevel === dashboardState.selectedCell.experienceLevel &&
+    d.companySize === dashboardState.selectedCell.companySize
+  );
+}
+
+function getFilteredData() {
+  let data = getSelectedData();
+
+  if (dashboardState.salaryRange) {
+    data = data.filter(d =>
+      d.salaryUsd >= dashboardState.salaryRange[0] &&
+      d.salaryUsd <= dashboardState.salaryRange[1]
+    );
+  }
+
+  return data;
+}
+
+function updateSummary(selectedData, filteredData) {
+  let text = "Showing all records";
+
+  if (dashboardState.selectedCell) {
+    const exp = experienceLabels[dashboardState.selectedCell.experienceLevel];
+    const size = companySizeLabels[dashboardState.selectedCell.companySize];
+    text = `Selected: ${exp}, ${size} company`;
+  }
+
+  if (dashboardState.salaryRange) {
+    text += ` | Salary brush: ${formatSalaryShort(dashboardState.salaryRange[0])} to ${formatSalaryShort(dashboardState.salaryRange[1])}`;
+  }
+
+  text += ` | Records shown: ${filteredData.length} of ${selectedData.length}`;
+
+  d3.select("#selection-summary").text(text);
+}
 
 function drawHeatmap(data) {
   const svg = d3.select("#heatmap");

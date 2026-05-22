@@ -2,35 +2,42 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="description" content="Data Science Job Salary Dashboard">
+  <meta name="description" content="Interactive Data Science Job Salary Dashboard">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Data Science Job Salary Dashboard</title>
+  <title>Interactive Data Science Salary Explorer</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
   <main class="dashboard">
     <header class="dashboard-header">
-      <h1>Data Science Job Salary Dashboard</h1>
-      <p>Exploring how data science salaries vary by experience, company size, remote work, and salary tier.</p>
+      <div>
+        <h1>Interactive Data Science Salary Explorer</h1>
+        <p>Click the heatmap to focus on a group, then use the salary distribution to filter the flow view.</p>
+      </div>
+
+      <div class="dashboard-controls">
+        <div id="selection-summary">Showing all records</div>
+        <button id="reset-button">Reset filters</button>
+      </div>
     </header>
 
     <section class="dashboard-grid">
       <section class="panel" id="overview-panel">
         <h2>Average Salary by Experience and Company Size</h2>
-        <p>Overview heatmap comparing average salary across experience levels and company sizes.</p>
+        <p>Context view comparing average salary across experience levels and company sizes.</p>
         <svg id="heatmap"></svg>
       </section>
 
       <section class="panel" id="distribution-panel">
         <h2>Salary Distribution by Experience Level</h2>
-        <p>Ridgeline view showing how salary ranges spread differently across experience levels.</p>
+        <p>Focus view showing how salary ranges spread differently across experience levels.</p>
         <svg id="distribution"></svg>
       </section>
 
       <section class="panel panel-wide" id="flow-panel">
         <h2>Career Flow from Experience to Remote Work to Salary Tier</h2>
-        <p>Advanced flow view showing how records move from experience level into work setting and salary range.</p>
+        <p>Advanced flow view showing how records move through work setting and salary range.</p>
         <svg id="flow"></svg>
       </section>
     </section>
