@@ -144,6 +144,11 @@ svg {
 .cell-label {
   font-size: 12px;
   font-weight: bold;
+  pointer-events: none;
+}
+
+.heatmap-cell {
+  cursor: pointer;
 }
 
 .density-area {

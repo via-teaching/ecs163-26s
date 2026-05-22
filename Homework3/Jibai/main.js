@@ -200,16 +200,33 @@ function drawHeatmap(data) {
     .attr("class", "axis")
     .call(d3.axisLeft(y).tickFormat(d => experienceLabels[d]).tickSizeOuter(0));
 
-  // Draw cell for each category pair.
+  // Click a cell to focus the other views.
   g.selectAll("rect")
     .data(cells)
     .join("rect")
+    .attr("class", "heatmap-cell")
     .attr("x", d => x(d.companySize))
     .attr("y", d => y(d.experienceLevel))
     .attr("width", x.bandwidth())
     .attr("height", y.bandwidth())
     .attr("rx", 8)
     .attr("fill", d => color(d.avgSalary))
+    .attr("stroke", "#111827")
+    .attr("stroke-width", d => isSelectedCell(d) ? 3 : 0)
+    .attr("opacity", d => getCellOpacity(d))
+    .on("click", function(event, d) {
+      if (isSelectedCell(d)) {
+        dashboardState.selectedCell = null;
+      } else {
+        dashboardState.selectedCell = {
+          experienceLevel: d.experienceLevel,
+          companySize: d.companySize
+        };
+      }
+
+      dashboardState.salaryRange = null;
+      renderDashboard();
+    })
     .on("mousemove", function(event, d) {
       tooltip
         .style("opacity", 1)
@@ -218,7 +235,8 @@ function drawHeatmap(data) {
         .html(`
           <strong>${experienceLabels[d.experienceLevel]} / ${companySizeLabels[d.companySize]}</strong><br>
           Avg salary: ${formatSalary(d.avgSalary)}<br>
-          Records: ${d.count}
+          Records: ${d.count}<br>
+          Click to focus this group
         `);
     })
     .on("mouseleave", function() {
@@ -234,6 +252,7 @@ function drawHeatmap(data) {
     .attr("y", d => y(d.experienceLevel) + y.bandwidth() / 2 + 4)
     .attr("text-anchor", "middle")
     .attr("fill", d => getTextColor(color(d.avgSalary)))
+    .attr("opacity", d => getCellOpacity(d))
     .text(d => formatSalaryShort(d.avgSalary));
 
   svg.append("text")
@@ -271,11 +290,13 @@ function drawDistribution(data) {
   const chartWidth = width - margin.left - margin.right;
   const chartHeight = height - margin.top - margin.bottom;
 
-  const displayOrder = ["EX", "SE", "MI", "EN"];
+  const displayOrder = dashboardState.selectedCell
+    ? [dashboardState.selectedCell.experienceLevel]
+    : ["EX", "SE", "MI", "EN"];
 
   const salaryValues = data.map(d => d.salaryUsd).sort(d3.ascending);
   const salaryLimit = d3.quantile(salaryValues, 0.99);
-  const xMax = Math.ceil(salaryLimit / 50000) * 50000;
+  const xMax = Math.max(50000, Math.ceil(salaryLimit / 50000) * 50000);
 
   // Trim very high outliers so the shape is easier to compare.
   const filteredData = data.filter(d => d.salaryUsd <= salaryLimit);
@@ -286,16 +307,16 @@ function drawDistribution(data) {
 
   const topPadding = 35;
   const bottomPadding = 35;
-  const ridgeGap = (chartHeight - topPadding - bottomPadding) / (displayOrder.length - 1);
+  const ridgeGap = (chartHeight - topPadding - bottomPadding) / Math.max(1, displayOrder.length - 1);
 
   const y = d3.scalePoint()
     .domain(displayOrder)
     .range([topPadding, chartHeight - bottomPadding]);
 
   const xTicks = x.ticks(60);
-  const bandwidth = salaryLimit / 22;
+  const bandwidth = Math.max(8000, salaryLimit / 22);
 
-  // Estimate a salary distribution for each experience level.
+  // Estimate a salary distribution for each visible experience group.
   const densities = displayOrder.map(exp => {
     const group = filteredData.filter(d => d.experienceLevel === exp);
     const density = kernelDensityEstimator(kernelEpanechnikov(bandwidth), xTicks)(
@@ -403,7 +424,7 @@ function drawDistribution(data) {
     .attr("y", 20)
     .text("Dots mark median salary. Top 1% salaries are trimmed for readability.");
 
-  drawDistributionLegend(svg, width, margin);
+  drawDistributionLegend(svg, width, margin, displayOrder);
 }
 
 function drawSalaryFlow(data) {
@@ -690,7 +711,7 @@ function drawFlowLegend(svg, width, margin) {
   });
 }
 
-function drawDistributionLegend(svg, width, margin) {
+function drawDistributionLegend(svg, width, margin, displayOrder) {
   const legend = svg.append("g")
     .attr("transform", `translate(${width - margin.right + 25}, ${margin.top + 12})`);
 
@@ -699,8 +720,6 @@ function drawDistributionLegend(svg, width, margin) {
     .attr("x", 0)
     .attr("y", -8)
     .text("Experience");
-
-  const displayOrder = ["EN", "MI", "SE", "EX"];
 
   displayOrder.forEach((exp, i) => {
     const row = legend.append("g")
@@ -852,6 +871,20 @@ function drawHeatmapLegend(svg, color, width, height, margin) {
     .attr("x", legendX - 5)
     .attr("y", legendY - 8)
     .text("Avg salary");
+}
+
+function isSelectedCell(d) {
+  return dashboardState.selectedCell &&
+    dashboardState.selectedCell.experienceLevel === d.experienceLevel &&
+    dashboardState.selectedCell.companySize === d.companySize;
+}
+
+function getCellOpacity(d) {
+  if (!dashboardState.selectedCell) {
+    return 1;
+  }
+
+  return isSelectedCell(d) ? 1 : 0.35;
 }
 
 function kernelDensityEstimator(kernel, xValues) {
