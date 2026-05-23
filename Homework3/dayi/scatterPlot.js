@@ -44,15 +44,15 @@ class ScatterPlot {
     update(data) {
         // updates axis domains based on filtered data
         this.x.domain([0, d3.max(data, d => d.salary_in_usd) || 0]);
-        this.y.domain([...new Set(data.map(d => d.experience_level))].sort());
+        this.y.domain(["EN", "MI", "SE", "EX"]);
 
         // updates axes with animation
         this.xAxis.transition().duration(500).call(d3.axisBottom(this.x).ticks(5).tickFormat(d3.format("~s")));
         this.yAxis.transition().duration(500).call(d3.axisLeft(this.y));
 
-        // data join for dots
+        // data join for dots using new record id in main.js
         let dots = this.svg.selectAll(".dot")
-            .data(data, d => d.id || Math.random());
+            .data(data, d => d.id);
 
         // removes dots with animation
         dots.exit().transition().duration(500).attr("r", 0).remove();
