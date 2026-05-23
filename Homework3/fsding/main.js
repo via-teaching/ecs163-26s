@@ -103,70 +103,7 @@ d3.csv("pokemon.csv").then(rawData =>{
                 .attr("height", scatterHeight + scatterMargin.top + scatterMargin.bottom)
                 .attr("transform", `translate(${scatterLeft + scatterMargin.left}, ${scatterTop + scatterMargin.top})`);
 
-    updateScatterAxes("Speed", "Attack");
-    /*
-                // X label
-    g1.append("text")
-    .attr("x", scatterWidth / 2)
-    .attr("y", scatterHeight + 80)
-    .attr("font-size", "25px")
-    .attr("text-anchor", "middle")
-    .text("HP vs Attack of Water Types");
-
-    g1.append("text")
-    .attr("x", scatterWidth / 2)
-    .attr("y", scatterHeight + 50)
-    .attr("font-size", "20px")
-    .attr("text-anchor", "middle")
-    .text("HP");
-
-
-    // Y label
-    g1.append("text")
-    .attr("x", -(scatterHeight / 2))
-    .attr("y", -40)
-    .attr("font-size", "20px")
-    .attr("text-anchor", "middle")
-    .attr("transform", "rotate(-90)")
-    .text("Attack");
-
-    // X ticks
-    const x1 = d3.scaleLinear()
-   // .domain([0, d3.max(processedData, d => d.HP)])
-   .domain([0, d3.max(processedData, d => stringToDParam(d, scatterX))])
-    .range([0, scatterWidth]);
-
-    const xAxisCall = d3.axisBottom(x1)
-                        .ticks(7);
-    g1.append("g")
-    .attr("transform", `translate(0, ${scatterHeight})`)
-    .call(xAxisCall)
-    .selectAll("text")
-        .attr("y", "10")
-        .attr("x", "-5")
-        .attr("text-anchor", "end")
-        .attr("transform", "rotate(-40)"); //tick labels
-
-    // Y ticks
-    const y1 = d3.scaleLinear()
-    .domain([0, d3.max(processedData, d => d.Attack)])
-    .range([scatterHeight, 0]);
-
-    const yAxisCall = d3.axisLeft(y1)
-                        .ticks(13);
-    g1.append("g").call(yAxisCall);
-
-    // circles
-    const circles = g1.selectAll("circle").data(processedData);
-
-    circles.enter().append("circle")
-         .attr("cx", d => x1(d.HP))
-         .attr("cy", d => y1(d.Attack))
-         .attr("r", 5)
-         .attr("fill", "deepskyblue");
-
-*/
-
+   // updateScatterAxes("Speed", "Attack");
 
     //plot 1: Bar Chart for Primary Types 
 
@@ -260,188 +197,27 @@ d3.csv("pokemon.csv").then(rawData =>{
         if(d.Type_1 === currentType){
             return "#0307fc";
         } })
-     .on("click", updateTypeData(d => d.Type_1));
+    // .on("click", updateTypeData(d => d.Type_1));
+    .on("click", function(d) {
+        console.log("click registered, updating to:", d.Type_1);
+        updateTypeData(d.Type_1);
+    });
 
 
 
         //plot 3 Sankey: type 1 (water) -> gens -> type2
 
-    //nodes and links list
-    const nodesList = ["Water"];
-    const links3 = [];
-    
-    //count number of water pokemon per generation
-    const genCounts = typeData.reduce((s, { Generation }) => (s[Generation] = (s[Generation] || 0) + 1, s), {});
-    const genData = Object.keys(genCounts).map((key) => ({ Generation: key, count: genCounts[key] }));
 
-    //water -> generation nodes, links
-    genData.forEach(d => {
-       // nodes.push({"name":"Generation " + d.Generation});
-        nodesList.push("Generation " + d.Generation);
-        links3.push({"source":"Water",
-                    "target":"Generation " + d.Generation,
-                    "value": d.count });
-    });
-
-    const sortedGens = [];
-    const gensByType = [];
-
-   // sort set of water type pokemon by gen
-   genData.forEach(p => {
-        sortedGens.push(typeData.filter(d=>d.Generation == p.Generation));    
-    });
-
-    // get counts of secondary type by gen
-    sortedGens.forEach(p => {
-        type2Counts = p.reduce((s, { Type_2 }) => (s[Type_2] = (s[Type_2] || 0) + 1, s), {});
-        gensByType.push(Object.keys(type2Counts).map((key) => ({ Type_2: key, Generation: p.at(0).Generation, count: type2Counts[key] })))
-    });
-
-    // nodes, links created
-    gensByType.forEach(p => {
-        p.forEach(q => {
-            //nodes.push({"name":q.Type_2});
-            if(q.Type_2.length > 0){
-            nodesList.push(q.Type_2);
-            links3.push({"source": "Generation " + q.Generation,
-                        "target":q.Type_2,
-                        "value": q.count})
-            } else {
-            nodesList.push("None");
-            links3.push({"source": "Generation " + q.Generation,
-                        "target":"None",
-                        "value": q.count})
-            }
-        });
-    });
-
-   //remove duplicate nodes
-   const nodesListFiltered = [...new Set(nodesList)].filter(d => d.id !== "");
-   const links = links3.filter(d => d.target !== "");
-
-   const nodes3 = [];
-
-    // loop through each link replacing the text with its index from node
-   links.forEach(function (d, i) {
-    links[i].source = nodesListFiltered.indexOf(links[i].source);
-    links[i].target = nodesListFiltered.indexOf(links[i].target);
-  });
-
-  // now loop through each nodes to make nodes an array of objects
-  // rather than an array of strings
-
-   nodesListFiltered.forEach(n => {
-     nodes3.push({"name": n});
-   });
-
-   
-
-
-    console.log("genData", genData);
-    console.log("sortedGens", sortedGens);
-    console.log("gensByType", gensByType);
-
-    console.log("nodes", nodes3);
-    console.log("links", links)
-
-  
-   
 
     const g2 = svg.append("g")
                 .attr("width", distrWidth + distrMargin.left + distrMargin.right)
                 .attr("height", distrHeight + distrMargin.top + distrMargin.bottom)
                 .attr("transform", `translate(${distrLeft}, ${distrTop})`);
- 
-// Credit to d3noob for this D3 Sankey example https://gist.github.com/d3noob/06e72deea99e7b4859841f305f63ba85
 
-        sankey = d3.sankey()
-      .nodes(nodes3)
-      .links(links)
-      .nodeWidth(36)
-      .nodePadding(1)
-      .size([distrWidth, distrHeight])
-      .layout(32);
+    /*
+   
 
-var path = sankey.link();
-var formatNumber = d3.format(",.0f"),    // zero decimal places
-    format = function(d) { return formatNumber(d) + " " + units; },
-    color = d3.scaleOrdinal(d3.schemeCategory10);
-
-var units = "Pokemon";
-
-
-
-//title
- g2.append("text")
-    .attr("x", distrWidth / 2)
-    .attr("y", distrHeight + 30)
-    .attr("font-size", "25px")
-    .attr("text-anchor", "middle")
-    .text("Water types across generations and their secondary types");
-
-//credit for example sankey code
- g2.append("text")
-    .attr("x", distrWidth / 2)
-    .attr("y", distrHeight + 50)
-    .attr("font-size", "10px")
-    .attr("text-anchor", "middle")
-    .text("Example code from d3noob: https://gist.github.com/d3noob/06e72deea99e7b4859841f305f63ba85");   
-
-  // add in the links
-  var link = g2.append("g").selectAll(".link")
-      .data(links)
-    .enter().append("path")
-      .attr("class", "link")
-      .attr("d", path)
-      .style("stroke-width", function(d) { return Math.max(1, d.dy); })
-      .sort(function(a, b) { return b.dy - a.dy; });
-
-  // add the link titles
-  link.append("title")
-        .text(function(d) {
-    		return d.source.name + " → " + 
-                d.target.name + "\n" + format(d.value); });
-
-  // add in the nodes
-  var node = g2.append("g").selectAll(".node")
-      .data(nodes3)
-    .enter().append("g")
-      .attr("class", "node")
-      .attr("transform", function(d) { 
-		  return "translate(" + d.x + "," + d.y + ")"; })
-      .call(d3.drag()
-        .subject(function(d) {
-          return d;
-        })
-        .on("start", function() {
-          this.parentNode.appendChild(this);
-        })
-        .on("drag", dragmove));
-
-  // add the rectangles for the nodes
-  node.append("rect")
-      .attr("height", function(d) { return d.dy; }) 
-      .attr("width", sankey.nodeWidth())
-      .style("fill", function(d) { 
-          //color(d.name.replace(/ .*/, ""))
-		  return d.color = nodeColorMap.get(d.name);})
-      .style("stroke", function(d) { 
-		  return d3.rgb(d.color).darker(2); })
-    .append("title")
-      .text(function(d) { 
-		  return d.name + "\n" + format(d.value); });
-
-  // add in the title for the nodes
-  node.append("text")
-      .attr("x", -6)
-      .attr("y", function(d) { return d.dy / 2; })
-      .attr("dy", ".35em")
-      .attr("text-anchor", "end")
-      .attr("transform", null)
-      .text(function(d) { return d.name; })
-    .filter(function(d) { return d.x < width / 2; })
-      .attr("x", 6 + sankey.nodeWidth())
-      .attr("text-anchor", "start");
+*/
 
   // the function for moving the nodes
   function dragmove(d) {
@@ -457,12 +233,14 @@ var units = "Pokemon";
   }
 
   function updateTypeData(type){
+       console.log("updating type");
        currentType = type;
        console.log("currentType", currentType);
        typeData = processedData.filter(d=>d.Type_1 == type);
 
        //redraw scatterplot
        updateScatterAxes(scatterX, scatterY);
+       updateSankey();
 
 
        
@@ -474,6 +252,9 @@ var units = "Pokemon";
 
         console.log("scatterX", scatterX);
         console.log("scatterY", scatterY);
+
+        g1.selectAll("*").remove();
+        //transition();
 
         g1.append("text")
             .attr("x", scatterWidth / 2)
@@ -527,14 +308,192 @@ var units = "Pokemon";
             // circles
             const circles = g1.selectAll("circle").data(typeData);
 
-            circles.enter().append("circle")
+            circles.enter()
+            .append("circle")
                 .attr("cx", d => x1(stringToDParam(d, updateX)))
                 .attr("cy", d => y1(stringToDParam(d, updateY)))
                 .transition()
                 .attr("r", 5)
-                .attr("fill", "deepskyblue");
+                .attr("fill", "deepskyblue")
+                //.append("title")
+                    .text(function(d) { 
+		             return d.name + "\n" + stringToDParam(d, updateX) + "\n" + stringToDParam(d, updateY); });
 
 
+            }
+
+
+            function updateSankey(){
+ //nodes and links list
+                const nodesList = [currentType];
+                const links3 = [];
+                
+                //count number of selected type pokemon per generation
+                const genCounts = typeData.reduce((s, { Generation }) => (s[Generation] = (s[Generation] || 0) + 1, s), {});
+                const genData = Object.keys(genCounts).map((key) => ({ Generation: key, count: genCounts[key] }));
+
+                //water -> generation nodes, links
+                genData.forEach(d => {
+                // nodes.push({"name":"Generation " + d.Generation});
+                    nodesList.push("Generation " + d.Generation);
+                    links3.push({"source":currentType,
+                                "target":"Generation " + d.Generation,
+                                "value": d.count });
+                });
+
+                const sortedGens = [];
+                const gensByType = [];
+
+            // sort set of water type pokemon by gen
+            genData.forEach(p => {
+                    sortedGens.push(typeData.filter(d=>d.Generation == p.Generation));    
+                });
+
+                // get counts of secondary type by gen
+                sortedGens.forEach(p => {
+                    type2Counts = p.reduce((s, { Type_2 }) => (s[Type_2] = (s[Type_2] || 0) + 1, s), {});
+                    gensByType.push(Object.keys(type2Counts).map((key) => ({ Type_2: key, Generation: p.at(0).Generation, count: type2Counts[key] })))
+                });
+
+                // nodes, links created
+                gensByType.forEach(p => {
+                    p.forEach(q => {
+                        //nodes.push({"name":q.Type_2});
+                        if(q.Type_2.length > 0){
+                        nodesList.push(q.Type_2);
+                        links3.push({"source": "Generation " + q.Generation,
+                                    "target":q.Type_2,
+                                    "value": q.count})
+                        } else {
+                        nodesList.push("None");
+                        links3.push({"source": "Generation " + q.Generation,
+                                    "target":"None",
+                                    "value": q.count})
+                        }
+                    });
+                });
+
+            //remove duplicate nodes
+            const nodesListFiltered = [...new Set(nodesList)].filter(d => d.id !== "");
+            const links = links3.filter(d => d.target !== "");
+
+            const nodes3 = [];
+
+                // loop through each link replacing the text with its index from node
+            links.forEach(function (d, i) {
+                links[i].source = nodesListFiltered.indexOf(links[i].source);
+                links[i].target = nodesListFiltered.indexOf(links[i].target);
+            });
+
+            // now loop through each nodes to make nodes an array of objects
+            // rather than an array of strings
+
+            nodesListFiltered.forEach(n => {
+                nodes3.push({"name": n});
+            });
+
+            
+
+
+                console.log("genData", genData);
+                console.log("sortedGens", sortedGens);
+                console.log("gensByType", gensByType);
+
+                console.log("nodes", nodes3);
+                console.log("links", links)
+
+            
+            
+            
+            // Credit to d3noob for this D3 Sankey example https://gist.github.com/d3noob/06e72deea99e7b4859841f305f63ba85
+
+                    sankey = d3.sankey()
+                .nodes(nodes3)
+                .links(links)
+                .nodeWidth(36)
+                .nodePadding(1)
+                .size([distrWidth, distrHeight])
+                .layout(32);
+
+            var path = sankey.link();
+            var formatNumber = d3.format(",.0f"),    // zero decimal places
+                format = function(d) { return formatNumber(d) + " " + units; },
+                color = d3.scaleOrdinal(d3.schemeCategory10);
+
+            var units = "Pokemon";
+
+                g2.selectAll("*").remove();
+                //transition();
+                //title
+                g2.append("text")
+                    .attr("x", distrWidth / 2)
+                    .attr("y", distrHeight + 30)
+                    .attr("font-size", "25px")
+                    .attr("text-anchor", "middle")
+                    .text(currentType + " types across generations and their secondary types");
+
+                //credit for example sankey code
+                g2.append("text")
+                    .attr("x", distrWidth / 2)
+                    .attr("y", distrHeight + 50)
+                    .attr("font-size", "10px")
+                    .attr("text-anchor", "middle")
+                    .text("Example code from d3noob: https://gist.github.com/d3noob/06e72deea99e7b4859841f305f63ba85");   
+
+                // add in the links
+                var link = g2.append("g").selectAll(".link")
+                    .data(links)
+                    .enter().append("path")
+                    .attr("class", "link")
+                    .attr("d", path)
+                    .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+                    .sort(function(a, b) { return b.dy - a.dy; });
+
+                // add the link titles
+                link.append("title")
+                        .text(function(d) {
+                            return d.source.name + " → " + 
+                                d.target.name + "\n" + format(d.value); });
+
+                // add in the nodes
+                var node = g2.append("g").selectAll(".node")
+                    .data(nodes3)
+                    .enter().append("g")
+                    .attr("class", "node")
+                    .attr("transform", function(d) { 
+                        return "translate(" + d.x + "," + d.y + ")"; })
+                    .call(d3.drag()
+                        .subject(function(d) {
+                        return d;
+                        })
+                        .on("start", function() {
+                        this.parentNode.appendChild(this);
+                        })
+                        .on("drag", dragmove));
+
+                // add the rectangles for the nodes
+                node.append("rect")
+                    .attr("height", function(d) { return d.dy; }) 
+                    .attr("width", sankey.nodeWidth())
+                    .style("fill", function(d) { 
+                        return d.color = nodeColorMap.get(d.name);})
+                    .style("stroke", function(d) { 
+                        return d3.rgb(d.color).darker(2); })
+                    .append("title")
+                    .text(function(d) { 
+                        return d.name + "\n" + format(d.value); });
+
+                // add in the title for the nodes
+                node.append("text")
+                    .attr("x", -6)
+                    .attr("y", function(d) { return d.dy / 2; })
+                    .attr("dy", ".35em")
+                    .attr("text-anchor", "end")
+                    .attr("transform", null)
+                    .text(function(d) { return d.name; })
+                    .filter(function(d) { return d.x < width / 2; })
+                    .attr("x", 6 + sankey.nodeWidth())
+                    .attr("text-anchor", "start");
             }
 //*/
             function stringToDParam(d, str){
