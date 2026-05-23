@@ -37,17 +37,30 @@ const SANKEY_OTHER_TYPE_LABEL = "Other Types";
 
 // track selected type
 let selectedType = null;
+let brushedTypes = null;
 let sankeyVisibleTypeSet = new Set();
 
 // transition timing
 const SELECTION_TRANSITION_DURATION = 600;
+const CONTEXT_OPACITY = 0.22;
+const SANKEY_CONTEXT_LINK_OPACITY = 0.03;
+const SANKEY_CONTEXT_NODE_OPACITY = 0.18;
+const SANKEY_CONTEXT_LABEL_OPACITY = 0.24;
 
 // selection links the overview, comparison, and advanced focus views
 // filtering transition helps users drill down into one type
 
 // related type check
-function isSelectedType(type) {
-  return selectedType === null || type === selectedType;
+function getActiveTypeSet() {
+  if (brushedTypes !== null && brushedTypes.size > 0) return brushedTypes;
+  if (selectedType !== null) return new Set([selectedType]);
+  return null;
+}
+
+// related type check
+function isTypeActive(type) {
+  const activeTypes = getActiveTypeSet();
+  return activeTypes === null || activeTypes.has(type);
 }
 
 // transition selection
@@ -61,6 +74,19 @@ function getSankeySelectedType(type) {
   return sankeyVisibleTypeSet.has(type) ? type : SANKEY_OTHER_TYPE_LABEL;
 }
 
+// map active types to sankey
+function getSankeyActiveTypeSet() {
+  const activeTypes = getActiveTypeSet();
+  if (activeTypes === null) return null;
+
+  const sankeyTypes = new Set();
+  activeTypes.forEach(function (type) {
+    sankeyTypes.add(getSankeySelectedType(type));
+  });
+
+  return sankeyTypes;
+}
+
 // update selection label
 function updateSelectionControl() {
   const button = d3.select("#clear-selection");
@@ -69,20 +95,30 @@ function updateSelectionControl() {
   button.classed("active", selectedType !== null).text(selectedType ? `Clear: ${selectedType}` : "Clear selection");
 }
 
+// update brush label
+function updateBrushControl() {
+  const button = d3.select("#clear-brush");
+  if (button.empty()) return;
+
+  button
+    .classed("active", brushedTypes !== null && brushedTypes.size > 0)
+    .text(brushedTypes !== null && brushedTypes.size > 0 ? `Clear Brush (${brushedTypes.size})` : "Clear Brush");
+}
+
 // update heatmap selection
 function updateHeatmapSelection() {
   const cells = d3.selectAll(".heatmap-cell");
 
   // fade unrelated cells
   selectionTransition(cells)
-    .attr("opacity", (d) => (isSelectedType(d.type) ? 1 : 0.18))
-    .attr("stroke", (d) => (selectedType !== null && d.type === selectedType ? "#263238" : "#f8fbfd"))
-    .attr("stroke-width", (d) => (selectedType !== null && d.type === selectedType ? 1.9 : 0.7));
+    .attr("opacity", (d) => (isTypeActive(d.type) ? 1 : CONTEXT_OPACITY))
+    .attr("stroke", (d) => (getActiveTypeSet() !== null && isTypeActive(d.type) ? "#263238" : "#f8fbfd"))
+    .attr("stroke-width", (d) => (getActiveTypeSet() !== null && isTypeActive(d.type) ? 1.9 : 0.7));
 
   // fade unrelated row labels
   selectionTransition(d3.selectAll(".heatmap-type-label"))
-    .attr("opacity", (d) => (isSelectedType(d) ? 1 : 0.28))
-    .attr("font-weight", (d) => (selectedType !== null && d === selectedType ? 800 : 600));
+    .attr("opacity", (d) => (isTypeActive(d) ? 1 : 0.32))
+    .attr("font-weight", (d) => (getActiveTypeSet() !== null && isTypeActive(d) ? 800 : 600));
 }
 
 // update bar selection
@@ -91,41 +127,45 @@ function updateBarSelection() {
 
   // fade unrelated bars
   selectionTransition(bars)
-    .attr("opacity", (d) => (isSelectedType(d.type) ? 1 : 0.18))
-    .attr("stroke", (d) => (selectedType !== null && d.type === selectedType ? "#263238" : "#ffffff"))
-    .attr("stroke-width", (d) => (selectedType !== null && d.type === selectedType ? 1.9 : 0.7));
+    .attr("opacity", (d) => (isTypeActive(d.type) ? 1 : CONTEXT_OPACITY))
+    .attr("stroke", (d) => (getActiveTypeSet() !== null && isTypeActive(d.type) ? "#263238" : "#ffffff"))
+    .attr("stroke-width", (d) => (getActiveTypeSet() !== null && isTypeActive(d.type) ? 1.9 : 0.7));
 }
 
 // sankey link check
 function isSankeyLinkRelated(d) {
-  const sankeyType = getSankeySelectedType(selectedType);
-  return sankeyType === null || d.source.label === sankeyType || d.target.label === sankeyType;
+  const sankeyTypes = getSankeyActiveTypeSet();
+  return sankeyTypes === null || sankeyTypes.has(d.source.label) || sankeyTypes.has(d.target.label);
 }
 
 // sankey node check
 function isSankeyNodeRelated(d) {
-  const sankeyType = getSankeySelectedType(selectedType);
-  if (sankeyType === null) return true;
-  if (d.stage === "type") return d.label === sankeyType;
+  const sankeyTypes = getSankeyActiveTypeSet();
+  if (sankeyTypes === null) return true;
+  if (d.stage === "type") return sankeyTypes.has(d.label);
 
   return (
-    d.sourceLinks.some((link) => link.target.label === sankeyType) ||
-    d.targetLinks.some((link) => link.source.label === sankeyType)
+    d.sourceLinks.some(function (link) {
+      return sankeyTypes.has(link.target.label);
+    }) ||
+    d.targetLinks.some(function (link) {
+      return sankeyTypes.has(link.source.label);
+    })
   );
 }
 
 // sankey node opacity
-function sankeyNodeOpacity(d, sankeyType) {
-  if (sankeyType === null) return 1;
-  if (d.stage === "type" && d.label === sankeyType) return 1;
-  return isSankeyNodeRelated(d) ? 1 : 0.16;
+function sankeyNodeOpacity(d, sankeyTypes) {
+  if (sankeyTypes === null) return 1;
+  if (d.stage === "type" && sankeyTypes.has(d.label)) return 1;
+  return isSankeyNodeRelated(d) ? 1 : SANKEY_CONTEXT_NODE_OPACITY;
 }
 
 // selected link color
 function sankeySelectedLinkColor(d) {
-  if (d.target.stage === "type") return "#b8792f";
-  if (d.target.label === "Legendary") return "#8f1422";
-  return "#536878";
+  if (d.target.stage === "type") return "#9d6427";
+  if (d.target.label === "Legendary") return "#7f1720";
+  return "#4f6673";
 }
 
 // update sankey selection
@@ -134,7 +174,7 @@ function updateSankeySelection() {
   const nodes = d3.selectAll(".sankey-node-group");
   const nodeRects = d3.selectAll(".sankey-node");
   const nodeLabels = d3.selectAll(".sankey-node-label");
-  const sankeyType = getSankeySelectedType(selectedType);
+  const sankeyTypes = getSankeyActiveTypeSet();
 
   // check selected sankey type
   const relatedLinks = links.filter((d) => isSankeyLinkRelated(d));
@@ -143,15 +183,15 @@ function updateSankeySelection() {
   // strengthen related links
   selectionTransition(links)
     .attr("stroke", (d) => {
-      if (sankeyType === null) return sankeyLinkColor(d);
-      return isSankeyLinkRelated(d) ? sankeySelectedLinkColor(d) : "#ddd7cf";
+      if (sankeyTypes === null) return sankeyLinkColor(d);
+      return isSankeyLinkRelated(d) ? sankeySelectedLinkColor(d) : "#e6e0d8";
     })
     .attr("stroke-opacity", (d) => {
-      if (sankeyType === null) return 0.42;
-      return isSankeyLinkRelated(d) ? 0.98 : 0.04;
+      if (sankeyTypes === null) return 0.42;
+      return isSankeyLinkRelated(d) ? 1 : SANKEY_CONTEXT_LINK_OPACITY;
     })
     .attr("stroke-width", (d) => {
-      if (sankeyType === null) return d.width;
+      if (sankeyTypes === null) return d.width;
       return isSankeyLinkRelated(d) ? d.width + Math.max(2, d.width * 0.15) : Math.max(1, d.width * 0.85);
     });
 
@@ -161,27 +201,36 @@ function updateSankeySelection() {
 
   // fade unrelated nodes
   selectionTransition(nodeRects)
-    .attr("opacity", (d) => sankeyNodeOpacity(d, sankeyType))
+    .attr("opacity", (d) => sankeyNodeOpacity(d, sankeyTypes))
     .attr("stroke", (d) => {
-      if (sankeyType !== null && d.label === sankeyType) return "#263238";
-      if (sankeyType !== null && isSankeyNodeRelated(d)) return "#4b4037";
+      if (sankeyTypes !== null && d.stage === "type" && sankeyTypes.has(d.label)) return "#263238";
+      if (sankeyTypes !== null && isSankeyNodeRelated(d)) return "#4b4037";
       return "#ffffff";
     })
     .attr("stroke-width", (d) => {
-      if (sankeyType !== null && isSankeyNodeRelated(d)) return 2;
+      if (sankeyTypes !== null && isSankeyNodeRelated(d)) return 2;
       return 0.9;
     });
 
   // fade unrelated labels
   selectionTransition(nodeLabels)
-    .attr("opacity", (d) => (sankeyType === null || isSankeyNodeRelated(d) ? 1 : 0.2))
-    .attr("font-weight", (d) => (sankeyType === null || isSankeyNodeRelated(d) ? 700 : 600));
+    .attr("opacity", (d) => (sankeyTypes === null || isSankeyNodeRelated(d) ? 1 : SANKEY_CONTEXT_LABEL_OPACITY))
+    .attr("font-weight", (d) => (sankeyTypes === null || isSankeyNodeRelated(d) ? 700 : 600));
 }
 
 // set selected type
 function setSelectedType(type) {
   selectedType = selectedType === type ? null : type;
   updateSelectionControl();
+  updateHeatmapSelection();
+  updateBarSelection();
+  updateSankeySelection();
+}
+
+// set brushed types
+function setBrushedTypes(types) {
+  brushedTypes = types && types.length > 0 ? new Set(types) : null;
+  updateBrushControl();
   updateHeatmapSelection();
   updateBarSelection();
   updateSankeySelection();
@@ -399,13 +448,13 @@ function typeGenerationHeatmap(pokemon) {
     .text("Pokemon Counts by Generation and Primary Type");
 
   // draw axes
-  chart
+  const xAxis = chart
     .append("g")
-    .attr("class", "axis")
+    .attr("class", "axis heatmap-x-axis")
     .attr("transform", `translate(0, ${height})`)
     .call(d3.axisBottom(xScale));
 
-  const yAxis = chart.append("g").attr("class", "axis").call(d3.axisLeft(yScale));
+  const yAxis = chart.append("g").attr("class", "axis heatmap-y-axis").call(d3.axisLeft(yScale));
 
   // add row click handler
   yAxis
@@ -600,6 +649,29 @@ function averageLine(chart, yScale, width, overallAverage) {
     .text(`Overall average: ${overallAverage.toFixed(1)}`);
 }
 
+// find bar under pointer
+function getBarAtX(x, typeData, xScale) {
+  return typeData.find(function (d) {
+    const left = xScale(d.type);
+    const right = left + xScale.bandwidth();
+    return x >= left && x <= right;
+  });
+}
+
+// find brushed types
+function getBrushedTypes(selection, typeData, xScale) {
+  if (!selection) return [];
+
+  return typeData
+    .filter(function (d) {
+      const center = xScale(d.type) + xScale.bandwidth() / 2;
+      return center >= selection[0] && center <= selection[1];
+    })
+    .map(function (d) {
+      return d.type;
+    });
+}
+
 // bar chart compares average type strength
 // supports type comparison and differs from heatmap by using averages
 function typeStrengthBarChart(pokemon) {
@@ -668,7 +740,7 @@ function typeStrengthBarChart(pokemon) {
     .text("Average Total Base Stats");
 
   // draw bars
-  chart
+  const bars = chart
     .selectAll("rect.strength-bar")
     .data(typeData)
     .enter()
@@ -705,11 +777,126 @@ function typeStrengthBarChart(pokemon) {
       tooltip.style("display", "none");
     });
 
+  // brushing fits the bar chart because type strength is ordered along one horizontal comparison axis
+  // brushing supports subset exploration by letting users isolate adjacent strong or weak type groups
+  // linked filtering across the heatmap and sankey preserves context while the brushed subset becomes focus
+  // the opacity transition keeps subset changes readable as types enter or leave the brushed range
+  // brushing is stronger than heatmap zoom here because the question is comparative, not spatial navigation
+
+  // create bar brush
+  const brushLayer = chart.append("g").attr("class", "bar-brush");
+  const brush = d3
+    .brushX()
+    .extent([
+      [0, 0],
+      [width, height],
+    ])
+    .on("start brush end", brushed);
+  let isSnappingBrush = false;
+
+  // apply brushed subset
+  function brushed() {
+    const selection = d3.event.selection;
+    const types = getBrushedTypes(selection, typeData, xScale);
+
+    if (isSnappingBrush) return;
+
+    if (d3.event.type === "start") {
+      // hide tooltip while brushing
+      tooltip.style("display", "none");
+      return;
+    }
+
+    setBrushedTypes(types);
+
+    if (d3.event.type === "end" && selection && types.length === 0) {
+      // clear empty brush
+      isSnappingBrush = true;
+      brushLayer
+        .transition()
+        .duration(300)
+        .ease(d3.easeCubicInOut)
+        .call(brush.move, null)
+        .on("end", function () {
+          isSnappingBrush = false;
+        });
+      return;
+    }
+
+    if (d3.event.type === "end" && selection && types.length > 0) {
+      const firstType = types[0];
+      const lastType = types[types.length - 1];
+      const snappedSelection = [xScale(firstType), xScale(lastType) + xScale.bandwidth()];
+
+      // snap brush to bars
+      isSnappingBrush = true;
+      brushLayer
+        .transition()
+        .duration(300)
+        .ease(d3.easeCubicInOut)
+        .call(brush.move, snappedSelection)
+        .on("end", function () {
+          isSnappingBrush = false;
+        });
+    }
+  }
+
+  brushLayer.call(brush);
+
+  // add brush tooltip
+  brushLayer
+    .select(".overlay")
+    .on("mousemove.tooltip", function () {
+      const mouse = d3.mouse(this);
+      const d = getBarAtX(mouse[0], typeData, xScale);
+      if (!d) {
+        tooltip.style("display", "none");
+        updateBarSelection();
+        return;
+      }
+
+      bars.attr("stroke", function (bar) {
+        return bar.type === d.type ? "#263238" : getActiveTypeSet() !== null && isTypeActive(bar.type) ? "#263238" : "#ffffff";
+      });
+
+      tooltip
+        .style("display", "block")
+        .html(
+          `<strong>${d.type}</strong><br>Average Total: ${d.averageTotal.toFixed(
+            1
+          )}<br>Pokemon count: ${d.count}<br>${d.averageTotal >= overallAverage ? "Above" : "Below"} overall average`
+        );
+      moveTooltip(tooltip);
+    })
+    .on("mouseout.tooltip", function () {
+      updateBarSelection();
+      tooltip.style("display", "none");
+    })
+    // add overlay click selection
+    .on("click.selection", function () {
+      const mouse = d3.mouse(this);
+      const d = getBarAtX(mouse[0], typeData, xScale);
+      if (d) {
+        setSelectedType(d.type);
+      }
+    });
+
+  // clear brushed subset
+  d3.select("#clear-brush").on("click", function () {
+    brushLayer
+      .transition()
+      .duration(600)
+      .ease(d3.easeCubicInOut)
+      .call(brush.move, null);
+    setBrushedTypes(null);
+  });
+
   // draw average line
   averageLine(chart, yScale, width, overallAverage);
 
   barChartLegend(svg, colors, margin.left + width + 18, margin.top + 16);
   updateBarSelection();
+  updateBrushControl();
 }
 
 // build sankey data
@@ -960,12 +1147,12 @@ function generationTypeLegendarySankey(pokemon) {
     .attr("data-target", (d) => d.target.label)
     // add tooltip interaction
     .on("mouseover", function (d) {
-      const sankeyType = getSankeySelectedType(selectedType);
+      const sankeyTypes = getSankeyActiveTypeSet();
 
       // restore selected sankey state
       flowLinks.attr("stroke-opacity", (link) => {
-        if (sankeyType === null) return 0.16;
-        return isSankeyLinkRelated(link) ? 0.28 : 0.04;
+        if (sankeyTypes === null) return 0.16;
+        return isSankeyLinkRelated(link) ? 0.32 : SANKEY_CONTEXT_LINK_OPACITY;
       });
       d3.select(this).raise().attr("stroke-opacity", 1).attr("stroke-width", d.width + Math.max(2, d.width * 0.15));
       tooltip
@@ -1058,3 +1245,11 @@ if (typeof document !== "undefined") {
       console.error("Failed to load Pokemon data:", error);
     });
 }
+
+/*
+final dashboard rationale:
+selection supports single-type drill-down by letting one pokemon type become the shared focus across the overview, comparison, and composition views
+brushing supports multi-type subset exploration by letting users compare groups of strong or weak types in the bar chart and see the same subset across the whole dashboard
+filtering transitions maintain visual continuity because related marks stay visible while unrelated marks fade with the same semantic animation in every view
+the heatmap, bar chart, and sankey preserve the overview to comparison to composition exploration flow for distribution, strength, and categorical identity
+*/

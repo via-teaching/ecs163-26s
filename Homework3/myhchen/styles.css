@@ -58,6 +58,7 @@ body {
 .scatter-panel {
   grid-column: 1;
   grid-row: 2;
+  position: relative;
 }
 
 .chart-container {
@@ -134,6 +135,43 @@ body {
 .strength-bar {
   stroke: #ffffff;
   stroke-width: 0.7px;
+}
+
+.bar-brush .selection {
+  fill: rgba(84, 110, 122, 0.1);
+  stroke: #78909c;
+  stroke-width: 0.8px;
+}
+
+.bar-brush .overlay {
+  cursor: crosshair;
+}
+
+.bar-brush .handle {
+  fill: #546e7a;
+  opacity: 0.28;
+}
+
+.brush-reset {
+  position: absolute;
+  top: 34px;
+  right: 12px;
+  z-index: 1;
+  padding: 4px 8px;
+  color: #263238;
+  background: #ffffff;
+  border: 1px solid #b0bec5;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(38, 50, 56, 0.08);
+}
+
+.brush-reset.active {
+  color: #ffffff;
+  background: #263238;
+  border-color: #263238;
 }
 
 .average-line,

@@ -10,7 +10,7 @@
 	<main class="dashboard">
 		<section id="parallel-panel" class="panel parallel-panel">
 			<h2>Generation-Type-Legendary: Sankey</h2>
-			<p class="chart-subtitle">Flows of Generation, Type, and Legendary Counts</p>
+			<p class="chart-subtitle">Grouped flow into legendary status</p>
 			<div id="sankey-flow" class="chart-container"></div>
 		</section>
 		<section id="heatmap-panel" class="panel heatmap-panel">
@@ -20,7 +20,8 @@
 		</section>
 		<section id="scatter-panel" class="panel scatter-panel">
 			<h2>Type & Strength: Bar Chart</h2>
-			<p class="chart-subtitle">Average stats by type</p>
+			<p class="chart-subtitle">Brush to compare type-strength subsets</p>
+			<button id="clear-brush" class="brush-reset" type="button">Clear Brush</button>
 			<div id="type-strength-bar-chart" class="chart-container"></div>
 		</section>
 	</main>
