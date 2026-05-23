@@ -627,9 +627,9 @@ function drawSalaryFlow(data) {
     .attr("class", "note-label")
     .attr("x", margin.left)
     .attr("y", 18)
-    .text(`Flow width shows number of records. Showing ${data.length.toLocaleString()} records.`);
+    .text(`Flow width compares records in the current view. Showing ${data.length.toLocaleString()} records.`);
 
-  drawFlowLegend(svg, width, margin, d3.max(links, d => d.value));
+  drawFlowLegend(svg, width, margin);
 }
 
 function layoutFlow(nodes, links, chartWidth, chartHeight) {
@@ -732,7 +732,7 @@ function flowPath(d) {
   `;
 }
 
-function drawFlowLegend(svg, width, margin, maxValue) {
+function drawFlowLegend(svg, width, margin) {
   const legend = svg.append("g")
     .attr("transform", `translate(${width - 145}, ${margin.top + 8})`);
 
@@ -772,41 +772,31 @@ function drawFlowLegend(svg, width, margin, maxValue) {
     .attr("class", "legend-label")
     .attr("x", 0)
     .attr("y", -8)
-    .text("Flow width");
+    .text("Relative flow size");
 
   const samples = [
-    Math.max(1, Math.round(maxValue * 0.12)),
-    Math.max(1, Math.round(maxValue * 0.4)),
-    Math.max(1, Math.round(maxValue))
+    { label: "Fewer records", width: 5 },
+    { label: "More records", width: 17 }
   ];
 
-  const uniqueSamples = [...new Set(samples)];
-
-  // Scale legend lines separately so they stay readable after filtering.
-  const legendWidth = d3.scaleLinear()
-    .domain([0, maxValue])
-    .range([3, 18]);
-
-  const rowGap = 30;
-
-  uniqueSamples.forEach((value, i) => {
+  samples.forEach((sample, i) => {
     const row = widthLegend.append("g")
-      .attr("transform", `translate(0, ${i * rowGap})`);
+      .attr("transform", `translate(0, ${i * 34})`);
 
     row.append("line")
       .attr("x1", 0)
       .attr("x2", 30)
-      .attr("y1", 8)
-      .attr("y2", 8)
+      .attr("y1", 10)
+      .attr("y2", 10)
       .attr("stroke", "#94a3b8")
-      .attr("stroke-width", legendWidth(value))
+      .attr("stroke-width", sample.width)
       .attr("opacity", 0.45);
 
     row.append("text")
       .attr("class", "legend-label")
       .attr("x", 42)
-      .attr("y", 12)
-      .text(value.toLocaleString());
+      .attr("y", 14)
+      .text(sample.label);
   });
 }
 
