@@ -1,0 +1,125 @@
+<!doctype html>
+<html style="width:100%;height:100%;">
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="">
+	<title>Music and Mental Health Dashboard</title>
+	<style>
+		* { box-sizing: border-box; }
+		body {
+			width: 100vw;
+			height: 100vh;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			flex-direction: column;
+			font-family: 'Arial', sans-serif;
+			overflow: hidden;
+		}
+		/* top header w/ title and reset */
+		#header {
+			width: 100%;
+			height: 36px;
+			background: #1a1a2e;
+			color: white;
+			display: flex;
+			align-items: center;
+			padding: 0 16px;
+			justify-content: space-between;
+			flex-shrink: 0;
+		}
+		#header h1 {
+			margin: 0;
+			font-size: 13px;
+			font-weight: 600;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			min-width: 0;
+		}
+		/* button to clear filters */
+		#reset-button {
+			background: #e94560;
+			border: none;
+			color: white;
+			padding: 4px 12px;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 12px;
+			flex-shrink: 0;
+		}
+		#reset-button:hover {
+			background: #c73652;
+		}
+		/* overview panel / heatmap */
+		#overview {
+			width: 100%;
+			flex: 0 0 38%;
+			border-bottom: 2px solid #ccc;
+			background: white;
+		}
+		/* bottom row with both views */
+		#focus-row {
+			width: 100%;
+			flex: 1;
+			display: flex;
+		}
+		/* parallel coordinates */
+		#parallel-coordinates {
+			width: 55%;
+			height: 100%;
+			border-right: 2px solid #ccc;
+			background: white;
+		}
+		/* scatter plot */
+		#scatter-plot {
+			width: 45%;
+			height: 100%;
+			background: white;
+		}
+		/* tooltip on hover */
+		#tooltip {
+			position: fixed;
+			background: rgba(0, 0, 0, 0.82);
+			color: white;
+			padding: 6px 10px;
+			border-radius: 4px;
+			font-size: 11px;
+			pointer-events: none;
+			opacity: 0;
+			transition: opacity 0.15s;
+			z-index: 100;
+		}
+		svg {
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+	<!-- Top header with title and reset button -->
+	<div id="header">
+		<h1>
+			Top chart: Click a genre column to filter all views by that genre &nbsp;&bull;&nbsp;
+			Bottom-left: Click and drag on any vertical axis to filter by value range &nbsp;&bull;&nbsp;
+			Bottom-right: Hover over a dot to see respondent details
+		</h1>
+		<button id="reset-button">Reset Filters</button>
+	</div>
+
+	<!-- Overview panel / heatmap -->
+	<div id="overview"></div>
+	
+	<!-- Bottom row with both views -->
+	<div id="focus-row">
+		<div id="parallel-coordinates"></div>
+		<div id="scatter-plot"></div>
+	</div>
+
+	<!-- Tooltip for hover -->
+	<div id="tooltip"></div>
+
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<script src="main.js"></script>
+</body>
+</html>
