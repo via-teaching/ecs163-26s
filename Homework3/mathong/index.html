@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokémon Dashboard — ECS 163 HW3</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top header bar with dashboard title and active-filter badge -->
+  <header id="dashboard-header">
+    <h1>Pokémon Stats Dashboard</h1>
+    <span class="subtitle">721 Pokémon · Gen 1–6 · click a type to filter</span>
+    <!-- Badge shown when a type filter is active; hidden by default -->
+    <div id="filter-badge" class="hidden">
+      Viewing: <span id="filter-label"></span>
+      <button id="clear-filter-btn" aria-label="Clear type filter">✕</button>
+    </div>
+  </header>
+
+  <!-- Main dashboard grid: left column = bar chart, right column = scatter + PCP -->
+  <main id="dashboard">
+
+    <!-- VIEW 1: Bar chart — context/overview showing all Pokémon by primary type -->
+    <section id="chart-bar" class="panel">
+      <h2 class="panel-title">Pokémon by Primary Type</h2>
+    </section>
+
+    <!-- VIEW 2: Scatter plot — focus view showing Attack vs Defense -->
+    <section id="chart-scatter" class="panel">
+      <h2 class="panel-title">Attack vs Defense</h2>
+    </section>
+
+    <!-- VIEW 3: Radar plot — advanced view showing avg stat profile per type -->
+    <section id="chart-pcp" class="panel">
+      <h2 class="panel-title">Avg Stat Profile by Type</h2>
+    </section>
+
+    <!-- VIEW 4: Stream graph — advanced view showing type counts across generations -->
+    <section id="chart-stream" class="panel">
+      <h2 class="panel-title">Type Distribution Across Generations</h2>
+    </section>
+
+  </main>
+
+  <!-- Floating tooltip for scatter plot hover; hidden by default -->
+  <div id="tooltip" class="tooltip hidden"></div>
+
+  <!-- D3 v7 loaded from CDN -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="main.js"></script>
+
+</body>
+</html>

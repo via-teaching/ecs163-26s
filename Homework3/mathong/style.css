@@ -1,0 +1,171 @@
+:root {
+  --bg:      #0d0f18;
+  --surface: #13151f;
+  --surface2: #1c1f2e;
+  --border:  #252840;
+  --text:    #dde1f0;
+  --muted:   #6b7094;
+  --accent:  #7c83fd;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  font-size: 13px;
+}
+
+/* header */
+#dashboard-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 18px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  height: 42px;
+}
+
+#dashboard-header h1 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+/* thin accent bar on the left of the title */
+#dashboard-header h1::before {
+  content: "";
+  display: inline-block;
+  width: 3px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 2px;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+/* subtitle shown after the h1 */
+#dashboard-header .subtitle {
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: 2px;
+}
+
+/* active filter badge */
+#filter-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px 3px 12px;
+  font-size: 11px;
+  color: var(--text);
+}
+
+#clear-filter-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+#clear-filter-btn:hover { color: var(--text); }
+
+/* grid layout */
+#dashboard {
+  display: grid;
+  grid-template-columns: 1.35fr 1.65fr;
+  grid-template-rows: 1fr 1fr;
+  height: calc(100vh - 42px);
+  gap: 6px;
+  padding: 6px;
+}
+
+/* 2x2 grid: bar top-left, scatter top-right, radar bottom-left, stream bottom-right */
+#chart-bar     { grid-column: 1; grid-row: 1; }
+#chart-scatter { grid-column: 2; grid-row: 1; }
+#chart-pcp     { grid-column: 1; grid-row: 2; }
+#chart-stream  { grid-column: 2; grid-row: 2; }
+
+/* panel cards */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* thin top accent line per panel */
+.panel::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--border);
+  border-radius: 6px 6px 0 0;
+}
+
+.panel-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+
+/* tooltip */
+.tooltip {
+  position: fixed;
+  pointer-events: none;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 11px;
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: var(--text);
+  max-width: 210px;
+  z-index: 100;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+
+.hidden { display: none !important; }
+
+/* d3 axis styling */
+.tick text {
+  fill: var(--muted);
+  font-size: 10px;
+}
+
+.tick line,
+.domain {
+  stroke: var(--border);
+}
+
+.axis-label {
+  fill: var(--muted);
+  font-size: 10px;
+}
