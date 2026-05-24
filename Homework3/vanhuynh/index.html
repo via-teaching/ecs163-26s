@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Music & Mental Health Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>Music & Mental Health Dashboard</h1>
+    <div class="dashboard">
+        <div class="view" id="view1">
+            <div class="view-title">Overview: Favorite Genres (Bar Chart)</div>
+            <div class="svg-container" id="bar-chart"></div>
+        </div>
+        <div class="view" id="view2">
+            <div class="view-title">Focus: Music Effects (Donut Chart)</div>
+            <div class="svg-container" id="scatter-plot"></div>
+        </div>
+        <div class="view view-bottom" id="view3">
+            <div class="view-title">Advanced: Sankey Diagram (Streaming Service → Genre → Music Effect)</div>
+            <div class="svg-container" id="parallel-coords"></div>
+        </div>
+    </div>
+    <div class="tooltip" id="tooltip"></div>
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>
