@@ -422,6 +422,22 @@ const RADAR_DIMS   = ["HP", "Attack", "Defense", "Sp_Atk", "Sp_Def", "Speed"];
 const RADAR_LABELS = ["HP", "Atk", "Def", "Sp.Atk", "Sp.Def", "Spd"];
 
 let radarSvgG, radarRadius, radarCx, radarCy, radarScale, typeAverages, overallAvg;
+let radarBrushPath = null;  // persistent animated path — morphs when brush selection changes
+let radarRefPath   = null;  // persistent dashed reference polygon
+
+// converts [[x,y],...] to SVG path d string
+function pointsToPathD(pts) {
+  return pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(2)},${p[1].toFixed(2)}`).join(" ") + " Z";
+}
+
+// returns an attrTween function that interpolates between two sets of polygon vertices
+function polygonTween(from, to) {
+  const interps = from.map((f, i) => [
+    d3.interpolateNumber(f[0], to[i][0]),
+    d3.interpolateNumber(f[1], to[i][1])
+  ]);
+  return t => pointsToPathD(interps.map(([xi, yi]) => [xi(t), yi(t)]));
+}
 
 // compute average stats for every type and for all pokemon combined
 function computeAverages() {
@@ -521,14 +537,14 @@ function drawRadar() {
       .text(RADAR_LABELS[i]);
   });
 
-  // legend: dashed = all-type avg, solid = selected type
+  // legend: classes allow updateRadar to change labels dynamically
   const radarLegend = svg.append("g").attr("transform", "translate(10, 10)");
 
   radarLegend.append("line")
     .attr("x1", 0).attr("x2", 18).attr("y1", 6).attr("y2", 6)
     .attr("stroke", "#6b7094").attr("stroke-width", 1.5)
     .attr("stroke-dasharray", "4,3");
-  radarLegend.append("text")
+  radarLegend.append("text").attr("class", "legend-ref-label")
     .attr("x", 22).attr("y", 10)
     .style("fill", "#6b7094").style("font-size", "10px")
     .text("All-type avg");
@@ -536,10 +552,22 @@ function drawRadar() {
   radarLegend.append("line")
     .attr("x1", 0).attr("x2", 18).attr("y1", 22).attr("y2", 22)
     .attr("stroke", "#dde1f0").attr("stroke-width", 2);
-  radarLegend.append("text")
+  radarLegend.append("text").attr("class", "legend-active-label")
     .attr("x", 22).attr("y", 26)
     .style("fill", "#6b7094").style("font-size", "10px")
-    .text("Selected type");
+    .text("Overall avg");
+
+  // persistent paths: radarRefPath (dashed reference) and radarBrushPath (animated active)
+  // appended after legend so they render on top of faint context polygons
+  radarRefPath = radarSvgG.append("path")
+    .attr("class", "radar-ref-polygon")
+    .attr("fill", "none")
+    .attr("stroke", "#6b7094").attr("stroke-width", 1.5)
+    .attr("stroke-dasharray", "4,3").attr("opacity", 0);
+
+  radarBrushPath = radarSvgG.append("path")
+    .attr("class", "radar-brush-polygon")
+    .attr("fill", "none").attr("stroke", "none").attr("opacity", 0);
 
   updateRadar();
 }
@@ -547,104 +575,83 @@ function drawRadar() {
 function updateRadar() {
   if (!radarSvgG) return;
 
-  // remove previous polygons so we redraw cleanly on filter change
   radarSvgG.selectAll("polygon.radar-type").remove();
   radarSvgG.selectAll("polygon.radar-avg").remove();
+  radarSvgG.selectAll("text.radar-val-label").remove();
 
-  if (state.selectedType) {
-    // all other types as faint context shapes
-    Object.entries(typeAverages).forEach(([type, stats]) => {
-      if (type === state.selectedType) return;
-      radarSvgG.append("polygon")
-        .attr("class", "radar-type")
-        .attr("points", radarPoints(stats).join(" "))
-        .attr("fill", TYPE_COLORS[type] || "#888")
-        .attr("fill-opacity", 0.06)
-        .attr("stroke", TYPE_COLORS[type] || "#888")
-        .attr("stroke-opacity", 0.2)
-        .attr("stroke-width", 1);
-    });
-
-    // dashed overall-average as reference
-    radarSvgG.append("polygon")
-      .attr("class", "radar-avg")
-      .attr("points", radarPoints(overallAvg).join(" "))
-      .attr("fill", "none")
-      .attr("stroke", "#6b7094")
-      .attr("stroke-width", 1.5)
-      .attr("stroke-dasharray", "4,3");
-
-    // highlighted polygon for the selected type
-    const selColor = TYPE_COLORS[state.selectedType] || "#888";
-    const selStats = typeAverages[state.selectedType];
-
-    radarSvgG.append("polygon")
-      .attr("class", "radar-type")
-      .attr("points", radarPoints(selStats).join(" "))
-      .attr("fill", selColor)
-      .attr("fill-opacity", 0.35)
-      .attr("stroke", selColor)
-      .attr("stroke-width", 3);
-
-    // stat value labels at each vertex of the selected type's polygon
-    RADAR_DIMS.forEach((dim, i) => {
-      const angle = (2 * Math.PI * i / RADAR_DIMS.length) - Math.PI / 2;
-      const r = radarScale(selStats[dim]);
-      const vx = radarCx + r * Math.cos(angle);
-      const vy = radarCy + r * Math.sin(angle);
-
-      radarSvgG.append("text")
-        .attr("x", vx + 8 * Math.cos(angle))
-        .attr("y", vy + 8 * Math.sin(angle))
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "middle")
-        .style("fill", selColor)
-        .style("font-size", "11px")
-        .style("font-weight", "600")
-        .text(Math.round(selStats[dim]));
-    });
-
-  } else {
-    // no filter — all 18 types faintly in the background
-    Object.entries(typeAverages).forEach(([type, stats]) => {
-      radarSvgG.append("polygon")
-        .attr("class", "radar-type")
-        .attr("points", radarPoints(stats).join(" "))
-        .attr("fill", TYPE_COLORS[type] || "#888")
-        .attr("fill-opacity", 0.05)
-        .attr("stroke", TYPE_COLORS[type] || "#888")
-        .attr("stroke-opacity", 0.25)
-        .attr("stroke-width", 0.8);
-    });
-
-    // overall average shown prominently when nothing is selected
-    radarSvgG.append("polygon")
-      .attr("class", "radar-avg")
-      .attr("points", radarPoints(overallAvg).join(" "))
-      .attr("fill", "#7c83fd")
-      .attr("fill-opacity", 0.2)
-      .attr("stroke", "#7c83fd")
-      .attr("stroke-width", 2.5);
-
-    // stat value labels at each vertex of the overall average polygon
-    RADAR_DIMS.forEach((dim, i) => {
-      const angle = (2 * Math.PI * i / RADAR_DIMS.length) - Math.PI / 2;
-      const r = radarScale(overallAvg[dim]);
-      const vx = radarCx + r * Math.cos(angle);
-      const vy = radarCy + r * Math.sin(angle);
-
-      // small label showing the average value at that vertex
-      radarSvgG.append("text")
-        .attr("x", vx + 8 * Math.cos(angle))
-        .attr("y", vy + 8 * Math.sin(angle))
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "middle")
-        .style("fill", "#7c83fd")
-        .style("font-size", "11px")
-        .style("font-weight", "600")
-        .text(Math.round(overallAvg[dim]));
-    });
+  // compute brushed-subset average if a brush selection exists
+  let brushAvg = null;
+  if (state.brushedNumbers && state.brushedNumbers.size > 0) {
+    const subset = state.data.filter(d => state.brushedNumbers.has(d.Number));
+    brushAvg = {};
+    RADAR_DIMS.forEach(dim => { brushAvg[dim] = d3.mean(subset, d => d[dim]); });
   }
+
+  // what the highlighted polygon represents (in priority: brush > type > overall)
+  const activeStats = brushAvg
+    || (state.selectedType ? typeAverages[state.selectedType] : overallAvg);
+  const activeColor = (brushAvg || !state.selectedType)
+    ? "#7c83fd"
+    : (TYPE_COLORS[state.selectedType] || "#888");
+
+  // faint context polygons for all types
+  Object.entries(typeAverages).forEach(([type, stats]) => {
+    const isFocusType = !brushAvg && type === state.selectedType;
+    radarSvgG.append("polygon").attr("class", "radar-type")
+      .attr("points", radarPoints(stats).join(" "))
+      .attr("fill", TYPE_COLORS[type] || "#888")
+      .attr("fill-opacity", isFocusType ? 0 : 0.05)
+      .attr("stroke", TYPE_COLORS[type] || "#888")
+      .attr("stroke-opacity", isFocusType ? 0 : 0.2)
+      .attr("stroke-width", 0.8);
+  });
+
+  // reference polygon (dashed) — only shown when brush is active
+  if (brushAvg) {
+    const refStats = state.selectedType ? typeAverages[state.selectedType] : overallAvg;
+    radarRefPath
+      .attr("d", pointsToPathD(radarPoints(refStats)))
+      .attr("opacity", 0.6);
+  } else {
+    radarRefPath.attr("opacity", 0);
+  }
+
+  // animated active polygon — morph via attrTween for smooth transition
+  const toPoints   = radarPoints(activeStats);
+  const fromPoints = radarBrushPath.property("__prevPoints") || toPoints;
+
+  radarBrushPath
+    .attr("fill", activeColor).attr("fill-opacity", brushAvg ? 0.28 : 0.2)
+    .attr("stroke", activeColor).attr("stroke-width", brushAvg ? 3 : 2.5)
+    .attr("opacity", 1)
+    .interrupt()
+    .transition().duration(600).ease(d3.easeCubicInOut)
+    .attrTween("d", () => polygonTween(fromPoints, toPoints));
+
+  // store target vertices so next call can morph from here
+  radarBrushPath.property("__prevPoints", toPoints);
+
+  // vertex value labels on the active polygon
+  RADAR_DIMS.forEach((dim, i) => {
+    const angle = (2 * Math.PI * i / RADAR_DIMS.length) - Math.PI / 2;
+    const r = radarScale(activeStats[dim]);
+    radarSvgG.append("text").attr("class", "radar-val-label")
+      .attr("x", radarCx + r * Math.cos(angle) + 8 * Math.cos(angle))
+      .attr("y", radarCy + r * Math.sin(angle) + 8 * Math.sin(angle))
+      .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
+      .style("fill", activeColor).style("font-size", "11px").style("font-weight", "600")
+      .attr("opacity", 0).text(Math.round(activeStats[dim]))
+      .transition().duration(300).attr("opacity", 1);
+  });
+
+  // update legend text to reflect what each polygon represents
+  const svg = d3.select("#chart-pcp svg");
+  svg.select(".legend-ref-label").text(
+    brushAvg ? (state.selectedType ? `${state.selectedType} avg` : "Overall avg") : "All-type avg"
+  );
+  svg.select(".legend-active-label").text(
+    brushAvg ? "Brushed avg" : (state.selectedType ? `${state.selectedType} avg` : "Overall avg")
+  );
 }
 
 // -------------------------------------------------------------------
