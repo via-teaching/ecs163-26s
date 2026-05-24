@@ -11,7 +11,7 @@
   <!-- Top header bar with dashboard title and active-filter badge -->
   <header id="dashboard-header">
     <h1>Pokémon Stats Dashboard</h1>
-    <span class="subtitle">721 Pokémon · Gen 1–6 · click a type to filter</span>
+    <span class="subtitle">721 Pokémon · Gen 1–6 · click type to filter · drag to brush · scroll to zoom</span>
     <!-- Badge shown when a type filter is active; hidden by default -->
     <div id="filter-badge" class="hidden">
       Viewing: <span id="filter-label"></span>
@@ -27,9 +27,22 @@
       <h2 class="panel-title">Pokémon by Primary Type</h2>
     </section>
 
-    <!-- VIEW 2: Scatter plot — focus view showing Attack vs Defense -->
+    <!-- VIEW 2: Scatter plot — focus view with brush + zoom mode toggle -->
     <section id="chart-scatter" class="panel">
-      <h2 class="panel-title">Attack vs Defense</h2>
+      <div class="panel-header">
+        <h2 class="panel-title">Attack vs Defense</h2>
+        <div class="scatter-controls">
+          <!-- shows count when brush selection is active -->
+          <span id="brush-badge" class="brush-badge hidden"></span>
+          <!-- toggle between brush and zoom interaction modes -->
+          <div class="mode-toggle">
+            <button class="mode-btn active" id="btn-brush-mode">Brush</button>
+            <button class="mode-btn"        id="btn-zoom-mode">Zoom</button>
+          </div>
+          <!-- only visible in zoom mode -->
+          <button id="reset-zoom-btn" class="reset-zoom-btn hidden">Reset</button>
+        </div>
+      </div>
     </section>
 
     <!-- VIEW 3: Radar plot — advanced view showing avg stat profile per type -->

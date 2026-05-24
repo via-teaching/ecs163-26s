@@ -169,3 +169,78 @@ html, body {
   fill: var(--muted);
   font-size: 10px;
 }
+
+/* panel header row — title + controls side by side */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+.panel-header .panel-title { margin-bottom: 0; }
+
+.scatter-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* brush / zoom mode toggle pill */
+.mode-toggle {
+  display: flex;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 2px;
+}
+.mode-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.mode-btn.active { background: var(--accent); color: #fff; }
+.mode-btn:not(.active):hover { color: var(--text); }
+
+/* reset zoom button */
+.reset-zoom-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.reset-zoom-btn:hover { color: var(--text); border-color: var(--accent); }
+
+/* brush selection count badge */
+.brush-badge {
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 600;
+  background: var(--surface2);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+/* d3 brush rect — styled to match dark theme */
+.brush .selection {
+  fill: var(--accent);
+  fill-opacity: 0.12;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 4,3;
+}
+.brush .handle { fill: var(--accent); fill-opacity: 0.4; }
