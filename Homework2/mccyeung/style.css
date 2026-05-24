@@ -1,0 +1,81 @@
+/* layout: locked to the viewport, 2x2 grid, bottom row spans full width */
+* { box-sizing: border-box; }
+
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: hsl(0, 0%, 13%);
+    background: hsl(240, 14%, 97%);
+    overflow: hidden;
+}
+
+#dashboard-header {
+    height: 70px;
+    padding: 8px 20px;
+    background: hsl(222, 37%, 19%);
+    color: hsl(0, 0%, 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#dashboard-header h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+#dashboard-header .subtitle {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: hsl(225, 28%, 83%);
+}
+
+#dashboard-grid {
+    width: 100%;
+    height: calc(100% - 70px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1.1fr;
+    gap: 10px;
+    padding: 10px;
+}
+
+.panel {
+    background: hsl(0, 0%, 100%);
+    border: 1px solid hsl(225, 16%, 90%);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* radar grid takes up the whole bottom row */
+.panel-wide {
+    grid-column: 1 / span 2;
+}
+
+.panel svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.axis text { font-size: 11px; fill: hsl(0, 0%, 27%); }
+.axis path, .axis line { stroke: hsl(225, 13%, 75%); }
+
+.chart-title {
+    font-size: 14px;
+    font-weight: 600;
+    fill: hsl(222, 37%, 19%);
+}
+
+.axis-label {
+    font-size: 12px;
+    fill: hsl(0, 0%, 20%);
+}
+
+.legend-label { font-size: 11px; fill: hsl(0, 0%, 20%); }

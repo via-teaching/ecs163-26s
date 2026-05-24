@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="Pokemon dashboard for ECS 163 Homework 2">
+    <title>Pokemon Stats Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header id="dashboard-header">
+        <h1>Pokémon Stats Dashboard</h1>
+        <p class="subtitle">
+            Exploring how 721 Pokémon are distributed across primary types,
+            which dual-type combinations exist, and how full stat profiles differ by type.
+        </p>
+    </header>
+
+    <!-- top row: bar chart + heatmap. bottom row: radar grid spanning both columns -->
+    <main id="dashboard-grid">
+        <section id="view-bar"      class="panel"><svg></svg></section>
+        <section id="view-scatter"  class="panel"><svg></svg></section>
+        <section id="view-parallel" class="panel panel-wide"><svg></svg></section>
+    </main>
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
