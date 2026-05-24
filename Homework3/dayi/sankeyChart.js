@@ -117,14 +117,14 @@ class SankeyChart {
         let links = this.svg.selectAll(".link")
             .data(graph.links, d => d.source.name + "-" + d.target.name);
 
-        // enter selection for links
+        // enter selection for links, start invisible to fade in animation principle
         links.enter()
             .append("path")
             .attr("class", "link")
             .attr("d", d3.sankeyLinkHorizontal())
             .attr("fill", "none")
             .attr("stroke", "#aaa")
-            .attr("stroke-opacity", 0.2)
+            .attr("stroke-opacity", 0)
             .attr("stroke-width", d => Math.max(1, d.width))
             .on("mouseover", (d) => {
                 this.tooltip.transition().duration(200).style("opacity", .9);
@@ -141,16 +141,21 @@ class SankeyChart {
             .transition()
             .duration(500)
             .attr("d", d3.sankeyLinkHorizontal())
-            .attr("stroke-width", d => Math.max(1, d.width));
+            .attr("stroke-width", d => Math.max(1, d.width))
+            .attr("stroke-opacity", 0.2);
 
-        // remove links
-        links.exit().remove();
+        // fade out links that no longer exist, then remove
+        links.exit()
+            .transition()
+            .duration(500)
+            .attr("stroke-opacity", 0)
+            .remove();
 
         // bind nodes to data
         let nodes = this.svg.selectAll(".node")
             .data(graph.nodes, d => d.name);
 
-        // enter selection for new nodes
+        // enter selection for new nodes, start invisible 
         let nodeEnter = nodes.enter()
             .append("g")
             .attr("class", "node")
@@ -178,10 +183,11 @@ class SankeyChart {
             .attr("x", 6 + this.sankey.nodeWidth())
             .attr("text-anchor", "start");
 
-        // update phase: merge and animate nodes to new layout positions
+        // update phase: merge enter and existing nodes, animate to new positions and fade in
         let nodeUpdate = nodeEnter.merge(nodes)
             .transition()
             .duration(500)
+            .attr("opacity", 1)
             .attr("transform", d => `translate(${d.x0},${d.y0})`);
 
         // smoothly update rectangle heights
@@ -192,8 +198,12 @@ class SankeyChart {
         nodeUpdate.select("text")
             .attr("y", d => (d.y1 - d.y0) / 2);
 
-        // exit phase: remove nodes that no longer exist
-        nodes.exit().remove();
+        // exit phase: fade out nodes that no longer exist, then remove
+        nodes.exit()
+            .transition()
+            .duration(500)
+            .attr("opacity", 0)
+            .remove();
 
         // ensure nodes stay visually in front of the gray links
         this.svg.selectAll(".node").raise();
