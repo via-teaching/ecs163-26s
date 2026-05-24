@@ -19,9 +19,27 @@
 			<div id="type-generation-heatmap" class="chart-container"></div>
 		</section>
 		<section id="scatter-panel" class="panel scatter-panel">
-			<h2>Type & Strength: Bar Chart</h2>
-			<p class="chart-subtitle">Brush to compare type-strength subsets</p>
-			<button id="clear-brush" class="brush-reset" type="button">Clear Brush</button>
+			<div class="bar-panel-header">
+				<div>
+					<h2>Type & Strength: Bar Chart</h2>
+					<p class="chart-subtitle">Brush adjacent type-strength groups</p>
+				</div>
+				<button id="clear-brush" class="brush-reset" type="button">Clear Brush</button>
+			</div>
+			<div class="bar-control-row">
+				<label class="metric-control" for="bar-metric-select">
+					<span>Metric</span>
+					<select id="bar-metric-select">
+						<option value="total" selected>Total</option>
+						<option value="attack">Attack</option>
+						<option value="defense">Defense</option>
+						<option value="speed">Speed</option>
+						<option value="hp">HP</option>
+						<option value="spAtk">Sp. Atk</option>
+						<option value="spDef">Sp. Def</option>
+					</select>
+				</label>
+			</div>
 			<div id="type-strength-bar-chart" class="chart-container"></div>
 		</section>
 	</main>

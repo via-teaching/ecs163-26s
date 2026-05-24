@@ -1,44 +1,61 @@
 /*
 dashboard theme:
-explore pokemon types by distribution, strength, and legendary status
+explore Pokemon type identity through distribution, strength, and legendary status
 
 dashboard flow:
-start with the heatmap to understand the overall type distribution
-move to the bar chart to compare type strength
-finish with the sankey to see how generation, type, and legendary status connect
+heatmap overview -> bar chart comparison -> sankey flow
 
 heatmap:
-shows type counts across generations
+overview of Pokemon type distribution across generations serves as the context view for exploration
 
 bar chart:
-compares average total stats by type
+compares average battle strength across primary types
+the metric selector updates the compared battle attribute while preserving type positions
 
 sankey:
-shows generation, type, and legendary count flow
+shows flow between generation, primary type, and legendary status
+uses proportional links to reveal categorical composition
+serves as the advanced visualization view
+
+sankey grouping:
+less frequent primary types are grouped as Other Types to reduce clutter
+hidden low-frequency types map to the grouped Other Types pathway
 
 focus + context:
-heatmap is the overview, bar chart is support, sankey is the focus
+selection and brushing make selected types the focus while faded marks remain as context
+the heatmap provides overview, the bar chart supports comparison, and the sankey shows composition detail
 
-design rationale:
-the heatmap uses position and color to show overall distribution patterns
-the bar chart uses length for accurate comparison of average type strength
-the sankey diagram uses flow width to show category composition and relationships
+interactions:
+selection supports single-type drill-down across coordinated views
+brushing supports subset exploration across related type-strength groups
 
-the three charts use different visualization methods and explore different aspects of the dataset
-the dashboard moves from overview to comparison to detailed categorical flow
+transitions:
+filtering transitions preserve visual continuity during interaction
+data schema change transitions update the compared battle attribute while preserving type positions
+
+The dashboard combines overview, comparison, and advanced composition views through coordinated interaction and analytical transitions
 */
 
 const DATA_PATH = "data/pokemon_alopez247.csv";
 
-// reusable fields
-const BATTLE_STATS = ["hp", "attack", "defense", "spAtk", "spDef", "speed"];
+const STAT_FIELDS = ["hp", "attack", "defense", "spAtk", "spDef", "speed"];
 const SANKEY_TOP_TYPE_COUNT = 10;
 const SANKEY_OTHER_TYPE_LABEL = "Other Types";
+const BAR_METRICS = [
+  { field: "total", label: "Total", title: "Average Total Stats by Primary Type", axis: "Average Total Base Stats" },
+  { field: "attack", label: "Attack", title: "Average Attack by Primary Type", axis: "Average Attack" },
+  { field: "defense", label: "Defense", title: "Average Defense by Primary Type", axis: "Average Defense" },
+  { field: "speed", label: "Speed", title: "Average Speed by Primary Type", axis: "Average Speed" },
+  { field: "hp", label: "HP", title: "Average HP by Primary Type", axis: "Average HP" },
+  { field: "spAtk", label: "Sp. Atk", title: "Average Sp. Atk by Primary Type", axis: "Average Sp. Atk" },
+  { field: "spDef", label: "Sp. Def", title: "Average Sp. Def by Primary Type", axis: "Average Sp. Def" },
+];
 
 // track selected type
 let selectedType = null;
 let brushedTypes = null;
 let sankeyVisibleTypeSet = new Set();
+let selectedBarMetric = "total";
 
 // transition timing
 const SELECTION_TRANSITION_DURATION = 600;
@@ -46,9 +63,6 @@ const CONTEXT_OPACITY = 0.22;
 const SANKEY_CONTEXT_LINK_OPACITY = 0.03;
 const SANKEY_CONTEXT_NODE_OPACITY = 0.18;
 const SANKEY_CONTEXT_LABEL_OPACITY = 0.24;
-
-// selection links the overview, comparison, and advanced focus views
-// filtering transition helps users drill down into one type
 
 // related type check
 function getActiveTypeSet() {
@@ -68,7 +82,14 @@ function selectionTransition(selection) {
   return selection.transition().duration(SELECTION_TRANSITION_DURATION).ease(d3.easeCubicInOut);
 }
 
-// map hidden types to other types
+// get bar metric
+function getBarMetric(field) {
+  return BAR_METRICS.find(function (metric) {
+    return metric.field === field;
+  }) || BAR_METRICS[0];
+}
+
+// map grouped types to other types
 function getSankeySelectedType(type) {
   if (type === null) return null;
   return sankeyVisibleTypeSet.has(type) ? type : SANKEY_OTHER_TYPE_LABEL;
@@ -275,7 +296,7 @@ function cleanPokemonRow(row) {
     bodyStyle: row.Body_Style,
   };
 
-  const statValues = BATTLE_STATS.map((field) => cleaned[field]);
+  const statValues = STAT_FIELDS.map((field) => cleaned[field]);
 
   // create derived fields
   cleaned.isDualType = cleaned.type2 !== "None";
@@ -283,7 +304,7 @@ function cleanPokemonRow(row) {
   cleaned.offense = cleaned.attack + cleaned.spAtk;
   cleaned.defenseScore = cleaned.defense + cleaned.spDef;
   cleaned.statSpread = Math.max(...statValues) - Math.min(...statValues);
-  cleaned.stats = BATTLE_STATS.map((field) => ({
+  cleaned.stats = STAT_FIELDS.map((field) => ({
     stat: field,
     value: cleaned[field],
   }));
@@ -399,8 +420,7 @@ function heatmapLegend(svg, colorScale, minValue, maxValue, x, y, height) {
     .text(minValue.toFixed(0));
 }
 
-// heatmap shows overview distribution across generations
-// uses matrix position for generation and type so provides context for the dashboard
+// draw overview heatmap
 function typeGenerationHeatmap(pokemon) {
   const container = d3.select("#type-generation-heatmap");
   container.selectAll("*").remove();
@@ -521,21 +541,35 @@ function typeGenerationHeatmap(pokemon) {
 }
 
 // type strength data
-function getTypeStrengthData(pokemon) {
-  return d3
+function getTypeStrengthData(pokemon, metricField, typeOrder) {
+  const typeOrderMap = typeOrder
+    ? new Map(
+        typeOrder.map(function (type, index) {
+          return [type, index];
+        })
+      )
+    : null;
+  const typeData = d3
     .nest()
     .key((d) => d.type1)
     .rollup((rows) => ({
-      averageTotal: d3.mean(rows, (d) => d.total),
+      averageValue: d3.mean(rows, (d) => d[metricField]),
       count: rows.length,
     }))
     .entries(pokemon)
     .map((d) => ({
       type: d.key,
-      averageTotal: d.value.averageTotal,
+      averageValue: d.value.averageValue,
       count: d.value.count,
-    }))
-    .sort((a, b) => d3.descending(a.averageTotal, b.averageTotal));
+    }));
+
+  if (typeOrderMap) {
+    return typeData.sort(function (a, b) {
+      return d3.ascending(typeOrderMap.get(a.type), typeOrderMap.get(b.type));
+    });
+  }
+
+  return typeData.sort((a, b) => d3.descending(a.averageValue, b.averageValue));
 }
 
 // bar axes
@@ -543,16 +577,16 @@ function barChartAxes(chart, xScale, yScale, width, height) {
   // draw gridlines
   chart
     .append("g")
-    .attr("class", "gridline")
+    .attr("class", "gridline bar-x-gridline")
     .attr("transform", `translate(0, ${height})`)
     .call(d3.axisBottom(xScale).tickSize(-height).tickFormat(""));
 
-  chart.append("g").attr("class", "gridline").call(d3.axisLeft(yScale).tickSize(-width).tickFormat(""));
+  chart.append("g").attr("class", "gridline bar-y-gridline").call(d3.axisLeft(yScale).tickSize(-width).tickFormat(""));
 
   // draw axes
   chart
     .append("g")
-    .attr("class", "axis")
+    .attr("class", "axis bar-x-axis")
     .attr("transform", `translate(0, ${height})`)
     .call(d3.axisBottom(xScale))
     .selectAll("text")
@@ -561,7 +595,7 @@ function barChartAxes(chart, xScale, yScale, width, height) {
     .attr("dy", "0.2em")
     .attr("transform", "rotate(-45)");
 
-  chart.append("g").attr("class", "axis").call(d3.axisLeft(yScale).ticks(5));
+  chart.append("g").attr("class", "axis bar-y-axis").call(d3.axisLeft(yScale).ticks(5));
 }
 
 // bar legend
@@ -672,8 +706,14 @@ function getBrushedTypes(selection, typeData, xScale) {
     });
 }
 
-// bar chart compares average type strength
-// supports type comparison and differs from heatmap by using averages
+// metric tooltip
+function barTooltipHtml(d, metric, overallAverage) {
+  return `<strong>${d.type}</strong><br>Metric: ${metric.label}<br>Average ${metric.label}: ${d.averageValue.toFixed(
+    1
+  )}<br>Pokemon count: ${d.count}<br>${d.averageValue >= overallAverage ? "Above" : "Below"} overall average`;
+}
+
+// draw type comparison bars
 function typeStrengthBarChart(pokemon) {
   const container = d3.select("#type-strength-bar-chart");
   container.selectAll("*").remove();
@@ -683,8 +723,14 @@ function typeStrengthBarChart(pokemon) {
   const outerHeight = container.node().clientHeight;
   const width = outerWidth - margin.left - margin.right;
   const height = outerHeight - margin.top - margin.bottom;
-  const typeData = getTypeStrengthData(pokemon);
-  const overallAverage = d3.mean(pokemon, (d) => d.total);
+  const typeOrder = getTypeStrengthData(pokemon, "total").map(function (d) {
+    return d.type;
+  });
+  let currentMetric = getBarMetric(selectedBarMetric);
+  let typeData = getTypeStrengthData(pokemon, currentMetric.field, typeOrder);
+  let overallAverage = d3.mean(pokemon, function (d) {
+    return d[currentMetric.field];
+  });
   const colors = { above: "#b2182b", below: "#8fa8b8" };
 
   // create svg container
@@ -694,7 +740,7 @@ function typeStrengthBarChart(pokemon) {
     .attr("height", outerHeight)
     .attr("viewBox", `0 0 ${outerWidth} ${outerHeight}`)
     .attr("role", "img")
-    .attr("aria-label", "Average total stats by primary type bar chart");
+    .attr("aria-label", "Average battle stat by primary type bar chart");
 
   const chart = svg
     .append("g")
@@ -704,7 +750,7 @@ function typeStrengthBarChart(pokemon) {
   const xScale = d3.scaleBand().domain(typeData.map((d) => d.type)).range([0, width]).padding(0.18);
   const yScale = d3
     .scaleLinear()
-    .domain([0, d3.max(typeData, (d) => d.averageTotal)])
+    .domain([0, d3.max(typeData, (d) => d.averageValue)])
     .nice()
     .range([height, 0]);
 
@@ -713,11 +759,11 @@ function typeStrengthBarChart(pokemon) {
   // draw title
   svg
     .append("text")
-    .attr("class", "chart-title")
+    .attr("class", "chart-title bar-chart-title")
     .attr("x", margin.left + width / 2)
     .attr("y", 16)
     .attr("text-anchor", "middle")
-    .text("Average Total Stats by Primary Type");
+    .text(currentMetric.title);
 
   barChartAxes(chart, xScale, yScale, width, height);
 
@@ -732,12 +778,12 @@ function typeStrengthBarChart(pokemon) {
 
   svg
     .append("text")
-    .attr("class", "axis-label")
+    .attr("class", "axis-label bar-y-axis-label")
     .attr("x", -(margin.top + height / 2))
     .attr("y", 16)
     .attr("text-anchor", "middle")
     .attr("transform", "rotate(-90)")
-    .text("Average Total Base Stats");
+    .text(currentMetric.axis);
 
   // draw bars
   const bars = chart
@@ -747,10 +793,10 @@ function typeStrengthBarChart(pokemon) {
     .append("rect")
     .attr("class", "strength-bar")
     .attr("x", (d) => xScale(d.type))
-    .attr("y", (d) => yScale(d.averageTotal))
+    .attr("y", (d) => yScale(d.averageValue))
     .attr("width", xScale.bandwidth())
-    .attr("height", (d) => height - yScale(d.averageTotal))
-    .attr("fill", (d) => (d.averageTotal >= overallAverage ? colors.above : colors.below))
+    .attr("height", (d) => height - yScale(d.averageValue))
+    .attr("fill", (d) => (d.averageValue >= overallAverage ? colors.above : colors.below))
     .attr("data-type", (d) => d.type)
     .attr("tabindex", 0)
     .classed("clickable", true)
@@ -763,11 +809,7 @@ function typeStrengthBarChart(pokemon) {
       d3.select(this).attr("stroke", "#263238").attr("stroke-width", 1.5);
       tooltip
         .style("display", "block")
-        .html(
-          `<strong>${d.type}</strong><br>Average Total: ${d.averageTotal.toFixed(
-            1
-          )}<br>Pokemon count: ${d.count}<br>${d.averageTotal >= overallAverage ? "Above" : "Below"} overall average`
-        );
+        .html(barTooltipHtml(d, currentMetric, overallAverage));
     })
     .on("mousemove", function () {
       moveTooltip(tooltip);
@@ -776,12 +818,6 @@ function typeStrengthBarChart(pokemon) {
       updateBarSelection();
       tooltip.style("display", "none");
     });
-
-  // brushing fits the bar chart because type strength is ordered along one horizontal comparison axis
-  // brushing supports subset exploration by letting users isolate adjacent strong or weak type groups
-  // linked filtering across the heatmap and sankey preserves context while the brushed subset becomes focus
-  // the opacity transition keeps subset changes readable as types enter or leave the brushed range
-  // brushing is stronger than heatmap zoom here because the question is comparative, not spatial navigation
 
   // create bar brush
   const brushLayer = chart.append("g").attr("class", "bar-brush");
@@ -861,11 +897,7 @@ function typeStrengthBarChart(pokemon) {
 
       tooltip
         .style("display", "block")
-        .html(
-          `<strong>${d.type}</strong><br>Average Total: ${d.averageTotal.toFixed(
-            1
-          )}<br>Pokemon count: ${d.count}<br>${d.averageTotal >= overallAverage ? "Above" : "Below"} overall average`
-        );
+        .html(barTooltipHtml(d, currentMetric, overallAverage));
       moveTooltip(tooltip);
     })
     .on("mouseout.tooltip", function () {
@@ -890,6 +922,69 @@ function typeStrengthBarChart(pokemon) {
       .call(brush.move, null);
     setBrushedTypes(null);
   });
+
+  // update metric state
+  d3.select("#bar-metric-select")
+    .property("value", currentMetric.field)
+    .on("change", function () {
+      selectedBarMetric = this.value;
+      currentMetric = getBarMetric(selectedBarMetric);
+      typeData = getTypeStrengthData(pokemon, currentMetric.field, typeOrder);
+      overallAverage = d3.mean(pokemon, function (d) {
+        return d[currentMetric.field];
+      });
+
+      yScale.domain([0, d3.max(typeData, function (d) {
+        return d.averageValue;
+      })]).nice();
+
+      const metricTransition = d3.transition().duration(700).ease(d3.easeCubicInOut);
+
+      bars.data(typeData, function (d) {
+        return d.type;
+      });
+
+      // animate bar height transition
+      bars
+        .transition(metricTransition)
+        .attr("y", function (d) {
+          return yScale(d.averageValue);
+        })
+        .attr("height", function (d) {
+          return height - yScale(d.averageValue);
+        })
+        .attr("fill", function (d) {
+          return d.averageValue >= overallAverage ? colors.above : colors.below;
+        });
+
+      // transition y-axis scale
+      chart
+        .select(".bar-y-axis")
+        .transition(metricTransition)
+        .call(d3.axisLeft(yScale).ticks(5));
+
+      chart
+        .select(".bar-y-gridline")
+        .transition(metricTransition)
+        .call(d3.axisLeft(yScale).tickSize(-width).tickFormat(""));
+
+      // update metric labels
+      svg.select(".bar-chart-title").text(currentMetric.title);
+      svg.select(".bar-y-axis-label").text(currentMetric.axis);
+
+      // update average reference
+      chart
+        .select(".average-line")
+        .transition(metricTransition)
+        .attr("y1", yScale(overallAverage))
+        .attr("y2", yScale(overallAverage));
+
+      chart
+        .select(".average-line-label")
+        .transition(metricTransition)
+        .attr("y", yScale(overallAverage) - 6)
+        .text(`Overall average: ${overallAverage.toFixed(1)}`);
+    });
 
   // draw average line
   averageLine(chart, yScale, width, overallAverage);
@@ -1060,8 +1155,7 @@ function sankeyLinkColor(d) {
   return "#d99a45";
 }
 
-// sankey shows categorical flow into legendary status
-// use proportional links for counts and differ by showing categorical composition
+// draw advanced sankey flow
 function generationTypeLegendarySankey(pokemon) {
   const container = d3.select("#sankey-flow");
   container.selectAll("*").remove();
@@ -1103,7 +1197,7 @@ function generationTypeLegendarySankey(pokemon) {
     .attr("x", outerWidth / 2)
     .attr("y", 34)
     .attr("text-anchor", "middle")
-    .text("links show Pokemon counts; top 10 types shown");
+    .text("links show Pokemon counts; ten frequent types shown");
 
   // draw grouping note
   svg
@@ -1112,7 +1206,7 @@ function generationTypeLegendarySankey(pokemon) {
     .attr("x", outerWidth / 2)
     .attr("y", 48)
     .attr("text-anchor", "middle")
-    .text("Low-count types are grouped as Other Types");
+    .text("Less frequent primary types are grouped as Other Types");
 
   // draw stage labels
   const stageLabels = [
@@ -1245,11 +1339,3 @@ if (typeof document !== "undefined") {
       console.error("Failed to load Pokemon data:", error);
     });
 }
-
-/*
-final dashboard rationale:
-selection supports single-type drill-down by letting one pokemon type become the shared focus across the overview, comparison, and composition views
-brushing supports multi-type subset exploration by letting users compare groups of strong or weak types in the bar chart and see the same subset across the whole dashboard
-filtering transitions maintain visual continuity because related marks stay visible while unrelated marks fade with the same semantic animation in every view
-the heatmap, bar chart, and sankey preserve the overview to comparison to composition exploration flow for distribution, strength, and categorical identity
-*/
