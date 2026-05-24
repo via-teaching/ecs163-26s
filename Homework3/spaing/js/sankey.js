@@ -94,7 +94,7 @@ function drawSankey(data) {
     }
 
     // Align each column so it spans exactly [0, h] by redistributing padding gaps
-    // between nodes — node heights stay intact so link stroke-widths stay consistent
+    // between nodes - node heights stay intact so link stroke-widths stay consistent
     // and bands remain gap-free.
     function stretchColumns(g) {
         const cols = d3.group(g.nodes, d => d.col);
@@ -214,6 +214,66 @@ function drawSankey(data) {
         .attr("opacity", REST_LBL)
         .text(d => d.label);
 
+    // --- Rich tooltip for links ---
+    let currentData = data;
+
+    function filterForLink(link) {
+        const src = link.source, tgt = link.target;
+        if (src.col === 0) return currentData.filter(d => d.experience_level === src.id && d.company_size === tgt.id);
+        if (src.col === 1) return currentData.filter(d => d.company_size === src.id && getBracket(d.salary_in_usd) === tgt.id);
+        if (src.col === 2) return currentData.filter(d => getBracket(d.salary_in_usd) === src.id && String(d.remote_ratio) === tgt.id);
+        return [];
+    }
+
+    function breakdownForCol(rows, col) {
+        if (col === 0) {
+            const counts = {};
+            rows.forEach(d => { counts[d.experience_level] = (counts[d.experience_level] || 0) + 1; });
+            return { label: "Experience", items: [...expOrder].reverse().map(e => ({ label: expLabels[e], id: e, count: counts[e] || 0 })), colorFn: expColor };
+        }
+        if (col === 1) {
+            const counts = {};
+            rows.forEach(d => { counts[d.company_size] = (counts[d.company_size] || 0) + 1; });
+            return { label: "Company Size", items: sizeOrder.map(s => ({ label: sizeLabel[s], id: s, count: counts[s] || 0 })), colorFn: sizeColor };
+        }
+        if (col === 2) {
+            const counts = {};
+            rows.forEach(d => { const b = getBracket(d.salary_in_usd); counts[b] = (counts[b] || 0) + 1; });
+            return { label: "Salary Range", items: brackets.map(b => ({ label: b, id: b, count: counts[b] || 0 })), colorFn: bracketColor };
+        }
+        if (col === 3) {
+            const counts = {};
+            rows.forEach(d => { counts[d.remote_ratio] = (counts[d.remote_ratio] || 0) + 1; });
+            return { label: "Work Mode", items: remoteOrder.map(r => ({ label: remoteLabel[r], id: String(r), count: counts[r] || 0 })), colorFn: remoteColor };
+        }
+    }
+
+    function renderBreakdown(bd) {
+        const total = bd.items.reduce((s, i) => s + i.count, 0);
+        if (total === 0) return '';
+        const bars = bd.items.map(item => {
+            const w = Math.round(item.count / total * 100);
+            return `<div style="display:flex;align-items:center;gap:5px;margin:3px 0;font-size:12px">
+                <span style="width:72px;text-align:right;color:#ddd">${item.label}</span>
+                <span style="display:inline-block;background:${bd.colorFn(item.id)};height:10px;width:${w}px;border-radius:2px;min-width:1px"></span>
+                <span style="color:#fff">${item.count}</span>
+            </div>`;
+        }).join('');
+        return `<div style="margin-top:7px;padding-top:5px;border-top:1px solid #ddd">
+            <div style="font-size:11px;color:#aaa;margin-bottom:3px">${bd.label}:</div>${bars}</div>`;
+    }
+
+    function makeLinkTip(link) {
+        const rows = filterForLink(link);
+        const dot = c => `<span style="display:inline-block;width:10px;height:10px;background:${c};border-radius:2px;margin-right:3px;vertical-align:middle"></span>`;
+        const base = `<strong>${dot(nodeColor(link.source))}${link.source.label} &rarr; ${dot(nodeColor(link.target))}${link.target.label}</strong><br/>${link.value.toLocaleString()} people`;
+        const sections = [0, 1, 2, 3]
+            .filter(col => col !== link.source.col && col !== link.target.col)
+            .map(col => renderBreakdown(breakdownForCol(rows, col)))
+            .join('');
+        return base + sections;
+    }
+
     // --- Hover helpers ---
     function fadeAll() {
         linkPaths.transition().duration(TRANSITION_MS)
@@ -246,7 +306,7 @@ function drawSankey(data) {
             nodeLabels.filter(n => n === d.source || n === d.target)
                 .transition().duration(TRANSITION_MS).attr("opacity", HOVR_LBL);
             scaleLabel(d.source); scaleLabel(d.target);
-            tipShow(`${d.source.label} -> ${d.target.label}<br/>${d.value.toLocaleString()} people`, event);
+            tipShow(makeLinkTip(d), event);
         })
         .on("mousemove", tipMove)
         .on("mouseout", () => { restoreAll(); tipHide(); });
@@ -279,7 +339,7 @@ function drawSankey(data) {
 
     svg.append("text").attr("x", W / 2).attr("y", 22)
         .attr("text-anchor", "middle").attr("font-size", "14px").attr("font-weight", "bold")
-        .text("Advanced: Salary Flow - Experience -> Company Size -> Salary Range -> Work Mode");
+        .text("Advanced: Salary Flow - Experience \u2192 Company Size \u2192 Salary Range \u2192 Work Mode");
     svg.append("text").attr("x", W / 2).attr("y", 40)
         .attr("text-anchor", "middle").attr("font-size", "11px")
         .attr("fill", "#888").attr("font-style", "italic")
@@ -288,6 +348,7 @@ function drawSankey(data) {
     // --- Update function ---
     return function update(filteredData) {
         const UPDATE_MS = 600;
+        currentData = filteredData;
 
         const newGraph = sankeyGen({
             nodes: allNodes.map(d => ({ ...d })),
