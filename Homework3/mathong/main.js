@@ -23,7 +23,9 @@ const TYPE_COLORS = {
 const state = {
   data:         [],
   filtered:     [],
-  selectedType: null
+  selectedType: null,
+  brushedNumbers: null,   // Set<number> of brushed pokemon IDs, null = no active brush
+  scatterMode:    "brush" // "brush" | "zoom"
 };
 
 // cache badge elements so we're not querying the DOM on every filter change
@@ -31,6 +33,12 @@ const badgeEl = document.getElementById("filter-badge");
 const labelEl = document.getElementById("filter-label");
 
 function updateAll() {
+  // clear any brush selection when the type filter changes — pixel coords are stale
+  if (state.brushedNumbers !== null) {
+    state.brushedNumbers = null;
+    if (scatterBrushG) scatterBrushG.call(brushBehavior.move, null);
+  }
+
   state.filtered = state.selectedType
     ? state.data.filter(d => d.Type_1 === state.selectedType)
     : state.data;
@@ -39,6 +47,7 @@ function updateAll() {
   updateBarHighlight();
   updateRadar();
   updateStream();
+  updateBrushBadge();
 
   // show/hide the active filter badge in the header
   if (state.selectedType) {
@@ -46,6 +55,16 @@ function updateAll() {
     badgeEl.classList.remove("hidden");
   } else {
     badgeEl.classList.add("hidden");
+  }
+}
+
+function updateBrushBadge() {
+  const badge = document.getElementById("brush-badge");
+  if (state.brushedNumbers && state.brushedNumbers.size > 0) {
+    badge.textContent = `${state.brushedNumbers.size} selected`;
+    badge.classList.remove("hidden");
+  } else {
+    badge.classList.add("hidden");
   }
 }
 
@@ -213,6 +232,10 @@ function updateBarHighlight() {
 // -------------------------------------------------------------------
 
 let scatterSvgG, scatterXScale, scatterYScale, scatterInnerW, scatterInnerH;
+let scatterSvgRoot = null;  // the <svg> element — needed to apply zoom
+let scatterBrushG  = null;  // <g> holding the d3.brush overlay
+let brushBehavior  = null;
+let zoomBehavior   = null;
 
 const tooltip = d3.select("#tooltip");
 
@@ -307,14 +330,49 @@ function drawScatter() {
     .style("fill", "#6b7094").style("font-size", "10px")
     .text("Legendary");
 
+  // clip path keeps dots and brush inside the axis area
+  scatterSvgG.append("clipPath").attr("id", "scatter-clip")
+    .append("rect").attr("width", scatterInnerW).attr("height", scatterInnerH);
+
+  // dots group (clipped) — updateScatter selects into this
+  scatterSvgG.append("g").attr("class", "dots-group")
+    .attr("clip-path", "url(#scatter-clip)");
+
+  // brush overlay group (clipped, above dots so it captures pointer events)
+  scatterBrushG = scatterSvgG.append("g").attr("class", "brush")
+    .attr("clip-path", "url(#scatter-clip)");
+
+  // store root svg for zoom
+  scatterSvgRoot = d3.select("#chart-scatter svg");
+
+  // build brush — extent matches inner chart area
+  brushBehavior = d3.brush()
+    .extent([[0, 0], [scatterInnerW, scatterInnerH]])
+    .on("brush end", handleBrush);
+
+  // build zoom — applied only in zoom mode
+  zoomBehavior = d3.zoom()
+    .scaleExtent([0.5, 12])
+    .on("zoom", handleZoom);
+
+  applyScatterMode(state.scatterMode);
   updateScatter();
+}
+
+// opacity rule shared by enter and update
+function dotOpacity(d) {
+  if (state.brushedNumbers && state.brushedNumbers.size > 0)
+    return state.brushedNumbers.has(d.Number) ? 0.9 : 0.06;
+  return !state.selectedType ? 0.7
+       : d.Type_1 === state.selectedType ? 0.85 : 0.08;
 }
 
 function updateScatter() {
   if (!scatterSvgG) return;
 
-  // bind filtered data, keyed by pokedex number for stable enter/exit
-  scatterSvgG.selectAll("circle.dot")
+  // dots live inside the clipped dots-group so they don't bleed past the axes
+  scatterSvgG.select(".dots-group")
+    .selectAll("circle.dot")
     .data(state.filtered, d => d.Number)
     .join(
       enter => enter.append("circle")
@@ -328,7 +386,6 @@ function updateScatter() {
         .attr("opacity", 0)
         .style("cursor", "pointer")
         .on("mouseover", (event, d) => {
-          // show stat tooltip on hover
           tooltip.classed("hidden", false)
             .html(`
               <strong>${d.Name}</strong><br>
@@ -344,16 +401,11 @@ function updateScatter() {
             .style("top",  (event.clientY - 28) + "px");
         })
         .on("mouseleave", () => tooltip.classed("hidden", true))
-        .call(enter => enter.transition().duration(400).attr("opacity", 0.7)),
+        .call(enter => enter.transition().duration(400).attr("opacity", dotOpacity)),
 
-      // on filter change, fade non-matching dots and brighten matching ones
       update => update
         .transition().duration(400)
-        .attr("opacity", d =>
-          !state.selectedType ? 0.7
-          : d.Type_1 === state.selectedType ? 0.85
-          : 0.08
-        ),
+        .attr("opacity", dotOpacity),
 
       exit => exit.transition().duration(400).attr("opacity", 0).remove()
     );
@@ -720,6 +772,81 @@ function updateStream() {
       : 0.12
     );
 }
+
+// -------------------------------------------------------------------
+// INTERACTION: brush + zoom mode toggle for scatter plot
+// -------------------------------------------------------------------
+
+function applyScatterMode(mode) {
+  state.scatterMode = mode;
+  document.getElementById("btn-brush-mode").classList.toggle("active", mode === "brush");
+  document.getElementById("btn-zoom-mode").classList.toggle("active",  mode === "zoom");
+  const resetBtn = document.getElementById("reset-zoom-btn");
+
+  if (mode === "brush") {
+    // remove zoom, show brush overlay
+    if (scatterSvgRoot) scatterSvgRoot.on(".zoom", null);
+    scatterBrushG.style("display", null).call(brushBehavior);
+    resetBtn.classList.add("hidden");
+  } else {
+    // clear + hide brush, apply zoom to svg root
+    scatterBrushG.call(brushBehavior.move, null);
+    scatterBrushG.style("display", "none");
+    if (state.brushedNumbers !== null) {
+      state.brushedNumbers = null;
+      updateScatter(); updateRadar(); updateBrushBadge();
+    }
+    scatterSvgRoot.call(zoomBehavior);
+    resetBtn.classList.remove("hidden");
+  }
+}
+
+// called by d3.brush on brush and end events
+function handleBrush(event) {
+  const sel = event.selection;
+  if (!sel) {
+    state.brushedNumbers = null;
+  } else {
+    const [[px0, py0], [px1, py1]] = sel;
+    const x0 = scatterXScale.invert(px0), x1 = scatterXScale.invert(px1);
+    // py1 > py0 in pixels but maps to lower values (y-axis is flipped)
+    const y0 = scatterYScale.invert(py1),  y1 = scatterYScale.invert(py0);
+    const source = state.selectedType
+      ? state.data.filter(d => d.Type_1 === state.selectedType)
+      : state.data;
+    const brushed = source.filter(d =>
+      d.Attack >= x0 && d.Attack <= x1 && d.Defense >= y0 && d.Defense <= y1
+    );
+    state.brushedNumbers = new Set(brushed.map(d => d.Number));
+  }
+  updateScatter();
+  updateRadar();
+  updateBrushBadge();
+}
+
+// called by d3.zoom on zoom events
+function handleZoom(event) {
+  const newX = event.transform.rescaleX(scatterXScale);
+  const newY = event.transform.rescaleY(scatterYScale);
+  scatterSvgG.select(".x-axis").call(d3.axisBottom(newX).ticks(8));
+  scatterSvgG.select(".y-axis").call(d3.axisLeft(newY).ticks(6));
+  scatterSvgG.select(".dots-group").selectAll("circle.dot")
+    .attr("cx", d => newX(d.Attack))
+    .attr("cy", d => newY(d.Defense));
+}
+
+// mode toggle button listeners (wired once; survive drawScatter redraws)
+document.getElementById("btn-brush-mode").addEventListener("click", () => {
+  if (state.scatterMode !== "brush") applyScatterMode("brush");
+});
+document.getElementById("btn-zoom-mode").addEventListener("click", () => {
+  if (state.scatterMode !== "zoom") applyScatterMode("zoom");
+});
+document.getElementById("reset-zoom-btn").addEventListener("click", () => {
+  if (scatterSvgRoot)
+    scatterSvgRoot.transition().duration(400)
+      .call(zoomBehavior.transform, d3.zoomIdentity);
+});
 
 // -------------------------------------------------------------------
 // load data and kick off all views
