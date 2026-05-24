@@ -170,7 +170,7 @@ function drawHeatmap(data) {
     const y = d3.scaleBand().domain(top10titles).range([0, h]).padding(0.05);
 
     const allVals = cells.filter(d => d.val != null).map(d => d.val);
-    const color = d3.scaleSequential(d3.interpolateYlOrRd)
+    const color = d3.scaleSequential(d3.interpolateBuPu)
         .domain([d3.min(allVals), d3.max(allVals)]);
 
     // one <g> per cell so rect + label scale together
@@ -291,13 +291,13 @@ function drawSankey(data) {
     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
     // salary bracket helper
-    const brackets = ["> $150k", "$75k-$150k", "< $75k"];
-    const getBracket = s => s >= 150000 ? brackets[0] : s >= 75000 ? brackets[1] : brackets[2];
+    const brackets = ["> $150k", "$100k-$150k", "$75k-$100k", "$50k-$75k", "< $50k"];
+    const getBracket = s => s >= 150000 ? brackets[0] : s >= 100000 ? brackets[1] : s >= 75000 ? brackets[2] : s >= 50000 ? brackets[3] : brackets[4];
 
     const sizeOrder = ["L", "M", "S"];
     const sizeLabel = { S: "Small", M: "Medium", L: "Large" };
 
-    // nodes: 4 exp + 3 size + 3 bracket = 10
+    // nodes: 4 exp + 3 size + 5 bracket = 12
     const allNodes = [
         ...[...expOrder].reverse().map(id => ({ id, label: expLabels[id], col: 0 })),
         ...sizeOrder.map(id => ({ id, label: sizeLabel[id], col: 1 })),
@@ -335,8 +335,8 @@ function drawSankey(data) {
         .domain(["S", "M", "L"])
         .range([d3.interpolateGreens(0.3), d3.interpolateGreens(0.55), d3.interpolateGreens(0.8)]);
     const bracketColor = d3.scaleOrdinal()
-        .domain(["< $75k", "$75k-$150k", "> $150k"])
-        .range([d3.interpolateYlOrRd(0.2), d3.interpolateYlOrRd(0.55), d3.interpolateYlOrRd(0.85)]);
+        .domain(["< $50k", "$50k-$75k", "$75k-$100k", "$100k-$150k", "> $150k"])
+        .range([d3.interpolateBuPu(0.1), d3.interpolateBuPu(0.3), d3.interpolateBuPu(0.55), d3.interpolateBuPu(0.75), d3.interpolateBuPu(0.95)]);
     const nodeColor = d => d.col === 0 ? expColor(d.id) : d.col === 1 ? sizeColor(d.id) : bracketColor(d.id);
 
     // gradient defs - one per link, blending source -> target node color
