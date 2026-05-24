@@ -44,7 +44,7 @@ function updateAll() {
     : state.data;
 
   updateScatter();
-  updateBarHighlight();
+  updateBar();
   updateRadar();
   updateStream();
   updateBrushBadge();
@@ -77,7 +77,7 @@ document.getElementById("clear-filter-btn").addEventListener("click", () => {
 // VIEW 1: Bar chart — overview of pokemon count by primary type
 // -------------------------------------------------------------------
 
-let barSvg, barXScale, barYScale, barInnerW, barInnerH, barMargin;
+let barSvg, barXScale, barYScale, barInnerW, barInnerH, barMargin, barYAxisG;
 
 function drawBar() {
   const container = document.getElementById("chart-bar");
@@ -136,8 +136,8 @@ function drawBar() {
     .attr("text-anchor", "middle")
     .text("Primary Type");
 
-  // y axis with dashed gridlines spanning the full chart width
-  barSvg.append("g")
+  // y axis with dashed gridlines — stored so updateBar can animate it
+  barYAxisG = barSvg.append("g")
     .attr("class", "y-axis")
     .call(
       d3.axisLeft(barYScale)
@@ -188,6 +188,16 @@ function drawBar() {
       .style("font-size", "9px")
       .text(d => d.count);
 
+  // context label — shows "all Pokémon" or "N brushed", updated by updateBar
+  barSvg.append("text")
+    .attr("class", "bar-context-label")
+    .attr("x", barInnerW)
+    .attr("y", -2)
+    .attr("text-anchor", "end")
+    .style("fill", "#6b7094")
+    .style("font-size", "10px")
+    .text("all Pokémon");
+
   // color legend — one swatch per type, two columns, positioned below the x-axis
   const legendG = barSvg.append("g")
     .attr("transform", `translate(0, ${barInnerH + 52})`);
@@ -211,20 +221,63 @@ function drawBar() {
       .text(d.type);
   });
 
-  updateBarHighlight();
+  updateBar();
 }
 
-// dims non-selected bars and outlines the active one
-function updateBarHighlight() {
+// updates bar heights, y-axis, and labels based on current brush + type filter state
+function updateBar() {
   if (!barSvg) return;
 
+  const hasBrush = state.brushedNumbers && state.brushedNumbers.size > 0;
+
+  // use brushed subset when active, otherwise all data
+  const sourceData = hasBrush
+    ? state.data.filter(d => state.brushedNumbers.has(d.Number))
+    : state.data;
+
+  const countMap = new Map(d3.rollup(sourceData, v => v.length, d => d.Type_1));
+
+  // keep bars in their original x-order — only heights change, no jumping
+  const newCounts = barXScale.domain().map(type => ({
+    type,
+    count: countMap.get(type) || 0
+  }));
+
+  // rescale y to the new max (Substrate Transformation)
+  barYScale.domain([0, d3.max(newCounts, d => d.count) || 1]).nice();
+
+  // animate bars
   barSvg.selectAll("rect.bar")
-    .transition().duration(300)
+    .data(newCounts, d => d.type)
+    .transition().duration(400)
+    .attr("y",      d => barYScale(d.count))
+    .attr("height", d => barInnerH - barYScale(d.count))
     .attr("opacity", d =>
       !state.selectedType || d.type === state.selectedType ? 1 : 0.25
     )
     .attr("stroke",       d => d.type === state.selectedType ? "#fff" : "none")
     .attr("stroke-width", d => d.type === state.selectedType ? 2 : 0);
+
+  // animate count labels
+  barSvg.selectAll("text.bar-label")
+    .data(newCounts, d => d.type)
+    .transition().duration(400)
+    .attr("y", d => barYScale(d.count) - 4)
+    .text(d => d.count > 0 ? d.count : "");
+
+  // animate y-axis to new scale, reapply gridline styling after transition
+  barYAxisG.transition().duration(400)
+    .call(d3.axisLeft(barYScale).ticks(6).tickSize(-barInnerW))
+    .on("end", function() {
+      d3.select(this).select(".domain").remove();
+      d3.select(this).selectAll(".tick line")
+        .style("stroke", "#2e3148")
+        .style("stroke-dasharray", "3,3");
+    });
+
+  // update context label
+  barSvg.select("text.bar-context-label")
+    .text(hasBrush ? `${state.brushedNumbers.size} brushed` : "all Pokémon");
 }
 
 // -------------------------------------------------------------------
@@ -827,6 +880,7 @@ function handleBrush(event) {
     state.brushedNumbers = new Set(brushed.map(d => d.Number));
   }
   updateScatter();
+  updateBar();
   updateRadar();
   updateBrushBadge();
 }
