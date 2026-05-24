@@ -6,15 +6,45 @@ class ScatterPlot {
         this.width = document.querySelector(selector).clientWidth - this.margin.left - this.margin.right;
         this.height = document.querySelector(selector).clientHeight - this.margin.top - this.margin.bottom;
 
-        this.svg = d3.select(selector)
+        this.svgContainer = d3.select(selector)
             .append("svg")
             .attr("width", "100%")
             .attr("height", "100%")
             .attr("viewBox", `0 0 ${this.width + this.margin.left + this.margin.right} ${this.height + this.margin.top + this.margin.bottom}`)
-            .append("g")
+
+        this.svg = this.svgContainer.append("g")
             .attr("transform", `translate(${this.margin.left},${this.margin.top})`);
 
-        // scalings for axes 
+
+        //add invisible background to capture zoom using pointer events
+        this.svg.append("rect")
+            .attr("width", this.width)
+            .attr("height", this.height)
+            .attr("fill", "none")
+            .style("pointer-events", "all")
+
+        this.svgContainer.append("defs").append("clipPath")
+            .attr("id", "clip")
+            .append("rect")
+            .attr("width", this.width)
+            .attr("height", this.height);
+
+
+        this.boundaries = this.svg.append("g").attr("clip-path", "url(#clip)");
+
+
+
+        this.zoom = d3.zoom()
+            .scaleExtent([0.5, 20])
+            .on("zoom", () => {
+                let newX = d3.event.transform.rescaleX(this.x);
+                this.xAxis.call(d3.axisBottom(newX).ticks(5).tickFormat(d3.format("~s")));
+                this.svg.selectAll(".dot")
+                    .attr("cx", d => newX(d.salary_in_usd))
+            });
+        this.svgContainer.call(this.zoom);
+
+        //scalings for axes
         this.x = d3.scaleLinear().range([0, this.width]);
         this.y = d3.scalePoint().range([this.height, 0]).padding(0.5);
         this.color = d3.scaleOrdinal(d3.schemeCategory10); // matches sankey colorscheme
@@ -51,7 +81,7 @@ class ScatterPlot {
         this.yAxis.transition().duration(500).call(d3.axisLeft(this.y));
 
         // data join for dots using new record id in main.js
-        let dots = this.svg.selectAll(".dot")
+        let dots = this.boundaries.selectAll(".dot")
             .data(data, d => d.id);
 
         // removes dots with animation
