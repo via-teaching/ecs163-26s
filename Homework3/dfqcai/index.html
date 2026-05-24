@@ -1,0 +1,301 @@
+<!-- Disclosure:
+Across all my projects, I have utilized AI to assist me with programming tasks. 
+However, I have not copied any code directly from the AI; rather, some of the directions for improvement were derived from its suggestions. 
+In most instances, I merely asked the AI ​​to identify which methods I should employ, rather than providing the specific implementation details. 
+Occasionally—typically when the AI ​​failed to recall my previous instructions—it would provide the specific implementation directly; consequently, there may be similarities in the general approach taken. 
+I am issuing this statement only now because I recently became aware of the requirement to disclose such usage. -->
+
+<!-- Note: I chose to use Vue 3 solely to take this opportunity to learn it, as it will have a positive impact on my career development. -->
+
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="">
+	<title>2023DS_salary_analysis</title>
+</head>
+
+<body style="width:100%;height:100%;margin: 0;">
+
+    <div id="app">
+        <nav class="navbar">
+            <ul>
+                <li
+                    v-for="item in menu"
+                    :key="item.id"
+                    :class="{active: activeTab === item.id}"
+                    @click="selectMenu(item.id)"
+                    >
+                    {{item.name}}
+                </li>
+            </ul>
+        </nav>
+
+        <div class="page">
+             <div v-show="activeTab === 1" class="page_overview">
+                <div :class="['frame_focus', graphs[0]]">
+                    
+                </div>
+                
+                <div :class="['frame_r1', graphs[1]]" @click="selectPage(1)">
+                    
+                </div>
+                
+                <div :class="['frame_r2', graphs[2]]" @click="selectPage(2)">
+                
+                </div>
+
+                <div class="desciption">
+
+                </div>
+
+                <div class="tip">
+
+                </div>
+
+                <div class="notice">
+
+                </div>
+             </div>
+             <div v-show="activeTab === 2" class="page_sankey">
+                <div :class="['frame_sankey', 'graph_sankey']">
+                </div>
+                <div style="font-size: 2rem; color: red;">
+                    These pages have not yet undergone full-screen optimization, as I simply ran out of time and energy. 
+                </div>
+                <div style="font-size: 2rem; color: red;">
+                    They are presented solely to showcase the interactive design; ideally, please just overlook them.
+                </div>
+
+             </div>
+
+             <div v-show="activeTab === 3" class="page_multilines">
+                <div :class="['frame_multilines', 'graph_multilines']">
+                </div>
+                <div style="font-size: 2rem; color: red;">
+                    These pages have not yet undergone full-screen optimization, as I simply ran out of time and energy. 
+                </div>
+                <div style="font-size: 2rem; color: red;">
+                    They are presented solely to showcase the interactive design; ideally, please just overlook them.
+                </div>
+                
+             </div>
+
+             <div v-show="activeTab === 4" class="page_bar">
+                <div :class="['frame_bar', 'graph_bar']">
+                </div>
+                <div style="font-size: 2rem; color: red;">
+                    These pages have not yet undergone full-screen optimization, as I simply ran out of time and energy. 
+                </div>
+                <div style="font-size: 2rem; color: red;" >
+                    They are presented solely to showcase the interactive design; ideally, please just overlook them.
+                </div>
+
+                
+             </div>
+        </div>
+
+    </div>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+
+        .tip{
+            margin-left: -35vw;
+            margin-top: 80vh;
+            width: 40vw;
+            height: 4vh;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+            background-color: gray;
+        }
+
+        .tip p{
+            font-size: clamp(2px, 1vw, 24px);
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .notice{
+            margin-left: -90vw;
+            margin-top: 80vh;
+            width: 40vw;
+            height: 4vh;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+            background-color: gray;
+        }
+
+        .notice p{
+            font-size: clamp(2px, 1vw, 24px);
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .desciption{
+            margin-left: -60vw;
+            margin-bottom: 43vh;
+            margin-top: 5vh;
+            width: 40vw;
+            height: 30vh;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+        }
+
+        .desciption p{
+            font-size: clamp(24px, 4vw, 96px);
+            font-weight: bold;
+            text-align: center;
+        }
+
+           
+        .page_overview{
+            width: 100%;
+            height: 85vh;
+            border: 1px solid transparent;
+            overflow: hidden;
+            display: flex;
+            gap: 0vw;
+            overflow-x: auto;
+    }
+
+        .page_overview .frame_r1{
+            margin-top: 37vh;
+            width: 30vw;
+            height: 43vh; /* =70*0.618 */
+            min-width: 250px;
+            min-height: 150px;
+    }
+
+        .page_overview .frame_focus{
+            margin-left: 5vh;
+            margin-top: 10vh;
+            width: 40vw;
+            height: 70vh;
+            min-width: 250px;
+            min-height: 150px;
+    }
+    
+        .page_overview .frame_r2{
+            margin-top: 37vh;
+            width: 30vw;
+            height: 43vh;
+            margin-right: 5%;
+            min-width: 250px;
+            min-height: 150px;
+    }
+        .navbar ul{
+            display: flex;
+            background-color: rgb(8, 181, 220);
+            padding: 5vh;
+            list-style: none;
+            flex-wrap: wrap;
+            gap: 9vw;
+            border-bottom: 1px solid black;
+            justify-content: center;
+        }
+        .navbar li{
+            margin-right: 20px;
+            padding: auto;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .navbar li.active{
+            color:dimgray;
+            border-bottom: 2px solid gray;
+            font-weight: bold;
+        }
+    </style>
+
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+
+    
+	<script type="module">
+        import {draw_sankey} from "./sankey.js";
+        import {draw_multilines} from "./multilines.js";
+        import {draw_bar} from "./bar.js";
+        const {createApp} = Vue
+        createApp({
+            data(){
+                return {
+                    r: ["frame_focus", "frame_r1", "frame_r2"],
+                    activeTab: 1,
+                    menu: [{id: 1, name: "Overview", page: "overview.js"}, {id: 2, name: "SankeyGraph", page: "./sankey.js"}, {id: 3, name: "MultilinesGraph", page: "./multilines.js"}, {id: 4, name: "BarChart", page: ""}],
+                    graphs: ["graph_sankey", "graph_multilines", "graph_bar"]
+                }
+            },
+            computed:{
+                cur_content(){
+                    const selected = this.menu.find(i => i.id === this.activeTab)
+                    return selected ? selected.page : {}
+                }
+            },
+            mounted() {
+                this.drawPage();
+                this.printTitle();
+                this.printTip();
+                this.printNotice();
+            },
+            methods:{
+                printTip(){
+                    const container = document.getElementsByClassName("tip")[0];
+                    container.innerHTML = "";
+                    const p = document.createElement("p");
+                    p.textContent = "Click unfocused graph to switch focus target!!!";
+                    container.append(p);
+                },
+                printNotice(){
+                    const container = document.getElementsByClassName("notice")[0];
+                    container.innerHTML = "";
+                    const p = document.createElement("p");
+                    p.textContent = "Sankey: MultiSelect, Pan & Zoom; MultiLines: Animation";
+                    container.append(p);
+                },
+                printTitle(){
+                    const container = document.getElementsByClassName("desciption")[0];
+                    container.innerHTML = "";
+                    const p = document.createElement("p");
+                    if(this.graphs[0] === "graph_sankey"){
+                        p.textContent = "Sankey Graph";
+                        container.append(p);
+                    }
+                    if(this.graphs[0] === "graph_bar"){
+                        p.textContent = "Bar Chart";
+                        container.append(p);
+                    }
+                    if(this.graphs[0] === "graph_multilines"){
+                        p.textContent = "Multiline Graph";
+                        container.append(p);
+                    }
+                    
+                },
+                selectMenu(id){
+                    this.activeTab = id
+                },
+                selectPage(index){
+                    focus = this.graphs[index]
+                    this.graphs.splice(index, 1)
+                    this.graphs.unshift(focus)
+                    this.drawPage();
+                    this.printTitle();
+                    this.printTip();
+                    console.info("now focusing on" + this.graphs[0])
+                },
+                drawPage(){
+                    draw_sankey();
+                    draw_multilines();
+                    draw_bar();
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>

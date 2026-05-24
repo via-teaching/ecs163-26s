@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="">
+	<title>2023DS_salary_analysis</title>
+</head>
+
+<body style="width:100%;height:100%;margin: 0;">
+
+    <div id="app">
+        <nav class="navbar">
+            <ul>
+                <li
+                    v-for="item in menu"
+                    :key="item.id"
+                    :class="{active: activeTab === item.id}"
+                    @click="selectMenu(item.id)"
+                    >
+                    {{item.name}}
+                </li>
+            </ul>
+        </nav>
+
+        <div class="page">
+             <div v-show="activeTab === 1" class="page_overview">
+                <div :class="['frame_focus', graphs[0]]">
+                    
+                </div>
+                
+                <div :class="['frame_r1', graphs[1]]" @click="selectPage(1)">
+                    
+                </div>
+                
+                <div :class="['frame_r2', graphs[2]]" @click="selectPage(2)">
+                
+                </div>
+
+                <div class="desciption">
+
+                </div>
+
+                <div class="tip">
+
+                </div>
+             </div>
+             <div v-show="activeTab === 2" class="page_sankey">
+                <div :class="['frame_sankey', 'graph_sankey']">
+                </div>
+                <div style="font-size: 2rem; color: red;">
+                    These pages have not yet undergone full-screen optimization, as I simply ran out of time and energy. 
+                </div>
+                <div style="font-size: 2rem; color: red;">
+                    They are presented solely to showcase the interactive design; ideally, please just overlook them.
+                </div>
+
+             </div>
+
+             <div v-show="activeTab === 3" class="page_multilines">
+                <div :class="['frame_multilines', 'graph_multilines']">
+                </div>
+                <div style="font-size: 2rem; color: red;">
+                    These pages have not yet undergone full-screen optimization, as I simply ran out of time and energy. 
+                </div>
+                <div style="font-size: 2rem; color: red;">
+                    They are presented solely to showcase the interactive design; ideally, please just overlook them.
+                </div>
+                
+             </div>
+
+             <div v-show="activeTab === 4" class="page_bar">
+                <div :class="['frame_bar', 'graph_bar']">
+                </div>
+                <div style="font-size: 2rem; color: red;">
+                    These pages have not yet undergone full-screen optimization, as I simply ran out of time and energy. 
+                </div>
+                <div style="font-size: 2rem; color: red;" >
+                    They are presented solely to showcase the interactive design; ideally, please just overlook them.
+                </div>
+
+                
+             </div>
+        </div>
+
+    </div>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+
+        .tip{
+            margin-left: -35vw;
+            margin-top: 80vh;
+            width: 40vw;
+            height: 4vh;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+            background-color: red;
+        }
+
+        .tip p{
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .desciption{
+            margin-left: -60vw;
+            margin-bottom: 43vh;
+            margin-top: 5vh;
+            width: 40vw;
+            height: 30vh;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+        }
+
+        .desciption p{
+            font-size: 8rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .frame_sankey{
+            width: 40vw;
+            height: 85vh;
+
+        }
+           
+        .page_overview{
+            width: 100%;
+            height: 85vh;
+            border: 1px solid transparent;
+            overflow: hidden;
+            display: flex;
+            gap: 0vw
+    }
+
+        .page_overview .frame_r1{
+            margin-top: 37vh;
+            width: 30vw;
+            height: 43vh; /* =70*0.618 */
+    }
+
+        .page_overview .frame_focus{
+            margin-left: 5vh;
+            margin-top: 10vh;
+            width: 40vw;
+            height: 70vh;
+    }
+    
+        .page_overview .frame_r2{
+            margin-top: 37vh;
+            width: 30vw;
+            height: 43vh;
+            margin-right: 5%;
+    }
+        .navbar ul{
+            display: flex;
+            background-color: rgb(8, 181, 220);
+            padding: 5vh;
+            list-style: none;
+            flex-wrap: wrap;
+            gap: 9vw;
+            border-bottom: 1px solid black;
+            justify-content: center;
+        }
+        .navbar li{
+            margin-right: 20px;
+            padding: auto;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .navbar li.active{
+            color:dimgray;
+            border-bottom: 2px solid gray;
+            font-weight: bold;
+        }
+    </style>
+
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+
+    
+	<script type="module">
+        import {draw_sankey} from "./sankey.js";
+        import {draw_multilines} from "./multilines.js";
+        import {draw_bar} from "./bar.js";
+        const {createApp} = Vue
+        createApp({
+            data(){
+                return {
+                    r: ["frame_focus", "frame_r1", "frame_r2"],
+                    activeTab: 1,
+                    menu: [{id: 1, name: "Overview", page: "overview.js"}, {id: 2, name: "SankeyGraph", page: "./sankey.js"}, {id: 3, name: "MultilinesGraph", page: "./multilines.js"}, {id: 4, name: "BarChart", page: ""}],
+                    graphs: ["graph_sankey", "graph_multilines", "graph_bar"]
+                }
+            },
+            computed:{
+                cur_content(){
+                    const selected = this.menu.find(i => i.id === this.activeTab)
+                    return selected ? selected.page : {}
+                }
+            },
+            mounted() {
+                this.drawPage();
+                this.printTitle();
+                this.printTip();
+            },
+            methods:{
+                printTip(){
+                    const container = document.getElementsByClassName("tip")[0];
+                    container.innerHTML = "";
+                    const p = document.createElement("p");
+                    p.textContent = "Click unfocused graph to switch focus target!!!";
+                    container.append(p);
+                },
+                printTitle(){
+                    const container = document.getElementsByClassName("desciption")[0];
+                    container.innerHTML = "";
+                    const p = document.createElement("p");
+                    if(this.graphs[0] === "graph_sankey"){
+                        p.textContent = "Sankey Graph";
+                        container.append(p);
+                    }
+                    if(this.graphs[0] === "graph_bar"){
+                        p.textContent = "Bar Chart";
+                        container.append(p);
+                    }
+                    if(this.graphs[0] === "graph_multilines"){
+                        p.textContent = "Multiline Graph";
+                        container.append(p);
+                    }
+                    
+                },
+                selectMenu(id){
+                    this.activeTab = id
+                },
+                selectPage(index){
+                    focus = this.graphs[index]
+                    this.graphs.splice(index, 1)
+                    this.graphs.unshift(focus)
+                    this.drawPage();
+                    this.printTitle();
+                    this.printTip();
+                    console.info("now focusing on" + this.graphs[0])
+                },
+                drawPage(){
+                    draw_sankey();
+                    draw_multilines();
+                    draw_bar();
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
