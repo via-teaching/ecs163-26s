@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Careers Visualization Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div id="dashboard">
+        <header>
+            <h1>Data Career Insights (2020 to 2023)</h1>
+            <p class="description">
+                Explores how salaries, job categories and experience levels connect across all types of data careers.
+                You can select a category, brush (with your cursor) over the years, or zoom into the arc diagram.
+            </p>
+        </header>
+
+        <div class="controls">
+            <button id="reset-btn">Reset Dashboard</button>
+            <span id="filter-summary">Showing all records</span>
+        </div>
+
+        <div class="row full-width">
+            <div class="chart-container">
+                <h3>Profession to Experience Flow</h3>
+                <p class="chart-desc">
+                    Shows how different data roles distribute across seniority levels, the line thickness represents volume.
+                    Use mouse wheel or trackpad to zoom and pan.
+                </p>
+                <div id="arc-svg-container"></div>
+            </div>
+        </div>
+
+        <div class="row split">
+            <div class="chart-container">
+                <h3>Average Salary Growth (over all data roles)</h3>
+                <p class="chart-desc">
+                    Yearly averages of compensation in data roles.
+                    Brush across the bars to filter the dashboard to selected years.
+                </p>
+                <div id="bar-svg-container"></div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Share of Market by different Data Professions</h3>
+                <p class="chart-desc">
+                    Breakdown of dataset by job category.
+                    Click a slice to select one job category and update all other views.
+                </p>
+                <div id="pie-svg-container"></div>
+            </div>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
