@@ -4,22 +4,22 @@ const height = window.innerHeight;
 
 
 //bar graph
-let teamLeft = 0, teamTop = 400;
+let teamLeft = 0, teamTop = 0;
 let teamMargin = {top: 50, right: 30, bottom: 30, left: 60},
     teamWidth = width/2 - teamMargin.left - teamMargin.right,
-    teamHeight = 400 - teamMargin.top - teamMargin.bottom;
+    teamHeight = height/2 - teamMargin.top - teamMargin.bottom;
 
     //scatterplot
-let scatterLeft = teamWidth, scatterTop = 400;
-let scatterMargin = {top: 100, right: 30, bottom: 30, left: 120},
+let scatterLeft = teamWidth, scatterTop = 0;
+let scatterMargin = {top: 30, right: 30, bottom: 30, left: 120},
     scatterWidth = width/2 - scatterMargin.left - scatterMargin.right,
-    scatterHeight = 400 - scatterMargin.top - scatterMargin.bottom;
+    scatterHeight = height/2 - 80- scatterMargin.top - scatterMargin.bottom;
 
 // sankey
-let distrLeft = 0, distrTop = 0;
-let distrMargin = {top: 10, right: 30, bottom: 30, left: 60},
+let distrLeft = 0, distrTop = teamHeight + 100;
+let distrMargin = {top: 30, right: 30, bottom: 30, left: 60},
     distrWidth = width - distrMargin.left - distrMargin.right,
-    distrHeight = height - 450 - distrMargin.top - distrMargin.bottom;
+    distrHeight = height/2 - distrMargin.top - distrMargin.bottom;
 
 //color map for sankey, bar graph
   const nodeColorMap = new Map([
@@ -69,6 +69,7 @@ d3.csv("pokemon.csv").then(rawData =>{
     //const filteredData = rawData; //.filter(d=>d.AB>abFilter);
     const processedData = rawData.map(d=>{
                           return {
+                             "Name": d.Name,
                               "Generation":d.Generation,
                              // "H_AB":d.H/d.AB,
                               //"SO_AB":d.SO/d.AB,
@@ -85,6 +86,15 @@ d3.csv("pokemon.csv").then(rawData =>{
     });
     console.log("processedData", processedData);
 
+    var scatterAxisOptions = [
+                              "HP",
+                              "Attack",
+                              "Total",
+                              "Defense",
+                              "Sp_Atk",
+                              "Sp_Def",
+                              "Speed"];
+
     var scatterX = "HP";
     var scatterY = "Attack";
 
@@ -93,22 +103,54 @@ d3.csv("pokemon.csv").then(rawData =>{
     var typeData = processedData.filter(d=>d.Type_1 == currentType);
     console.log("typeData", typeData);
 
-    
-
-//plot 2: Scatter Plot for Water types
+    //create svg
     const svg = d3.select("svg");
+
+      //SANKEY
+    const g2 = svg.append("g")
+                .attr("width", distrWidth + distrMargin.left + distrMargin.right)
+                .attr("height", distrHeight + distrMargin.top + distrMargin.bottom)
+                .attr("transform", `translate(${distrLeft}, ${distrTop})`);
+
+    //plot 2: Scatter Plot for Water types
+    
 
     const g1 = svg.append("g")
                 .attr("width", scatterWidth + scatterMargin.left + scatterMargin.right)
                 .attr("height", scatterHeight + scatterMargin.top + scatterMargin.bottom)
                 .attr("transform", `translate(${scatterLeft + scatterMargin.left}, ${scatterTop + scatterMargin.top})`);
 
-   // updateScatterAxes("Speed", "Attack");
 
-    //plot 1: Bar Chart for Primary Types 
+    d3.select("#selectButton1")
+    .selectAll('myOptions')
+     	.data(scatterAxisOptions)
+      .enter()
+    	.append('option')
+      .text(function (d) { return d; }) // text showed in the menu
+      .attr("value", function (d) { return d; }) // corresponding value returned by the button
+      .attr("transform", `translate(${scatterLeft}, ${scatterTop})`);
 
-   // /*
+/** d3.select("#selectButton").on("change", function(d) {
+        // recover the option that has been chosen
+        var selectedOption = d3.select(this).property("value")
+        // run the updateChart function with this selected option
+        update(selectedOption)
+    }) */
 
+    d3.select("#selectButton2")
+    .selectAll('myOptions')
+     	.data(scatterAxisOptions)
+      .enter()
+    	.append('option')
+      .text(function (d) { return d; }) // text showed in the menu
+      .attr("value", function (d) { return d; }) // corresponding value returned by the button
+      .attr("transform", `translate(${scatterLeft}, ${scatterTop})`);
+  
+    updateScatterAxes("Speed", "Attack");
+    updateSankey();
+
+
+    //PLOT 1: bar chart
     const typeCounts = processedData.reduce((s, { Type_1 }) => (s[Type_1] = (s[Type_1] || 0) + 1, s), {});
    // typeCounts.sort((a,b) => d3.descending(a.count, b.count));
     const typesData = Object.keys(typeCounts).map((key) => ({ Type_1: key, count: typeCounts[key] }));
@@ -116,8 +158,6 @@ d3.csv("pokemon.csv").then(rawData =>{
     const sortedTypesData = Array.from(typesData).sort((a,b) => d3.descending(a.count, b.count));
     console.log("typesData", typesData);
     console.log("sortedTypesData", sortedTypesData);
-
-
     const g3 = svg.append("g")
                 .attr("width", teamWidth + teamMargin.left + teamMargin.right)
                 .attr("height", teamHeight + teamMargin.top + teamMargin.bottom)
@@ -138,7 +178,16 @@ d3.csv("pokemon.csv").then(rawData =>{
     .attr("y", teamHeight + 80)
     .attr("font-size", "25px")
     .attr("text-anchor", "middle")
-    .text("Overview: Distribution of All Pokemon Types");
+    .text("Overview: Distribution of All Pokemon Types)");
+     
+    
+    //title
+     g3.append("text")
+    .attr("x", teamWidth / 2)
+    .attr("y", teamHeight + 100)
+    .attr("font-size", "15px")
+    .attr("text-anchor", "middle")
+    .text("(select a type to view in detail)");
 
 
     // Y label
@@ -204,33 +253,19 @@ d3.csv("pokemon.csv").then(rawData =>{
     });
 
 
+    d3.select("#selectButton1").on("change", function(d) {
+        var selectX = d3.select(this).property("value");
+        console.log("Selected for X: ", selectX);
+        updateScatterAxes(selectX, scatterY)
+       });
 
-        //plot 3 Sankey: type 1 (water) -> gens -> type2
+    d3.select("#selectButton2").on("change", function(d) {
+        var selectY = d3.select(this).property("value");
+        console.log("Selected for Y: ", selectY);
+        updateScatterAxes(scatterX, selectY)
+       });
 
 
-
-    const g2 = svg.append("g")
-                .attr("width", distrWidth + distrMargin.left + distrMargin.right)
-                .attr("height", distrHeight + distrMargin.top + distrMargin.bottom)
-                .attr("transform", `translate(${distrLeft}, ${distrTop})`);
-
-    /*
-   
-
-*/
-
-  // the function for moving the nodes
-  function dragmove(d) {
-    d3.select(this)
-      .attr("transform", 
-            "translate(" 
-               + d.x + "," 
-               + (d.y = Math.max(
-                  0, Math.min(distrHeight - d.dy, d3.event.y))
-                 ) + ")");
-    sankey.relayout();
-    link.attr("d", path);
-  }
 
   function updateTypeData(type){
        console.log("updating type");
@@ -317,7 +352,7 @@ d3.csv("pokemon.csv").then(rawData =>{
                 .attr("fill", "deepskyblue")
                 //.append("title")
                     .text(function(d) { 
-		             return d.name + "\n" + stringToDParam(d, updateX) + "\n" + stringToDParam(d, updateY); });
+		             return d.Name + "\n" + stringToDParam(d, updateX) + "\n" + stringToDParam(d, updateY); });
 
 
             }
@@ -469,7 +504,18 @@ d3.csv("pokemon.csv").then(rawData =>{
                         .on("start", function() {
                         this.parentNode.appendChild(this);
                         })
-                        .on("drag", dragmove));
+                        //.on("drag", dragmove));
+                        .on("drag", function (d) {
+                        d3.select(this)
+                        .attr("transform", 
+                                "translate(" 
+                                + d.x + "," 
+                                + (d.y = Math.max(
+                                    0, Math.min(distrHeight - d.dy, d3.event.y))
+                                    ) + ")");
+                        sankey.relayout();
+                        link.attr("d", path);
+                    }));
 
                 // add the rectangles for the nodes
                 node.append("rect")
