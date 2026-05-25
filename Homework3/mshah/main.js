@@ -46,8 +46,7 @@ function initBarChart(data) {
   barSvgG = svg.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  // Compute all genres from full dataset (order never changes)
-  const avgMap = d3.rollup(data, v => d3.mean(v, d => d.depression), d => d.genre);
+  const avgMap = d3.rollup(data, v => d3.mean(v, d => d.depression), d => d.genre);  // Compute all genres from full dataset
   barAllGenres = [...new Set(data.map(d => d.genre))]
     .sort((a, b) => avgMap.get(b) - avgMap.get(a));
 
@@ -61,13 +60,11 @@ function initBarChart(data) {
     .domain([0, Math.ceil(yMax) + 0.5])
     .range([barIH, 0]);
 
-  // Grid lines (drawn once)
-  barSvgG.append("g").attr("class", "grid")
+  barSvgG.append("g").attr("class", "grid")  // Grid lines
     .call(d3.axisLeft(barYScale).tickSize(-barIW).tickFormat(""))
     .call(ax => ax.select(".domain").remove());
 
-  // X axis (drawn once)
-  barSvgG.append("g").attr("class", "axis x-axis")
+  barSvgG.append("g").attr("class", "axis x-axis")  //x axis
     .attr("transform", `translate(0,${barIH})`)
     .call(d3.axisBottom(barXScale).tickSize(0))
     .call(ax => ax.select(".domain").remove())
@@ -77,8 +74,7 @@ function initBarChart(data) {
       .attr("dy", "0.35em")
       .attr("dx", "-0.4em");
 
-  // Y axis (drawn once)
-  barSvgG.append("g").attr("class", "axis")
+  barSvgG.append("g").attr("class", "axis")  // Y axis
     .call(d3.axisLeft(barYScale).ticks(5))
     .call(ax => ax.select(".domain").remove());
 
@@ -88,8 +84,7 @@ function initBarChart(data) {
     .attr("text-anchor", "middle")
     .text("Avg. Depression Score (0–10)");
 
-  // Legend (drawn once)
-  const BAR_COLOR = "#1FCC23";
+  const BAR_COLOR = "#1FCC23";  // Legend
   const lx = barIW - 120, ly = 0;
   const lg = barSvgG.append("g").attr("transform", `translate(${lx},${ly})`);
   lg.append("rect").attr("width", 14).attr("height", 10)
@@ -99,8 +94,7 @@ function initBarChart(data) {
     .attr("font-family", "Arial, sans-serif")
     .text("Avg. Depression Score");
 
-  // Initial draw
-  updateBarChart(data);
+  updateBarChart(data);  // Initial draw
 }
 
 function updateBarChart(filteredData) {
@@ -112,13 +106,12 @@ function updateBarChart(filteredData) {
     d => d.genre
   );
 
-  // BARS — data join with animated transition
-  barSvgG.selectAll(".bar")
+  barSvgG.selectAll(".bar")  //Animated transition for the bar graph
     .data(barAllGenres, d => d)
     .join(
       enter => enter.append("rect").attr("class", "bar")
         .attr("x", d => barXScale(d))
-        .attr("y", barIH)             // start at baseline
+        .attr("y", barIH)
         .attr("width", barXScale.bandwidth())
         .attr("height", 0)
         .attr("fill", BAR_COLOR)
@@ -145,8 +138,7 @@ function updateBarChart(filteredData) {
         return avg != null ? barIH - barYScale(avg) : 0;
       });
 
-  // VALUE LABELS — data join with animated transition
-  barSvgG.selectAll(".bar-label")
+  barSvgG.selectAll(".bar-label")  // Value labels data join with animated transition
     .data(barAllGenres, d => d)
     .join(
       enter => enter.append("text").attr("class", "bar-label")
@@ -168,31 +160,26 @@ function updateBarChart(filteredData) {
         return avg != null ? avg.toFixed(1) : "";
       });
 
-  // ── SELECTION on bar chart (click genre → highlight scatter dots) ────────
-  barSvgG.selectAll(".bar")
+  barSvgG.selectAll(".bar")  // Selection on bar chart
     .on("click", (event, d) => {
       const alreadySelected = d3.select(event.currentTarget).attr("stroke") === "#1a7a1d";
 
-      // Reset all bars first
-      barSvgG.selectAll(".bar")
+      barSvgG.selectAll(".bar")  // reset all bars 
         .attr("stroke", "none")
         .attr("fill-opacity", 0.75);
 
       if (alreadySelected) {
-        // Click same bar again → deselect, reset scatter
-        d3.selectAll(".dot")
+        d3.selectAll(".dot")  // Click same bar again to deselect and reset scatter
           .transition().duration(400)
           .attr("fill-opacity", 0.45)
           .attr("stroke", "none");
       } else {
-        // Highlight clicked bar
-        d3.select(event.currentTarget)
+        d3.select(event.currentTarget)  // Highlight clicked bar
           .attr("stroke", "#1a7a1d")
           .attr("stroke-width", 2)
           .attr("fill-opacity", 1);
 
-        // Highlight matching dots in scatter, dim the rest
-        d3.selectAll(".dot")
+        d3.selectAll(".dot")  // Highlight matching dots in scatter and dim the rest
           .transition().duration(400)
           .attr("fill-opacity", dd => dd.genre === d ? 0.85 : 0.08)
           .attr("stroke", dd => dd.genre === d ? "#5a0080" : "none");
@@ -427,7 +414,6 @@ function drawScatter(data) {
   const svg = d3.select("#scatter-area").append("svg")
     .attr("width", fullW).attr("height", H);
 
-  // ── Clip path so dots don't render outside the plot area during zoom ──
   svg.append("defs").append("clipPath")
     .attr("id", "scatter-clip")
     .append("rect")
@@ -437,8 +423,7 @@ function drawScatter(data) {
   const g = svg.append("g")
     .attr("transform", `translate(${offsetX + margin.left},${margin.top})`);
 
-  // ── Scales ──
-  let xScale = d3.scaleLinear()
+  let xScale = d3.scaleLinear()  //scales
     .domain([0, d3.max(data, d => d.hours) + 0.5])
     .range([0, iW]);
 
@@ -446,8 +431,7 @@ function drawScatter(data) {
     .domain([0, 10])
     .range([iH, 0]);
 
-  // ── Grid lines ──
-  const xGrid = g.append("g").attr("class", "grid")
+  const xGrid = g.append("g").attr("class", "grid")  // grid lines
     .attr("transform", `translate(0,${iH})`)
     .call(d3.axisBottom(xScale).tickSize(-iH).tickFormat(""))
     .call(ax => ax.select(".domain").remove());
@@ -456,8 +440,7 @@ function drawScatter(data) {
     .call(d3.axisLeft(yScale).tickSize(-iW).tickFormat(""))
     .call(ax => ax.select(".domain").remove());
 
-  // ── Axes ──
-  const xAxisG = g.append("g").attr("class", "axis")
+  const xAxisG = g.append("g").attr("class", "axis")  // Axes
     .attr("transform", `translate(0,${iH})`)
     .call(d3.axisBottom(xScale).ticks(10))
     .call(ax => ax.select(".domain").remove());
@@ -466,8 +449,7 @@ function drawScatter(data) {
     .call(d3.axisLeft(yScale).ticks(5))
     .call(ax => ax.select(".domain").remove());
 
-  // ── Axis labels ──
-  g.append("text").attr("class", "axis-label")
+  g.append("text").attr("class", "axis-label")  // Axis Labels
     .attr("x", iW / 2).attr("y", iH + 36)
     .attr("text-anchor", "middle")
     .text("Hours of Music Listened Per Day");
@@ -478,11 +460,9 @@ function drawScatter(data) {
     .attr("text-anchor", "middle")
     .text("Anxiety Score (0–10)");
 
-  // ── Dots layer (clipped) ──
-  const dotsG = g.append("g").attr("clip-path", "url(#scatter-clip)");
+  const dotsG = g.append("g").attr("clip-path", "url(#scatter-clip)");  // Dots layer
 
-  // Store jitter so it's stable across redraws
-  const jittered = data.map(d => ({
+  const jittered = data.map(d => ({  //storing jitter
     ...d,
     jx: d.hours  + (Math.random() - 0.5) * 0.3,
     jy: d.anxiety + (Math.random() - 0.5) * 0.8
@@ -506,8 +486,7 @@ function drawScatter(data) {
          Anxiety: ${d.anxiety}<br>Depression: ${d.depression}`, event))
       .on("mouseout", hideTip);
 
-  // ── Trend line ──
-  const n     = data.length;
+  const n     = data.length;  //trend line
   const sumX  = d3.sum(data, d => d.hours);
   const sumY  = d3.sum(data, d => d.anxiety);
   const sumXY = d3.sum(data, d => d.hours * d.anxiety);
@@ -524,8 +503,7 @@ function drawScatter(data) {
     .attr("stroke-width", 1.8)
     .attr("stroke-dasharray", "5,3");
 
-  // ── Legend ──
-  const lx = iW - 140, ly = 4;
+  const lx = iW - 140, ly = 4;  //legend
   const lg = g.append("g").attr("transform", `translate(${lx},${ly})`);
   lg.append("circle").attr("cx", 6).attr("cy", 6).attr("r", 3.5)
     .attr("fill", "#992685").attr("fill-opacity", 0.55);
@@ -539,25 +517,21 @@ function drawScatter(data) {
     .attr("font-size", 9).attr("fill", "#555")
     .attr("font-family", "Arial, sans-serif").text("Trend line");
 
-  // ── BRUSH ────────────────────────────────────────────────────────────────
-  const brush = d3.brush()
+  const brush = d3.brush()  // brush
     .extent([[0, 0], [iW, iH]])
     .on("brush end", ({ selection }) => {
       if (!selection) {
-        // Brush cleared — reset all dots, reset bar chart
-        dots.attr("fill-opacity", 0.45).attr("stroke", "none");
+        dots.attr("fill-opacity", 0.45).attr("stroke", "none");  // Brush cleared
         updateBarChart(data);
         return;
       }
 
       const [[x0, y0], [x1, y1]] = selection;
 
-      // Convert pixel selection back to data space using current scales
-      const hMin = xScale.invert(x0), hMax = xScale.invert(x1);
-      const aMin = yScale.invert(y1), aMax = yScale.invert(y0); // y is inverted
+      const hMin = xScale.invert(x0), hMax = xScale.invert(x1);  // Convert pixel selection back to data space using current scales
+      const aMin = yScale.invert(y1), aMax = yScale.invert(y0);  // y is inverted
 
-      // Highlight brushed dots, dim the rest
-      dots
+      dots  // Highlight brushed dots, dim the rest
         .attr("fill-opacity", d =>
           d.jx >= hMin && d.jx <= hMax && d.jy >= aMin && d.jy <= aMax
             ? 0.85 : 0.08)
@@ -565,14 +539,12 @@ function drawScatter(data) {
           d.jx >= hMin && d.jx <= hMax && d.jy >= aMin && d.jy <= aMax
             ? "#5a0080" : "none");
 
-      // Filter data and update bar chart with animation
       const brushed = data.filter(d =>
-        d.hours  >= hMin && d.hours  <= hMax &&
+        d.hours  >= hMin && d.hours  <= hMax &&  // Filter data and update bar chart with animation
         d.anxiety >= aMin && d.anxiety <= aMax
       );
       updateBarChart(brushed);
     });
 
-  // Brush layer goes on top of dots
   const brushG = g.append("g").attr("class", "brush").call(brush);
 }
