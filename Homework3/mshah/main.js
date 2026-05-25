@@ -181,6 +181,7 @@ function updateBarChart(filteredData) {
       if (alreadySelected) {
         // Click same bar again → deselect, reset scatter
         d3.selectAll(".dot")
+          .transition().duration(400)
           .attr("fill-opacity", 0.45)
           .attr("stroke", "none");
       } else {
@@ -192,6 +193,7 @@ function updateBarChart(filteredData) {
 
         // Highlight matching dots in scatter, dim the rest
         d3.selectAll(".dot")
+          .transition().duration(400)
           .attr("fill-opacity", dd => dd.genre === d ? 0.85 : 0.08)
           .attr("stroke", dd => dd.genre === d ? "#5a0080" : "none");
       }
