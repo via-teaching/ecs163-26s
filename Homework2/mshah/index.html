@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Music & Mental Health Dashboard</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: #fff;
+      color: #222;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      overflow: hidden;
+    }
+
+    header {
+      height: 36px;
+      background: #ffffff;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+    }
+    header h1    { font-size: 15px; font-weight: bold; color: #222; }
+    header .sub  { font-size: 11px; color: #777; }
+
+    #grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 220px;
+      width: 100vw;
+      height: calc(100vh - 36px);
+      gap: 1px;
+      background: #ddd;
+    }
+
+    .panel {
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Scatter spans full bottom row but centers its SVG in JS */
+    #panel-scatter { grid-column: 1 / -1; }
+
+    .panel-title {
+      font-size: 12px;
+      font-weight: bold;
+      color: #333;
+      padding: 6px 14px 4px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .panel-title .tag {
+      font-size: 9px;
+      font-weight: normal;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: #999;
+      border: 1px solid #ddd;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    .chart-area { flex: 1; overflow: hidden; position: relative; }
+    svg { display: block; }
+
+    /* ── Tooltip ── */
+    #tooltip {
+      position: fixed;
+      pointer-events: none;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 7px 11px;
+      font-size: 11px;
+      color: #333;
+      line-height: 1.6;
+      z-index: 999;
+      opacity: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,.12);
+      transition: opacity .1s;
+    }
+
+    /* ── Shared D3 element styles ── */
+    .axis text       { fill: #555; font-size: 10px; font-family: Arial, sans-serif; }
+    .axis path,
+    .axis line       { stroke: #ccc; }
+    .grid line       { stroke: #eee; stroke-dasharray: 3,3; }
+    .grid path       { stroke: none; }
+    .axis-label      { fill: #555; font-size: 10px; font-family: Arial, sans-serif; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Music &amp; Mental Health Dashboard</h1>
+  <span class="sub">736 survey respondents · How music listening habits relate to mental health outcomes</span>
+</header>
+
+<div id="grid">
+
+  <!-- Top-left: Bar Chart (Overview) -->
+  <div class="panel" id="panel-bar">
+    <div class="panel-title">
+      Average Depression Score by Favorite Genre
+      <span class="tag">Overview</span>
+    </div>
+    <div class="chart-area" id="bar-area"></div>
+  </div>
+
+  <!-- Top-right: Alluvial (Advanced) -->
+  <div class="panel" id="panel-alluvial">
+    <div class="panel-title">
+      Genre → Daily Listening Hours → Music Effect on Mental Health
+      <span class="tag">Advanced · Alluvial</span>
+    </div>
+    <div class="chart-area" id="alluvial-area"></div>
+  </div>
+
+  <!-- Bottom: Scatter (Focus, full width, SVG centered in JS) -->
+  <div class="panel" id="panel-scatter">
+    <div class="panel-title">
+      Daily Listening Hours vs. Anxiety Score
+      <span class="tag">Focus</span>
+    </div>
+    <div class="chart-area" id="scatter-area"></div>
+  </div>
+
+</div>
+
+<div id="tooltip"></div>
+<script src="main.js"></script>
+</body>
+</html>
