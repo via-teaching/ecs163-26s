@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokémon Stats Dashboard — Interactive</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- Dashboard header -->
+    <header id="header">
+      <h1>Pokémon Stats Dashboard</h1>
+      <span id="subtitle">
+        Drag scatter to brush · Click dot or PCP line to select · Switch modes to morph dots into groups
+      </span>
+    </header>
+
+    <!-- Three-panel grid: overview on top, two focus views on bottom -->
+    <div id="grid">
+
+      <!-- View 1 (Context / Overview): horizontal bar chart — scroll to zoom -->
+      <section id="view-overview" class="view">
+        <h2 class="view-title">Overview: Pokémon Count by Primary Type &nbsp;<span class="hint">brush in scatter to see selected counts</span></h2>
+        <div id="bar-chart" class="chart"></div>
+      </section>
+
+      <!-- View 2 (Focus): Attack vs Defense scatter — brush + click select -->
+      <section id="view-scatter" class="view">
+        <div class="view-header">
+          <h2 class="view-title">Focus: Attack vs. Defense &nbsp;<span class="hint">drag = brush · click = select · wheel = zoom · ⇧+drag = pan</span></h2>
+          <div id="scatter-controls">
+            <button class="toggle-btn active" data-mode="all"    onclick="setScatterMode('all')">Individual Pokémon</button>
+            <button class="toggle-btn"        data-mode="type"   onclick="setScatterMode('type')">Type Averages</button>
+            <button class="toggle-btn"        data-mode="kmeans" onclick="setScatterMode('kmeans')">K-Means (k=5)</button>
+          </div>
+        </div>
+        <div id="scatter-plot" class="chart"></div>
+      </section>
+
+      <!-- View 3 (Advanced Focus): parallel coordinates — click line to select -->
+      <section id="view-pcp" class="view">
+        <div class="view-header">
+          <h2 class="view-title">Focus: Stat Profiles (Parallel Coordinates) &nbsp;<span class="hint">click line to select</span></h2>
+          <div id="pcp-controls">
+            <button class="toggle-btn active" data-mode="type"   onclick="setPCPMode('type')">Type Averages</button>
+            <button class="toggle-btn"        data-mode="kmeans" onclick="setPCPMode('kmeans')">K-Means (k=5)</button>
+            <button class="toggle-btn"        data-mode="all"    onclick="setPCPMode('all')">Individual Pokémon</button>
+          </div>
+        </div>
+        <div id="pcp-chart" class="chart"></div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- D3.js v7 from CDN -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="main.js?v=15"></script>
+</body>
+</html>
