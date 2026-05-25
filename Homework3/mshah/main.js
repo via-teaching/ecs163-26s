@@ -386,46 +386,57 @@ function drawScatter(data) {
   const fullW = container.clientWidth;
   const H     = container.clientHeight;
 
-  const W      = fullW * 0.55;
+  const W       = fullW * 0.55;
   const offsetX = (fullW - W) / 2;
 
   const margin = { top: 14, right: 30, bottom: 44, left: 52 };
   const iW = W - margin.left - margin.right;
   const iH = H - margin.top  - margin.bottom;
 
-  const svg = d3.select("#scatter-area").append("svg")  // span full container
+  const svg = d3.select("#scatter-area").append("svg")
     .attr("width", fullW).attr("height", H);
+
+  // ── Clip path so dots don't render outside the plot area during zoom ──
+  svg.append("defs").append("clipPath")
+    .attr("id", "scatter-clip")
+    .append("rect")
+      .attr("width", iW)
+      .attr("height", iH);
 
   const g = svg.append("g")
     .attr("transform", `translate(${offsetX + margin.left},${margin.top})`);
 
-  const xScale = d3.scaleLinear()  //scales
+  // ── Scales ──
+  let xScale = d3.scaleLinear()
     .domain([0, d3.max(data, d => d.hours) + 0.5])
     .range([0, iW]);
 
-  const yScale = d3.scaleLinear()
+  let yScale = d3.scaleLinear()
     .domain([0, 10])
     .range([iH, 0]);
 
-  g.append("g").attr("class", "grid")  //grid lines
-    .call(d3.axisLeft(yScale).tickSize(-iW).tickFormat(""))
-    .call(ax => ax.select(".domain").remove());
-
-  g.append("g").attr("class", "grid")
+  // ── Grid lines ──
+  const xGrid = g.append("g").attr("class", "grid")
     .attr("transform", `translate(0,${iH})`)
     .call(d3.axisBottom(xScale).tickSize(-iH).tickFormat(""))
     .call(ax => ax.select(".domain").remove());
 
-  g.append("g").attr("class", "axis")  //axes
+  const yGrid = g.append("g").attr("class", "grid")
+    .call(d3.axisLeft(yScale).tickSize(-iW).tickFormat(""))
+    .call(ax => ax.select(".domain").remove());
+
+  // ── Axes ──
+  const xAxisG = g.append("g").attr("class", "axis")
     .attr("transform", `translate(0,${iH})`)
     .call(d3.axisBottom(xScale).ticks(10))
     .call(ax => ax.select(".domain").remove());
 
-  g.append("g").attr("class", "axis")
+  const yAxisG = g.append("g").attr("class", "axis")
     .call(d3.axisLeft(yScale).ticks(5))
     .call(ax => ax.select(".domain").remove());
 
-  g.append("text").attr("class", "axis-label")  //axis labels
+  // ── Axis labels ──
+  g.append("text").attr("class", "axis-label")
     .attr("x", iW / 2).attr("y", iH + 36)
     .attr("text-anchor", "middle")
     .text("Hours of Music Listened Per Day");
@@ -436,67 +447,101 @@ function drawScatter(data) {
     .attr("text-anchor", "middle")
     .text("Anxiety Score (0–10)");
 
-  g.selectAll(".dot")  // scatter plots and prevent over plotting
-    .data(data)
+  // ── Dots layer (clipped) ──
+  const dotsG = g.append("g").attr("clip-path", "url(#scatter-clip)");
+
+  // Store jitter so it's stable across redraws
+  const jittered = data.map(d => ({
+    ...d,
+    jx: d.hours  + (Math.random() - 0.5) * 0.3,
+    jy: d.anxiety + (Math.random() - 0.5) * 0.8
+  }));
+
+  const dots = dotsG.selectAll(".dot")
+    .data(jittered)
     .join("circle")
       .attr("class", "dot")
-      .attr("cx", d => xScale(d.hours + (Math.random() - 0.5) * 0.3))
-      .attr("cy", d => yScale(d.anxiety + (Math.random() - 0.5) * 0.4))
+      .attr("cx", d => xScale(d.jx))
+      .attr("cy", d => yScale(d.jy))
       .attr("r", 3.5)
       .attr("fill", "#992685")
       .attr("fill-opacity", 0.45)
       .attr("stroke", "none")
       .on("mouseover", (event, d) => showTip(
-        `Genre: ${d.genre}<br>
-         Hours/day: ${d.hours}<br>
-         Anxiety: ${d.anxiety}<br>
-         Depression: ${d.depression}`, event))
+        `Genre: ${d.genre}<br>Hours/day: ${d.hours}<br>
+         Anxiety: ${d.anxiety}<br>Depression: ${d.depression}`, event))
       .on("mousemove", (event, d) => showTip(
-        `Genre: ${d.genre}<br>
-         Hours/day: ${d.hours}<br>
-         Anxiety: ${d.anxiety}<br>
-         Depression: ${d.depression}`, event))
+        `Genre: ${d.genre}<br>Hours/day: ${d.hours}<br>
+         Anxiety: ${d.anxiety}<br>Depression: ${d.depression}`, event))
       .on("mouseout", hideTip);
 
-  const n     = data.length;  //trend line
+  // ── Trend line ──
+  const n     = data.length;
   const sumX  = d3.sum(data, d => d.hours);
   const sumY  = d3.sum(data, d => d.anxiety);
   const sumXY = d3.sum(data, d => d.hours * d.anxiety);
   const sumX2 = d3.sum(data, d => d.hours * d.hours);
-
   const slope     = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
   const intercept = (sumY - slope * sumX) / n;
-
   const xMin = d3.min(data, d => d.hours);
   const xMax = d3.max(data, d => d.hours);
 
-  g.append("line")
+  const trendLine = g.append("line")
     .attr("x1", xScale(xMin)).attr("y1", yScale(slope * xMin + intercept))
     .attr("x2", xScale(xMax)).attr("y2", yScale(slope * xMax + intercept))
     .attr("stroke", "#FF0000")
     .attr("stroke-width", 1.8)
     .attr("stroke-dasharray", "5,3");
 
-  const lx = iW - 140;  //legend
-  const ly = 4;
+  // ── Legend ──
+  const lx = iW - 140, ly = 4;
   const lg = g.append("g").attr("transform", `translate(${lx},${ly})`);
-
-  lg.append("circle")  //dots color and placement
-    .attr("cx", 6).attr("cy", 6).attr("r", 3.5)
+  lg.append("circle").attr("cx", 6).attr("cy", 6).attr("r", 3.5)
     .attr("fill", "#992685").attr("fill-opacity", 0.55);
-  lg.append("text")
-    .attr("x", 14).attr("y", 10)
+  lg.append("text").attr("x", 14).attr("y", 10)
     .attr("font-size", 9).attr("fill", "#555")
-    .attr("font-family", "Arial, sans-serif")
-    .text("Survey respondent");
-
-  lg.append("line")  //trend line red thing
-    .attr("x1", 0).attr("x2", 14).attr("y1", 22).attr("y2", 22)
+    .attr("font-family", "Arial, sans-serif").text("Survey respondent");
+  lg.append("line").attr("x1", 0).attr("x2", 14).attr("y1", 22).attr("y2", 22)
     .attr("stroke", "#FF0000").attr("stroke-width", 1.8)
     .attr("stroke-dasharray", "5,3");
-  lg.append("text")
-    .attr("x", 18).attr("y", 26)
+  lg.append("text").attr("x", 18).attr("y", 26)
     .attr("font-size", 9).attr("fill", "#555")
-    .attr("font-family", "Arial, sans-serif")
-    .text("Trend line");
+    .attr("font-family", "Arial, sans-serif").text("Trend line");
+
+  // ── BRUSH ────────────────────────────────────────────────────────────────
+  const brush = d3.brush()
+    .extent([[0, 0], [iW, iH]])
+    .on("brush end", ({ selection }) => {
+      if (!selection) {
+        // Brush cleared — reset all dots, reset bar chart
+        dots.attr("fill-opacity", 0.45).attr("stroke", "none");
+        updateBarChart(data);
+        return;
+      }
+
+      const [[x0, y0], [x1, y1]] = selection;
+
+      // Convert pixel selection back to data space using current scales
+      const hMin = xScale.invert(x0), hMax = xScale.invert(x1);
+      const aMin = yScale.invert(y1), aMax = yScale.invert(y0); // y is inverted
+
+      // Highlight brushed dots, dim the rest
+      dots
+        .attr("fill-opacity", d =>
+          d.jx >= hMin && d.jx <= hMax && d.jy >= aMin && d.jy <= aMax
+            ? 0.85 : 0.08)
+        .attr("stroke", d =>
+          d.jx >= hMin && d.jx <= hMax && d.jy >= aMin && d.jy <= aMax
+            ? "#5a0080" : "none");
+
+      // Filter data and update bar chart with animation
+      const brushed = data.filter(d =>
+        d.hours  >= hMin && d.hours  <= hMax &&
+        d.anxiety >= aMin && d.anxiety <= aMax
+      );
+      updateBarChart(brushed);
+    });
+
+  // Brush layer goes on top of dots
+  const brushG = g.append("g").attr("class", "brush").call(brush);
 }
