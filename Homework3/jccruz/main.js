@@ -3,7 +3,7 @@ const height = window.innerHeight;
 const sankeyWidth = width * 0.9;
 const sankeyHeight = height * 0.3;
 const barWidth = width * 0.4;
-const barHeight = height * 0.3;
+const barHeight = height * 0.35;
 const pieWidth = width * 0.22;
 const pieHeight = width * 0.22;
 const pieRadius = Math.min(pieWidth, pieHeight) / 2;
@@ -39,10 +39,10 @@ const sankeyGroup = svg.append("g")
     .attr("transform", `translate(50, 500)`);
 
 const barGroup = svg.append("g")
-    .attr("transform", `translate(110, 150)`);
+    .attr("transform", `translate(110, 120)`);
 
 const pieGroup = svg.append("g")
-    .attr("transform", `translate(1160, 280)`)
+    .attr("transform", `translate(1100, 280)`);
 
 // data processing and visualization for all three graphics
 d3.csv("./data/ds_salaries.csv").then(rawData => {
@@ -188,14 +188,35 @@ d3.csv("./data/ds_salaries.csv").then(rawData => {
         salary: d[1]
     }));
 
+    // clip paths for zooming
+    const defs = svg.append("defs");
+
+    defs.append("clipPath")
+        .attr("id", "clip")
+        .append("rect")
+        .attr("width", barWidth)
+        .attr("height", barHeight);
+
+    defs.append("clipPath")
+        .attr("id", "x-axis-clip")
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", barWidth)
+        .attr("height", 60);
+
+    // create a group for the bars and apply the clip path
+    const barsContainer = barGroup.append("g")
+        .attr("clip-path", "url(#clip)");
+
     // title for the bar graph
     barGroup.append("text")
         .attr("x", barWidth / 2)
-        .attr("y", -10)
+        .attr("y", -25)
         .attr("text-anchor", "middle")
         .attr("font-size", "24px")
         .attr("font-weight", "600")
-        .text("Average salary by Experience level");
+        .text("Average salary by Experience level (Movable)");
 
     // sets the scale for the x-axis
     const x = d3.scaleBand()
@@ -211,7 +232,9 @@ d3.csv("./data/ds_salaries.csv").then(rawData => {
         
     // adds the x-axis to the bottom of the chart
     barGroup.append("g")
+        .attr("class", "x-axis")
         .attr("transform", `translate(0, ${barHeight})`)
+        .attr("clip-path", "url(#x-axis-clip)")
         .call(d3.axisBottom(x))
         .selectAll("text")
         .style("font-size", "14px");
@@ -241,16 +264,34 @@ d3.csv("./data/ds_salaries.csv").then(rawData => {
         .attr("font-size", "16px")
         .text("Average Salary (USD)");
 
-    // adds the bars for each experience level
-    barGroup.selectAll("rect")
+    // adds the bars for each experience level inside the clipped container
+    barsContainer.selectAll(".bar")
         .data(barData)
         .enter()
         .append("rect")
+        .attr("class", "bar")
         .attr("x", d => x(d.experience))
         .attr("y", d => y(d.salary))
         .attr("width", x.bandwidth())
         .attr("height", d => barHeight - y(d.salary))
         .attr("fill", "#4e79a7");
+
+    // zoom behavior
+    const zoom = d3.zoom()
+        .scaleExtent([1, 6])
+        .extent([[0, 0], [barWidth, barHeight]])
+        .on("zoom", zoomed);
+    
+    barGroup.call(zoom)
+
+    function zoomed() {
+        const transform = d3.event.transform;
+        x.range([0, barWidth].map(d => transform.applyX(d)));
+        barsContainer.selectAll(".bar")
+            .attr("x", d => x(d.experience))
+            .attr("width", x.bandwidth());
+        barGroup.select(".x-axis").call(d3.axisBottom(x));
+    }
 
     const locationCounts = {};
     rawData.forEach(d => {
@@ -269,8 +310,11 @@ d3.csv("./data/ds_salaries.csv").then(rawData => {
 
     const pieData = topLocations.map(d => ({
         location: d[0],
-        count: d[1]
+        count: d[1],
+        enabled: true
     }));
+
+    const total = d3.sum(pieData, d => d.count);
 
     // title for the pie chart
     pieGroup.append("text")
@@ -294,33 +338,117 @@ d3.csv("./data/ds_salaries.csv").then(rawData => {
     const arc = d3.arc()
         .innerRadius(0)
         .outerRadius(pieRadius);
-
-    // sets the radii for the labels of the slices
-    const labelArc = d3.arc()
-        .innerRadius(pieRadius)
-        .outerRadius(pieRadius * 0.6);
-
-    // adds the slices of the pie chart with the appropriate proportion
-    pieGroup.selectAll("path")
-        .data(pie(pieData))
-        .enter()
-        .append("path")
-        .attr("d", arc)
-        .attr("fill", d => pieColor(d.data.location))
-        .attr("stroke", "white")
-        .style("stroke-width", "2px");
     
-    // adds the lavels of the slices at about the middle of a slice.
-    pieGroup.selectAll(".pie-label")
-        .data(pie(pieData))
+    const legendHeight = pieData.length * 25 + 40;
+
+    // re-renders the enabled slices of the pie whenever called
+    function updatePie() {
+        const activeData = pieData.filter(d => d.enabled);
+    
+        const pieSlices = pieGroup.selectAll(".pie-slice")
+            .data(pie(activeData), d => d.data.location);
+    
+        pieSlices.enter()
+            .append("path")
+            .attr("class", "pie-slice")
+            .each(function(d) { this._current = d; })
+            .merge(pieSlices)
+            .transition()
+            .duration(750)
+            .attrTween("d", function(d) {
+                const interpolate = d3.interpolate(this._current || d, d);
+                this._current = interpolate(1);
+                return function(t) {
+                    return arc(interpolate(t));
+                };
+            })
+            .attr("fill", d => pieColor(d.data.location))
+            .attr("stroke", "white")
+            .style("stroke-width", "2px");
+    
+        pieSlices.exit().remove();
+    }
+    
+    updatePie();
+
+    // legend container
+    const legend = pieGroup.append("g")
+        .attr("transform", `translate(${pieRadius + 40}, ${-pieRadius + 20})`);
+
+    // legend outline box
+    legend.append("rect")
+        .attr("width", 160)
+        .attr("height", legendHeight)
+        .attr("fill", "white")
+        .attr("stroke", "black")
+        .attr("x", -10)
+        .attr("y", -40)
+        .attr("rx", 6);
+
+    // legend title
+    legend.append("text")
+        .attr("x", 45)
+        .attr("y", -20)
+        .style("font-size", "16px")
+        .style("font-weight", "bold")
+        .text("Legend");
+
+    // create one legend row per category
+    const legendItems = legend.selectAll(".legend-item")
+        .data(pieData)
         .enter()
-        .append("text")
-        .attr("class", "pie-label")
-        .attr("transform", d => `translate(${labelArc.centroid(d)[0]}, ${labelArc.centroid(d)[1]})`)
-        .attr("text-anchor", "middle")
-        .style("font-size", "12px")
-        .style("fill", "white")
-        .style("font-weight", "600")
-        .text(d => d.data.location);
+        .append("g")
+        .attr("class", "legend-item")
+        .attr("transform", (d, i) => `translate(0, ${i * 25})`);
+
+    // colored square
+    legendItems.append("rect")
+        .attr("width", 16)
+        .attr("height", 16)
+        .attr("fill", d => pieColor(d.location));
+
+    // location name
+    legendItems.append("text")
+        .attr("x", 24)
+        .attr("y", 12)
+        .style("font-size", "14px")
+        .style("fill", "black")
+        .text(d => d.location);
+
+    // percentage text
+    legendItems.append("text")
+        .attr("x", 110)
+        .attr("y", 12)
+        .style("font-size", "14px")
+        .style("fill", "black")
+        .style("text-anchor", "end")
+        .text(d => `${((d.count / total) * 100).toFixed(1)}%`);
+
+    // selection box
+    legendItems.append("rect")
+        .attr("x", 125)
+        .attr("y", 0)
+        .attr("width", 16)
+        .attr("height", 16)
+        .attr("fill", "white")
+        .attr("stroke", "black")
+        .style("cursor", "pointer")
+        .on("click", function(d) {
+            d.enabled = !d.enabled;
+
+            d3.select(this.nextSibling)
+                .style("display", d.enabled ? null : "none");
+
+            updatePie();
+        });
+
+    // styling for the filled in box
+    legendItems.append("rect")
+        .attr("x", 128)
+        .attr("y", 3)
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("fill", "black")
+        .style("pointer-events", "none");
 
 });
