@@ -167,6 +167,35 @@ function updateBarChart(filteredData) {
         const avg = avgMap.get(d);
         return avg != null ? avg.toFixed(1) : "";
       });
+
+  // ── SELECTION on bar chart (click genre → highlight scatter dots) ────────
+  barSvgG.selectAll(".bar")
+    .on("click", (event, d) => {
+      const alreadySelected = d3.select(event.currentTarget).attr("stroke") === "#1a7a1d";
+
+      // Reset all bars first
+      barSvgG.selectAll(".bar")
+        .attr("stroke", "none")
+        .attr("fill-opacity", 0.75);
+
+      if (alreadySelected) {
+        // Click same bar again → deselect, reset scatter
+        d3.selectAll(".dot")
+          .attr("fill-opacity", 0.45)
+          .attr("stroke", "none");
+      } else {
+        // Highlight clicked bar
+        d3.select(event.currentTarget)
+          .attr("stroke", "#1a7a1d")
+          .attr("stroke-width", 2)
+          .attr("fill-opacity", 1);
+
+        // Highlight matching dots in scatter, dim the rest
+        d3.selectAll(".dot")
+          .attr("fill-opacity", dd => dd.genre === d ? 0.85 : 0.08)
+          .attr("stroke", dd => dd.genre === d ? "#5a0080" : "none");
+      }
+    });
 }
 
 //  VIEW 2: Alluvial Diagram  (Genre → Daily Listening Hours → Music Effect)
