@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Homework 3</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* fill in the entire view port to prevent scroll on the main full screen page  */
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #fafaf8;
+      font-family: Georgia, serif;
+    }
+    /* centers the text of dashboard to the top of page */
+    #dashboard-title {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(16px, 2vw, 26px);   
+      font-weight: bold;
+      color: #2d2d2d;
+      letter-spacing: 1px;
+      pointer-events: none;
+      width: 90vw;
+      text-align: center;
+    }
+
+    /* title for subtitle under main title */
+    #dashboard-subtitle {
+      position: absolute;
+      top: 38px;                           
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(8px, 0.85vw, 11px);
+      color: #666;
+      font-family: Georgia, serif;
+      pointer-events: none;
+      width: 90vw;
+      text-align: center;
+    }
+
+    /* SVG fills the whole viewport to contain all svg inside the area */
+    #main-svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    /* styling in D3 for axis */
+    .axis path, .axis line { stroke: #bbb; }
+    .axis text { font-family: Georgia, serif; font-size: 11px; fill: #444; }
+  </style>
+</head>
+<body>
+  <div id="dashboard-title">Pokémon Explorer</div>
+  <div id="dashboard-subtitle">Explore attack, defense, stats, and type relationships across all Pokémon.</div>
+
+  <svg id="main-svg"></svg>
+
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
