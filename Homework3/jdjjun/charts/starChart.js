@@ -1,6 +1,4 @@
 // chart/starChart.js
-// Global placeholder references to allow main.js to command layout states cleanly
-let toggleStarChartLayout; 
 
 function drawStarChart(newData, genreCounts) {
     const svg = d3.select("svg");
@@ -30,15 +28,19 @@ function drawStarChart(newData, genreCounts) {
         .attr("class", "small-multiples-group")
         .attr("transform", `translate(${teamMargin.left + 20}, ${teamTop + 50})`);
 
-    // Precalculate coordinates to build containers
     genreCounts.forEach((genreObj, index) => {
         const genreName = genreObj.key;
         const genreData = newData.filter(d => d["Fav genre"] === genreName);
-        
-        const radarData = categories.map(key => ({
-            axis: key,
-            value: d3.mean(genreData, d => +d[key]) || 0
-        }));
+
+        // fix radardata
+        let radarData = [];
+
+        categories.forEach(cat => {
+        radarData.push({
+            axis: cat,
+            value: d3.mean(genreData, d => +d[cat]) || 0
+            });
+        });
 
         const normRow = Math.floor(index / defaultRow);
         const normCol = index % defaultRow;
@@ -88,12 +90,12 @@ function drawStarChart(newData, genreCounts) {
                 .text(cat);
         });
 
-        // Structural label container for genre titles & local reset keys
-        const footerLabelGroup = gInner.append("g")
+        // Add genre titles and reset keys
+        const labelG = gInner.append("g")
             .attr("class", "footer-label-group")
             .attr("transform", `translate(0, ${radarRadius + 25})`);
 
-        const genreTextNode = footerLabelGroup.append("text")
+        const genreTextNode = labelG.append("text")
             .attr("text-anchor", "middle")
             .style("font-size", "11px")
             .style("font-weight", "bold")
@@ -102,16 +104,14 @@ function drawStarChart(newData, genreCounts) {
 
         const textW = genreTextNode.node().getBBox().width;
 
-        // Localized Return square mark button
-        const localResetSquare = footerLabelGroup.append("rect")
+        // create reset button
+        const resetBtn = labelG.append("rect")
             .attr("class", "local-reset-square")
             .attr("x", -(textW / 2) - 14).attr("y", -9).attr("width", 10).attr("height", 10).attr("rx", 1.5)
             .attr("fill", colorScale(genreName))
             .style("cursor", "pointer")
             .style("opacity", 0) 
             .style("pointer-events", "none");
-
-        localResetSquare.append("title").text("Click to pull this star shape out of the comparison workbench!");
 
         // The baseline star path polygon
         gInner.append("path")
@@ -129,7 +129,7 @@ function drawStarChart(newData, genreCounts) {
         });
 
         // add action key
-        localResetSquare.on("click", function(d) {
+        resetBtn.on("click", function(d) {
             d3.event.stopPropagation(); 
             removeGenre(d.genreName);
         });
@@ -137,28 +137,28 @@ function drawStarChart(newData, genreCounts) {
 
 
     // Main Chart in Selection
-    const workbenchRadius = 90; 
-    const workbenchG = svg.append("g")
-        .attr("class", "focus-workbench-panel")
+    const mainViewRadius = 90; 
+    const mainViewG = svg.append("g")
+        .attr("class", "focus-mainView-panel")
         .attr("transform", `translate(${width - 320}, ${teamTop + 120})`) 
         .style("opacity", 0)
         .style("pointer-events", "none");
 
-    const rScaleWB = d3.scaleLinear().domain([0, maxValue]).range([0, workbenchRadius]);
+    const rScaleWB = d3.scaleLinear().domain([0, maxValue]).range([0, mainViewRadius]);
     const wbRadarLine = d3.lineRadial().radius(d => rScaleWB(d.value)).angle((d, i) => i * angleSlice).curve(d3.curveLinearClosed);
 
     // Grid tracks background rings
     const gridRings = 4;
     for (let j = 0; j < gridRings; j++) {
-        workbenchG.append("circle").attr("r", workbenchRadius * ((j + 1) / gridRings)).attr("fill", "none").attr("stroke", "#ccc").attr("stroke-width", "0.5px");
+        mainViewG.append("circle").attr("r", mainViewRadius * ((j + 1) / gridRings)).attr("fill", "none").attr("stroke", "#ccc").attr("stroke-width", "0.5px");
     }
 
     categories.forEach((cat, i) => {
         const angle = angleSlice * i - Math.PI / 2;
-        const x = (workbenchRadius + 12) * Math.cos(angle);
-        const y = (workbenchRadius + 12) * Math.sin(angle);
+        const x = (mainViewRadius + 12) * Math.cos(angle);
+        const y = (mainViewRadius + 12) * Math.sin(angle);
 
-        workbenchG.append("text")
+        mainViewG.append("text")
             .attr("x", x).attr("y", y)
             .attr("text-anchor", Math.abs(x) < 5 ? "middle" : (x > 0 ? "start" : "end"))
             .attr("dy", "0.35em")
@@ -166,11 +166,11 @@ function drawStarChart(newData, genreCounts) {
             .text(cat);
     });
 
-    // Sub-group wrapper specifically designed to clip instructions card and dynamic text
-    const textLayerG = workbenchG.append("g").attr("class", "workbench-text-layer");
-    const shapeLayerG = workbenchG.append("g").attr("class", "workbench-shapes-layer");
+    // wrap layer in text
+    const textLayerG = mainViewG.append("g").attr("class", "mainView-text-layer");
+    const shapeLayerG = mainViewG.append("g").attr("class", "mainView-shapes-layer");
 
-    // Array to manage explicit rotation of genres loaded onto the workbench
+    // Array to manage genres loaded onto main view
     let loadedGenres = [];
 
     addDirections();
@@ -178,32 +178,32 @@ function drawStarChart(newData, genreCounts) {
     //Create directions
     function addDirections() {
         textLayerG.selectAll("*").remove();
-        const directionContainer= textLayerG.append("g")
-            .attr("transform", `translate(${workbenchRadius + 65}, 0)`);
+        const directions= textLayerG.append("g")
+            .attr("transform", `translate(${mainViewRadius + 65}, 0)`);
 
-        directionContainer.append("text")
+        directions.append("text")
             .attr("x", 87.5).attr("y", -100).attr("text-anchor", "middle")
             .style("font-size", "12px").style("font-weight", "bold").style("fill", "#444")
             .text("Double click to compare");
 
-        directionContainer.append("text")
+        directions.append("text")
             .attr("x", 87.5).attr("y", -80).attr("text-anchor", "middle")
             .style("font-size", "12px").style("fill", "#777").style("font-style", "italic")
             .text("Max is 3 genres");
 
-        directionContainer.append("text")
+        directions.append("text")
             .attr("x", 87.5).attr("y", -60).attr("text-anchor", "middle")
             .style("font-size", "12px").style("fill", "#777").style("font-style", "italic")
             .text("Click color icon to remove");
     }
 
     // Displays color square legends 
-    function drawSelectedLegends() {
+    function drawLegend() {
         textLayerG.selectAll("*").remove();
 
         loadedGenres.forEach((genreInfo, lineIndex) => {
             const legendRowG = textLayerG.append("g")
-                .attr("transform", `translate(${workbenchRadius + 75}, ${-60 + (lineIndex * 50)})`);
+                .attr("transform", `translate(${mainViewRadius + 75}, ${-60 + (lineIndex * 50)})`);
 
             // Color identifier
             legendRowG.append("rect")
@@ -212,10 +212,13 @@ function drawStarChart(newData, genreCounts) {
                 .attr("fill", colorScale(genreInfo.name));
 
             // Name label
-            legendRowG.append("text")
-                .attr("x", 16).attr("y", -20)
-                .style("font-size", "12px").style("font-weight", "bold").style("fill", "black")
+            const label = legendRowG.append("text");
+            label
+                .attr("x", 16)
+                .attr("y", -20)
                 .text(genreInfo.name);
+
+            label.style("font-size", "12px");
 
             // Averages metric metrics metrics block
             genreInfo.data.forEach((metric, metricIdx) => {
@@ -237,8 +240,7 @@ function drawStarChart(newData, genreCounts) {
         // if genre has been added do nothing
         if (loadedGenres.some(item => item.name === genreName)) return;
 
-        // Once 3 has been loaded 
-        //remove everything and load in the new one
+        // max 3
         if (loadedGenres.length >= 3) {
             const elementsToRemove = [...loadedGenres];
             loadedGenres = [];
@@ -268,7 +270,7 @@ function drawStarChart(newData, genreCounts) {
 
         shapeLayerG.append("path")
             .datum(radarData)
-            .attr("class", `workbench-overlay-poly wb-layer-${genreName.replace(/[^a-zA-Z0-9]/g, '-')}`)
+            .attr("class", `overlay wb-layer-${genreName.replace(/[^a-zA-Z0-9]/g, '-')}`)
             .attr("d", wbRadarLine)
             .attr("fill", colorScale(genreName))
             .attr("fill-opacity", 0.35)
@@ -278,8 +280,7 @@ function drawStarChart(newData, genreCounts) {
             .transition().duration(400).ease(d3.easeCubicOut)
             .attr("transform", "translate(0,0) scale(1)");
 
-        // Refresh legend panel text updates
-        drawSelectedLegends();
+        drawLegend();
     }
 
 
@@ -301,11 +302,11 @@ function drawStarChart(newData, genreCounts) {
             .attr("transform", `translate(${targetLocalX}, ${targetLocalY}) scale(0.3)`)
             .remove();
 
-        // if no genres are loaded then go back to displaying directions
+        // else display directions
         if (loadedGenres.length === 0) {
             addDirections();
         } else {
-            drawSelectedLegends();
+            drawLegend();
         }
     }
 
@@ -329,7 +330,6 @@ function drawStarChart(newData, genreCounts) {
             .transition().duration(1500)
             .style("opacity", selectionMode? 0 : 1);
 
-        // Dynamic spacing adjustment between views
         // ensures that the genre label is close enough when
         // swapped to selection mode
         smallMultiplesG.selectAll(".footer-label-group")
@@ -343,27 +343,27 @@ function drawStarChart(newData, genreCounts) {
             .style("pointer-events", selectionMode? "all" : "none");
 
         // Load in the main view
-        workbenchG.transition().duration(1500)
+        mainViewG.transition().duration(1500)
             .style("opacity", selectionMode ? 1 : 0)
             .style("pointer-events", selectionMode? "all" :"none");
 
         //reset everything when user goes back to default view
         if (!selectionMode) {
-            shapeLayerG.selectAll(".workbench-overlay-poly").remove();
+            shapeLayerG.selectAll(".overlay").remove();
             loadedGenres = [];
             addDirections();
         }
     };
 
     // Add chart header
-    const titleTextString = "Mean of Mental Health Survey On A Scale of 1-10 Based On Different Music Genre Lovers";
+    const title = "Mean of Mental Health Survey On A Scale of 1-10 Based On Different Music Genre Lovers";
     const titleNode = svg.append("text")
         .attr("class", "star-chart-main-title")
         .attr("x", teamMargin.left || 30)
         .attr("y", teamTop ? teamTop - 20 : 380)
         .style("font-weight", "bold")
         .style("font-size", "16px")
-        .text(titleTextString);
+        .text(title);
 
     setTimeout(() => {
         titleNode
