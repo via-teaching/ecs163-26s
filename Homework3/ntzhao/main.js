@@ -278,6 +278,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .data(countsArray)
     .enter()
     .append("rect")
+    .attr("class", (d) => `bar bar-${getGenreKey(d.genre)}`)
     .attr("x", (d) => barX(d.genre))
     .attr("y", (d) => barY(d.count))
     .attr("width", barX.bandwidth())
@@ -586,6 +587,19 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
 
   // INTERACTIVITY
 
+  function activateBarHover(genre) {
+    d3.selectAll(".bar").transition().duration(200).style("opacity", 0.5);
+
+    d3.select(".bar-" + getGenreKey(genre))
+      .transition()
+      .duration(200)
+      .style("opacity", 1.0);
+  }
+
+  function deactivateBarHover() {
+    d3.selectAll(".bar").transition().duration(200).style("opacity", 0.75);
+  }
+
   function activateParallelHover(genre) {
     d3.selectAll(".line")
       .transition()
@@ -624,10 +638,12 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
   }
 
   function onGenreMouseEnter(genre) {
+    activateBarHover(genre);
     activateParallelHover(genre);
   }
 
   function onGenreMouseLeave(genre) {
+    deactivateBarHover();
     deactivateParallelHover(genre);
   }
 });
