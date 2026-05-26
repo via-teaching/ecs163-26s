@@ -3,37 +3,37 @@ const svg = d3.select("#main-svg");
 const svgEl = document.getElementById("main-svg");
 
 // read actual rendered pixel size of the SVG element
-let W = svgEl.clientWidth  || window.innerWidth;
+let W = svgEl.clientWidth || window.innerWidth;
 let H = svgEl.clientHeight || window.innerHeight;
 
 // font sizes that scale with window width 
-let titleFont    = Math.max(12, W * 0.011);
+let titleFont = Math.max(12, W * 0.011);
 let subtitleFont = Math.max(10, W * 0.008);
 
 // main tooltip for all visuals 
 const tooltip = d3.select("body").append("div")
-    .style("position",       "absolute")
-    .style("background",     "rgba(255,255,255,0.95)")
-    .style("border",         "1px solid #ccc")
-    .style("border-radius",  "6px")
-    .style("padding",        "8px 12px")
-    .style("font-family",    "Georgia, serif")
-    .style("font-size",      "12px")
+    .style("position", "absolute")
+    .style("background", "rgba(255,255,255,0.95)")
+    .style("border", "1px solid #ccc")
+    .style("border-radius", "6px")
+    .style("padding", "8px 12px")
+    .style("font-family", "Georgia, serif")
+    .style("font-size", "12px")
     .style("pointer-events", "none")
-    .style("display",        "none");
+    .style("display", "none");
 
 function hideTooltip() { tooltip.style("display", "none"); }
 
 // handles browser resize
 // recalculaes all layout variables and reconfigures the three visualizations
 let resizeTimer;
-window.addEventListener("resize", function() {
+window.addEventListener("resize", function () {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(function() {
+    resizeTimer = setTimeout(function () {
         if (!window._lastData) return;
-        W = svgEl.clientWidth  || window.innerWidth;
+        W = svgEl.clientWidth || window.innerWidth;
         H = svgEl.clientHeight || window.innerHeight;
-        titleFont    = Math.max(12, W * 0.011);
+        titleFont = Math.max(12, W * 0.011);
         subtitleFont = Math.max(10, W * 0.008);
         recalcLayout();
         svg.selectAll("*").remove();
@@ -46,15 +46,15 @@ window.addEventListener("resize", function() {
 
 // recalculate the dimensions of all visalizations for width and height 
 function recalcLayout() {
-    scatterWidth  = W * 0.38 - scatterMargin.left - scatterMargin.right;
-    scatterHeight = H * 0.48 - scatterMargin.top  - scatterMargin.bottom;
-    barLeft       = W * 0.54;
-    barTop        = 0;   // was 18
-    barWidth      = W * 0.44 - barMargin.left - barMargin.right;
-    barHeight     = H * 0.48 - barMargin.top  - barMargin.bottom;
-    chordTop      = H * 0.54;
-    chordHeight   = H * 0.46 - chordMargin.top - chordMargin.bottom;
-    chordRadius   = Math.min(W * 0.14, chordHeight) / 2 - 5;
+    scatterWidth = W * 0.38 - scatterMargin.left - scatterMargin.right;
+    scatterHeight = H * 0.48 - scatterMargin.top - scatterMargin.bottom;
+    barLeft = W * 0.54;
+    barTop = 0;   // was 18
+    barWidth = W * 0.44 - barMargin.left - barMargin.right;
+    barHeight = H * 0.48 - barMargin.top - barMargin.bottom;
+    chordTop = H * 0.54;
+    chordHeight = H * 0.46 - chordMargin.top - chordMargin.bottom;
+    chordRadius = Math.min(W * 0.14, chordHeight) / 2 - 5;
 }
 
 // shared data type used by scatter plot and chord diagram 
@@ -82,7 +82,7 @@ pokemonTypes.forEach((t, i) => typeIndex[t] = i);
 // focus view: shows average stats of brushed/filtered selection made on the scatter plot
 // stats show attack, hp, defense, speed, and both special attack and special defense 
 // on scroll zooms into the bar chart, drag to move along x-axis 
-const statCols   = ["HP", "Attack", "Defense", "Sp_Atk", "Sp_Def", "Speed"];
+const statCols = ["HP", "Attack", "Defense", "Sp_Atk", "Sp_Def", "Speed"];
 const statLabels = {
     HP: "HP", Attack: "Attack", Defense: "Defense",
     Sp_Atk: "Sp. Atk", Sp_Def: "Sp. Def", Speed: "Speed"
@@ -95,18 +95,18 @@ const statColor = d3.scaleOrdinal()
 
 // layout variables
 // recalculated by recalcLayout() when resized 
-let barLeft   = W * 0.54,  barTop = 0;   
+let barLeft = W * 0.54, barTop = 0;
 let barMargin = { top: 115, right: 120, bottom: 50, left: 55 };
-let barWidth  = W * 0.44 - barMargin.left - barMargin.right;
-let barHeight = H * 0.48 - barMargin.top  - barMargin.bottom;
+let barWidth = W * 0.44 - barMargin.left - barMargin.right;
+let barHeight = H * 0.48 - barMargin.top - barMargin.bottom;
 
 // calculate the per-stat averages of the top 3 pokemons for the current selection 
 function computeAverages(data) {
     return statCols.map(stat => ({
         stat,
-        avg:  d3.mean(data, d => +d[stat]),
+        avg: d3.mean(data, d => +d[stat]),
         top3: [...data].sort((a, b) => +b[stat] - +a[stat])
-                       .slice(0, 3).map(d => d.Name)
+            .slice(0, 3).map(d => d.Name)
     }));
 }
 
@@ -121,7 +121,7 @@ function updateBarChart(selectedData, label) {
     barG.selectAll(".bar")
         .data(avgs, d => d.stat)
         .transition().duration(500).ease(d3.easeCubicInOut)
-        .attr("y",      d => yBarScale(d.avg))
+        .attr("y", d => yBarScale(d.avg))
         .attr("height", d => barHeight - yBarScale(d.avg));
 
     // animate value labels to new positions
@@ -141,9 +141,9 @@ function drawBarChart(data) {
     svg.append("defs").append("clipPath")
         .attr("id", "bar-clip")
         .append("rect")
-        .attr("x", -5)           
+        .attr("x", -5)
         .attr("y", -10)
-        .attr("width",  barWidth + 5)
+        .attr("width", barWidth + 5)
         .attr("height", barHeight + 10);
 
     barG = svg.append("g")
@@ -189,8 +189,8 @@ function drawBarChart(data) {
         .domain([0, 260])
         .range([barHeight, 0]);
 
-        // x-axis (angled labels)
-        barG.append("g")
+    // x-axis (angled labels)
+    barG.append("g")
         .attr("class", "bar-x-axis axis")
         .attr("clip-path", "url(#bar-clip)")
         .attr("transform", `translate(0, ${barHeight})`)
@@ -212,7 +212,7 @@ function drawBarChart(data) {
         .call(d3.axisLeft(yBarScale).ticks(6).tickSize(-barWidth).tickFormat(""))
         .call(g => g.selectAll("line").attr("stroke", "#e8e8e4").attr("stroke-dasharray", "2,2"))
         .call(g => g.select(".domain").remove());
-    
+
     // stat color legend in bar chart
     const barLegG = barG.append("g")
         .attr("transform", `translate(${barWidth + 10}, 0)`);
@@ -226,7 +226,7 @@ function drawBarChart(data) {
         .attr("stroke", "#ddd")
         .attr("stroke-width", 0.8);
 
-    statCols.forEach(function(stat, i) {
+    statCols.forEach(function (stat, i) {
         const row = barLegG.append("g")
             .attr("transform", `translate(8, ${i * 20 + 6})`);
 
@@ -257,50 +257,50 @@ function drawBarChart(data) {
         .data(avgs, d => d.stat)
         .enter().append("rect")
         .attr("class", "bar")
-        .attr("x",      d => xBarScale(d.stat))
-        .attr("width",  xBarScale.bandwidth())
-        .attr("y",      barHeight)
+        .attr("x", d => xBarScale(d.stat))
+        .attr("width", xBarScale.bandwidth())
+        .attr("y", barHeight)
         .attr("height", 0)
-        .attr("fill",   d => statColor(d.stat))
+        .attr("fill", d => statColor(d.stat))
         .attr("rx", 3)
         .attr("opacity", 0.82)
         .style("cursor", "pointer")
-        .on("mouseover", function(event, d) {
+        .on("mouseover", function (event, d) {
             d3.select(this).attr("opacity", 1).attr("stroke", "#333").attr("stroke-width", 1.5);
             tooltip.style("display", "block")
                 .style("left", (event.pageX + 14) + "px")
-                .style("top",  (event.pageY - 38) + "px")
+                .style("top", (event.pageY - 38) + "px")
                 .html(`<strong>${statLabels[d.stat]}</strong><br>
                        Avg: <strong>${d.avg.toFixed(1)}</strong><br>
                        <hr style="margin:4px 0">
                        Top in selection:<br>
                        ${d.top3.map((n, i) => `${i + 1}. ${n}`).join("<br>")}`);
         })
-        .on("mousemove", function(event) {
+        .on("mousemove", function (event) {
             tooltip.style("left", (event.pageX + 14) + "px")
-                   .style("top",  (event.pageY - 38) + "px");
+                .style("top", (event.pageY - 38) + "px");
         })
-        .on("mouseout", function() {
+        .on("mouseout", function () {
             d3.select(this).attr("opacity", 0.82).attr("stroke", "none");
             hideTooltip();
         })
 
         // animate bars growing up from baseline on load 
         .transition().duration(700).ease(d3.easeCubicOut)
-        .attr("y",      d => yBarScale(d.avg))
+        .attr("y", d => yBarScale(d.avg))
         .attr("height", d => barHeight - yBarScale(d.avg));
-    
+
     // value labels on top of each other 
     barsGroup.selectAll(".bar-label")
         .data(avgs, d => d.stat)
         .enter().append("text")
         .attr("class", "bar-label")
-        .attr("x",           d => xBarScale(d.stat) + xBarScale.bandwidth() / 2)
-        .attr("y",           barHeight)
+        .attr("x", d => xBarScale(d.stat) + xBarScale.bandwidth() / 2)
+        .attr("y", barHeight)
         .attr("text-anchor", "middle")
-        .attr("font-size",   "11px")
+        .attr("font-size", "11px")
         .attr("font-family", "Georgia,serif")
-        .attr("fill",        "#444")
+        .attr("fill", "#444")
         .text(d => d.avg.toFixed(1))
         .transition().duration(700).ease(d3.easeCubicOut)
         .attr("y", d => yBarScale(d.avg) - 5);
@@ -314,17 +314,17 @@ function drawBarChart(data) {
         .scaleExtent([1, 6])
         .translateExtent(zoomExtent)
         .extent(zoomExtent)
-        .filter(function() {
+        .filter(function () {
             // Allow wheel zoom and drag, block right-click
-            return !d3.event.button; 
+            return !d3.event.button;
         })
-        .on("zoom", function() {
-            const t         = d3.event.transform;
+        .on("zoom", function () {
+            const t = d3.event.transform;
             const bandwidth = xBarScale.bandwidth();
 
             // reposition bars using raw transform 
             barG.selectAll(".bar")
-                .attr("x",     d => t.applyX(xBarScale(d.stat)))
+                .attr("x", d => t.applyX(xBarScale(d.stat)))
                 .attr("width", bandwidth * t.k);
 
             barG.selectAll(".bar-label")
@@ -335,7 +335,7 @@ function drawBarChart(data) {
                 .range(xBarScale.range().map(d => t.applyX(d)));
             barG.select(".bar-x-axis")
                 .call(d3.axisBottom(zoomedX).tickFormat(d => statLabels[d]));
-            
+
             // show reset button only when actually zoomed in 
             barG.select(".zoom-reset-btn")
                 .style("display", t.k > 1.01 ? "block" : "none");
@@ -371,15 +371,15 @@ function drawBarChart(data) {
         .attr("class", "zoom-overlay")
         .attr("x", 0)
         .attr("y", 0)
-        .attr("width",  barWidth)
+        .attr("width", barWidth)
         .attr("height", barHeight)
-        .attr("fill",   "transparent")
+        .attr("fill", "transparent")
         .style("cursor", "grab")
         .call(zoomBehavior)
         .on("dblclick.zoom", null); // disable d3 built-in dblclick zoom 
 
     // Reset button to animate back to original view
-    resetG.on("click", function() {
+    resetG.on("click", function () {
         overlayRect
             .transition().duration(400).ease(d3.easeCubicOut)
             .call(zoomBehavior.transform, d3.zoomIdentity);
@@ -398,7 +398,7 @@ function drawBarChart(data) {
 
 // hover an arc to see which pokemon belong to that type
 // hover over a ribbon to see which dual-type pokemon connect those two types 
-let chordTop    = H * 0.54;
+let chordTop = H * 0.54;
 let chordMargin = { top: 55, right: 20, bottom: 20, left: 20 };
 let chordHeight = H * 0.46 - chordMargin.top - chordMargin.bottom;
 let chordRadius = Math.min(W * 0.14, chordHeight) / 2 - 5;
@@ -407,14 +407,14 @@ let chordRadius = Math.min(W * 0.14, chordHeight) / 2 - 5;
 // matrix[i][j] = number of pokemon of type i and j
 // mono-type pokemon increment diagonal for arc visibility 
 function buildTypeMatrix(data) {
-    const n   = pokemonTypes.length;
+    const n = pokemonTypes.length;
     const mat = Array.from({ length: n }, () => new Array(n).fill(0));
-    data.forEach(function(d) {
+    data.forEach(function (d) {
         const i = typeIndex[d.Type_1];
         const j = typeIndex[d.Type_2];
         if (i === undefined) return;
         if (j !== undefined) { mat[i][j]++; mat[j][i]++; } // dual type = both directions 
-        else                 { mat[i][i]++; } // mono-type = self-loop 
+        else { mat[i][i]++; } // mono-type = self-loop 
     });
     return mat;
 }
@@ -445,9 +445,9 @@ function drawChord(data) {
 
     // type color legend 
     const chordLegRowH = Math.max(11, H * 0.016);
-    const chordLegFont = Math.max(7,  W * 0.005);
-    const colSize      = 9;
-    const colWidth     = Math.max(70, W * 0.055);   // scales with window
+    const chordLegFont = Math.max(7, W * 0.005);
+    const colSize = 9;
+    const colWidth = Math.max(70, W * 0.055);   // scales with window
 
     // position legend to right of chord circle 
     const chordLegG = svg.append("g")
@@ -455,13 +455,13 @@ function drawChord(data) {
 
     chordLegG.append("rect")
         .attr("x", -8).attr("y", -8)
-        .attr("width",  colWidth * 2 + 12)
+        .attr("width", colWidth * 2 + 12)
         .attr("height", colSize * chordLegRowH + 16)
-        .attr("fill",   "rgba(245,244,240,0.9)")
+        .attr("fill", "rgba(245,244,240,0.9)")
         .attr("rx", 5)
         .attr("stroke", "#ddd").attr("stroke-width", 0.8);
 
-    pokemonTypes.forEach(function(type, i) {
+    pokemonTypes.forEach(function (type, i) {
         const col = Math.floor(i / colSize);
         const row = i % colSize;
 
@@ -480,21 +480,21 @@ function drawChord(data) {
             .attr("fill", "#333")
             .text(type);
     });
-    
+
     renderChordLayout(data);
 }
 
 // draws the chord arcs, ribbons, and labels
 function renderChordLayout(data) {
-    chordTop    = H * 0.54;
+    chordTop = H * 0.54;
     chordHeight = H * 0.46 - chordMargin.top - chordMargin.bottom;
-    chordRadius = Math.max(40, Math.min(W * 0.14, chordHeight) / 2 - 5);  
+    chordRadius = Math.max(40, Math.min(W * 0.14, chordHeight) / 2 - 5);
 
-    const matrix      = buildTypeMatrix(data);
+    const matrix = buildTypeMatrix(data);
     const chordLayout = d3.chord().padAngle(0.04).sortSubgroups(d3.descending);
-    const chords      = chordLayout(matrix);
-    const arc         = d3.arc().innerRadius(chordRadius).outerRadius(chordRadius + 18);
-    const ribbon      = d3.ribbon().radius(chordRadius);
+    const chords = chordLayout(matrix);
+    const arc = d3.arc().innerRadius(chordRadius).outerRadius(chordRadius + 18);
+    const ribbon = d3.ribbon().radius(chordRadius);
 
     // outer arcs 
     // one per type, sized by how many pokemon of that type is selected 
@@ -503,14 +503,14 @@ function renderChordLayout(data) {
         .enter().append("path")
         .attr("class", "chord-arc")
         .attr("d", arc)
-        .attr("fill",   d => typeColor(pokemonTypes[d.index]))
+        .attr("fill", d => typeColor(pokemonTypes[d.index]))
         .attr("stroke", d => d3.rgb(typeColor(pokemonTypes[d.index])).darker())
         .attr("stroke-width", 0.5)
         .attr("opacity", 0) // start invisible for fade-in animation 
         .style("cursor", "pointer")
-        .on("mouseover", function(d) {
+        .on("mouseover", function (d) {
             const event = d3.event;
-            const type  = pokemonTypes[d.index];
+            const type = pokemonTypes[d.index];
 
             d3.select(this).attr("opacity", 1).attr("stroke-width", 2);
 
@@ -520,26 +520,26 @@ function renderChordLayout(data) {
                 .attr("opacity", r =>
                     (r.source.index === d.index || r.target.index === d.index) ? 0.75 : 0.05);
 
-            const primary   = data.filter(pk => pk.Type_1 === type);
+            const primary = data.filter(pk => pk.Type_1 === type);
             const secondary = data.filter(pk => pk.Type_2 === type);
-            const sample    = primary.slice(0, 4).map(pk => pk.Name).join(", ");
-            const more      = primary.length > 4 ? ` +${primary.length - 4} more` : "";
+            const sample = primary.slice(0, 4).map(pk => pk.Name).join(", ");
+            const more = primary.length > 4 ? ` +${primary.length - 4} more` : "";
 
             tooltip.style("display", "block")
                 .style("left", (event.pageX + 14) + "px")
-                .style("top",  (event.pageY - 38) + "px")
+                .style("top", (event.pageY - 38) + "px")
                 .html(`<strong style="color:${typeColor(type)}">${type}</strong><br>
                        <b>${primary.length}</b> primary · <b>${secondary.length}</b> secondary<br>
                        <hr style="margin:4px 0; border-color:#eee">
                        <em style="color:#888;font-size:10px">Primary type Pokémon:</em><br>
                        ${sample}${more}`);
         })
-        .on("mousemove", function() {                     // ← no event arg
+        .on("mousemove", function () {                     // ← no event arg
             const event = d3.event;
             tooltip.style("left", (event.pageX + 14) + "px")
-                   .style("top",  (event.pageY - 38) + "px");
+                .style("top", (event.pageY - 38) + "px");
         })
-        .on("mouseout", function() {
+        .on("mouseout", function () {
             d3.select(this).attr("opacity", 0.85).attr("stroke-width", 0.5);
             chordG.selectAll(".chord-ribbon")
                 .transition().duration(150).attr("opacity", 0.35);
@@ -558,16 +558,16 @@ function renderChordLayout(data) {
         .enter().append("text")
         .attr("class", "chord-label")
         .attr("dy", "0.35em")
-        .attr("font-size", Math.max(9, chordRadius * 0.09) + "px")   
+        .attr("font-size", Math.max(9, chordRadius * 0.09) + "px")
         .attr("font-family", "Georgia,serif")
         .attr("fill", "#222")
         .attr("opacity", 0)
-        .attr("transform", function(d) {
+        .attr("transform", function (d) {
             const angle = (d.startAngle + d.endAngle) / 2;
-            const r     = chordRadius + 42;    
-            const x     = Math.sin(angle) * r;
-            const y     = -Math.cos(angle) * r;
-            const rot   = (angle * 180 / Math.PI) - 90;
+            const r = chordRadius + 42;
+            const x = Math.sin(angle) * r;
+            const y = -Math.cos(angle) * r;
+            const rot = (angle * 180 / Math.PI) - 90;
             return `translate(${x},${y}) rotate(${rot > 90 ? rot + 180 : rot})`;
         })
         .attr("text-anchor", "middle")
@@ -582,12 +582,12 @@ function renderChordLayout(data) {
         .enter().append("path")
         .attr("class", "chord-ribbon")
         .attr("d", ribbon)
-        .attr("fill",    d => typeColor(pokemonTypes[d.source.index]))
+        .attr("fill", d => typeColor(pokemonTypes[d.source.index]))
         .attr("opacity", 0)
-        .attr("stroke",  "rgba(255,255,255,0.2)")
+        .attr("stroke", "rgba(255,255,255,0.2)")
         .attr("stroke-width", 0.5)
         .style("cursor", "pointer")
-        .on("mouseover", function(d) {
+        .on("mouseover", function (d) {
             const event = d3.event;
             d3.select(this).attr("opacity", 0.85);
             const t1 = pokemonTypes[d.source.index];
@@ -597,11 +597,11 @@ function renderChordLayout(data) {
                 (pk.Type_1 === t1 && pk.Type_2 === t2) ||
                 (pk.Type_1 === t2 && pk.Type_2 === t1));
             const sample = members.slice(0, 5).map(pk => pk.Name).join(", ");
-            const more   = members.length > 5 ? ` +${members.length - 5} more` : "";
+            const more = members.length > 5 ? ` +${members.length - 5} more` : "";
 
             tooltip.style("display", "block")
                 .style("left", (event.pageX + 14) + "px")
-                .style("top",  (event.pageY - 38) + "px")
+                .style("top", (event.pageY - 38) + "px")
                 .html(`<strong style="color:${typeColor(t1)}">${t1}</strong>
                        &nbsp;/&nbsp;
                        <strong style="color:${typeColor(t2)}">${t2}</strong>
@@ -611,12 +611,12 @@ function renderChordLayout(data) {
                        <em style="color:#888;font-size:10px">Pokémon in selection:</em><br>
                        ${sample}${more}`);
         })
-        .on("mousemove", function() {
+        .on("mousemove", function () {
             const event = d3.event;
             tooltip.style("left", (event.pageX + 14) + "px")
-                   .style("top",  (event.pageY - 38) + "px");
+                .style("top", (event.pageY - 38) + "px");
         })
-        .on("mouseout", function() {
+        .on("mouseout", function () {
             d3.select(this).attr("opacity", 0.35);
             hideTooltip();
         })
@@ -637,7 +637,7 @@ function updateChord(selectedData) {
     chordG.selectAll(".chord-arc, .chord-ribbon, .chord-label")
         .transition().duration(250)
         .attr("opacity", 0)
-        .on("end", function(d, i) {
+        .on("end", function (d, i) {
             if (i !== 0) return; // only trigger redraw once 
             chordG.selectAll(".chord-arc, .chord-ribbon, .chord-label").remove();
             renderChordLayout(selectedData);
@@ -651,14 +651,14 @@ function updateChord(selectedData) {
 // brush to select a subset, drives bar chart and chord updates
 // click legend to filter by type
 // double click legend row to isolate that type 
-let scatterLeft   = 0,     scatterTop = 0;
+let scatterLeft = 0, scatterTop = 0;
 let scatterMargin = { top: 115, right: 30, bottom: 50, left: 70 };  // left was 55
-let scatterWidth  = W * 0.38 - scatterMargin.left - scatterMargin.right;
-let scatterHeight = H * 0.48 - scatterMargin.top  - scatterMargin.bottom;
+let scatterWidth = W * 0.38 - scatterMargin.left - scatterMargin.right;
+let scatterHeight = H * 0.48 - scatterMargin.top - scatterMargin.bottom;
 
 // shared set of active types, shared by legend click and brush handler
 // help filtering and brushing stay in sync 
-let activeTypeFilter = new Set(); 
+let activeTypeFilter = new Set();
 
 function drawScatter(data) {
     pokemonTypes.forEach(t => activeTypeFilter.add(t));
@@ -726,7 +726,7 @@ function drawScatter(data) {
         .attr("class", "axis")
         .call(d3.axisLeft(y).ticks(5));
 
-    const dotGroup   = g.append("g");
+    const dotGroup = g.append("g");
 
     // dots - pointer-events disabled to help brush overlay capture all mouse events
     // tootip handled via nearest-dot search on brush overaly 
@@ -743,12 +743,12 @@ function drawScatter(data) {
         .attr("stroke-width", 0.5)
         .style("pointer-events", "none");
 
-        // pre-compute dot pixel positions for fast nearest-dot tooltip lookup 
-        const dotPositions = data.map(d => ({
-            px: x(+d.Attack),
-            py: y(+d.Defense),
-            d:  d
-        }));
+    // pre-compute dot pixel positions for fast nearest-dot tooltip lookup 
+    const dotPositions = data.map(d => ({
+        px: x(+d.Attack),
+        py: y(+d.Defense),
+        d: d
+    }));
 
     // tracks which Pokémon are currently inside the brush (null = no brush active)
     let brushActive = false;
@@ -756,10 +756,10 @@ function drawScatter(data) {
 
     // Legend
     // clickable to filter by type 
-    const legG    = g.append("g").attr("transform", `translate(${scatterWidth + 10}, 0)`);
+    const legG = g.append("g").attr("transform", `translate(${scatterWidth + 10}, 0)`);
     const legRowH = Math.max(13, H * 0.016);
     const legFont = Math.max(8, W * 0.006);
-    const legW    = Math.max(90, W * 0.075);
+    const legW = Math.max(90, W * 0.075);
 
 
     legG.append("rect")
@@ -769,8 +769,8 @@ function drawScatter(data) {
         .attr("fill", "rgba(245,244,240,0.9)").attr("rx", 5)
         .attr("stroke", "#ddd").attr("stroke-width", 0.8);
 
-    pokemonTypes.forEach(function(type, i) {
-           const row = legG.append("g")
+    pokemonTypes.forEach(function (type, i) {
+        const row = legG.append("g")
             .attr("transform", `translate(8, ${i * legRowH + 6})`)
             .attr("data-type", type)
             .style("cursor", "pointer");
@@ -787,9 +787,9 @@ function drawScatter(data) {
             .attr("font-size", legFont + "px")
             .attr("font-family", "Georgia,serif").attr("fill", "#333")
             .text(type);
-        
+
         // single click, toggle type on and off 
-        row.on("click", function() {
+        row.on("click", function () {
             if (activeTypeFilter.has(type)) {
                 activeTypeFilter.delete(type);
                 d3.select(this).select("circle").attr("fill", "#ccc");
@@ -802,7 +802,7 @@ function drawScatter(data) {
 
             scatterDots.transition().duration(200)
                 .attr("opacity", d => activeTypeFilter.has(d.Type_1) ? 0.75 : 0.0)
-                .attr("r",       d => activeTypeFilter.has(d.Type_1) ? 4 : 0);
+                .attr("r", d => activeTypeFilter.has(d.Type_1) ? 4 : 0);
 
             const filtered = data.filter(d => activeTypeFilter.has(d.Type_1));
             if (filtered.length > 0) {
@@ -812,12 +812,12 @@ function drawScatter(data) {
         });
 
         // double-click to isolate just that one type
-        row.on("dblclick", function() {
+        row.on("dblclick", function () {
             // If this is the only active type, restore all
             if (activeTypeFilter.size === 1 && activeTypeFilter.has(type)) {
                 // already isolated, restore all types 
                 pokemonTypes.forEach(t => activeTypeFilter.add(t));
-                pokemonTypes.forEach(function(t) {
+                pokemonTypes.forEach(function (t) {
                     legG.select(`g[data-type="${t}"] circle`).attr("fill", typeColor(t));
                     legG.select(`g[data-type="${t}"] text`).attr("fill", "#333");
                 });
@@ -830,7 +830,7 @@ function drawScatter(data) {
                 // isolate just this type, grey out all others 
                 activeTypes.clear();
                 activeTypes.add(type);
-                pokemonTypes.forEach(function(t) {
+                pokemonTypes.forEach(function (t) {
                     const on = activeTypeFilter.has(t);
                     legG.select(`g[data-type="${t}"] circle`)
                         .attr("fill", on ? typeColor(t) : "#ccc");
@@ -839,7 +839,7 @@ function drawScatter(data) {
                 });
                 scatterDots.transition().duration(200)
                     .attr("opacity", d => d.Type_1 === type ? 0.85 : 0.0)
-                    .attr("r",       d => d.Type_1 === type ? 4 : 0);
+                    .attr("r", d => d.Type_1 === type ? 4 : 0);
                 const filtered = data.filter(d => d.Type_1 === type);
                 updateBarChart(filtered, `${filtered.length} ${type} Pokémon`);
                 updateChord(filtered);
@@ -852,7 +852,7 @@ function drawScatter(data) {
     // filtered out types are excluded from selection 
     const brush = d3.brush()
         .extent([[0, 0], [scatterWidth, scatterHeight]])
-        .on("brush end", function() {
+        .on("brush end", function () {
             const sel = d3.event.selection;
 
             if (!sel) {
@@ -861,7 +861,7 @@ function drawScatter(data) {
                 brushSelectedSet.clear();
 
                 // Restore legend rows to match activeTypeFilter
-                pokemonTypes.forEach(function(t) {
+                pokemonTypes.forEach(function (t) {
                     const on = activeTypeFilter.has(t);
                     legG.select(`g[data-type="${t}"] circle`)
                         .attr("fill", on ? typeColor(t) : "#ccc");
@@ -871,7 +871,7 @@ function drawScatter(data) {
 
                 scatterDots.transition().duration(200)
                     .attr("opacity", d => activeTypeFilter.has(d.Type_1) ? 0.75 : 0.0)
-                    .attr("r",       d => activeTypeFilter.has(d.Type_1) ? 4 : 0);
+                    .attr("r", d => activeTypeFilter.has(d.Type_1) ? 4 : 0);
                 const filtered = data.filter(d => activeTypeFilter.has(d.Type_1));
                 updateBarChart(filtered, `All ${filtered.length} Pokémon`);
                 updateChord(filtered);
@@ -885,17 +885,17 @@ function drawScatter(data) {
                 const cx = x(+d.Attack);
                 const cy = y(+d.Defense);
                 return cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1
-                    && activeTypeFilter.has(d.Type_1);  
+                    && activeTypeFilter.has(d.Type_1);
             });
 
             // dim dots outside brush, keep filtered out types fully hidden 
             scatterDots.transition().duration(200)
-                .attr("opacity", function(d) {
-                    if (!activeTypeFilter.has(d.Type_1)) return 0.0;  
+                .attr("opacity", function (d) {
+                    if (!activeTypeFilter.has(d.Type_1)) return 0.0;
                     const cx = x(+d.Attack), cy = y(+d.Defense);
                     return (cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1) ? 0.85 : 0.08;
                 })
-                .attr("r", function(d) {
+                .attr("r", function (d) {
                     if (!activeTypeFilter.has(d.Type_1)) return 0;
                     const cx = x(+d.Attack), cy = y(+d.Defense);
                     return (cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1) ? 5 : 3;
@@ -911,7 +911,7 @@ function drawScatter(data) {
                 const typesInBrush = new Set(selected.map(d => d.Type_1));
 
                 // grey out legend rows for types not in brush
-               pokemonTypes.forEach(function(t) {
+                pokemonTypes.forEach(function (t) {
                     const inBrush = typesInBrush.has(t);
                     legG.select(`g[data-type="${t}"] circle`)
                         .attr("fill", inBrush ? typeColor(t) : "#ccc");
@@ -926,42 +926,42 @@ function drawScatter(data) {
 
     g.append("g").attr("class", "brush").call(brush);
 
-// tooltip via brush overlay 
-// dots have pointer-events:none so we intercept mousemove on the overlay and find the nearest dot
-g.select(".brush .overlay")
-    .on("mousemove.tooltip", function() {
-        const [mx, my] = d3.mouse(this);
+    // tooltip via brush overlay 
+    // dots have pointer-events:none so we intercept mousemove on the overlay and find the nearest dot
+    g.select(".brush .overlay")
+        .on("mousemove.tooltip", function () {
+            const [mx, my] = d3.mouse(this);
 
-        // Find nearest dot within 12px
-        let nearest = null, nearestDist = 12;
-        dotPositions.forEach(function(pos) {
-            const dist = Math.hypot(pos.px - mx, pos.py - my);
-            if (dist < nearestDist) {
-                nearest = pos.d;
-                nearestDist = dist;
-            }
-        });
+            // Find nearest dot within 12px
+            let nearest = null, nearestDist = 12;
+            dotPositions.forEach(function (pos) {
+                const dist = Math.hypot(pos.px - mx, pos.py - my);
+                if (dist < nearestDist) {
+                    nearest = pos.d;
+                    nearestDist = dist;
+                }
+            });
 
-        // if brush is active, only show tooltip for dots inside the selection
-        if (nearest && (!brushActive || brushSelectedSet.has(nearest.Name))) {
-            tooltip.style("display", "block")
-                .style("left", (d3.event.pageX + 14) + "px")
-                .style("top",  (d3.event.pageY - 38) + "px")
-                .html(`<strong>${nearest.Name}</strong><br>
+            // if brush is active, only show tooltip for dots inside the selection
+            if (nearest && (!brushActive || brushSelectedSet.has(nearest.Name))) {
+                tooltip.style("display", "block")
+                    .style("left", (d3.event.pageX + 14) + "px")
+                    .style("top", (d3.event.pageY - 38) + "px")
+                    .html(`<strong>${nearest.Name}</strong><br>
                        Type: ${nearest.Type_1}${nearest.Type_2 ? " / " + nearest.Type_2 : ""}<br>
                        Attack: <strong>${nearest.Attack}</strong>
                        &nbsp; Defense: <strong>${nearest.Defense}</strong><br>
                        Total: <strong>${nearest.Total}</strong>`);
-        } else {
-            hideTooltip();
-        }
-    })
-    .on("mouseleave.tooltip", hideTooltip);
+            } else {
+                hideTooltip();
+            }
+        })
+        .on("mouseleave.tooltip", hideTooltip);
 }
 
 // load data 
 // stores data globally, help resize handler to redraw without re-fetching info
-d3.csv("data/pokemon_alopez247.csv").then(function(data) {
+d3.csv("data/pokemon_alopez247.csv").then(function (data) {
     window._lastData = data;
     drawScatter(data);
     drawBarChart(data);
