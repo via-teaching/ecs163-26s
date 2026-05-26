@@ -224,6 +224,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     Catch_Rate: parseInt(d.Catch_Rate),
     Type_1: d.Type_1,
     Number: d.Number,
+    Name: d.Name,
   }));
 
   // Plot Title
@@ -234,7 +235,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .attr("text-anchor", "middle")
     .style("font-size", `${chartDims.scatter.innerWidth / 504.1666666667}rem`)
     .style("font-weight", "bold")
-    .text("Total Stats vs Catch Rate %");
+    .text("Total Stats vs Catch Rate");
 
   // Create x and y axis
 
@@ -289,7 +290,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     )
     .attr("text-anchor", "middle")
     .attr("font-size", "14px")
-    .text("Catch Rate %");
+    .text("Catch Rate");
 
   // Draw circles
   const r = 5;
@@ -307,6 +308,9 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .style("fill-opacity", 0.9)
     .style("stroke", "black")
     .style("stroke-width", 0.8);
+
+  // Circle title
+  circles.append("title").text((d) => `Name: ${d.Name}\nTotal Stats: ${d.Total}\nCatch Rate: ${d.Catch_Rate}`);
 
   // plot 3: Parallel Coordinates Plot
   // Source: https://observablehq.com/@d3/brushable-parallel-coordinates?collection=@d3/d3-brush
