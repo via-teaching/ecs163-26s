@@ -1,4 +1,4 @@
-// barChart.js - Grouped Percentage Distribution Module
+// barChart.js 
 function drawBarChart(newData) {
     // d3.select() crreate the d3 selection object
     const svg = d3.select("svg");
@@ -58,8 +58,26 @@ function drawBarChart(newData) {
     const gBar = svg.append("g")
         .attr("transform", `translate(${distrLeft + 50}, ${distrTop + 40})`);
 
+    // --- ZOOM SETTINGS & CLIP PATH FRAME ---
+    // Unique ID clip rectangle stops bars from running over axes boundaries when panned
+    const clipId = "bar-chart-clip";
+    svg.append("defs").append("clipPath")
+        .attr("id", clipId)
+      .append("rect")
+        .attr("width", distrWidth)
+        .attr("height", distrHeight + 100) // Extra bottom breathing room for text labels
+        .attr("y", -10);
+
+    // Separate group container for static backdrops (Y-axis, labels) vs zoomable content
+    const staticAxisG = gBar.append("g").attr("class", "static-axis-layer");
+    
+    // Zoomable data pad group clipped to frame
+    const zoomableContentG = gBar.append("g")
+        .attr("class", "zoomable-content-layer")
+        .attr("clip-path", `url(#${clipId})`);
+
     // Create elements for each group 
-    const genreGroups = gBar.selectAll(".genre-group")
+    const genreGroups = zoomableContentG.selectAll(".genre-group")
         .data(effectData)
         .enter().append("g")
         .attr("class", "genre-group")
@@ -76,24 +94,27 @@ function drawBarChart(newData) {
         .attr("fill", d => effectColors(d.key));
 
     // Generate the bottom axis with d3.axisBottom()
-    gBar.append("g")
-        .attr("transform", `translate(0, ${distrHeight})`)
-        .call(d3.axisBottom(x0))
+    const xAxisG = zoomableContentG.append("g")
+        .attr("class", "x-axis")
+        .attr("transform", `translate(0, ${distrHeight})`);
+
+    xAxisG.call(d3.axisBottom(x0))
         .selectAll("text")
         .attr("transform", "rotate(-45)")
         .style("text-anchor", "end")
         .style("font-size", "10px");
 
     // Ensures it shows as percentage, d3axisLeft() generates the vertical axis
-    gBar.append("g")
+    staticAxisG.append("g")
         .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".0%"))); 
 
     //  Add a Legend to the right side of the graph
-    const barlegend = gBar.append("g")
+    const barlegend = staticAxisG.append("g")
         .attr("transform", `translate(${distrWidth - 60}, -10)`);
 
     // Add Title to the Bar chart
     svg.append("text")
+        .attr("class", "bar-chart-main-title")
         .attr("x", distrLeft + 10)
         .attr("y", distrTop + 27)
         .style("font-weight", "bold")
@@ -101,7 +122,7 @@ function drawBarChart(newData) {
         .text("Does Listening To Music Improve Mental Health?");
 
     // x axis label
-    gBar.append("text")
+    staticAxisG.append("text")
         .attr("x", distrWidth / 2)
         .attr("y", distrHeight + 40)
         .style("font-weight", "bold")
@@ -110,7 +131,7 @@ function drawBarChart(newData) {
         .text("Genres of Music");
 
     // Y label
-    gBar.append("text")
+    staticAxisG.append("text")
         .attr("x", -(distrHeight / 2))
         .attr("y", -45)
         .style("font-weight", "bold")

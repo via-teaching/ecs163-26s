@@ -140,4 +140,28 @@ function drawScatterPlot(newData, genreCounts) {
             }
         });
     });
+
+    
+    const brush = d3.brush()
+        .extent([[60, 40], [scatterWidth+ 65, scatterHeight + 40]])
+        .on("start brush end", brushed)
+
+    svg.append("g")
+        .attr("class", "brush")
+        .call(brush);
+    
+    function brushed() {
+        const selection = d3.event.selection;
+        if (selection) {
+            const [[x0, y0], [x1, y1]] = selection;
+            // Search your scatter plot circles to see which ones are inside these pixel coordinates
+            circle.classed("selected", d => {
+                return x0 <= xScale(d.Age) && xScale(d.Age) <= x1 &&
+                   y0 <= yScale(d.Score) && yScale(d.Score) <= y1;
+            });
+        }
+    }  
+
+
+    
 }
