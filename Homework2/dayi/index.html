@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" style="width:100%;height:100%;">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Data Science Salaries Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+</head>
+
+<body style="width:100%;height:100%;margin:0; overflow:hidden;">
+    <div id="container">
+        <div id="top-half"></div>
+        <div id="bottom-half">
+            <div id="bottom-left"></div>
+            <div id="bottom-right"></div>
+        </div>
+    </div>
+
+    <div id="hover-tooltip" class="tooltip"></div>
+    <script src="sankeyChart.js"></script>
+    <script src="barChart.js"></script>
+    <script src="scatterPlot.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>
