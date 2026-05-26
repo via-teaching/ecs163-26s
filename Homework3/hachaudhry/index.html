@@ -1,0 +1,197 @@
+<!doctype html>
+<html style="width:100%;height:100%;">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Global Terrorism Dashboard (1970–2017)</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #12131a;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #header {
+      flex-shrink: 0;
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      padding: 5px 14px;
+      background: #1a1b26;
+      border-bottom: 1px solid #2d2e3e;
+    }
+    #header h1  { font-size: 13px; font-weight: 600; color: #e05c5c; letter-spacing: 0.4px; }
+    #subtitle   { font-size: 10px; color: #555; }
+
+    #dashboard {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    #top-row {
+      flex: 0 0 63%;
+      display: flex;
+      min-height: 0;
+    }
+
+    #map-panel {
+      flex: 0 0 56%;
+      position: relative;
+      border-right: 1px solid #2d2e3e;
+      min-width: 0;
+    }
+
+    #stream-panel {
+      flex: 1;
+      position: relative;
+      min-width: 0;
+    }
+
+    #bar-panel {
+      flex: 1;
+      position: relative;
+      border-top: 1px solid #2d2e3e;
+      min-height: 0;
+    }
+
+    .panel-title {
+      position: absolute;
+      top: 5px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    svg { display: block; width: 100%; height: 100%; }
+
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 19, 26, 0.93);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      font-size: 13px;
+      color: #666;
+      gap: 14px;
+    }
+    #loading .spinner {
+      width: 30px; height: 30px;
+      border: 3px solid #2d2e3e;
+      border-top-color: #e05c5c;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #tooltip {
+      position: fixed;
+      background: rgba(22, 23, 35, 0.97);
+      border: 1px solid #3a3b4e;
+      padding: 8px 11px;
+      border-radius: 6px;
+      font-size: 11px;
+      line-height: 1.65;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.08s;
+      z-index: 200;
+      max-width: 210px;
+    }
+    #tooltip strong { color: #e05c5c; display: block; margin-bottom: 1px; }
+
+    .axis text    { fill: #555; font-size: 10px; }
+    .axis .domain { stroke: #2d2e3e; }
+    .axis .tick line { stroke: #2d2e3e; }
+    .axis-label   { fill: #555; font-size: 10px; }
+
+    .grid line   { stroke: #1e1f2a; stroke-dasharray: 3,3; }
+    .grid .domain { stroke: none; }
+
+    /* d3-brush selection styling for dark theme */
+    .brush .selection {
+      fill: rgba(240, 208, 96, 0.18);
+      stroke: #f0d060;
+      stroke-width: 1;
+    }
+    .brush .handle {
+      fill: #f0d060;
+      opacity: 0.6;
+    }
+    .brush .overlay {
+      cursor: crosshair;
+    }
+
+    /* zoom hint on map */
+    #zoom-hint {
+      position: absolute;
+      bottom: 6px;
+      right: 8px;
+      font-size: 9px;
+      color: #444;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="header">
+    <h1>Global Terrorism Dashboard &mdash; 1970&ndash;2017</h1>
+    <span id="subtitle">Click a country to filter by region &nbsp;·&nbsp; Drag the strip below the stream to filter years &nbsp;·&nbsp; 181,693 incidents</span>
+  </div>
+
+  <div id="dashboard">
+
+    <div id="top-row">
+
+      <div id="map-panel">
+        <div class="panel-title">Attacks by Country &mdash; Overview</div>
+        <svg id="map-svg"></svg>
+        <div id="zoom-hint">Scroll/pinch to zoom &nbsp;·&nbsp; Drag to pan &nbsp;·&nbsp; Dbl-click to reset</div>
+      </div>
+
+      <div id="stream-panel">
+        <div class="panel-title" id="stream-title">Attack Methods Over Time &mdash; Focus</div>
+        <svg id="stream-svg"></svg>
+      </div>
+
+    </div>
+
+    <div id="bar-panel">
+      <div class="panel-title" id="bar-title">Casualties by Region &mdash; Focus</div>
+      <svg id="bar-svg"></svg>
+    </div>
+
+  </div>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <span>Loading 181,693 records&hellip;</span>
+  </div>
+
+  <div id="tooltip"></div>
+
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script src="main.js"></script>
+
+</body>
+</html>
