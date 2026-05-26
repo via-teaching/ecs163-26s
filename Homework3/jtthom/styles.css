@@ -1,0 +1,103 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #f5f7fb;
+      font-family: Arial, sans-serif;
+      color: #1f2a44;
+      padding: 20px;
+    }
+
+    .dashboard-header {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .dashboard-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1f2a44;
+    }
+    .dashboard-header p {
+      font-size: 11px;
+      color: #6b7a99;
+      margin-top: 4px;
+    }
+
+    .card {
+      background: #fff;
+      border: 2px solid #c9d5eb;
+      border-radius: 18px;
+      padding: 16px 20px 12px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1f2a44;
+    }
+    .card-subtitle {
+      font-size: 11px;
+      color: #6b7a99;
+      margin-top: 3px;
+      margin-bottom: 8px;
+    }
+
+    .heatmap-legend {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 8px;
+      font-size: 11px;
+      color: #1f2a44;
+      align-items: center;
+    }
+    .legend-swatch {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+    .sankey-card  { margin-bottom: 16px; }
+
+    .bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .chart-svg { 
+      display: block; 
+      width: 100%; overflow: 
+      visible; }
+
+    .sankey-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #1f2a44;
+      margin-bottom: 8px;
+    }
+    .sankey-legend span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sankey-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      opacity: 0.85;
+    }
+
+    .filter-badge {
+      font-size: 11px;
+      font-weight: 600;
+      color: #355da8;
+      float: right;
+      margin-top: -2px;
+    }
+
+    @media (max-width: 800px) {
+      .bottom-row { grid-template-columns: 1fr; }
+    }
