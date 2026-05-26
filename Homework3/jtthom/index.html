@@ -1,0 +1,70 @@
+<!doctype html>
+<html style="width:100%;min-height:100%;">
+<head>
+  <meta charset="utf-8">
+  <title>Student Mental Health Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="dashboard-header">
+    <h1>Student Mental Health Dashboard</h1>
+    <p>Click a heatmap row to filter by mental health. Drag the year bar to filter by year. Hover sankey flows for details</p>
+  </div>
+
+  <div class="card sankey-card">
+    <div class="card-title">
+      Study Year, Mental Health Issues, and Treatment Seeking
+      <span class="filter-badge" id="sankey-filter-badge"></span>
+    </div>
+    <div class="sankey-legend">
+      <span><i class="sankey-dot" style="background:#4C78A8"></i>Year 1</span>
+      <span><i class="sankey-dot" style="background:#72B7B2"></i>Year 2</span>
+      <span><i class="sankey-dot" style="background:#F2CF5B"></i>Year 3</span>
+      <span><i class="sankey-dot" style="background:#B279A2"></i>Year 4</span>
+      <span><i class="sankey-dot" style="background:#4f7cff"></i>Sought Treatment</span>
+      <span><i class="sankey-dot" style="background:#aeb8cc"></i>No Treatment</span>
+    </div>
+    <svg id="sankey-svg" class="chart-svg"></svg>
+  </div>
+
+  <!-- heatmap and overlap row -->
+  <div class="bottom-row">
+    <div class="card">
+      <div class="card-title">Mental Health Issues by Study Year</div>
+      <div class="card-subtitle">Click a row to filter by mental health. Drag the year bar to filter by year</div>
+      <div class="heatmap-legend">
+        <span><i class="legend-swatch" style="background:#c9d5eb"></i>Lower Count</span>
+        <span><i class="legend-swatch" style="background:#355da8"></i>Higher Count</span>
+      </div>
+      <svg id="heatmap-svg" class="chart-svg"></svg>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Top 3 Mental Health Overlaps</div>
+      <svg id="overlap-svg" class="chart-svg"></svg>
+    </div>
+
+  </div>
+
+  <!-- sankey tooltip -->
+  <div id="flow-tooltip" style="
+    position: fixed;
+    pointer-events: none;
+    opacity: 0;
+    background: #233f73;
+    color: #fff;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    line-height: 1.5;
+    transition: opacity 0.15s;
+    max-width: 280px;
+    box-shadow: 0 4px 12px rgba(35,63,115,0.25);
+  "></div>
+
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
