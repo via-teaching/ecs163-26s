@@ -2,31 +2,56 @@
 // Pokémon Stats Dashboard — main.js
 // ECS 163 Homework 3  |  rlsayar
 //
-// Three interactions + a meaningful animated transition:
+// DESIGN THEME: Focus + Context for data exploration
+// ───────────────────────────────────────────────────
+//   The three views form a classic overview-first, drill-down-second
+//   pipeline:
 //
-//   INTERACTION 1 — Selection (click a dot or PCP line)
-//     Click a scatter dot or PCP line to single-select; cross-highlights
-//     across all three views.  Click again to deselect.
+//   BAR CHART (Context / Overview)
+//     A horizontal count of Pokémon per primary type gives the audience
+//     an instant sense of the dataset's composition.  It was chosen
+//     because type is the most salient categorical variable and a bar
+//     chart is the clearest way to compare 18 unordered categories.
+//     When a lasso selection is active, an overlay bar layer shows the
+//     selected sub-count so the viewer can instantly judge the type mix
+//     of any region in the scatter.
 //
-//   INTERACTION 2 — Brushing (d3.brush on scatter, Individual mode)
-//     Drag a rectangle over dots to select a subset.  The bar chart
-//     overlays solid colored bars (selected count) on top of faded
-//     bars (total count) so the share is visually obvious.  PCP dims
-//     non-matching polylines.
+//   SCATTER PLOT (Focus — offensive vs. defensive trade-off)
+//     Uses composite axes (Offence = Atk + SpAtk, Defence = HP + Def +
+//     SpDef) to surface the single most interesting structural split in
+//     Pokémon stats: physical/special attackers vs. bulky walls.  A
+//     freehand lasso lets users draw an irregular selection (better than
+//     a rectangle for clusters that are not axis-aligned).  The view
+//     supports three modes that animate in-place: Individual dots,
+//     per-type convex hulls (with a spotlight sequence highlighting each
+//     hull's boundary), and k-means clusters.
 //
-//   TRANSITION — Visualization Change / Filtering (≈800 ms ease-cubic)
-//     Switching scatter/PCP mode does NOT clear and redraw.  Each
-//     individual Pokémon dot/line is persistent and animates from
-//     its individual position to its group's centroid:
-//        Individual → Type Avg    : each dot moves to its type's centroid
-//        Individual → K-Means     : each dot moves to its cluster's centroid
-//     This makes the grouping itself the focus of the animation —
-//     you literally see which Pokémon get fit into which category.
-//     Group decorations (type labels, cluster rings) fade in/out as
-//     dots arrive.  Same idea is mirrored in the PCP for polylines.
+//   PCP — Parallel Coordinates (Focus — six-stat profiles)
+//     Reveals the full HP/Atk/Def/SpAtk/SpDef/Speed profile of any
+//     Pokémon or group.  In Individual mode it acts as a "probe" —
+//     blank until a dot is hovered or lasso-selected, then shows the
+//     relevant polyline(s).  In Type/Cluster mode it renders one clean
+//     centroid ribbon per group so the viewer can compare stat shapes
+//     across 18 types or 5 k-means archetypes.
 //
-// All three views share one type-color palette and a clickable
-// legend that filters every view simultaneously with a smooth fade.
+//   INTERACTION 1 — Single selection (click a scatter dot or PCP line)
+//     Cross-highlights across all three views; click again to deselect.
+//
+//   INTERACTION 2 — Lasso selection (freehand drag in Individual scatter mode)
+//     Draws a polygon; Pokémon inside are highlighted and counted per
+//     type in the bar chart.  PCP shows all matching polylines at once.
+//
+//   TRANSITION — Mode morph (≈800 ms ease-cubic-in-out)
+//     Switching scatter/PCP modes does NOT redraw — each persistent
+//     dot/line animates to its group's centroid position.  In the
+//     scatter's Type mode the animation is staged: a spotlight sequence
+//     walks through each type, highlighting its convex hull boundary
+//     before fading all dots to faint.  In K-Means mode the dots dim
+//     then flash cluster-by-cluster as they converge.  The PCP mirrors
+//     this with staggered polyline morphs.
+//
+// All three views share one type-color palette and a clickable legend
+// that filters every view simultaneously with a smooth fade.
 // ============================================================
 
 // ── Shared type color palette ────────────────────────────────
@@ -215,7 +240,9 @@ function drawBarChart(data) {
   const iW = W - m.left - m.right;
   const iH = H - m.top  - m.bottom;
 
+  // root SVG for the bar chart, sized to fill the container div
   const svg = d3.select('#bar-chart').append('svg').attr('width', W).attr('height', H);
+  // margin group so axes and bars respect the padding insets
   const g   = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
 
   const counts = Array.from(
@@ -223,17 +250,19 @@ function drawBarChart(data) {
     ([type, count]) => ({ type, count })
   ).sort((a, b) => b.count - a.count);
 
+  // ordinal y-scale mapping each type name to a horizontal band
   const yScale = d3.scaleBand().domain(counts.map(d => d.type)).range([0, iH]).padding(0.22);
+  // linear x-scale for count, extended to a round number so grid aligns nicely
   const xScale = d3.scaleLinear().domain([0, d3.max(counts, d => d.count)]).range([0, iW]).nice();
 
-  // Vertical grid lines
+  // subtle vertical gridlines anchored to axis tick positions for count readability
   g.selectAll('.x-grid').data(xScale.ticks(5)).join('line')
     .attr('class', 'x-grid')
     .attr('x1', d => xScale(d)).attr('x2', d => xScale(d))
     .attr('y1', 0).attr('y2', iH)
     .attr('stroke', '#eee').attr('stroke-dasharray', '3,3');
 
-  // BACKGROUND bars (always at full width = total count)
+  // BACKGROUND bars — always span the full type count; faded to ~0.22 when a lasso is active
   const bgBars = g.selectAll('.bg-bar').data(counts).join('rect')
     .attr('class', 'bg-bar')
     .attr('x', 0).attr('y', d => yScale(d.type))
@@ -241,7 +270,7 @@ function drawBarChart(data) {
     .attr('height', yScale.bandwidth())
     .attr('fill', d => typeColor(d.type)).attr('rx', 3);
 
-  // SELECTION OVERLAY bars (initially width 0, grow when brush active)
+  // SELECTION OVERLAY bars — grow from 0 to show how many of a type are lasso-selected
   const selBars = g.selectAll('.sel-bar').data(counts).join('rect')
     .attr('class', 'sel-bar')
     .attr('x', 0).attr('y', d => yScale(d.type))
@@ -250,6 +279,7 @@ function drawBarChart(data) {
     .attr('fill', d => typeColor(d.type)).attr('rx', 3)
     .attr('opacity', 0);
 
+  // count labels to the right of each bar; switch to "sel / total" format during lasso
   const barLabels = g.selectAll('.bar-label').data(counts).join('text')
     .attr('class', 'bar-label')
     .attr('x', d => xScale(d.count) + 4)
@@ -257,17 +287,20 @@ function drawBarChart(data) {
     .attr('dy', '0.35em').attr('fill', '#555').attr('font-size', '11px')
     .text(d => d.count);
 
+  // left axis — type names as labels, no domain line (bars serve as the visual boundary)
   const yAxis = g.append('g').attr('class', 'axis y-axis')
     .call(d3.axisLeft(yScale).tickSize(0).tickPadding(6))
     .call(a => a.select('.domain').remove());
   yAxis.selectAll('text').attr('fill', '#333').attr('font-size', '11px').attr('font-weight', '600');
 
+  // bottom count axis with light domain stroke so it doesn't compete with bars
   g.append('g').attr('class', 'axis x-axis')
     .attr('transform', `translate(0,${iH})`)
     .call(d3.axisBottom(xScale).ticks(5))
     .call(a => a.select('.domain').attr('stroke', '#ccc'))
     .selectAll('text').attr('fill', '#555');
 
+  // x-axis label clarifies that alternate/mega forms are excluded from counts
   g.append('text').attr('class', 'axis-label')
     .attr('x', iW / 2).attr('y', iH + 28)
     .attr('text-anchor', 'middle').attr('fill', '#777').attr('font-size', '11px')
@@ -286,6 +319,7 @@ function drawBarChart(data) {
     }
     const selType = selectedName ? nameToType1.get(selectedName) : null;
 
+    // fade background bars out when a lasso is active so the overlay bars read clearly
     bgBars.transition().duration(FADE_MS).attr('opacity', d => {
       if (!activeTypes.has(d.type)) return 0.07;
       if (brushedCounts) return 0.22;                    // brush active → fade
@@ -293,10 +327,12 @@ function drawBarChart(data) {
       return 1;
     });
 
+    // grow/shrink the overlay bars and toggle their visibility with lasso state
     selBars.transition().duration(FADE_MS)
       .attr('opacity', d => brushedCounts && activeTypes.has(d.type) ? 1 : 0)
       .attr('width', d => brushedCounts ? xScale(brushedCounts.get(d.type) || 0) : 0);
 
+    // slide count labels right of whichever bar is wider; swap text to "sel / total" during lasso
     barLabels.transition().duration(FADE_MS)
       .attr('opacity', d => activeTypes.has(d.type) ? 1 : 0)
       .attr('x', d => {
@@ -309,6 +345,7 @@ function drawBarChart(data) {
         return `${sel} / ${d.count}`;
       });
 
+    // dim tick labels for types that have been toggled off in the legend
     yAxis.selectAll('.tick').transition().duration(FADE_MS)
       .attr('opacity', d => activeTypes.has(d) ? 1 : 0.15);
   };
@@ -332,18 +369,24 @@ function drawScatter(data) {
   const iW = W - m.left - m.right;
   const iH = H - m.top  - m.bottom;
 
+  // shared tooltip div — one instance reused across all three views
   const tip = d3.select('body')
     .selectAll('.tooltip').data([null]).join('div')
     .attr('class', 'tooltip').style('opacity', 0);
 
+  // root SVG for the scatter plot
   const svg = d3.select('#scatter-plot').append('svg').attr('width', W).attr('height', H);
+  // margin group so the plot area is inset from the SVG edges
   const g   = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
 
   // Composite axes: offence = Attack + Sp.Atk  |  defence = HP + Defense + Sp.Def
+  // linear scale for the composite offence axis (Attack + Sp.Atk)
   const baseXScale = d3.scaleLinear()
     .domain([0, d3.max(data, d => d.offence) + 20]).range([0, iW]);
+  // linear scale for the composite defence axis (HP + Defense + Sp.Def), inverted so 0 is at bottom
   const baseYScale = d3.scaleLinear()
     .domain([0, d3.max(data, d => d.defence) + 20]).range([iH, 0]);
+  // sqrt scale for dot radius so area (not radius) encodes total base stats
   const rScale = d3.scaleSqrt()
     .domain(d3.extent(data, d => d.total)).range([2.5, 9]);
 
@@ -371,6 +414,7 @@ function drawScatter(data) {
     c.offence = d3.mean(members, d => d.offence);
     c.defence = d3.mean(members, d => d.defence);
   });
+  // sqrt scale mapping cluster member count to ring radius — larger clusters get proportionally bigger rings
   const countScale = d3.scaleSqrt()
     .domain([0, d3.max(centroids, d => d.count)]).range([14, 30]);
 
@@ -398,10 +442,12 @@ function drawScatter(data) {
   // diagonal up by the average HP so the reference is meaningful.
   const meanHP   = d3.mean(data, d => d.hp);
   const diagEndX = Math.min(d3.max(data, d => d.offence), d3.max(data, d => d.defence) - meanHP);
+  // diagonal reference line: defence = offence + meanHP — Pokémon above it skew defensive
   const atkDefLine = g.append('line').attr('class', 'atk-def-line')
     .attr('x1', xScale(0)).attr('y1', yScale(meanHP))
     .attr('x2', xScale(diagEndX)).attr('y2', yScale(diagEndX + meanHP))
     .attr('stroke', '#ccc').attr('stroke-dasharray', '5,4').attr('stroke-width', 1);
+  // annotation for the diagonal so viewers understand what "balanced" means
   const atkDefLabel = g.append('text').attr('class', 'atk-def-label')
     .attr('x', xScale(diagEndX) - 4).attr('y', yScale(diagEndX + meanHP) - 6)
     .attr('fill', '#aaa').attr('font-size', '10px').attr('text-anchor', 'end')
@@ -414,9 +460,11 @@ function drawScatter(data) {
   const topByDef = [...data].sort((a,b) => b.defence - a.defence).slice(0, 5);
   const outlierSet = new Map();
   [...topByAtk, ...topByDef].forEach(d => { if (!outlierSet.has(d.name)) outlierSet.set(d.name, d); });
+  // container for outlier name labels — hidden in type/cluster modes where positions are meaningless
   const outlierG = g.append('g').attr('class', 'outlier-layer')
     .style('display', scatterMode === 'all' ? null : 'none');
   outlierSet.forEach(d => {
+    // name label for each extreme Pokémon — anchored so it doesn't overlap its dot
     outlierG.append('text')
       .attr('class', 'outlier-label')
       .attr('x', baseXScale(d.offence) + (d.offence > maxAtk * 0.7 ? -4 : 6))
@@ -433,11 +481,11 @@ function drawScatter(data) {
   let lassoActive  = false;
   let lassoWasDrag = false;
 
-  // Hull layer — convex-hull polygons per type (sits UNDER dots in SVG order)
+  // layer that holds convex-hull paths — sits below dots so hulls don't occlude them
   const hullG = g.append('g').attr('class', 'hull-layer');
 
-  // Transparent overlay catches background mousedown to start the lasso.
-  // It lives under the dots; a click on a dot goes to the dot first (stopPropagation).
+  // full-plot transparent rect that catches mousedown events to begin a lasso;
+  // positioned below dots so a click on a dot fires the dot's handler first
   const lassoOverlay = g.append('rect')
     .attr('class', 'lasso-overlay')
     .attr('width', iW).attr('height', iH)
@@ -445,6 +493,7 @@ function drawScatter(data) {
     .style('cursor', 'crosshair');
 
   // ── DOTS (persistent across modes) ─────────────────────────
+  // one circle per Pokémon — never destroyed; their positions animate during mode changes
   const dots = g.selectAll('.dot').data(data).join('circle')
     .attr('class', 'dot')
     .attr('cx', d => xScale(d.offence)).attr('cy', d => yScale(d.defence))
@@ -492,7 +541,7 @@ function drawScatter(data) {
       tip.transition().duration(150).style('opacity', 0);
     });
 
-  // ── Lasso path (on top of dots — shows freehand outline while drawing) ──
+  // freehand polygon drawn by the user while lassoeing — rendered above dots so it's always visible
   const lassoPath = g.append('path')
     .attr('class', 'lasso-path')
     .attr('fill', 'rgba(99,144,240,0.10)')
@@ -565,13 +614,16 @@ function drawScatter(data) {
   });
 
   // ── Type centroid decorations (rings + labels) ────────────
+  // group for per-type average markers — fades in/out with the Type mode toggle
   const typeDecor = g.append('g').attr('class', 'type-decor').style('opacity', scatterMode === 'type' ? 1 : 0);
+  // small rings marking each type's average position on the Offence/Defence plane
   typeDecor.selectAll('.type-ring').data(typeAvgsArr).join('circle')
     .attr('class', 'type-ring')
     .attr('cx', d => xScale(d.offence)).attr('cy', d => yScale(d.defence))
     .attr('r', 14)
     .attr('fill', 'none').attr('stroke', d => typeColor(d.type)).attr('stroke-width', 2)
     .attr('opacity', 0.7);
+  // type name + member count label above each ring so the viewer knows which type is where
   typeDecor.selectAll('.type-label').data(typeAvgsArr).join('text')
     .attr('class', 'type-label')
     .attr('x', d => xScale(d.offence)).attr('y', d => yScale(d.defence) - 18)
@@ -581,13 +633,16 @@ function drawScatter(data) {
     .text(d => `${d.type} (${d.count})`);
 
   // ── Cluster decorations ───────────────────────────────────
+  // group for k-means cluster markers — only visible in K-Means mode
   const kmDecor = g.append('g').attr('class', 'km-decor').style('opacity', scatterMode === 'kmeans' ? 1 : 0);
+  // filled rings at each cluster centroid — radius encodes member count so bigger clusters look bigger
   kmDecor.selectAll('.cluster-ring').data(centroids).join('circle')
     .attr('class', 'cluster-ring')
     .attr('cx', d => xScale(d.offence)).attr('cy', d => yScale(d.defence))
     .attr('r', d => countScale(d.count))
     .attr('fill', (_, i) => CLUSTER_COLORS[i]).attr('opacity', 0.1)
     .attr('stroke', (_, i) => CLUSTER_COLORS[i]).attr('stroke-width', 2);
+  // cluster name + count label placed above each ring so it doesn't sit inside the fill
   kmDecor.selectAll('.cluster-label').data(centroids).join('text')
     .attr('class', 'cluster-label')
     .attr('x', d => xScale(d.offence))
@@ -628,7 +683,7 @@ function drawScatter(data) {
       const PER_TYPE_STEPS = [1500, 1000, 500]; // types 1,2,3
       const PER_TYPE_REST  = 400;               // type 4 onward
 
-      // Reset dots to individual positions (important when coming from k-means)
+      // snap dots back to individual positions first so the hull spotlight starts from a clean slate
       dots.interrupt()
         .transition().duration(RESET_MS).ease(d3.easeCubicInOut)
           .attr('cx', d => xScale(d.offence))
@@ -698,10 +753,11 @@ function drawScatter(data) {
             .attr('opacity', d => boundary.has(d.name) ? 0.90 : 0.20);
         }, t0 + DIM_DUR));
 
-        // Step 3: hull polygon fades in over the boundary dots
+        // Step 3: hull polygon fades in over the boundary dots — fill opacity scales with type count
         scatterTimeouts.push(setTimeout(() => {
           const hull = hullPaths.get(type);
           if (!hull) return;
+          // path element for the convex hull of this type's Pokémon in Offence/Defence space
           hullG.append('path')
             .attr('class', 'type-hull')
             .attr('data-type', type)
@@ -712,15 +768,17 @@ function drawScatter(data) {
             .attr('stroke-opacity', 0)
             .attr('pointer-events', 'none')
             .attr('d', `M${hull.map(([o, e]) => `${xScale(o)},${yScale(e)}`).join('L')}Z`)
+            // fade hull in after boundary dots are highlighted so the polygon reveal is legible
             .transition().duration(HULL_DUR)
               .attr('fill-opacity', hullFillOp(type))
               .attr('stroke-opacity', 0.82);
         }, t0 + DIM_DUR + INNER_DUR));
       });
 
-      // Final: all dots settle to uniform faint state (after last type is done)
+      // after all types have been spotlit, settle all dots to a uniform faint background
       const tFinal = cumDelay + 100;
       scatterTimeouts.push(setTimeout(() => {
+        // fade all dots to near-invisible so the hull polygons become the dominant visual element
         dots.interrupt('op')
           .transition('op').duration(320)
           .attr('opacity', d => activeTypes.has(d.type1) ? 0.12 : 0);
@@ -728,12 +786,13 @@ function drawScatter(data) {
 
     } else if (scatterMode === 'kmeans') {
       // ── K-MEANS: fade hulls out first, then dim-then-flash ──
+      // remove any lingering hull polygons from the previous type-mode spotlight
       hullG.selectAll('.type-hull').interrupt()
         .transition().duration(200)
           .attr('fill-opacity', 0).attr('stroke-opacity', 0)
           .remove();
       typeDecor.style('opacity', 0);
-      kmDecor.style('opacity', 1); // show cluster rings immediately
+      kmDecor.style('opacity', 1); // reveal cluster rings immediately so the destination is clear
 
       const DIM_MS   = 600;
       const GAP_MS   = 840;
@@ -741,6 +800,7 @@ function drawScatter(data) {
       const MOVE_MS  = 2100;
       const INTERVAL = 840;
 
+      // dim all dots to black first so the per-cluster flash is visually dramatic
       dots.transition().duration(DIM_MS).attr('opacity', 0);
 
       [0, 1, 2, 3, 4].forEach((cluster, gi) => {
@@ -748,8 +808,10 @@ function drawScatter(data) {
         const startAt   = GAP_MS + gi * INTERVAL;
 
         groupDots
+          // flash this cluster's dots at full opacity to show which ones belong here
           .transition().delay(startAt).duration(FLASH_MS).ease(d3.easeLinear)
           .attr('opacity', 0.95)
+          // then glide them to the cluster centroid position
           .transition().duration(MOVE_MS).ease(d3.easeCubicInOut)
           .attr('cx', (d, i) => xScale(dataPos(d, i, 'kmeans').a))
           .attr('cy', (d, i) => yScale(dataPos(d, i, 'kmeans').e))
@@ -758,15 +820,16 @@ function drawScatter(data) {
 
     } else {
       // ── Return to Individual ──
-      // Fade out and remove any hulls
+      // dissolve any type hulls before returning to individual positions
       hullG.selectAll('.type-hull').interrupt()
         .transition().duration(200)
           .attr('fill-opacity', 0).attr('stroke-opacity', 0)
           .remove();
+      // fade out group annotations — they aren't meaningful in Individual mode
       typeDecor.transition().duration(400).style('opacity', 0);
       kmDecor.transition().duration(400).style('opacity', 0);
 
-      // Animate dots back to their individual positions
+      // animate each dot back to its own Offence/Defence position — the dispersal IS the insight
       dots.interrupt()
         .transition().duration(MORPH_MS).ease(d3.easeCubicInOut)
           .attr('cx', d => xScale(d.offence))
@@ -779,6 +842,7 @@ function drawScatter(data) {
 
   // ── updaters.scatter — filter / selection (no morph) ──────
   updaters.scatter = () => {
+    // fade non-selected/non-brushed dots without triggering the full mode morph
     dots.transition().duration(FADE_MS)
       .attr('opacity', (d, i) => {
         if (!activeTypes.has(d.type1)) return 0;
@@ -786,10 +850,11 @@ function drawScatter(data) {
         if (selectedName !== null) return d.name === selectedName ? 1 : 0.06;
         return defaultOp(scatterMode);
       })
+      // dark stroke on the selected dot so it stands out from the crowd
       .attr('stroke', d => selectedName === d.name ? '#222' : '#fff')
       .attr('stroke-width', d => selectedName === d.name ? 2 : 0.4)
       .attr('display', d => activeTypes.has(d.type1) ? null : 'none');
-    // Hide hulls for type-toggled-off types
+    // hide hull polygons for types that have been toggled off in the legend
     hullG.selectAll('.type-hull').each(function() {
       const type = this.getAttribute('data-type');
       d3.select(this).attr('display', activeTypes.has(type) ? null : 'none');
@@ -797,26 +862,30 @@ function drawScatter(data) {
   };
 
   // ── Axes (kept as refs so zoom can rescale them) ─────────
+  // bottom axis group — stored so applyZoomTransform can re-call the axis after panning/zooming
   const xAxisG = g.append('g').attr('class', 'axis x-axis')
     .attr('transform', `translate(0,${iH})`)
     .call(d3.axisBottom(xScale).ticks(6))
     .call(a => a.select('.domain').attr('stroke', '#ccc'));
   xAxisG.selectAll('text').attr('fill', '#555');
+  // left axis group — also kept as a ref for zoom rescaling
   const yAxisG = g.append('g').attr('class', 'axis y-axis')
     .call(d3.axisLeft(yScale).ticks(6))
     .call(a => a.select('.domain').attr('stroke', '#ccc'));
   yAxisG.selectAll('text').attr('fill', '#555');
+  // x-axis label names the composite offensive stat formula
   g.append('text').attr('class', 'axis-label')
     .attr('x', iW / 2).attr('y', iH + 38)
     .attr('text-anchor', 'middle').attr('fill', '#666').attr('font-size', '12px')
     .text('Offence (Attack + Sp.Atk)');
+  // y-axis label names the composite defensive stat formula
   g.append('text').attr('class', 'axis-label')
     .attr('transform', 'rotate(-90)').attr('x', -iH / 2).attr('y', -40)
     .attr('text-anchor', 'middle').attr('fill', '#666').attr('font-size', '12px')
     .text('Defence (HP + Defense + Sp.Def)');
 
   // ── PAN/ZOOM (wheel = zoom, shift+drag = pan; brush handles regular drag) ──
-  // Clip path so zoomed/panned dots don't render outside the plot area
+  // clip-path rect restricts rendering to the plot area so zoomed dots don't spill into the legend
   svg.append('defs').append('clipPath').attr('id', 'scatter-clip')
     .append('rect').attr('width', iW).attr('height', iH);
   // Move dots + decorations into a clipped group so they don't bleed into legend
@@ -872,11 +941,12 @@ function drawScatter(data) {
       .selectAll('text').attr('fill', '#555');
   }
 
+  // zoom behavior — wheel zooms; shift+drag pans; plain drag is reserved for the lasso
   const zoomBehavior = d3.zoom()
     .scaleExtent([1, 8])
     .translateExtent([[0, 0], [iW, iH]])
     .extent([[0, 0], [iW, iH]])
-    // Only wheel events or shift+drag start a zoom; regular mousedown is for brush
+    // filter ensures only wheel and shift+drag trigger zoom so the lasso can own regular drag
     .filter(event => {
       if (event.type === 'wheel') return true;
       if (event.type === 'mousedown' && event.shiftKey) return true;
@@ -884,25 +954,31 @@ function drawScatter(data) {
     })
     .on('zoom', event => applyZoomTransform(event.transform));
 
+  // attach zoom to the whole SVG so wheel events anywhere in the plot area zoom
   svg.call(zoomBehavior);
-  // Double-click resets zoom
+  // double-click resets zoom to identity — animated so the jump isn't jarring
   svg.on('dblclick.zoom', () => {
     svg.transition().duration(400).call(zoomBehavior.transform, d3.zoomIdentity);
   });
 
   // ── Type legend (clickable) ──────────────────────────────
+  // legend container — positioned in the right margin outside the plot area
   const legG = g.append('g').attr('transform', `translate(${iW + 14}, 0)`);
+  // legend header text — instructs users that clicking filters all three views
   legG.append('text').attr('y', -4)
     .attr('fill', '#555').attr('font-size', '11px').attr('font-weight', '600')
     .text('Type (click to filter)');
   const legColW = 68;
   ALL_TYPES.forEach((type, i) => {
     const col = Math.floor(i / 9), row = i % 9;
+    // one group per legend entry — toggling its CSS class dims it visually
     const itemG = legG.append('g')
       .attr('class', `legend-item${activeTypes.has(type) ? '' : ' inactive'}`)
       .attr('transform', `translate(${col * legColW}, ${row * 14 + 8})`);
+    // color swatch circle matching the type's palette color
     itemG.append('circle').attr('r', 5).attr('cx', 5)
       .attr('fill', typeColor(type)).attr('opacity', 0.9);
+    // type name label next to the swatch
     itemG.append('text').attr('x', 13).attr('dy', '0.35em')
       .attr('fill', '#333').attr('font-size', '10px').text(type);
     itemG.on('click', () => toggleType(type, itemG));
@@ -931,15 +1007,19 @@ function drawPCP(data) {
   const iW = W - m.left - m.right;
   const iH = H - m.top  - m.bottom;
 
+  // root SVG for the parallel coordinates chart
   const svg = d3.select('#pcp-chart').append('svg').attr('width', W).attr('height', H);
+  // margin group so axes and labels sit within the inset plot area
   const g   = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
 
+  // one independent linear scale per stat axis, each 0-based and nicely rounded
   const yScales = Object.fromEntries(
     STAT_KEYS.map(key => [key, d3.scaleLinear()
       .domain([0, d3.max(data, d => d[key])])
       .range([iH, 0])
       .nice()])
   );
+  // point scale evenly spaces the six stat axes across the plot width
   const xScale = d3.scalePoint().domain(STAT_KEYS).range([0, iW]);
 
   function pcpPath(profile) {
@@ -972,6 +1052,7 @@ function drawPCP(data) {
   // ── PERSISTENT INDIVIDUAL LINES (one per Pokémon, morph between modes) ──
   // In 'all' mode: invisible by default. Only the hovered / selected line shows.
   // This removes clutter — the PCP becomes a "probe" for individual Pokémon.
+  // one path per Pokémon — never removed; opacity and position animate between modes
   const lines = g.selectAll('.pcp-line').data(data).join('path')
     .attr('class', 'pcp-line')
     .attr('d', d => pcpPath(d))
@@ -982,7 +1063,7 @@ function drawPCP(data) {
     .attr('pointer-events', 'none')  // all events go to hitLines
     .attr('display', d => activeTypes.has(d.type1) ? null : 'none');
 
-  // Hint text shown when nothing is selected in Individual mode
+  // placeholder text that guides users when the PCP is blank in Individual mode
   const pcpHintText = g.append('text')
     .attr('x', iW / 2).attr('y', iH / 2)
     .attr('text-anchor', 'middle').attr('fill', '#bbb')
@@ -993,6 +1074,7 @@ function drawPCP(data) {
   // ── HIT AREAS: invisible wide paths for reliable hover/click ──
   // 1026 visible lines are 1px wide — impossible to click precisely.
   // These transparent 10px paths sit on top and give a large hit area.
+  // invisible 10px-wide paths that give each visible 1.5px line a reliably clickable hit area
   const hitLines = g.selectAll('.pcp-hit').data(data).join('path')
     .attr('class', 'pcp-hit')
     .attr('d', d => pcpPath(d))
@@ -1040,6 +1122,7 @@ function drawPCP(data) {
 
   // ── CLEAN GROUP-CENTROID LINES (fade in/out by mode) ──────
   // 18 type-average lines — clean, bold, only visible in 'type' mode
+  // one centroid path per type — bolder and cleaner than the individual lines underneath
   const typeLines = g.selectAll('.type-line').data(typeAvgsArr).join('path')
     .attr('class', 'type-line')
     .attr('d', d => pcpPath(d))
@@ -1066,6 +1149,7 @@ function drawPCP(data) {
     });
 
   // 5 cluster centroid lines — clean, bold, only visible in 'kmeans' mode
+  // one centroid path per k-means cluster — thicker than type lines to suggest broader groupings
   const clusterLines = g.selectAll('.cluster-line').data(centroids).join('path')
     .attr('class', 'cluster-line')
     .attr('d', d => pcpPath(d))
@@ -1106,7 +1190,7 @@ function drawPCP(data) {
       return typeKeys.indexOf(d.type1) * (STAGGER / 2); // dispersing to 'all'
     };
 
-    // Stage 1: morph individual lines toward group centroids (staggered by group)
+    // Stage 1: individual lines animate to group centroid paths — staggered per group for visual legibility
     lines.transition().duration(MORPH_MS).ease(d3.easeCubicInOut)
       .delay(groupDelay)
       .attr('d', (d, i) => pcpPath(targetProfile(d, i, pcpMode)))
@@ -1117,22 +1201,24 @@ function drawPCP(data) {
         return pcpMode === 'all' ? 0.08 : 0.04;
       });
 
-    // hitLines: update position immediately (invisible anyway), toggle pointer-events
+    // hitLines: snap to new position immediately (they're invisible, no visual jump), update interactivity
     hitLines.attr('d', (d, i) => pcpPath(targetProfile(d, i, pcpMode)))
       .attr('pointer-events', pcpMode === 'all' ? 'auto' : 'none');
 
-    // Hint text: only show in Individual mode when nothing is selected
+    // hint text only relevant in Individual mode when no line is selected
     pcpHintText.style('display', pcpMode === 'all' && !selectedName ? null : 'none');
 
-    // Stage 2: clean group lines fade in/out
+    // Stage 2: fade the bold centroid ribbons in or out depending on active mode
     typeLines.transition().duration(MORPH_MS)
       .attr('opacity', pcpMode === 'type' ? 0.85 : 0);
     typeLines.attr('pointer-events', pcpMode === 'type' ? 'auto' : 'none');
 
+    // fade cluster centroid lines in/out in sync with the individual-line morph
     clusterLines.transition().duration(MORPH_MS)
       .attr('opacity', pcpMode === 'kmeans' ? 0.95 : 0);
     clusterLines.attr('pointer-events', pcpMode === 'kmeans' ? 'auto' : 'none');
 
+    // cluster legend only meaningful in k-means mode — fade it in/out accordingly
     clusterLegendG.transition().duration(300).style('opacity', pcpMode === 'kmeans' ? 1 : 0);
   }
   pcpApplyMode = applyMode;
@@ -1143,7 +1229,7 @@ function drawPCP(data) {
       ? new Set([...brushedNames].map(n => nameToType1.get(n))) : null;
     const selType = selectedName ? nameToType1.get(selectedName) : null;
 
-    // Individual lines: only show selected / brushed — everything else is 0
+    // fade individual lines based on brush/selection state without triggering the mode morph
     lines.transition().duration(FADE_MS)
       .attr('opacity', d => {
         if (!activeTypes.has(d.type1)) return 0;
@@ -1152,14 +1238,17 @@ function drawPCP(data) {
         if (selectedName !== null) return d.name === selectedName ? 1 : 0;
         return 0;   // default in Individual mode: blank until hovered
       })
+      // thicker stroke on the selected line so it stays legible above brushed lines
       .attr('stroke-width', d => selectedName === d.name ? 2 : 1.5)
       .attr('display', d => activeTypes.has(d.type1) ? null : 'none');
 
+    // bring selected line to front so it renders above lasso-highlighted lines
     if (selectedName) lines.filter(d => d.name === selectedName).raise();
 
     // When a Pokémon is selected: disable ALL other hit areas so nothing can
     // be accidentally hovered or clicked — only the selected line's hit area
     // stays active (for click-to-deselect).
+    // gate pointer-events so only the relevant hit areas respond after a selection
     hitLines.attr('pointer-events', d => {
       if (pcpMode !== 'all') return 'none';
       if (selectedName !== null) return d.name === selectedName ? 'auto' : 'none';
@@ -1167,10 +1256,10 @@ function drawPCP(data) {
       return 'auto';
     });
 
-    // Show/hide hint text
+    // hide hint once the user has something selected or a lasso active
     pcpHintText.style('display', pcpMode === 'all' && !selectedName && !brushedNames ? null : 'none');
 
-    // Clean type-average lines
+    // highlight the matching type-average line when a dot or lasso selection is active
     typeLines.transition().duration(FADE_MS)
       .attr('display', d => activeTypes.has(d.type) ? null : 'none')
       .attr('opacity', d => {
@@ -1180,18 +1269,23 @@ function drawPCP(data) {
         if (brushedTypes) return brushedTypes.has(d.type) ? 1 : 0.15;
         return 0.85;
       })
+      // thicken the selected type's ribbon so it visually pops
       .attr('stroke-width', d => selType === d.type ? 4 : 2.5);
   };
 
   // ── Vertical axes (labels only on leftmost) ──────────────
   STAT_KEYS.forEach((key, i) => {
+    // one axis group per stat, positioned at its x-scale band
     const axisG = g.append('g').attr('transform', `translate(${xScale(key)},0)`);
+    // leftmost axis shows tick values; all others suppress numbers to avoid clutter
     const axisFn = i === 0
       ? d3.axisLeft(yScales[key]).ticks(4)
       : d3.axisLeft(yScales[key]).ticks(4).tickFormat('');
+    // draw the axis line and ticks; style domain line so it reads as a PCP column
     axisG.call(axisFn)
       .call(a => a.select('.domain').attr('stroke', '#aaa').attr('stroke-width', 1.5))
       .selectAll('text').attr('fill', '#666').attr('font-size', '8px');
+    // stat name label below the axis bottom — doubles as the column header
     g.append('text')
       .attr('x', xScale(key)).attr('y', iH + 22)
       .attr('text-anchor', 'middle')
@@ -1200,32 +1294,43 @@ function drawPCP(data) {
   });
 
   // ── Cluster legend (visible only in kmeans mode) ─────────
+  // container for cluster legend — fades in/out with k-means mode to avoid confusing type mode
   const clusterLegendG = g.append('g')
     .attr('class', 'cluster-legend')
     .attr('transform', `translate(${iW + 16}, 0)`)
     .style('opacity', pcpMode === 'kmeans' ? 1 : 0);
+  // legend section header
   clusterLegendG.append('text').attr('y', -4)
     .attr('fill', '#555').attr('font-size', '11px').attr('font-weight', '600')
     .text('Clusters');
   centroids.forEach((c, i) => {
+    // one row per cluster — color swatch + archetype name + member count
     const rg = clusterLegendG.append('g').attr('transform', `translate(0,${i * 32 + 8})`);
+    // color swatch rectangle matching the cluster's line color in the PCP
     rg.append('rect').attr('width', 10).attr('height', 10).attr('rx', 2).attr('fill', CLUSTER_COLORS[i]);
+    // archetype name derived from the cluster's highest-scoring stat
     rg.append('text').attr('x', 14).attr('y', 9).attr('fill', '#222').attr('font-size', '10px').text(c.name);
+    // member count in a lighter color — secondary info below the archetype name
     rg.append('text').attr('x', 14).attr('y', 20).attr('fill', '#888').attr('font-size', '9px')
       .text(`${c.count} Pokémon`);
   });
 
   // ── Type legend ──────────────────────────────────────────
+  // type legend sits below the cluster legend in the same right-margin column
   const legG = g.append('g').attr('transform', `translate(${iW + 16}, ${5 * 32 + 22})`);
+  // section header reminding users that clicking filters all three views at once
   legG.append('text').attr('y', -4)
     .attr('fill', '#555').attr('font-size', '11px').attr('font-weight', '600')
     .text('Type (click to filter)');
   ALL_TYPES.forEach((type, i) => {
     const col = Math.floor(i / 9), row = i % 9;
+    // one group per type — laid out in two columns of nine to fit the margin
     const itemG = legG.append('g')
       .attr('class', `legend-item${activeTypes.has(type) ? '' : ' inactive'}`)
       .attr('transform', `translate(${col * 68}, ${row * 14 + 8})`);
+    // type color swatch
     itemG.append('circle').attr('r', 5).attr('cx', 5).attr('fill', typeColor(type)).attr('opacity', 0.9);
+    // type name label
     itemG.append('text').attr('x', 13).attr('dy', '0.35em').attr('fill', '#333').attr('font-size', '10px')
       .text(type);
     itemG.on('click', () => toggleType(type, itemG));
