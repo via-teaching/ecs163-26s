@@ -7,7 +7,7 @@ function drawSankey(data) {
     const TRANSITION_MS = 250;
 
     const REST_LINK = 0.60;
-    const FADE_LINK = 0.15;
+    const FADE_LINK = 0.10;
     const ACTV_LINK = 0.85;
     const HOVR_LINK = 0.75;
     const REST_NODE = 1.00;
@@ -16,6 +16,7 @@ function drawSankey(data) {
     const REST_LBL  = 1.00;
     const FADE_LBL  = 0.55;
     const HOVR_LBL  = 1.00;
+    const SUBB_LINK = 0.40; // sub-band opacity
 
     const container = document.getElementById("view3");
     const W = container.clientWidth, H = container.clientHeight;
@@ -295,36 +296,147 @@ function drawSankey(data) {
             .attr("transform", `translate(${lx},${ly}) scale(1.2) translate(${-lx},${-ly})`);
     }
 
-    // --- Hover events ---
+    // --- Sub-band overlays + frozen active state on link click ---
+    let subBandsActive = false;
+
+    function filterByNode(rows, node) {
+        if (node.col === 0) return rows.filter(d => d.experience_level === node.id);
+        if (node.col === 1) return rows.filter(d => d.company_size === node.id);
+        if (node.col === 2) return rows.filter(d => getBracket(d.salary_in_usd) === node.id);
+        if (node.col === 3) return rows.filter(d => String(d.remote_ratio) === node.id);
+        return rows;
+    }
+
+    function countForLinkPath(rows, adjLink) {
+        return filterByNode(filterByNode(rows, adjLink.source), adjLink.target).length;
+    }
+
+    function getLinkIdx(targetLink) {
+        let idx = -1;
+        linkPaths.each((d, i) => { if (d === targetLink) idx = i; });
+        return idx;
+    }
+
+    function allDownstreamLinks(startNode) {
+        const result = [];
+        let frontier = [startNode];
+        while (frontier.length > 0) {
+            const next = [];
+            frontier.forEach(node => node.sourceLinks.filter(l => l.value > 0).forEach(l => {
+                result.push(l); next.push(l.target);
+            }));
+            frontier = next;
+        }
+        return result;
+    }
+
+    function allUpstreamLinks(startNode) {
+        const result = [];
+        let frontier = [startNode];
+        while (frontier.length > 0) {
+            const next = [];
+            frontier.forEach(node => node.targetLinks.filter(l => l.value > 0).forEach(l => {
+                result.push(l); next.push(l.source);
+            }));
+            frontier = next;
+        }
+        return result;
+    }
+
+    const subBandG = g.append("g").attr("pointer-events", "none");
+
+    function clearSubBands() {
+        subBandG.selectAll("path").remove();
+        if (subBandsActive) { subBandsActive = false; restoreAll(); }
+    }
+
+    function drawSubBand(adjLink, rows) {
+        const condCount = countForLinkPath(rows, adjLink);
+        if (condCount === 0 || adjLink.value === 0) return;
+        const w = Math.max(1, adjLink.width * (condCount / adjLink.value));
+        const idx = getLinkIdx(adjLink);
+        subBandG.append("path")
+            .attr("d", d3.sankeyLinkHorizontal()(adjLink))
+            .attr("fill", "none")
+            .attr("stroke", idx >= 0 ? `url(#link-grad-${idx})` : "#fff")
+            .attr("stroke-width", 0)
+            .attr("stroke-opacity", SUBB_LINK)
+            .transition().duration(800)
+            .attr("stroke-width", w);
+    }
+
+    function freezeAndDraw(rows, highlightNodes, highlightLink) {
+        subBandsActive = true;
+        fadeAll();
+        nodeRects.filter(n => highlightNodes.includes(n))
+            .transition().duration(TRANSITION_MS).attr("opacity", HOVR_NODE);
+        nodeLabels.filter(n => highlightNodes.includes(n))
+            .transition().duration(TRANSITION_MS).attr("opacity", HOVR_LBL);
+        if (highlightLink) {
+            d3.select(linkPaths.nodes()[getLinkIdx(highlightLink)])
+                .transition().duration(TRANSITION_MS).attr("stroke-opacity", ACTV_LINK);
+        }
+        highlightNodes.forEach(n => {
+            allUpstreamLinks(n).forEach(l => drawSubBand(l, rows));
+            allDownstreamLinks(n).forEach(l => drawSubBand(l, rows));
+        });
+    }
+
+    function showSubBands(link) {
+        if (link.value === 0) return;
+        freezeAndDraw(filterForLink(link), [link.source, link.target], link);
+    }
+
+    function showSubBandsForNode(node) {
+        freezeAndDraw(filterByNode(currentData, node), [node], null);
+    }
+
+    // --- Hover events (respect frozen state) ---
     linkPaths
         .on("mouseover", (event, d) => {
-            fadeAll();
-            d3.select(event.currentTarget)
-                .transition().duration(TRANSITION_MS).attr("stroke-opacity", ACTV_LINK);
-            nodeRects.filter(n => n === d.source || n === d.target)
-                .transition().duration(TRANSITION_MS).attr("opacity", HOVR_NODE);
-            nodeLabels.filter(n => n === d.source || n === d.target)
-                .transition().duration(TRANSITION_MS).attr("opacity", HOVR_LBL);
-            scaleLabel(d.source); scaleLabel(d.target);
+            if (!subBandsActive) {
+                fadeAll();
+                d3.select(event.currentTarget)
+                    .transition().duration(TRANSITION_MS).attr("stroke-opacity", ACTV_LINK);
+                nodeRects.filter(n => n === d.source || n === d.target)
+                    .transition().duration(TRANSITION_MS).attr("opacity", HOVR_NODE);
+                nodeLabels.filter(n => n === d.source || n === d.target)
+                    .transition().duration(TRANSITION_MS).attr("opacity", HOVR_LBL);
+                scaleLabel(d.source); scaleLabel(d.target);
+            }
             tipShow(makeLinkTip(d), event);
         })
         .on("mousemove", tipMove)
-        .on("mouseout", () => { restoreAll(); tipHide(); });
+        .on("mouseout", () => { if (!subBandsActive) restoreAll(); tipHide(); })
+        .on("click", (event, d) => {
+            event.stopPropagation();
+            clearSubBands();
+            if (d.value > 0) showSubBands(d);
+        });
 
     nodeRects.style("cursor", "pointer")
         .on("mouseover", (event, d) => {
-            fadeAll();
-            d3.select(event.currentTarget)
-                .transition().duration(TRANSITION_MS).attr("opacity", HOVR_NODE);
-            nodeLabels.filter(n => n === d)
-                .transition().duration(TRANSITION_MS).attr("opacity", HOVR_LBL);
-            scaleLabel(d);
-            linkPaths.filter(l => l.source === d || l.target === d)
-                .transition().duration(TRANSITION_MS).attr("stroke-opacity", HOVR_LINK);
+            if (!subBandsActive) {
+                fadeAll();
+                d3.select(event.currentTarget)
+                    .transition().duration(TRANSITION_MS).attr("opacity", HOVR_NODE);
+                nodeLabels.filter(n => n === d)
+                    .transition().duration(TRANSITION_MS).attr("opacity", HOVR_LBL);
+                scaleLabel(d);
+                linkPaths.filter(l => l.source === d || l.target === d)
+                    .transition().duration(TRANSITION_MS).attr("stroke-opacity", HOVR_LINK);
+            }
             tipShow(`<strong>${d.label}</strong><br/>${d.value.toLocaleString()} people`, event);
         })
         .on("mousemove", tipMove)
-        .on("mouseout", () => { restoreAll(); tipHide(); });
+        .on("mouseout", () => { if (!subBandsActive) restoreAll(); tipHide(); })
+        .on("click", (event, d) => {
+            event.stopPropagation();
+            clearSubBands();
+            showSubBandsForNode(d);
+        });
+
+    svg.on("click.subbands", () => clearSubBands());
 
     // --- Column headers ---
     const colHeaders = ["Experience Level", "Company Size", "Salary Range", "Work Mode"];
@@ -349,6 +461,7 @@ function drawSankey(data) {
     return function update(filteredData) {
         const UPDATE_MS = 600;
         currentData = filteredData;
+        clearSubBands();
 
         const newGraph = sankeyGen({
             nodes: allNodes.map(d => ({ ...d })),
