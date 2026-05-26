@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" style="width: 100%; height: 100%;">
+<head>
+    <meta charset="utf-8">
+    <title>Pokemon Analysis Dashboard</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f4f7f6;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #5b0a0a;
+            color: #ecf0f1;
+            padding: 10px 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 60% 40%;
+            gap: 15px;
+            padding: 15px;
+            flex-grow: 1;
+            box-sizing: border-box;
+            height: calc(100vh - 50px);
+        }
+
+        .view-panel {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 10px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #view1 {
+            grid-column: 1 / 3;
+            grid-row: 1 / 2;
+        }
+
+        #view2 {
+            grid-column: 1 / 2;
+            grid-row: 2 / 3;
+        }
+
+        #view3 {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+        }
+
+        .view-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            flex-grow: 1;
+        }
+
+        .axis line, .axis path {
+            stroke: #bdc3c7;
+        }
+        .axis text {
+            fill: #7f8c8d;
+            font-size: 12px;
+        }
+        
+        .axis-label {
+            font-size: 14px;
+            font-weight: bold;
+            fill: #2c3e50;
+        }
+
+        .tooltip {
+            position: absolute;
+            text-align: left;
+            padding: 8px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #bdc3c7;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 10;
+        }
+
+        .legend-text {
+            font-size: 12px;
+            fill: #34495e;
+        }
+
+        .line {
+            fill: none;
+            stroke-width: 1.5px;
+            opacity: 0.2;
+            transition: opacity 0.2s, stroke-width 0.2s;
+        }
+        
+        .line.active {
+            opacity: 0.7;
+            stroke-width: 2px;
+        }
+
+        .line.inactive {
+            opacity: 0.05;
+        }
+
+        .brush .selection {
+            fill: #3498db;
+            fill-opacity: 0.3;
+            stroke: #2980b9;
+        }
+
+        .dot {
+            opacity: 0.7;
+            stroke: #fff;
+            stroke-width: 1px;
+        }
+        .dot.inactive {
+            opacity: 0.1;
+        }
+
+        .bar {
+            opacity: 0.8;
+        }
+        .bar:hover {
+            opacity: 1;
+        }
+
+        #global-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            background-color: #ffffff;
+            padding: 10px;
+            border-bottom: 1px solid #bdc3c7;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+            font-size: 12px;
+            color: #2c3e50;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+            border: 1px solid #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Pokemon Statistics Dashboard - Parwaan Virk ECS 163 26S2</h1>
+    </header>
+
+    <div id="global-legend"></div>
+
+    <div class="dashboard-container">
+        <div id="view1" class="view-panel">
+            <div class="view-title">Combat Stats Overview (filter by brushing axes)</div>
+            <svg id="svg-view1"></svg>
+        </div>
+
+        <div id="view2" class="view-panel">
+            <div class="view-title">Type Distribution (Filtered Subset)</div>
+            <svg id="svg-view2"></svg>
+        </div>
+
+        <div id="view3" class="view-panel">
+            <div class="view-title">Physical Stats (Weight vs Height)</div>
+            <svg id="svg-view3"></svg>
+        </div>
+    </div>
+
+    <div id="tooltip" class="tooltip"></div>
+
+    <script src="main.js"></script>
+</body>
+</html>
