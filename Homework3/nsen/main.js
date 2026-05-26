@@ -358,11 +358,11 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .style("font-size", `${chartDims.parallel.innerWidth / 756.25}rem`)
     .style("font-weight", "bold")
     .text(`*Brush along any axis`)
-    .attr("x", chartDims.parallel.width - margins.right - 15)
+    .attr("x", chartDims.parallel.innerWidth)
     .attr("y", margins.top - 15)
     .append('tspan')
     .text(`to filter by data points`)
-    .attr("x", chartDims.parallel.width - margins.right - 15)
+    .attr("x", chartDims.parallel.innerWidth)
     .attr("y", margins.top + chartDims.parallel.innerWidth / 40 - 15)
 
   // Create the horizontal axis scale for each key
