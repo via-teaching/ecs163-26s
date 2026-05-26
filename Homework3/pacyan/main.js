@@ -163,7 +163,7 @@ function drawBarChart(data) {
         .attr("text-anchor", "middle")
         .attr("font-size", subtitleFont + "px")
         .attr("font-family", "Georgia,serif").attr("fill", "#888")
-        .text(`All Pokémon · Scroll to zoom`);
+        .text(`All types selected (Scroll to zoom)`);
 
     barG.append("text")
         .attr("x", barWidth / 2).attr("y", barHeight + 50)
@@ -177,7 +177,7 @@ function drawBarChart(data) {
         .attr("x", -(barHeight / 2)).attr("y", -48)
         .attr("text-anchor", "middle")
         .attr("font-size", "12px").attr("font-family", "Georgia,serif").attr("fill", "#555")
-        .text("Average Value");
+        .text("Average Value (0-260)");
 
     // scales 
     xBarScale = d3.scaleBand()
@@ -441,7 +441,7 @@ function drawChord(data) {
         .attr("text-anchor", "middle")
         .attr("font-size", subtitleFont + "px")
         .attr("font-family", "Georgia,serif").attr("fill", "#888")
-        .text("Arc size = # of that type in selection · Ribbon = dual-type pair · Hover for Pokémon names");
+        .text("Arc size = # of that type in selection, Ribbon width = # of dual-type pairs (Hover for Pokémon details)");
 
     // type color legend 
     const chordLegRowH = Math.max(11, H * 0.016);
@@ -632,7 +632,7 @@ function renderChordLayout(data) {
 // stage 2 remove and redraw new data 
 function updateChord(selectedData) {
     svg.select(".chord-subtitle")
-        .text(`${selectedData.length} Pokémon · arcs = type count · chords = dual-type pairs`);
+        .text(`${selectedData.length} Pokémon ( arcs = type count, chords = dual-type pairs)`);
 
     chordG.selectAll(".chord-arc, .chord-ribbon, .chord-label")
         .transition().duration(250)
@@ -679,7 +679,7 @@ function drawScatter(data) {
         .attr("text-anchor", "middle")
         .attr("font-size", subtitleFont + "px")
         .attr("font-family", "Georgia,serif").attr("fill", "#888")
-        .text("Brush to select Pokémon · Color = Type 1");
+        .text("Brush to select Pokémon (Color = Type)");
 
     // axis labels 
     g.append("text")
