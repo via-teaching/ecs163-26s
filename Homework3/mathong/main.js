@@ -83,9 +83,12 @@ function drawBar() {
   const container = document.getElementById("chart-bar");
   const { width, height } = container.getBoundingClientRect();
 
-  barMargin = { top: 12, right: 16, bottom: 175, left: 50 };
+  // bottom margin reserves room for the rotated x-axis tick labels (~46px)
+  // PLUS the "Primary Type" axis label below them; redundant 2-col color
+  // legend was removed (bars themselves are colored and labeled).
+  barMargin = { top: 18, right: 18, bottom: 84, left: 52 };
   barInnerW  = width          - barMargin.left - barMargin.right;
-  barInnerH  = (height - 26) - barMargin.top  - barMargin.bottom;
+  barInnerH  = (height - 38) - barMargin.top  - barMargin.bottom;
 
   // rollup counts pokemon per type, then sort highest to lowest
   const typeCounts = Array.from(
@@ -111,7 +114,7 @@ function drawBar() {
   barSvg = d3.select("#chart-bar")
     .append("svg")
     .attr("width",  width)
-    .attr("height", height - 26)
+    .attr("height", height - 38)
     .append("g")
     .attr("transform", `translate(${barMargin.left},${barMargin.top})`);
 
@@ -128,11 +131,12 @@ function drawBar() {
       .style("fill", "#7b7f9e")
       .style("font-size", "11px");
 
-  // x axis label
+  // x axis label — positioned higher within the bottom margin so descenders
+  // (g, p, y) never reach the panel's clipped bottom edge.
   barSvg.append("text")
     .attr("class", "axis-label")
     .attr("x", barInnerW / 2)
-    .attr("y", barInnerH + barMargin.bottom - 4)
+    .attr("y", barInnerH + barMargin.bottom - 18)
     .attr("text-anchor", "middle")
     .text("Primary Type");
 
@@ -198,28 +202,9 @@ function drawBar() {
     .style("font-size", "10px")
     .text("all Pokémon");
 
-  // color legend — one swatch per type, two columns, positioned below the x-axis
-  const legendG = barSvg.append("g")
-    .attr("transform", `translate(0, ${barInnerH + 52})`);
-
-  typeCounts.forEach((d, i) => {
-    const col = i % 2;
-    const row = Math.floor(i / 2);
-    const lx  = col * (barInnerW / 2);
-    const ly  = row * 13;
-
-    // colored swatch matching the bar
-    legendG.append("rect")
-      .attr("x", lx).attr("y", ly - 1)
-      .attr("width", 8).attr("height", 8).attr("rx", 1)
-      .attr("fill", TYPE_COLORS[d.type] || "#888");
-
-    // type name next to swatch
-    legendG.append("text")
-      .attr("x", lx + 11).attr("y", ly + 6)
-      .style("fill", "#6b7094").style("font-size", "9px")
-      .text(d.type);
-  });
+  // NOTE: removed the 2-column color legend that previously rendered below
+  // the x-axis — it was redundant (each bar is already colored AND labeled
+  // with its type name) and was overflowing the panel bounds.
 
   updateBar();
 }
@@ -295,22 +280,39 @@ const tooltip = d3.select("#tooltip");
 function drawScatter() {
   const container = document.getElementById("chart-scatter");
   const { width, height } = container.getBoundingClientRect();
-  const margin = { top: 20, right: 24, bottom: 50, left: 52 };
-  scatterInnerW = width          - margin.left - margin.right;
-  scatterInnerH = (height - 26) - margin.top  - margin.bottom;
+  // tight right margin — legend was removed because the panel is now
+  // square (every pixel of plot width counts). Color mapping is shared
+  // with the bar chart panel; Regular vs Legendary is visually obvious
+  // from the dot size + white outline on legendary dots.
+  const margin = { top: 20, right: 24, bottom: 50, left: 56 };
+  const availW = width          - margin.left - margin.right;
+  const availH = (height - 38) - margin.top  - margin.bottom;
+
+  // Force the plot AREA to be square so 1 Attack unit == 1 Defense unit
+  // visually — Attack and Defense are the same kind of stat (0-220ish),
+  // and an equal-scale square plot is the honest way to compare them.
+  // Take the smaller of the two available dimensions, then center the
+  // square horizontally inside the SVG.
+  const plotSize = Math.min(availW, availH);
+  scatterInnerW = plotSize;
+  scatterInnerH = plotSize;
+  const extraX  = (availW - plotSize) / 2;   // horizontal padding to center the square
 
   d3.select("#chart-scatter svg").remove();
 
+  // svg root + inner group shifted by margins, centered horizontally inside the square plot area
   const svg = d3.select("#chart-scatter")
     .append("svg")
     .attr("width",  width)
-    .attr("height", height - 26);
+    .attr("height", height - 38);
 
   scatterSvgG = svg.append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+    .attr("transform", `translate(${margin.left + extraX},${margin.top})`);
 
-  // x: attack, y: defense — fixed domains so axes don't shift on filter
-  scatterXScale = d3.scaleLinear().domain([0, 220]).range([0, scatterInnerW]);
+  // x and y share the SAME domain (0..240) so 1 px on x == 1 px on y in
+  // data units. Data max is ~190 attack / ~230 defense — 240 covers all
+  // with some headroom.
+  scatterXScale = d3.scaleLinear().domain([0, 240]).range([0, scatterInnerW]);
   scatterYScale = d3.scaleLinear().domain([0, 240]).range([scatterInnerH, 0]);
 
   // horizontal gridlines
@@ -327,22 +329,24 @@ function drawScatter() {
       .style("stroke", "#2e3148")
       .style("stroke-dasharray", "3,3"));
 
-  // x axis
+  // x axis — 6 ticks (0, 40, 80, …, 240) so labels don't crowd
+  // in the smaller square plot area
   scatterSvgG.append("g")
     .attr("class", "x-axis")
     .attr("transform", `translate(0,${scatterInnerH})`)
-    .call(d3.axisBottom(scatterXScale).ticks(8));
+    .call(d3.axisBottom(scatterXScale).ticks(6));
 
-  // y axis
+  // y axis — same tick count as x for visual parity (matched domains)
   scatterSvgG.append("g")
     .attr("class", "y-axis")
     .call(d3.axisLeft(scatterYScale).ticks(6));
 
-  // axis labels
+  // axis labels — kept inside the SVG bottom margin so descenders ('y', 'p')
+  // don't clip against the panel's hidden overflow.
   scatterSvgG.append("text")
     .attr("class", "axis-label")
     .attr("x", scatterInnerW / 2)
-    .attr("y", scatterInnerH + 42)
+    .attr("y", scatterInnerH + 36)
     .attr("text-anchor", "middle")
     .text("Attack");
 
@@ -354,34 +358,11 @@ function drawScatter() {
     .attr("text-anchor", "middle")
     .text("Defense");
 
-  // legend — anchored to bottom-right of the inner chart area
-  const legend = scatterSvgG.append("g")
-    .attr("transform", `translate(${scatterInnerW - 110}, ${scatterInnerH - 56})`);
-
-  // header
-  legend.append("text")
-    .attr("x", 0).attr("y", 0)
-    .style("fill", "#6b7094").style("font-size", "10px").style("font-weight", "600")
-    .text("Color = Primary Type");
-
-  // regular pokemon dot
-  legend.append("circle")
-    .attr("cx", 6).attr("cy", 16).attr("r", 4)
-    .attr("fill", "#6b7094");
-  legend.append("text")
-    .attr("x", 16).attr("y", 20)
-    .style("fill", "#6b7094").style("font-size", "10px")
-    .text("Regular");
-
-  // legendary pokemon dot (larger, white outline)
-  legend.append("circle")
-    .attr("cx", 6).attr("cy", 36).attr("r", 6)
-    .attr("fill", "#6b7094")
-    .attr("stroke", "#fff").attr("stroke-width", 1.5);
-  legend.append("text")
-    .attr("x", 16).attr("y", 40)
-    .style("fill", "#6b7094").style("font-size", "10px")
-    .text("Legendary");
+  // NOTE: the SVG color legend was removed when the panel became square —
+  // every pixel of plot width is needed. The colors map to primary type
+  // exactly as in the bar chart (shared dashboard mental model), and
+  // Regular vs Legendary is visually obvious from the dot size + the
+  // white stroke on legendary dots.
 
   // clip path keeps dots and brush inside the axis area
   scatterSvgG.append("clipPath").attr("id", "scatter-clip")
@@ -436,7 +417,10 @@ function updateScatter() {
         .attr("fill",         d => TYPE_COLORS[d.Type_1] || "#888")
         .attr("stroke",       d => d.isLegendary ? "#fff" : "none")
         .attr("stroke-width", d => d.isLegendary ? 1.5 : 0)
-        .attr("opacity", 0)
+        // start at correct opacity (was 0 with a fade-in transition, but
+        // that's fragile — if rAF is throttled or the transition is
+        // interrupted before its first tick, dots stay invisible forever).
+        .attr("opacity", dotOpacity)
         .style("cursor", "pointer")
         .on("mouseover", (event, d) => {
           tooltip.classed("hidden", false)
@@ -522,10 +506,11 @@ function radarPoints(stats) {
 function drawRadar() {
   const container = document.getElementById("chart-pcp");
   const { width, height } = container.getBoundingClientRect();
-  const svgH = height - 26;
+  const svgH = height - 38;
 
   d3.select("#chart-pcp svg").remove();
 
+  // svg root; radarSvgG is an unshifted group — radar centers itself via cx/cy
   const svg = d3.select("#chart-pcp")
     .append("svg")
     .attr("width", width)
@@ -547,7 +532,9 @@ function drawRadar() {
   const scaleMax = maxBST / RADAR_DIMS.length;   // 720 / 6 = 120
   radarScale = d3.scaleLinear().domain([0, scaleMax]).range([0, radarRadius]);
 
-  // concentric grid rings at 25/50/75/100% with value labels on the right
+  // concentric grid rings at 25/50/75/100% — value labels sit on a
+  // dedicated "northeast" diagonal so they never overlap the active
+  // polygon's vertex value labels (which live on the spoke endpoints).
   [0.25, 0.5, 0.75, 1].forEach(t => {
     radarSvgG.append("circle")
       .attr("cx", radarCx).attr("cy", radarCy)
@@ -557,12 +544,15 @@ function drawRadar() {
       .attr("stroke-width", t === 1 ? 1.5 : 1)
       .attr("stroke-dasharray", t === 1 ? null : "3,3");
 
+    // angle = -PI/3 → tucks between the HP (top) and Atk (upper-right) spokes
+    const labelAngle = -Math.PI / 3;
     radarSvgG.append("text")
-      .attr("x", radarCx + radarRadius * t + 5)
-      .attr("y", radarCy)
+      .attr("x", radarCx + (radarRadius * t) * Math.cos(labelAngle))
+      .attr("y", radarCy + (radarRadius * t) * Math.sin(labelAngle))
+      .attr("text-anchor", "middle")
       .attr("dominant-baseline", "middle")
       .style("fill", "#4a5070")
-      .style("font-size", "12px")
+      .style("font-size", "9px")
       .style("font-weight", "500")
       .text(Math.round(scaleMax * t));
   });
@@ -628,6 +618,7 @@ function drawRadar() {
 function updateRadar() {
   if (!radarSvgG) return;
 
+  // remove previous polygons and value labels before redrawing for current state
   radarSvgG.selectAll("polygon.radar-type").remove();
   radarSvgG.selectAll("polygon.radar-avg").remove();
   radarSvgG.selectAll("text.radar-val-label").remove();
@@ -669,7 +660,9 @@ function updateRadar() {
     radarRefPath.attr("opacity", 0);
   }
 
-  // animated active polygon — morph via attrTween for smooth transition
+  // animated active polygon — morph via attrTween for smooth transition.
+  // Also set `d` directly: ensures the polygon renders even if the rAF-
+  // backed transition is throttled (e.g. tab inactive during init).
   const toPoints   = radarPoints(activeStats);
   const fromPoints = radarBrushPath.property("__prevPoints") || toPoints;
 
@@ -677,6 +670,7 @@ function updateRadar() {
     .attr("fill", activeColor).attr("fill-opacity", brushAvg ? 0.28 : 0.2)
     .attr("stroke", activeColor).attr("stroke-width", brushAvg ? 3 : 2.5)
     .attr("opacity", 1)
+    .attr("d", pointsToPathD(toPoints))   // guaranteed final shape
     .interrupt()
     .transition().duration(600).ease(d3.easeCubicInOut)
     .attrTween("d", () => polygonTween(fromPoints, toPoints));
@@ -688,13 +682,15 @@ function updateRadar() {
   RADAR_DIMS.forEach((dim, i) => {
     const angle = (2 * Math.PI * i / RADAR_DIMS.length) - Math.PI / 2;
     const r = radarScale(activeStats[dim]);
+    // vertex value labels on the active polygon — drawn at full opacity
+    // so they're visible even if the fade-in transition is throttled
+    // (e.g. tab inactive during initial load).
     radarSvgG.append("text").attr("class", "radar-val-label")
       .attr("x", radarCx + r * Math.cos(angle) + 8 * Math.cos(angle))
       .attr("y", radarCy + r * Math.sin(angle) + 8 * Math.sin(angle))
       .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
       .style("fill", activeColor).style("font-size", "11px").style("font-weight", "600")
-      .attr("opacity", 0).text(Math.round(activeStats[dim]))
-      .transition().duration(300).attr("opacity", 1);
+      .text(Math.round(activeStats[dim]));
   });
 
   // update legend text to reflect what each polygon represents
@@ -718,16 +714,19 @@ let streamSvgG, streamXScale, streamInnerW, streamInnerH, streamSeries;
 function drawStream() {
   const container = document.getElementById("chart-stream");
   const { width, height } = container.getBoundingClientRect();
-  const margin = { top: 16, right: 16, bottom: 36, left: 44 };
+  // right margin keeps the "Gen 6" tick label from clipping on the edge;
+  // bottom is sized for axis ticks + "Generation" axis label.
+  const margin = { top: 28, right: 28, bottom: 50, left: 52 };
   streamInnerW = width          - margin.left - margin.right;
-  streamInnerH = (height - 26) - margin.top  - margin.bottom;
+  streamInnerH = (height - 38) - margin.top  - margin.bottom;
 
   d3.select("#chart-stream svg").remove();
 
+  // svg root + inner group shifted by margins
   const svg = d3.select("#chart-stream")
     .append("svg")
     .attr("width", width)
-    .attr("height", height - 26);
+    .attr("height", height - 38);
 
   streamSvgG = svg.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
@@ -791,11 +790,12 @@ function drawStream() {
         .tickFormat(d => `Gen ${d}`)
     );
 
-  // x axis label
+  // x axis label — kept comfortably inside the SVG's bottom margin so the
+  // text's descenders ('g') don't fall into the panel's clipped area.
   streamSvgG.append("text")
     .attr("class", "axis-label")
     .attr("x", streamInnerW / 2)
-    .attr("y", streamInnerH + 32)
+    .attr("y", streamInnerH + 36)
     .attr("text-anchor", "middle")
     .text("Generation");
 
@@ -885,11 +885,12 @@ function handleBrush(event) {
   updateBrushBadge();
 }
 
-// called by d3.zoom on zoom events
+// called by d3.zoom on zoom events — matches the initial tick count
+// from drawScatter so axes don't suddenly densify when the user zooms in
 function handleZoom(event) {
   const newX = event.transform.rescaleX(scatterXScale);
   const newY = event.transform.rescaleY(scatterYScale);
-  scatterSvgG.select(".x-axis").call(d3.axisBottom(newX).ticks(8));
+  scatterSvgG.select(".x-axis").call(d3.axisBottom(newX).ticks(6));
   scatterSvgG.select(".y-axis").call(d3.axisLeft(newY).ticks(6));
   scatterSvgG.select(".dots-group").selectAll("circle.dot")
     .attr("cx", d => newX(d.Attack))
