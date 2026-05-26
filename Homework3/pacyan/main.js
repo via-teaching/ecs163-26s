@@ -828,8 +828,8 @@ function drawScatter(data) {
                 updateChord(data);
             } else {
                 // isolate just this type, grey out all others 
-                activeTypes.clear();
-                activeTypes.add(type);
+                activeTypeFilter.clear();
+                activeTypeFilter.add(type);
                 pokemonTypes.forEach(function (t) {
                     const on = activeTypeFilter.has(t);
                     legG.select(`g[data-type="${t}"] circle`)
