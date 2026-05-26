@@ -36,11 +36,21 @@ class BarChart {
         // chart title
         this.svg.append("text")
             .attr("x", this.width / 2)
-            .attr("y", -15)
+            .attr("y", -22)
             .attr("text-anchor", "middle")
             .style("font-size", "16px")
             .style("font-weight", "bold")
             .text("Top 10 Most Common Data Science Roles");
+
+        // interactive subtitle annotation
+        this.svg.append("text")
+            .attr("x", this.width / 2)
+            .attr("y", -5)
+            .attr("text-anchor", "middle")
+            .style("font-size", "11px")
+            .style("fill", "#666")
+            .style("font-style", "italic")
+            .text("Interactive: Click a bar to filter focus charts below, click again to reset");
 
         // uses html tooltip div
         this.tooltip = d3.select("#hover-tooltip");
