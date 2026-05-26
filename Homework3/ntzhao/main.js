@@ -402,8 +402,6 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
       "Mental health challenges",
     );
 
-    console.log(genre, filteredXIntercept);
-
     // Add scatterplot trendline
     g2.append("line")
       .attr("class", `temp-trendline trendline-${getGenreKey(genre)}`)
@@ -437,6 +435,69 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
       .style("opacity", 0.2)
       .style("stroke-width", 2);
   }
+
+  // Scatterplot legend
+  const scatterLegendDotSize = legendDotSize * 0.75;
+
+  const scatterLegend = g2
+    .append("g")
+    .attr("transform", `translate(0, ${visSizes.plot2.height + 80})`);
+
+  // Create legend label
+  const scatterLegendLabel = scatterLegend
+    .append("text")
+    .attr("anchor", "middle")
+    .attr("x", 0)
+    .attr("y", -40)
+    .text("Favorite Genre")
+    .style("font-family", "Arial")
+    .style("font-size", standardFontSize * 0.833);
+
+  // Create legend hint subtext
+  const scatterLegendSubtext = scatterLegend
+    .append("text")
+    .attr("anchor", "middle")
+    .attr("x", 0)
+    .attr("y", -28)
+    .text("(HOVER TO HIGHLIGHT)")
+    .style("font-family", "Arial")
+    .style("font-size", standardFontSize * 0.75);
+
+  const scatterLegendItem = scatterLegend
+    .selectAll(".legend-item")
+    .data(genres)
+    .enter()
+    .append("g")
+    .attr(
+      "transform",
+      (d, i) =>
+        `translate(${Math.floor(i % 8) * 80}, ${Math.floor(i / 8) * (scatterLegendDotSize + 4) - 20})`,
+    )
+    .style("cursor", "pointer")
+    .on("mouseover", (event, idx) => onGenreMouseEnter(genres[idx]))
+    .on("mouseleave", (event, idx) => onGenreMouseLeave(genres[idx]));
+
+  // Create colored squares for legend
+  scatterLegendItem
+    .append("rect")
+    .attr(
+      "class",
+      (d, i) => `legend-square legend-square-${getGenreKey(genres[i])}`,
+    )
+    .attr("width", scatterLegendDotSize)
+    .attr("height", scatterLegendDotSize)
+    .style("fill", (d) => color(d))
+    .style("opacity", 0.75);
+
+  // Create legend item text labels
+  scatterLegendItem
+    .append("text")
+    .attr("x", scatterLegendDotSize + 4)
+    .attr("y", scatterLegendDotSize / 2)
+    .attr("dominant-baseline", "middle")
+    .style("font-size", standardFontSize * 0.833)
+    .style("font-family", "Arial")
+    .text((d) => d);
 
   // PARALLEL COORDINATES PLOT
   // Docs: https://d3-graph-gallery.com/parallel.html
