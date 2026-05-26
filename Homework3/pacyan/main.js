@@ -106,6 +106,7 @@ function computeAverages(data) {
         stat,
         avg: d3.mean(data, d => +d[stat]),
         top3: [...data].sort((a, b) => +b[stat] - +a[stat])
+            // sort descending by stat value, take top 3 names for tooltip display 
             .slice(0, 3).map(d => d.Name)
     }));
 }
@@ -227,6 +228,7 @@ function drawBarChart(data) {
         .attr("stroke-width", 0.8);
 
     statCols.forEach(function (stat, i) {
+        // draw one colored square and label per stat in the legend 
         const row = barLegG.append("g")
             .attr("transform", `translate(8, ${i * 20 + 6})`);
 
@@ -265,7 +267,9 @@ function drawBarChart(data) {
         .attr("rx", 3)
         .attr("opacity", 0.82)
         .style("cursor", "pointer")
+
         .on("mouseover", function (event, d) {
+            //highlight bar and show tooltip with stat average and top 3 pokemon in selection 
             d3.select(this).attr("opacity", 1).attr("stroke", "#333").attr("stroke-width", 1.5);
             tooltip.style("display", "block")
                 .style("left", (event.pageX + 14) + "px")
@@ -277,10 +281,12 @@ function drawBarChart(data) {
                        ${d.top3.map((n, i) => `${i + 1}. ${n}`).join("<br>")}`);
         })
         .on("mousemove", function (event) {
+            // keep tooltip following cursor 
             tooltip.style("left", (event.pageX + 14) + "px")
                 .style("top", (event.pageY - 38) + "px");
         })
         .on("mouseout", function () {
+            // restore bar opacity and hide tooltip on mouse leave 
             d3.select(this).attr("opacity", 0.82).attr("stroke", "none");
             hideTooltip();
         })
@@ -462,6 +468,7 @@ function drawChord(data) {
         .attr("stroke", "#ddd").attr("stroke-width", 0.8);
 
     pokemonTypes.forEach(function (type, i) {
+        // draw one colored circle and type name per pokemon type in legend 
         const col = Math.floor(i / colSize);
         const row = i % colSize;
 
@@ -486,6 +493,7 @@ function drawChord(data) {
 
 // draws the chord arcs, ribbons, and labels
 function renderChordLayout(data) {
+    // recalculate chord dimensions in case of resize before redraw 
     chordTop = H * 0.54;
     chordHeight = H * 0.46 - chordMargin.top - chordMargin.bottom;
     chordRadius = Math.max(40, Math.min(W * 0.14, chordHeight) / 2 - 5);
@@ -509,6 +517,7 @@ function renderChordLayout(data) {
         .attr("opacity", 0) // start invisible for fade-in animation 
         .style("cursor", "pointer")
         .on("mouseover", function (d) {
+            // highlight ribbon and show tooltip listing dual-type pokemon in selection 
             const event = d3.event;
             const type = pokemonTypes[d.index];
 
@@ -534,12 +543,14 @@ function renderChordLayout(data) {
                        <em style="color:#888;font-size:10px">Primary type Pokémon:</em><br>
                        ${sample}${more}`);
         })
-        .on("mousemove", function () {                     // ← no event arg
+        .on("mousemove", function () {
+            // track cursor for ribbon tooltip                   
             const event = d3.event;
             tooltip.style("left", (event.pageX + 14) + "px")
                 .style("top", (event.pageY - 38) + "px");
         })
         .on("mouseout", function () {
+            // restore ribbon opacity and hide tooltip 
             d3.select(this).attr("opacity", 0.85).attr("stroke-width", 0.5);
             chordG.selectAll(".chord-ribbon")
                 .transition().duration(150).attr("opacity", 0.35);
@@ -776,11 +787,13 @@ function drawScatter(data) {
             .style("cursor", "pointer");
 
         row.append("circle")
+            // colored dot match the type's color in scatter plot 
             .attr("class", `leg-circle-${type.replace(/\s/g, "")}`)
             .attr("cx", 5).attr("cy", legRowH * 0.4).attr("r", 4.5)
             .attr("fill", typeColor(type));
 
         row.append("text")
+            // type name label next to dot 
             .attr("class", `leg-text-${type.replace(/\s/g, "")}`)
             .attr("x", 14).attr("y", legRowH * 0.55)
             .attr("dominant-baseline", "middle")
