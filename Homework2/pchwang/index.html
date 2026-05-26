@@ -1,0 +1,82 @@
+<!doctype html>
+<html style="width:100%;height:100%;">
+<head>
+    <meta charset="utf-8">
+    <title>Pokemon Dashboard</title>
+    <style>
+        /* Reset margins and fill the whole screen */
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100vh;
+            background: #1a1a2e;
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr 1fr 1fr;
+        }
+
+        #header { grid-row: 1; }
+        #chart1 { grid-row: 2; }
+        #chart2 { grid-row: 3; }
+        #chart3 { grid-row: 4; }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-title {
+            fill: #eee;
+            font-family: sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .axis text {
+            fill: #ccc;
+            font-family: sans-serif;
+            font-size: 11px;
+        }
+
+        .axis line, .axis path {
+            stroke: #ccc;
+        }
+
+        .axis-label {
+            fill: #ccc;
+            font-family: sans-serif;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dashboard header explaining the focus + context relationship between views -->
+    <div id="header" style="
+        color: #ccc;
+        font-family: sans-serif;
+        font-size: 12px;
+        padding: 6px 20px;
+        background: #12122a;
+        border-bottom: 1px solid #333;
+    ">
+        <strong style="color:white; font-size:14px;">Pokémon Dashboard</strong>
+        &nbsp;·&nbsp;
+        <em>Context:</em> type distribution (top) →
+        <em>Focus:</em> attack vs defense per Pokémon (middle) →
+        <em>Detail:</em> full stat profiles by type (bottom)
+    </div>
+
+    <!-- Chart 1: Overview bar chart - Pokemon count by type -->
+    <div id="chart1"><svg></svg></div>
+
+    <!-- Chart 2: Focus scatter plot - Attack vs Defense colored by type -->
+    <div id="chart2"><svg></svg></div>
+
+    <!-- Chart 3: Advanced parallel coordinates - all 6 base stats -->
+    <div id="chart3"><svg></svg></div>
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
