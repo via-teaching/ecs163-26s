@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Pokemon stats dashboard">
+    <title>Pokemon Dashboard</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- css -->
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --panel-bg: #1e293b;
+            --panel-border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: var(--panel-bg);
+            border-bottom: 2px solid var(--panel-border);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+        }
+
+        .header-title-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-family: sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-reset {
+            background: rgba(244, 63, 94, 0.15);
+            border: 1px solid rgba(244, 63, 94, 0.4);
+            color: #fda4af;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            font-family: sans-serif;
+        }
+
+        .btn-reset:hover {
+            background: rgba(244, 63, 94, 0.3);
+            box-shadow: 0 0 10px rgba(244, 63, 94, 0.2);
+            transform: translateY(-1px);
+        }
+
+        #global-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid var(--panel-border);
+            padding: 12px 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 4px 10px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .legend-item:hover {
+            color: var(--text-main);
+            transform: translateY(-1px);
+        }
+
+        .legend-item.active-filter {
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            flex-grow: 1;
+            height: calc(100vh - 120px);
+            max-height: calc(100vh - 120px);
+            overflow: hidden;
+        }
+
+        .visuals-container {
+            display: grid;
+            grid-template-rows: 55% 45%;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .bottom-visuals {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .view-panel {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            transition: border-color var(--transition-speed);
+        }
+
+        .view-panel:hover {
+            border-color: #475569;
+        }
+
+        .view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        .view-title {
+            font-family: sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .view-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .select-input {
+            background-color: #0f172a;
+            border: 1px solid var(--panel-border);
+            color: var(--text-main);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+            transition: border-color var(--transition-speed);
+        }
+
+        .select-input:focus {
+            border-color: #6366f1;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: 100%;
+            flex-grow: 1;
+            position: relative;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .axis path,
+        .axis line {
+            stroke: #334155;
+        }
+
+        .axis text {
+            fill: #94a3b8;
+            font-size: 11px;
+            font-family: sans-serif;
+        }
+
+        .grid-line line {
+            stroke: #1e293b;
+            stroke-opacity: 0.7;
+            shape-rendering: crispEdges;
+        }
+
+        .axis-label {
+            font-size: 12px;
+            font-weight: 600;
+            fill: #cbd5e1;
+            font-family: sans-serif;
+        }
+
+        .line {
+            fill: none;
+            stroke-width: 1px;
+            opacity: 0.15;
+            transition: stroke-width 0.3s, opacity 0.3s;
+        }
+
+        .line.active {
+            opacity: 0.85;
+            stroke-width: 2px;
+        }
+
+        .line.inactive {
+            opacity: 0.02;
+            stroke-width: 0.5px;
+        }
+
+        .line.highlighted {
+            opacity: 1;
+            stroke-width: 4px !important;
+            filter: drop-shadow(0px 0px 4px rgba(255, 255, 255, 0.4));
+        }
+
+        .brush .selection {
+            fill: #818cf8;
+            fill-opacity: 0.25;
+            stroke: #6366f1;
+            stroke-width: 1px;
+            stroke-dasharray: 2, 2;
+        }
+
+        .brush .handle {
+            fill: #818cf8;
+            stroke: #312e81;
+        }
+
+        .dot {
+            opacity: 0.75;
+            stroke-width: 1px;
+            transition: r 0.3s, opacity 0.3s, fill 0.5s;
+            cursor: pointer;
+        }
+
+        .dot:hover {
+            opacity: 1 !important;
+            stroke: #fff !important;
+            stroke-width: 2px !important;
+        }
+
+        .dot.inactive {
+            opacity: 0.05 !important;
+            pointer-events: none;
+        }
+
+        .dot.selected-dot {
+            opacity: 1 !important;
+            stroke: #ffffff !important;
+            stroke-width: 3px !important;
+            filter: drop-shadow(0 0 8px currentColor);
+        }
+
+        .zoom-overlay-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid var(--panel-border);
+            color: var(--text-main);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+            backdrop-filter: blur(5px);
+            z-index: 5;
+            transition: all var(--transition-speed);
+        }
+
+        .zoom-overlay-btn:hover {
+            border-color: #6366f1;
+            background: #6366f1;
+        }
+
+        .bar {
+            opacity: 0.8;
+            cursor: pointer;
+            transition: fill 0.3s, opacity 0.3s;
+        }
+
+        .bar:hover {
+            opacity: 1;
+            stroke: #fff;
+            stroke-width: 1.5px;
+        }
+
+        .bar.inactive {
+            opacity: 0.2;
+        }
+
+        .bar.active-bar {
+            opacity: 1;
+            stroke: #10b981;
+            stroke-width: 2px;
+            filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.4));
+        }
+
+        .detail-sidebar {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .pokemon-card {
+            background: var(--panel-bg);
+            border: 2px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .card-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: var(--text-muted);
+            padding: 20px;
+            gap: 15px;
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+            height: 100%;
+        }
+
+        .pokemon-image-container {
+            width: 140px;
+            height: 140px;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--panel-border);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .pokemon-image-container:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .pokemon-image {
+            width: 130px;
+            height: 130px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        .pokemon-id {
+            background-color: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #818cf8;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-bottom: 5px;
+            font-family: sans-serif;
+        }
+
+        .pokemon-name {
+            font-family: sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 5px;
+            text-align: center;
+            text-transform: capitalize;
+        }
+
+        .type-badges {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+
+        .badge-pill {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 12px;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        .phys-specs {
+            display: flex;
+            width: 100%;
+            justify-content: space-around;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 0.8rem;
+        }
+
+        .spec-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .spec-val {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .spec-lbl {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .stats-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .stat-row {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            width: 100%;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .stat-name {
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .stat-bar-bg {
+            height: 7px;
+            background-color: rgba(30, 41, 59, 0.8);
+            border-radius: 4px;
+            overflow: hidden;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.1, 0.8, 0.2, 1);
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--panel-border);
+            color: var(--text-main);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            font-family: sans-serif;
+            line-height: 1.4;
+            backdrop-filter: blur(5px);
+            transition: opacity 0.15s;
+        }
+
+        .tooltip strong {
+            font-family: sans-serif;
+            font-size: 0.85rem;
+            color: #fb7185;
+            display: block;
+            margin-bottom: 4px;
+            text-transform: capitalize;
+        }
+
+        .tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 2px;
+        }
+
+        .tooltip-lbl {
+            color: var(--text-muted);
+        }
+
+        .tooltip-val {
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto;
+                height: auto;
+                max-height: none;
+                overflow: visible;
+            }
+            .visuals-container {
+                height: 1000px;
+            }
+            .pokemon-card {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title-container">
+            <h1>Pokemon Stats and Interactions</h1>
+            <div class="subtitle">ECS 163 Homework 3 - Focus + Context - Parwaan Virk</div>
+        </div>
+        <div class="header-actions">
+            <button id="btn-reset" class="btn-reset" title="clear all filters">Reset Dashboard</button>
+        </div>
+    </header>
+
+    <!-- type filters legend -->
+    <div id="global-legend" role="group" aria-label="type filters"></div>
+
+    <div class="dashboard-container">
+        <main class="visuals-container">
+            <!-- parallel coords plot -->
+            <div id="view1" class="view-panel">
+                <div class="view-header">
+                    <h2 class="view-title">
+                        Combat Stats Overview (Parallel Coordinates)
+                    </h2>
+                    <div class="subtitle" style="margin:0;">Brush axes vertically to filter Pokemon</div>
+                </div>
+                <div class="svg-container">
+                    <svg id="svg-view1"></svg>
+                </div>
+            </div>
+
+            <div class="bottom-visuals">
+                <!--dynamic bar chart -->
+                <div id="view2" class="view-panel">
+                    <div class="view-header">
+                        <h2 class="view-title">
+                            Primary Type Distribution (Dynamic Bar Chart)
+                        </h2>
+                        <div class="subtitle" style="margin:0;">Click bar to filter by type</div>
+                    </div>
+                    <div class="svg-container">
+                        <svg id="svg-view2"></svg>
+                    </div>
+                </div>
+
+                <!--scatter plo t -->
+                <div id="view3" class="view-panel">
+                    <div class="view-header">
+                        <h2 class="view-title">
+                            Attribute Scaling Matrix (Zoomable Scatter by Dragging)
+                        </h2>
+                        <div class="view-controls">
+                            <label for="scatter-x-select" style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">X:</label>
+                            <select id="scatter-x-select" class="select-input" aria-label="select x axis">
+                                <option value="Weight_kg" selected>Weight (kg)</option>
+                                <option value="Height_m">Height (m)</option>
+                                <option value="Total">Total Stats</option>
+                                <option value="HP">HP</option>
+                                <option value="Attack">Attack</option>
+                                <option value="Defense">Defense</option>
+                                <option value="Sp_Atk">Sp. Atk</option>
+                                <option value="Sp_Def">Sp. Def</option>
+                                <option value="Speed">Speed</option>
+                            </select>
+
+                            <label for="scatter-y-select" style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Y:</label>
+                            <select id="scatter-y-select" class="select-input" aria-label="select y axis">
+                                <option value="Weight_kg">Weight (kg)</option>
+                                <option value="Height_m" selected>Height (m)</option>
+                                <option value="Total">Total Stats</option>
+                                <option value="HP">HP</option>
+                                <option value="Attack">Attack</option>
+                                <option value="Defense">Defense</option>
+                                <option value="Sp_Atk">Sp. Atk</option>
+                                <option value="Sp_Def">Sp. Def</option>
+                                <option value="Speed">Speed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="svg-container">
+                        <!-- reset zoom button -->
+                        <button id="btn-reset-zoom" class="zoom-overlay-btn">Reset Zoom</button>
+                        <svg id="svg-view3"></svg>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- details sidebar panel -->
+        <aside class="detail-sidebar">
+            <div id="pokemon-detail-card" class="pokemon-card">
+                <!-- empty selection placeholder -->
+                <div id="card-placeholder" class="card-placeholder">
+                    <h3 style="font-family:sans-serif; font-size:1.1rem; color:var(--text-main);">No Pokemon Selected</h3>
+                    <p style="font-size:0.8rem; line-height:1.4;">Click on a dot in the Scatter Plot or a line in the Parallel Coordinates to analyze stats, attributes, and high-resolution artwork.</p>
+                </div>
+
+                <!-- selected pokemon card content -->
+                <div id="card-content" class="card-content" style="display: none;">
+                    <div id="detail-id" class="pokemon-id">#000</div>
+                    <h3 id="detail-name" class="pokemon-name">Bulbasaur</h3>
+                    
+                    <div id="detail-types" class="type-badges">
+                        <span class="badge-pill" style="background-color: #7AC74C;">Grass</span>
+                        <span class="badge-pill" style="background-color: #A33EA1;">Poison</span>
+                    </div>
+
+                    <div class="pokemon-image-container">
+                        <img id="detail-img" class="pokemon-image" src="" alt="pokemon artwork">
+                    </div>
+
+                    <div class="phys-specs">
+                        <div class="spec-item">
+                            <span id="detail-weight" class="spec-val">0.0 kg</span>
+                            <span class="spec-lbl">Weight</span>
+                        </div>
+                        <div class="spec-item" style="border-left: 1px solid var(--panel-border); padding-left: 15px;">
+                            <span id="detail-height" class="spec-val">0.0 m</span>
+                            <span class="spec-lbl">Height</span>
+                        </div>
+                        <div class="spec-item" style="border-left: 1px solid var(--panel-border); padding-left: 15px;">
+                            <span id="detail-generation" class="spec-val">Gen 1</span>
+                            <span class="spec-lbl">Gens</span>
+                        </div>
+                    </div>
+
+                    <div class="stats-container">
+                        <h4 style="font-family:sans-serif; font-size:0.85rem; color:var(--text-muted); margin-bottom: 5px;">Base Statistics</h4>
+                        
+                        <div class="stat-row">
+                            <div class="stat-header">
+                                <span class="stat-name">HP</span>
+                                <span id="val-HP" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-bar-bg">
+                                <div id="bar-HP" class="stat-bar-fill"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-row">
+                            <div class="stat-header">
+                                <span class="stat-name">Attack</span>
+                                <span id="val-Attack" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-bar-bg">
+                                <div id="bar-Attack" class="stat-bar-fill"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-row">
+                            <div class="stat-header">
+                                <span class="stat-name">Defense</span>
+                                <span id="val-Defense" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-bar-bg">
+                                <div id="bar-Defense" class="stat-bar-fill"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-row">
+                            <div class="stat-header">
+                                <span class="stat-name">Sp. Atk</span>
+                                <span id="val-Sp_Atk" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-bar-bg">
+                                <div id="bar-Sp_Atk" class="stat-bar-fill"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-row">
+                            <div class="stat-header">
+                                <span class="stat-name">Sp. Def</span>
+                                <span id="val-Sp_Def" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-bar-bg">
+                                <div id="bar-Sp_Def" class="stat-bar-fill"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-row">
+                            <div class="stat-header">
+                                <span class="stat-name">Speed</span>
+                                <span id="val-Speed" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-bar-bg">
+                                <div id="bar-Speed" class="stat-bar-fill"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-row" style="margin-top: 5px; border-top: 1px solid var(--panel-border); padding-top: 8px;">
+                            <div class="stat-header" style="color:var(--text-main);">
+                                <span class="stat-name">Total Stats Base</span>
+                                <span id="val-Total" class="stat-value" style="color:#f43f5e; font-size:0.9rem;">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+    <div id="tooltip" class="tooltip"></div>
+    <script src="main.js"></script>
+</body>
+</html>
