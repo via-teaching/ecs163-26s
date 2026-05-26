@@ -120,7 +120,7 @@ class ScatterPlot {
             .transition().duration(800)
             .attr("cx", d => this.x(d.salary_in_usd))
             // adds some randomness to y positions so points don't overlap
-            .attr("cy", d => this.y(d.experience_level) + ((d.id % 7) - 3) * 4)
+            .attr("cy", d => this.y(d.experience_level) + ((d.id * 17) % 21 - 10))
             .attr("r", 5)
             .attr("fill", d => this.color(d.experience_level))
             .attr("fill-opacity", 0.6)
