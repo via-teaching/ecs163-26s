@@ -6,9 +6,7 @@ function drawBarChart(newData) {
     // Grouped Bar Chart
     const effectCategories = ["Improve", "No effect", "Worsen"];
 
-    // d3.nest() was used in order to turn group everything. This would allow me to calculate the
-    // percentages of every genre's votes of Improve, No effect, or Worsen
-    // Also sorted all the countries alphabetically
+    // d3.nest() was used in order to turn group everything
     let effectData = d3.nest()
         .key(d => d["Fav genre"])
         .rollup(v => {
@@ -16,7 +14,10 @@ function drawBarChart(newData) {
             return {
                 "Improve": v.filter(d => d["Music effects"] ==="Improve").length / total,
                 "No effect": v.filter(d => d["Music effects"] === "No effect").length / total,
-                "Worsen": v.filter(d => d["Music effects"] === "Worsen").length / total
+                "Worsen": v.filter(d => d["Music effects"] === "Worsen").length / total,
+                "Improve_count": v.filter(d => d["Music effects"] === "Improve").length,
+                "No effect_count": v.filter(d => d["Music effects"] ==="No effect").length,
+                "Worsen_count": v.filter(d => d["Music effects"] === "Worsen").length
             };
         })
         .entries(newData)
@@ -29,19 +30,16 @@ function drawBarChart(newData) {
     });
 
     // dr.scaleband() was used to create a scale for each of the genres
-    // this allows me to map each domain into a physical part of the chart
-    // and allows me to space each genre on the x-axis accordingly
     const x0 = d3.scaleBand()
         .domain(effectData.map(d => d.Genre))
         .range([0, distrWidth])
-        .padding(0.2);
+        .padding(0.05)
 
     // Same as above but to group different bar charts data for the same 
     // genre
     const x1 = d3.scaleBand()
         .domain(effectCategories)
         .range([0, x0.bandwidth()])
-        .padding(0.05);
 
     // d3.scaleLinear() allows me to scale my percentages from 0-100%
     const y = d3.scaleLinear()
@@ -57,6 +55,43 @@ function drawBarChart(newData) {
     // Create chart container
     const gBar = svg.append("g")
         .attr("transform", `translate(${distrLeft + 50}, ${distrTop + 40})`);
+
+  
+    // Create pie chart if mouse hover
+    const pieG = svg.append("g")
+        .attr("class", "pie-pieG-group")
+        .style("opacity", 0)
+        .style("pointer-events", "none");
+
+    // background creation
+    pieG.append("rect")
+        .attr("width", 150)
+        .attr("height", 110)
+        .attr("rx", 6)
+        .attr("fill", "rgba(255, 255, 255, 0.96)")
+        .attr("stroke", "#bbb")
+        .attr("stroke-width", "1px")
+        .style("filter", "drop-shadow(0px 2px 5px rgba(0,0,0,0.15))");
+
+    // title for subview
+    const pieTitle = pieG.append("text")
+        .attr("x", 12)
+        .attr("y", 18)
+        .style("font-size", "11px")
+        .style("font-weight", "bold")
+        .style("fill", "#222");
+
+    // Create piechart
+    const tooltip = pieG.append("g")
+        .attr("transform", "translate(38, 63)");
+
+    // add legend
+    const pieLegend = pieG.append("g")
+        .attr("transform", "translate(79, 42)");
+
+    const miniRadius = 30;
+    const miniArc = d3.arc().innerRadius(0).outerRadius(miniRadius);
+    const pieLayout = d3.pie().value(p => p.percent).sort(null);
 
     // Create elements for each group 
     const genreGroups = gBar.selectAll(".genre-group")
@@ -74,6 +109,60 @@ function drawBarChart(newData) {
         .attr("width", x1.bandwidth())
         .attr("height", d => distrHeight - y(d.value))
         .attr("fill", d => effectColors(d.key));
+
+    //mouseover logic.
+    genreGroups
+        .style("cursor", "pointer")
+        .on("mouseover", function(selectedData) {
+            pieG.transition().duration(150).style("opacity", 1);
+            pieTitle.text(`${selectedData.Genre} Participant Vote`);
+            const pieData = effectCategories.map(cat => ({
+                category: cat,
+                percent: selectedData[cat],
+                count: selectedData[cat + "_count"]
+            }));
+
+            tooltip.selectAll("*").remove();
+            pieLegend.selectAll("*").remove();
+
+            // Draw mini pie
+            tooltip.selectAll("path")
+                .data(pieLayout(pieData))
+                .enter().append("path")
+                .attr("d", miniArc)
+                .attr("fill", d => effectColors(d.data.category))
+
+            // display next to legend
+            pieData.forEach((item, index) => {
+                const legendRow = pieLegend.append("g")
+                    .attr("transform", `translate(0, ${index * 15})`);
+
+                legendRow.append("rect")
+                    .attr("width", 10).attr("height", 7).attr("rx", 1.5)
+                    .attr("fill", effectColors(item.category));
+
+                legendRow.append("text")
+                    .attr("x", 12).attr("y", 7)
+                    .style("font-size", "9px")
+                    .style("fill", "#444")
+                    .text(`${item.category.split(' ')[0]}: ${item.count}`);
+            });
+        })
+
+        //cursor movement 
+        .on("mousemove", function() {
+        const mouseCoords = d3.mouse(svg.node());
+        const tooFarRight = width - 200;
+            //ensure view
+            if (mouseCoords[0] > tooFarRight) {
+                pieG.attr("transform", `translate(${mouseCoords[0] - 160}, ${mouseCoords[1] - 120})`);
+            } else {
+                pieG.attr("transform", `translate(${mouseCoords[0] + 15}, ${mouseCoords[1] - 120})`);
+            }
+        })
+        .on("mouseout", function() {
+            pieG.transition().duration(150).style("opacity", 0);
+        });
 
     // Generate the bottom axis with d3.axisBottom()
     gBar.append("g")

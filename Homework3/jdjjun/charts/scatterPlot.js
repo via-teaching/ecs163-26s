@@ -1,4 +1,4 @@
-// scatterPlot.js - Mean Mental Health By Age Scatter Module
+// scatterPlot.js 
 function drawScatterPlot(newData, genreCounts) {
     // d3.select() crreate the d3 selection object
     const svg = d3.select("svg");
@@ -141,7 +141,7 @@ function drawScatterPlot(newData, genreCounts) {
         });
     });
 
-    
+    //add brush
     const brush = d3.brush()
         .extent([[60, 40], [scatterWidth+ 65, scatterHeight + 40]])
         .on("start brush end", brushed)
@@ -149,19 +149,31 @@ function drawScatterPlot(newData, genreCounts) {
     svg.append("g")
         .attr("class", "brush")
         .call(brush);
-    
+    //Add brushed area, see which circles are within the area
+    /** 
     function brushed() {
         const selection = d3.event.selection;
         if (selection) {
             const [[x0, y0], [x1, y1]] = selection;
-            // Search your scatter plot circles to see which ones are inside these pixel coordinates
             circle.classed("selected", d => {
-                return x0 <= xScale(d.Age) && xScale(d.Age) <= x1 &&
+                return x0 <=spx(d.Age) && xScale(d.Age) <= x1 &&
                    y0 <= yScale(d.Score) && yScale(d.Score) <= y1;
             });
-        }
-    }  
+        } **/
 
+    function brushed() {
+    const selection = d3.event.selection;
+    if (selection) {
+        const [[x0, y0], [x1, y1]] = selection;
+        dataCircles.classed("selected", d => {
+            const x = spx(d.age);
+            const y = spy(d.meanScore);
+
+            return x0 <= x && x <= x1 &&
+                   y0 <= y && y <= y1;
+        });
+    }
+    }
 
     
 }

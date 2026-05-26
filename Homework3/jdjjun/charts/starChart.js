@@ -260,7 +260,7 @@ function drawStarChart(newData, genreCounts) {
             });
         }
 
-        // Push new entity token to tracking array
+        // Push new genre to array
         loadedGenres.push({ name: genreName, data: radarData });
 
         const sourceCell = smallMultiplesG.selectAll(".star-chart-container").filter(d => d.genreName === genreName).datum();
