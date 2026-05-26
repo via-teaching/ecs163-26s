@@ -1,0 +1,108 @@
+<!doctype html>
+<html style="width:100%;height:100%;">
+
+<head>
+    <meta charset="utf-8">
+    <title>Cosmetics Explorer Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        /* controls overflow, scale keeps page as one main screen */
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            background: #f5f4f0;
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+        }
+
+        /* positioning the main dashboard title centered screen */
+        #dashboard-title {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(11px, 1.4vw, 18px);
+            font-weight: bold;
+            color: #2d2d2d;
+            letter-spacing: 1px;
+            pointer-events: none;
+            width: 90vw;
+            text-align: center;
+        }
+
+        /* text subheading below the main title, description describing the overall dashboard showing visualizations of cosmetics*/
+        #dashboard-subtitle {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(8px, 0.85vw, 11px);
+            color: #666;
+            font-family: 'Georgia', serif;
+            letter-spacing: 0.3px;
+            pointer-events: none;
+            width: 90vw;
+            text-align: center;
+        }
+
+        svg {
+            display: block;
+        }
+
+        /* axis styling */
+        .axis path,
+        .axis line {
+            stroke: #bbb;
+        }
+
+        .axis text {
+            font-family: 'Georgia', serif;
+            font-size: 11px;
+            fill: #444;
+        }
+
+        /* tooltip */
+        /* tooltip styling for the hover info box that appears when hovering over data points, showing product details */
+        #tooltip {
+            position: absolute;
+            background: rgba(30, 28, 26, 0.88);
+            color: #f5f4f0;
+            padding: 9px 13px;
+            border-radius: 6px;
+            font-size: 12.5px;
+            line-height: 1.55;
+            pointer-events: none;
+            display: none;
+            /* hidden by default, shown on hover */
+            max-width: 220px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- main title and subtitle for dashboard -->
+    <div id="dashboard-title">Cosmetics Explorer (Price, Rating & Skin Compatibility)</div>
+    <div id="dashboard-subtitle">
+        Explore how cosmetic product categories differ in price, ratings, and skin-type compatibility.
+    </div>
+    
+    <!-- tooltip div, show or hide product details based on mouseover events -->
+    <div id="tooltip"></div>
+    
+    <!-- the main SVG container for all visualizations, set to fill the entire viewport -->
+    <svg width="100%" height="100%"></svg>
+
+    <!-- D3.js library for data visualization, and the main.js script containing the code to create the visualizations and interactivity of the dashboard -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <script src="main.js"></script>
+</body>
+
+</html>
