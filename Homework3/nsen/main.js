@@ -14,6 +14,9 @@ const margins = {
 const headerHeight = 100;
 const keyHeight = 20;
 
+// Animation duration (ms)
+const animDur = 175;
+
 // Dimensions for all three charts
 const chartDims = {
   bar: {
@@ -459,10 +462,13 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
       const active = Array.from(selections).every(
         ([key, [min, max]]) => d[key] >= min && d[key] <= max,
       );
-      d3.select(this).style(
-        "stroke",
-        active && activeCategories.has(d.Type_1) ? typeColors(d.Type_1) : deselectedColor,
-      );
+      d3.select(this)
+        .transition("brush")
+        .duration(animDur)
+        .style(
+          "stroke",
+          active && activeCategories.has(d.Type_1) ? typeColors(d.Type_1) : deselectedColor,
+        );
       if (active) {
         d3.select(this).raise();
         selected.push(d);
@@ -478,17 +484,26 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
   const bars = barSvg.selectAll(".bars").on("click", function (event, d) {
     if (activeCategories.has(d.Type_1)) {
       activeCategories.delete(d.Type_1);
-      d3.select(this).style("opacity", 0.3);
+      d3.select(this)
+        .transition("bars-select")
+        .duration(animDur)  
+        .style("opacity", 0.3);
     } else {
       activeCategories.add(d.Type_1);
-      d3.select(this).style("opacity", 1);
+      d3.select(this)
+        .transition("bars-deselect")
+        .duration(animDur)  
+        .style("opacity", 1);
     }
 
     path.each(function (d) {
-      d3.select(this).style(
-        "stroke",
-        activePoints.has(d.Number) && activeCategories.has(d.Type_1) ? typeColors(d.Type_1) : deselectedColor,
-      );
+      d3.select(this)
+        .transition("paths")
+        .duration(animDur)  
+        .style(
+          "stroke",
+          activePoints.has(d.Number) && activeCategories.has(d.Type_1) ? typeColors(d.Type_1) : deselectedColor,
+        );
     })
     scatterSelect();
   });
@@ -496,7 +511,9 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
   function scatterSelect() {
     const dots = scatterSvg
       .selectAll(".mark-circle")
+      .transition("scatter")
+      .duration(animDur)  
       .style("fill-opacity", (d) => (activeCategories.has(d.Type_1) && activePoints.has(d.Number) ? 0.9 : 0))
-      .style("stroke-width", (d) => (activeCategories.has(d.Type_1) && activePoints.has(d.Number) ? 0.8 : 0));
+      .style("stroke-opacity", (d) => (activeCategories.has(d.Type_1) && activePoints.has(d.Number) ? 1 : 0));
   }
 });
