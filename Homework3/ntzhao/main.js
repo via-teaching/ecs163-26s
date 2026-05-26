@@ -363,10 +363,12 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .data(data)
     .enter()
     .append("circle")
+    .attr("class", (d) => `dot dot-${getGenreKey(d["Fav genre"])}`)
     .attr("cx", (d) => scatterX(d["Hours per day"]))
     .attr("cy", (d) => scatterY(d["Mental health challenges"]))
-    .attr("r", 1.5)
-    .style("fill", "#69b3a2");
+    .attr("r", 3)
+    .style("fill", (d) => color(d["Fav genre"]))
+    .style("opacity", 0.5);
 
   // Perform linear regression to get trendline
   const { slope, intercept } = linearRegression(
@@ -377,13 +379,43 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
 
   // Add scatterplot trendline
   g2.append("line")
+    .attr("class", "trendline")
     .attr("x1", scatterX(0))
     .attr("x2", scatterX(20))
     .attr("y1", scatterY(calculateLineValue(slope, intercept, 0)))
     .attr("y2", scatterY(calculateLineValue(slope, intercept, 20)))
-    .style("stroke", "#3896b2")
-    .style("opacity", 0.5)
+    .style("stroke", "#000000")
+    .attr("stroke-dasharray", "4")
+    .style("opacity", 0.75)
     .style("stroke-width", 2);
+
+  for (let genre of genres) {
+    const filteredByGenre = data.filter((d) => d["Fav genre"] === genre);
+    const { slope: filteredSlope, intercept: filteredIntercept } =
+      linearRegression(
+        filteredByGenre,
+        "Hours per day",
+        "Mental health challenges",
+      );
+
+    // Add scatterplot trendline
+    g2.append("line")
+      .attr("class", `temp-trendline trendline-${getGenreKey(genre)}`)
+      .attr("x1", scatterX(0))
+      .attr("x2", scatterX(20))
+      .attr(
+        "y1",
+        scatterY(calculateLineValue(filteredSlope, filteredIntercept, 0)),
+      )
+      .attr(
+        "y2",
+        scatterY(calculateLineValue(filteredSlope, filteredIntercept, 20)),
+      )
+      .style("stroke", color(genre))
+      .attr("stroke-dasharray", "4")
+      .style("opacity", 0.2)
+      .style("stroke-width", 2);
+  }
 
   // PARALLEL COORDINATES PLOT
   // Docs: https://d3-graph-gallery.com/parallel.html
@@ -596,8 +628,45 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
       .style("opacity", 1.0);
   }
 
+  function activateDotHover(genre) {
+    d3.selectAll(".dot")
+      .transition()
+      .duration(200)
+      .style("opacity", 0)
+      .style("fill", "#7b7b7b");
+
+    d3.selectAll(".dot-" + getGenreKey(genre))
+      .transition()
+      .duration(200)
+      .style("opacity", 1.0)
+      .style("fill", (d) => color(d["Fav genre"]));
+
+    d3.selectAll(".temp-trendline")
+      .transition()
+      .duration(200)
+      .style("opacity", 0.1);
+
+    d3.select(".trendline").transition().duration(200).style("opacity", 0.1);
+
+    d3.select(".trendline-" + getGenreKey(genre))
+      .transition()
+      .duration(200)
+      .style("opacity", 1.0);
+  }
+
   function deactivateBarHover() {
     d3.selectAll(".bar").transition().duration(200).style("opacity", 0.75);
+  }
+
+  function deactivateDotHover() {
+    d3.selectAll(".dot")
+      .transition()
+      .duration(200)
+      .style("opacity", 0.75)
+      .style("fill", (d) => color(d["Fav genre"]));
+
+    d3.select(".trendline").style("opacity", 0.75);
+    d3.selectAll(".temp-trendline").style("opacity", 0.1);
   }
 
   function activateParallelHover(genre) {
@@ -639,11 +708,13 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
 
   function onGenreMouseEnter(genre) {
     activateBarHover(genre);
+    activateDotHover(genre);
     activateParallelHover(genre);
   }
 
   function onGenreMouseLeave(genre) {
     deactivateBarHover();
+    deactivateDotHover();
     deactivateParallelHover(genre);
   }
 });
