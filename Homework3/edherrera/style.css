@@ -1,0 +1,144 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: #f4f6f8;
+  color: #1f2933;
+}
+
+.dashboard-header {
+  padding: 1rem 1.5rem 0.5rem;
+}
+
+.dashboard-header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  margin: 0;
+  color: #52606d;
+  font-size: 0.95rem;
+}
+
+.selection-status {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0b7285;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(320px, 42vh) minmax(280px, 38vh);
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem 1.25rem;
+  height: calc(100vh - 5.5rem);
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+  padding: 0.75rem 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.panel-wide {
+  grid-column: 1 / -1;
+}
+
+#parallel-panel {
+  overflow-x: auto;
+}
+
+#parallel-svg {
+  display: block;
+  min-width: 720px;
+}
+
+.panel h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.panel svg {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  overflow: visible;
+}
+
+.chart-title {
+  font-size: 12px;
+  font-weight: 600;
+  fill: #334e68;
+}
+
+.axis-label {
+  font-size: 11px;
+  fill: #486581;
+}
+
+.legend-label {
+  font-size: 10px;
+  fill: #334e68;
+}
+
+.bar-segment {
+  cursor: pointer;
+}
+
+.bar-segment:hover {
+  stroke: #102a43;
+  stroke-width: 1;
+}
+
+.bar-segment.selected {
+  stroke: #0b7285;
+  stroke-width: 2;
+}
+
+.parallel-line {
+  fill: none;
+  stroke-width: 1.5;
+  opacity: 0.55;
+}
+
+.parallel-line.dimmed {
+  opacity: 0.08;
+}
+
+.parallel-line.highlighted {
+  opacity: 0.95;
+  stroke-width: 2.5;
+}
+
+.brush .selection {
+  fill: #0b7285;
+  fill-opacity: 0.15;
+  stroke: #0b7285;
+}
+
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    height: auto;
+  }
+
+  .panel-wide {
+    grid-column: auto;
+  }
+
+  .panel svg {
+    min-height: 260px;
+  }
+}

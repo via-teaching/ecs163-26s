@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hmework 3 - Edgar Herrera</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="dashboard-header">
+    <h1>Edgar Herrera - homework 3</h1>
+    <p class="subtitle">
+      Now click an age group in the overview, or brush an axis in the parallel coordinates view, to explore subsets.
+    </p>
+    <p id="selection-status" class="selection-status">Showing all 30 respondents</p>
+  </header>
+
+  <main class="dashboard-grid">
+  <section class="panel" id="overview-panel">
+    <h2>Overview: Engagement by the age group</h2>
+    <svg id="overview-svg" aria-label="Stacked bar chart of engagement by age group"></svg>
+  </section>
+
+  <section class="panel" id="radar-panel">
+    <h2>Focus: Perceived benefits profile</h2>
+    <svg id="radar-svg" aria-label="Radar chart of average Likert scores"></svg>
+  </section>
+
+  <section class="panel panel-wide" id="parallel-panel">
+    <h2>Advanced: Parallel coordinates (drag on one axis; double-click chart to clear brush)</h2>
+    <svg id="parallel-svg" aria-label="Parallel coordinates plot"></svg>
+  </section>
+  </main>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="code.js"></script>
+</body>
+</html>
