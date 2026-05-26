@@ -618,91 +618,96 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .style("font-size", standardFontSize * 1.125);
 
   // INTERACTIVITY
+  const ANIMATION_LENGTH = 100;
 
   function activateBarHover(genre) {
-    d3.selectAll(".bar").transition().duration(200).style("opacity", 0.5);
+    d3.selectAll(".bar")
+      .transition()
+      .duration(ANIMATION_LENGTH)
+      .style("opacity", 0.5);
 
     d3.select(".bar-" + getGenreKey(genre))
       .transition()
-      .duration(200)
+      .duration(ANIMATION_LENGTH)
       .style("opacity", 1.0);
   }
 
   function activateDotHover(genre) {
     d3.selectAll(".dot")
+      .interrupt()
       .transition()
-      .duration(200)
+      .duration(ANIMATION_LENGTH)
       .style("opacity", 0)
       .style("fill", "#7b7b7b");
 
     d3.selectAll(".dot-" + getGenreKey(genre))
+      .interrupt()
       .transition()
-      .duration(200)
+      .duration(ANIMATION_LENGTH)
       .style("opacity", 1.0)
       .style("fill", (d) => color(d["Fav genre"]));
 
-    d3.selectAll(".temp-trendline")
-      .transition()
-      .duration(200)
-      .style("opacity", 0.1);
+    d3.selectAll(".temp-trendline").interrupt().style("opacity", 0.1);
 
-    d3.select(".trendline").transition().duration(200).style("opacity", 0.1);
+    d3.select(".trendline").interrupt().style("opacity", 0.1);
 
     d3.select(".trendline-" + getGenreKey(genre))
-      .transition()
-      .duration(200)
+      .interrupt()
       .style("opacity", 1.0);
-  }
-
-  function deactivateBarHover() {
-    d3.selectAll(".bar").transition().duration(200).style("opacity", 0.75);
   }
 
   function deactivateDotHover() {
     d3.selectAll(".dot")
       .transition()
-      .duration(200)
+      .duration(ANIMATION_LENGTH)
       .style("opacity", 0.75)
       .style("fill", (d) => color(d["Fav genre"]));
 
-    d3.select(".trendline").style("opacity", 0.75);
-    d3.selectAll(".temp-trendline").style("opacity", 0.1);
+    d3.select(".trendline").interrupt().style("opacity", 0.75);
+    d3.selectAll(".temp-trendline").interrupt().style("opacity", 0.1);
+  }
+
+  function deactivateBarHover() {
+    d3.selectAll(".bar")
+      .transition()
+      .duration(ANIMATION_LENGTH)
+      .style("opacity", 0.75);
   }
 
   function activateParallelHover(genre) {
     d3.selectAll(".line")
       .transition()
-      .duration(200)
+      .duration(ANIMATION_LENGTH)
       .style("stroke", "lightgrey")
       .style("opacity", 0.1);
 
     d3.selectAll("." + getGenreKey(genre))
       .transition()
-      .duration(200)
+      .duration(ANIMATION_LENGTH)
       .style("stroke", color(genre))
       .style("opacity", 1.0);
 
     d3.selectAll(".legend-square")
       .transition()
-      .duration(200)
+      .duration(ANIMATION_LENGTH)
       .style("opacity", 0.5);
 
     d3.select(".legend-square-" + getGenreKey(genre))
       .transition()
-      .duration(200)
+      .duration(ANIMATION_LENGTH)
       .style("opacity", 1.0);
   }
 
   function deactivateParallelHover(genre) {
     d3.selectAll(".line")
       .transition()
-      .duration(200)
+      .duration(ANIMATION_LENGTH)
       .style("stroke", (d) => color(d["Fav genre"]))
       .style("opacity", 0.5);
 
     d3.selectAll(".legend-square")
       .transition()
-      .duration(200)
+      .duration(ANIMATION_LENGTH)
       .style("opacity", 0.75);
   }
 
