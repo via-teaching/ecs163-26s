@@ -1,0 +1,146 @@
+<!doctype html>
+<html style="width:100%;height:100%;">
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="">
+	<title>Student Mental Health Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+      color: #253047;
+    }
+
+    svg {
+      width: 100vw;
+      height: calc(100vh - 95px);
+      display: block;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #dashboard-header {
+      background: #000BA3;
+      padding: 18px 28px;
+      color: white;
+      border-bottom: 2px solid #d9dde7;
+    }
+
+    #dashboard-header h1 {
+      margin: 0;
+      font-size: 34px;
+      font-weight: bold;
+    }
+
+    #dashboard-header p {
+      margin-top: 6px;
+      margin-bottom: 0;
+      font-size: 15px;
+      color: #d7dcec;
+    }
+
+    .author-name {
+      margin-top: 4px;
+      font-size: 14px;
+      color: #ffffff;
+      font-weight: bold;
+    }
+
+    #filter-container {
+      position: absolute;
+      top: 25px;
+      right: 30px;
+    }
+
+    #filter-button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background: white;
+      color: #1f2a44;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    #reset-button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background: #ff6b6b;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #reset-button:hover {
+      background: #e63946;
+    }
+
+    #filter-menu {
+      margin-top: 8px;
+      background: white;
+      color: #1f2a44;
+      padding: 12px;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    }
+
+    #filter-menu label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .chart-card {
+      fill: white;
+      stroke: #d9dde7;
+      stroke-width: 1;
+      rx: 10;
+      ry: 10; 
+    }
+
+    .brush .selection {
+      fill: #1f77b4;
+      fill-opacity: 0.18;
+      stroke: #1f77b4;
+      stroke-width: 2;
+    }
+
+  </style>
+</head>
+<body style="width:100%;height:100%;margin: 0;">
+    <div id="dashboard-header">
+        <h1>Student Mental Health Dashboard</h1>
+        <p>
+            Exploring the distribution of students mental health responses across years of study and academic courses.
+        </p>
+        <p class="author-name">
+          Created by: Tanner Nguyen
+        </p>
+        <div id="filter-container">
+        <button id="filter-button">Filter Data ▾</button>
+        <button id="reset-button">Reset Filters</button>
+
+        <div id="filter-menu" class="hidden">
+            <label><input type="checkbox" value="Depression" checked> Depression</label>
+            <label><input type="checkbox" value="Anxiety" checked> Anxiety</label>
+            <label><input type="checkbox" value="Panic Attack" checked> Panic Attack</label>
+            <label><input type="checkbox" value="Treatment" checked> Treatment</label>
+        </div>
+    </div>
+    </div>
+	<svg width="100%" height="100%">
+	</svg>
+
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<script src="main.js"></script>
+	<script>
+
+	</script>
+</body>
+</html>
