@@ -1,0 +1,187 @@
+/* ── Reset ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Root layout: full-screen, no scroll ──────────────────── */
+body {
+  background: #ffffff;
+  color: #222;
+  font-family: sans-serif;   /* browser default sans-serif (Arial/Helvetica) */
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+#header {
+  height: 48px;
+  flex-shrink: 0;
+  background: #ffffff;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 20px;
+}
+
+#header h1 {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #111;
+  white-space: nowrap;
+}
+
+#subtitle {
+  font-size: 12px;
+  color: #888;
+}
+
+/* ── Dashboard grid ───────────────────────────────────────── */
+#grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 2fr 3fr;
+  overflow: hidden;
+}
+
+#view-overview {
+  grid-column: 1 / 3;
+  grid-row: 1;
+  border-bottom: 1px solid #ddd;
+}
+
+#view-scatter {
+  grid-column: 1;
+  grid-row: 2;
+  border-right: 1px solid #ddd;
+}
+
+#view-pcp {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+/* ── HW3: hint labels in view titles ─────────────────────── */
+.hint {
+  font-size: 10px;
+  font-weight: 400;
+  color: #aaa;
+  font-style: italic;
+}
+
+/* ── View panels ──────────────────────────────────────────── */
+.view {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 6px 8px 2px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.view-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-bottom: 2px;
+}
+
+.view-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+#pcp-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.toggle-btn {
+  font-size: 11px;
+  font-family: sans-serif;
+  padding: 3px 10px;
+  border: 1px solid #888;
+  border-radius: 3px;
+  background: #f0f0f0;
+  color: #333;
+  cursor: pointer;
+}
+
+.toggle-btn:hover {
+  background: #e0e0e0;
+}
+
+.toggle-btn.active {
+  background: #333;
+  color: #fff;
+  border-color: #333;
+}
+
+/* Chart div fills all remaining space in its panel */
+.chart {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── Tooltip ──────────────────────────────────────────────── */
+.tooltip {
+  position: fixed;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 7px 11px;
+  font-size: 12px;
+  line-height: 1.65;
+  color: #222;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  z-index: 100;
+}
+
+/* ── D3 axis shared styles ────────────────────────────────── */
+.axis .domain  { stroke: #ccc; }
+.axis .tick line { stroke: #ccc; }
+.axis text { fill: #444; font-size: 11px; }
+
+/* ── Scatter legend: inactive type (toggled off) ──────────── */
+.legend-item.inactive circle {
+  opacity: 0.2;
+}
+.legend-item.inactive text {
+  fill: #bbb;
+  text-decoration: line-through;
+}
+.legend-item {
+  cursor: pointer;
+}
+
+/* ── HW3: lasso selection (fill/stroke set inline in JS) ──── */
+.lasso-path { pointer-events: none; }
+
+/* ── HW3: type convex hull polygons ──────────────────────── */
+.type-hull  { pointer-events: none; }
+
+/* ── HW3: selected dot ring ───────────────────────────────── */
+.dot.selected {
+  stroke: #222 !important;
+  stroke-width: 2px !important;
+}
+
+/* ── HW3: selected PCP line ───────────────────────────────── */
+.pcp-line.selected {
+  stroke-width: 2.5px;
+}
