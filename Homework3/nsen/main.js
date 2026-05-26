@@ -102,7 +102,6 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     ),
     ([Type_1, freq]) => ({ Type_1, freq }),
   );
-  // console.log("barData", barData);
 
   // Plot Title
   barSvg
@@ -470,7 +469,6 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
         activePoints.add(d.Number);
       }
     });
-    // console.log("selections", selections)
     scatterSelect();
     parallelSvg.property("value", selected).dispatch("input");
   }
@@ -478,7 +476,6 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
 
 
   const bars = barSvg.selectAll(".bars").on("click", function (event, d) {
-    console.log("event", event, "d", d);
     if (activeCategories.has(d.Type_1)) {
       activeCategories.delete(d.Type_1);
       d3.select(this).style("opacity", 0.3);
@@ -497,11 +494,9 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
   });
 
   function scatterSelect() {
-    console.log("activePoints", activePoints)
     const dots = scatterSvg
       .selectAll(".mark-circle")
       .style("fill-opacity", (d) => (activeCategories.has(d.Type_1) && activePoints.has(d.Number) ? 0.9 : 0))
       .style("stroke-width", (d) => (activeCategories.has(d.Type_1) && activePoints.has(d.Number) ? 0.8 : 0));
-    // console.log("dots", dots);
   }
 });
