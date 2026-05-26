@@ -4,7 +4,7 @@ Explores Pokemon through strength versus catch difficulty, average battle stat p
 and Legendary typing patterns.
 */
 
-// Pokemon type colors used consistently across all dashboard views.
+// Pokemon type colors used across all dashboard views
 const typeColors = {
   Water: "#6390F0",
   Normal: "#A8A77A",
@@ -27,7 +27,7 @@ const typeColors = {
   None: "#CCCCCC"
 };
 
-// Legendary Pokemon use a dark-gold-silver palette so they stand apart from Electric yellow.
+// Legendary Pokemon use a dark-gold-silver palette
 const legendaryColors = {
   dark: "#1A1D20",
   gold: "#D4AF37",
@@ -35,7 +35,7 @@ const legendaryColors = {
   outline: "#D4AF37"
 };
 
-// Shared tooltip used by all visualizations.
+// shared tooltip used by all visualizations
 const tooltip = d3.select("#tooltip");
 
 let dashboardData = [];
@@ -53,7 +53,6 @@ function currentFocusData() {
   if (!brushedRowIds) {
     return dashboardData;
   }
-
   return dashboardData.filter(d => brushedRowIds.has(d.RowIndex));
 }
 
@@ -142,7 +141,7 @@ function drawStrengthCatchScatterplot(data) {
     .nice()
     .range([height, 0]);
 
-  // Chart title identifying the overview view.
+  // chart title identifying the overview view
   svg.append("text")
     .attr("x", margin.left)
     .attr("y", 24)
@@ -150,7 +149,7 @@ function drawStrengthCatchScatterplot(data) {
     .attr("font-weight", "bold")
     .text("Strength vs. Catch Difficulty");
 
-  // Subtitle summarizes the main pattern visible in the overview scatterplot.
+  // Subtitle summarizes the main pattern visible in the overview scatterplot
   svg.append("text")
     .attr("x", margin.left)
     .attr("y", 43)
@@ -158,7 +157,7 @@ function drawStrengthCatchScatterplot(data) {
     .attr("fill", "#555")
     .text("Legendary Pokemon tend to be stronger and harder to catch.");
 
-  // Light gridlines help compare each Pokemon's total stats and catch rate.
+  // Light gridlines help compare each Pokemon's total stats and catch rate
   g.append("g")
     .attr("class", "grid")
     .attr("transform", `translate(0,${height})`)
@@ -196,7 +195,7 @@ function drawStrengthCatchScatterplot(data) {
       updateDashboardHighlights();
     });
 
-  // Brush layer captures drag selections over the overview scatterplot.
+  // Brush layer captures drag selections over the overview scatterplot
   const brushLayer = g.append("g")
     .attr("class", "scatter-brush")
     .call(brush);
@@ -210,11 +209,11 @@ function drawStrengthCatchScatterplot(data) {
     .attr("stroke", legendaryColors.dark)
     .attr("stroke-width", 1.1);
 
-  // Legend container for Legendary highlighting.
+  // Legend container for Legendary highlighting
   const legend = svg.append("g")
     .attr("transform", `translate(${margin.left + width - 164}, 58)`);
 
-  // Legend background box for readability over the plotted points.
+  // Legend background box for readability over the plotted points
   legend.append("rect")
     .attr("width", 164)
     .attr("height", 58)
@@ -222,7 +221,7 @@ function drawStrengthCatchScatterplot(data) {
     .attr("fill", "rgba(255,255,255,0.86)")
     .attr("stroke", "#ccc");
 
-  // Legend title.
+  // legend title
   legend.append("text")
     .attr("x", 8)
     .attr("y", 16)
@@ -230,7 +229,7 @@ function drawStrengthCatchScatterplot(data) {
     .attr("font-weight", "bold")
     .text("Legend");
 
-  // Legend marker showing the style used for non-Legendary Pokemon points.
+  // Legend marker showing the style used for non-Legendary Pokemon points
   legend.append("circle")
     .attr("cx", 14)
     .attr("cy", 28)
@@ -342,7 +341,7 @@ function drawStrengthCatchScatterplot(data) {
   g.append("g")
     .call(d3.axisLeft(y).ticks(5));
 
-  // Y-axis label for total stat values.
+  // y-axis label for total stat values.
   svg.append("text")
     .attr("transform", "rotate(-90)")
     .attr("x", -margin.top - height / 2)
