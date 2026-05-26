@@ -100,7 +100,10 @@ function drawStrengthCatchScatterplot(data) {
   const svg = container.append("svg")
     .attr("viewBox", `0 0 ${outerWidth} ${outerHeight}`);
 
+  // SVG defs container stores the reusable Legendary point gradient.
   const defs = svg.append("defs");
+
+  // Radial gradient gives Legendary scatterplot points a distinct metallic fill.
   const legendaryPointGradient = defs.append("radialGradient")
     .attr("id", "legendary-point-gradient")
     .attr("cx", "36%")
@@ -112,6 +115,7 @@ function drawStrengthCatchScatterplot(data) {
     { offset: "50%", color: legendaryColors.gold },
     { offset: "100%", color: legendaryColors.dark }
   ].forEach(stop => {
+    // Gradient stop defines one color band in the Legendary point gradient.
     legendaryPointGradient.append("stop")
       .attr("offset", stop.offset)
       .attr("stop-color", stop.color);
@@ -146,6 +150,7 @@ function drawStrengthCatchScatterplot(data) {
     .attr("font-weight", "bold")
     .text("Strength vs. Catch Difficulty");
 
+  // Subtitle summarizes the main pattern visible in the overview scatterplot.
   svg.append("text")
     .attr("x", margin.left)
     .attr("y", 43)
@@ -191,6 +196,7 @@ function drawStrengthCatchScatterplot(data) {
       updateDashboardHighlights();
     });
 
+  // Brush layer captures drag selections over the overview scatterplot.
   const brushLayer = g.append("g")
     .attr("class", "scatter-brush")
     .call(brush);
@@ -224,6 +230,7 @@ function drawStrengthCatchScatterplot(data) {
     .attr("font-weight", "bold")
     .text("Legend");
 
+  // Legend marker showing the style used for non-Legendary Pokemon points.
   legend.append("circle")
     .attr("cx", 14)
     .attr("cy", 28)
@@ -233,12 +240,14 @@ function drawStrengthCatchScatterplot(data) {
     .attr("stroke", "#4B535C")
     .attr("stroke-width", 0.5);
 
+  // Legend label for non-Legendary Pokemon points.
   legend.append("text")
     .attr("x", 26)
     .attr("y", 32)
     .attr("font-size", "12px")
     .text("Non-Legendary");
 
+  // Legend marker showing the metallic style used for Legendary Pokemon points.
   legend.append("circle")
     .attr("cx", 14)
     .attr("cy", 46)
@@ -247,6 +256,7 @@ function drawStrengthCatchScatterplot(data) {
     .attr("stroke", legendaryColors.outline)
     .attr("stroke-width", 2);
 
+  // Legend label for Legendary Pokemon points.
   legend.append("text")
     .attr("x", 26)
     .attr("y", 50)
@@ -321,14 +331,14 @@ function drawStrengthCatchScatterplot(data) {
       });
   };
 
-  // X-axis showing catch rate values; lower values are harder to catch.
+  // X-axis group showing catch rate values; lower values are harder to catch.
   g.append("g")
     .attr("transform", `translate(0,${height})`)
     .call(d3.axisBottom(x))
     .selectAll("text")
     .attr("font-size", "14px");
 
-  // Y-axis showing each Pokemon's total battle stats.
+  // Y-axis group showing each Pokemon's total battle stats.
   g.append("g")
     .call(d3.axisLeft(y).ticks(5));
 
@@ -489,8 +499,8 @@ function drawTypeStatHeatmap(data) {
     .attr("transform", "rotate(-22)")
     .style("text-anchor", "end");
 
-  // Y-axis showing primary types.
-  const yAxis = g.append("g")
+  // Y-axis group showing primary types; labels can be clicked to select a type.
+  g.append("g")
     .attr("class", "heatmap-y-axis")
     .call(d3.axisLeft(y))
     .selectAll("text")
@@ -651,6 +661,7 @@ function drawLegendarySankey(data) {
     { offset: "75%", color: legendaryColors.silver },
     { offset: "100%", color: legendaryColors.dark }
   ].forEach(stop => {
+    // Gradient stop defines one color band in the Legendary Sankey gradient.
     legendaryGradient.append("stop")
       .attr("offset", stop.offset)
       .attr("stop-color", stop.color);
@@ -699,11 +710,13 @@ function drawLegendarySankey(data) {
   }
 
   function drawEmptySankeyMessage() {
+    // Empty-state group centers the message when the current focus contains no Legendary Pokemon.
     const emptyState = svg.append("g")
       .attr("class", "sankey-empty-state")
       .attr("transform", `translate(${outerWidth / 2},${margin.top + height / 2})`)
       .attr("opacity", 0);
 
+    // Empty-state background panel keeps the no-data message readable over the dashboard.
     emptyState.append("rect")
       .attr("x", -190)
       .attr("y", -48)
@@ -713,6 +726,7 @@ function drawLegendarySankey(data) {
       .attr("fill", "rgba(255,255,255,0.90)")
       .attr("stroke", "#bbb");
 
+    // Empty-state title explains why the Sankey diagram is hidden.
     emptyState.append("text")
       .attr("y", -10)
       .attr("text-anchor", "middle")
@@ -721,6 +735,7 @@ function drawLegendarySankey(data) {
       .attr("fill", "#333")
       .text("No Legendary Pokemon selected");
 
+    // Empty-state hint points users back to the scatterplot brush interaction.
     emptyState.append("text")
       .attr("y", 22)
       .attr("text-anchor", "middle")
