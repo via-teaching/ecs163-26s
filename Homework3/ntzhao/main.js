@@ -11,9 +11,11 @@ const headerHeight = 60;
 
 // Width allocated to legend box
 const legendWidth = 60;
+const scatterLegendWidth = 30;
 
 // Square size allocated to legend color
 const legendDotSize = useLargeLayout ? windowHeight * 0.02 : 10;
+const scatterLegendDotSize = legendDotSize * 0.75;
 
 // Height for each visualization
 const visHeight = windowHeight / 2 - margin.top - margin.bottom - headerHeight;
@@ -44,10 +46,10 @@ const visSizes = {
     top: 0,
     margin,
     width: useLargeLayout
-      ? windowWidth / 2 - margin.left - margin.right
-      : windowWidth - margin.left - margin.right,
+      ? windowWidth / 2 - margin.left - margin.right - scatterLegendWidth
+      : windowWidth - margin.left - margin.right - scatterLegendWidth,
     height: useLargeLayout ? visHeight : mobileVisHeight,
-    legendWidth,
+    scatterLegendWidth,
   },
   plot3: {
     left: 0,
@@ -78,7 +80,7 @@ const genres = [
   "R&B",
   "Rap",
   "Rock",
-  "Video game music",
+  "Game",
 ];
 
 // Statically define colors
@@ -156,14 +158,11 @@ const layoutTopRow = d3
   .select("#layoutTopRow")
   .style(
     "height",
-    `${windowHeight > 700 ? visDivHeight : mobileVisDivHeight}px`,
+    `${useLargeLayout ? visDivHeight : 2 * mobileVisDivHeight}px`,
   );
 const layoutBottomRow = d3
   .select("#layoutBottomRow")
-  .style(
-    "height",
-    `${windowHeight > 700 ? visDivHeight : mobileVisDivHeight}px`,
-  );
+  .style("height", `${useLargeLayout ? visDivHeight : mobileVisDivHeight}px`);
 
 // Parse data and make graphs
 d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
@@ -173,6 +172,11 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .map((d) => ({
       ...d,
       "Mental health challenges": +d.Anxiety + +d.Depression + +d.OCD,
+    }))
+    .map((d) => ({
+      ...d,
+      "Fav genre":
+        d["Fav genre"] === "Video game music" ? "Game" : d["Fav genre"],
     }))
     .filter(
       (d) => d["Hours per day"] < 24 && d.Age > 5 && d.BPM && d.BPM < 300,
@@ -431,17 +435,20 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
         ),
       )
       .style("stroke", color(genre))
-      .attr("stroke-dasharray", "4")
+      // .attr("stroke-dasharray", "4")
       .style("opacity", 0.2)
       .style("stroke-width", 2);
   }
 
   // Scatterplot legend
-  const scatterLegendDotSize = legendDotSize * 0.75;
+  const scatterLegendRowLength = 1;
 
   const scatterLegend = g2
     .append("g")
-    .attr("transform", `translate(0, ${visSizes.plot2.height + 80})`);
+    .attr(
+      "transform",
+      `translate(${visSizes.plot2.width + 8}, ${useLargeLayout ? 40 : 0})`,
+    );
 
   // Create legend label
   const scatterLegendLabel = scatterLegend
@@ -449,17 +456,25 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr("anchor", "middle")
     .attr("x", 0)
     .attr("y", -40)
-    .text("Favorite Genre")
+    .text("Fav Genre")
     .style("font-family", "Arial")
     .style("font-size", standardFontSize * 0.833);
 
-  // Create legend hint subtext
   const scatterLegendSubtext = scatterLegend
     .append("text")
     .attr("anchor", "middle")
-    .attr("x", 0)
+    .attr("x", 4)
     .attr("y", -28)
-    .text("(HOVER TO HIGHLIGHT)")
+    .text("(HOVER TO")
+    .style("font-family", "Arial")
+    .style("font-size", standardFontSize * 0.75);
+
+  const scatterLegendSubtext2 = scatterLegend
+    .append("text")
+    .attr("anchor", "middle")
+    .attr("x", 4)
+    .attr("y", -18)
+    .text("HIGHLIGHT)")
     .style("font-family", "Arial")
     .style("font-size", standardFontSize * 0.75);
 
@@ -471,7 +486,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr(
       "transform",
       (d, i) =>
-        `translate(${Math.floor(i % 8) * 80}, ${Math.floor(i / 8) * (scatterLegendDotSize + 4) - 20})`,
+        `translate(${Math.floor(i % scatterLegendRowLength) * 80}, ${Math.floor(i / scatterLegendRowLength) * (scatterLegendDotSize + 4) - 8})`,
     )
     .style("cursor", "pointer")
     .on("mouseover", (event, idx) => onGenreMouseEnter(genres[idx]))
@@ -580,8 +595,6 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
         return "Kpop";
       case "Hip hop":
         return "Hiphop";
-      case "Video game music":
-        return "Game";
       default:
         return name;
     }
@@ -621,11 +634,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
   // Add chart legend to illustrate genre colors
   // With added interactivity (hover to highlight certain genre)
   // Docs: https://d3-graph-gallery.com/graph/custom_legend.html
-  const legendRowLength = useLargeLayout
-    ? 1
-    : windowWidth > 500
-      ? genres.length / 4
-      : genres.length / 8;
+  const legendRowLength = useLargeLayout ? 1 : genres.length / 4;
 
   const legend = g3
     .append("g")
