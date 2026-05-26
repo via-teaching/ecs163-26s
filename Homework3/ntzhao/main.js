@@ -132,22 +132,23 @@ function linearRegression(data, xAttr, yAttr) {
   });
 
   const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-  const intercept = (sumY - slope * sumX) / n;
+  const yIntercept = (sumY - slope * sumX) / n;
+  const xIntercept = -yIntercept / slope;
 
-  return { slope, intercept };
+  return { slope, yIntercept, xIntercept };
 }
 
 /**
  * Given a slope, intercept, and x-value, calculate the output for a linear function.
  *
  * @param { number } slope
- * @param { number } intercept
+ * @param { number } yIntercept
  * @param { number } x
  *
  * @returns Calculated linear function output.
  */
-function calculateLineValue(slope, intercept, x) {
-  return slope * x + intercept;
+function calculateLineValue(slope, yIntercept, x) {
+  return slope * x + yIntercept;
 }
 
 // Dynamically set heights of layout rows
@@ -371,7 +372,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .style("opacity", 0.5);
 
   // Perform linear regression to get trendline
-  const { slope, intercept } = linearRegression(
+  const { slope, yIntercept, xIntercept } = linearRegression(
     data,
     "Hours per day",
     "Mental health challenges",
@@ -382,8 +383,8 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr("class", "trendline")
     .attr("x1", scatterX(0))
     .attr("x2", scatterX(20))
-    .attr("y1", scatterY(calculateLineValue(slope, intercept, 0)))
-    .attr("y2", scatterY(calculateLineValue(slope, intercept, 20)))
+    .attr("y1", scatterY(calculateLineValue(slope, yIntercept, 0)))
+    .attr("y2", scatterY(calculateLineValue(slope, yIntercept, 20)))
     .style("stroke", "#000000")
     .attr("stroke-dasharray", "4")
     .style("opacity", 0.75)
@@ -391,25 +392,45 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
 
   for (let genre of genres) {
     const filteredByGenre = data.filter((d) => d["Fav genre"] === genre);
-    const { slope: filteredSlope, intercept: filteredIntercept } =
-      linearRegression(
-        filteredByGenre,
-        "Hours per day",
-        "Mental health challenges",
-      );
+    const {
+      slope: filteredSlope,
+      yIntercept: filteredYIntercept,
+      xIntercept: filteredXIntercept,
+    } = linearRegression(
+      filteredByGenre,
+      "Hours per day",
+      "Mental health challenges",
+    );
+
+    console.log(genre, filteredXIntercept);
 
     // Add scatterplot trendline
     g2.append("line")
       .attr("class", `temp-trendline trendline-${getGenreKey(genre)}`)
       .attr("x1", scatterX(0))
-      .attr("x2", scatterX(20))
+      .attr(
+        "x2",
+        scatterX(
+          filteredXIntercept > 0 && filteredXIntercept < 20
+            ? filteredXIntercept
+            : 20,
+        ),
+      )
       .attr(
         "y1",
-        scatterY(calculateLineValue(filteredSlope, filteredIntercept, 0)),
+        scatterY(calculateLineValue(filteredSlope, filteredYIntercept, 0)),
       )
       .attr(
         "y2",
-        scatterY(calculateLineValue(filteredSlope, filteredIntercept, 20)),
+        scatterY(
+          calculateLineValue(
+            filteredSlope,
+            filteredYIntercept,
+            filteredXIntercept > 0 && filteredXIntercept < 20
+              ? filteredXIntercept
+              : 20,
+          ),
+        ),
       )
       .style("stroke", color(genre))
       .attr("stroke-dasharray", "4")
