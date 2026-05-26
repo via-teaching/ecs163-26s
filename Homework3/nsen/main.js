@@ -40,6 +40,7 @@ const chartDims = {
   },
 };
 
+// Type to color dictionary
 const typeColorDict = {
   Grass: "#8cc260",
   Fire: "#e38643",
@@ -61,11 +62,13 @@ const typeColorDict = {
   Flying: "#a192c9",
 };
 
+// Type to color mapping
 const typeColors = d3
   .scaleOrdinal()
   .domain(Object.keys(typeColorDict))
   .range(Object.values(typeColorDict));
 
+// Dynamially resize svg height and width on page refresh
 d3.select(".left-col")
   .style("height", `${chartDims.parallel.height}px`)
   .style("width", `${chartDims.parallel.width}px`);
@@ -116,7 +119,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .style("font-weight", "bold")
     .text("Type 1 vs Frequency");
 
-  // Help indicator
+  // Help indicator text
   barSvg
     .append("text")
     .attr("text-anchor", "middle")
@@ -125,10 +128,10 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .text(`*Select bars to filter`)
     .attr("x", chartDims.bar.innerWidth)
     .attr("y", margins.top)
-    .append('tspan')
+    .append("tspan")
     .text(`data by Type 1`)
     .attr("x", chartDims.bar.innerWidth)
-    .attr("y", margins.top + chartDims.bar.innerWidth / 40)
+    .attr("y", margins.top + chartDims.bar.innerWidth / 40);
 
   // Create x and y axis
 
@@ -188,8 +191,6 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .text("Frequency");
 
   // Draw bars
-  const barColor = "#77ACA2";
-  const highlightColor = "orange";
   const rect = barSvg
     .append("g")
     .classed("mark", true)
@@ -208,7 +209,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .attr("stroke", "black")
     .attr("stroke-width", 1);
 
-  // Bar title
+  // Bar tooltips
   rect.append("title").text((d) => `Type 1: ${d.Type_1}\nFrequency: ${d.freq}`);
 
   // plot 2: Scatterplot
@@ -219,8 +220,8 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .append("g")
     .attr("width", chartDims.scatter.width)
     .attr("height", chartDims.scatter.height);
-  // .attr("viewbox", "-5 -5 10 10");
 
+  // Filter data attributes for scatterplot
   const scatterData = data.map((d) => ({
     Total: parseInt(d.Total),
     Catch_Rate: parseInt(d.Catch_Rate),
@@ -311,8 +312,13 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .style("stroke", "black")
     .style("stroke-width", 0.8);
 
-  // Circle title
-  circles.append("title").text((d) => `Name: ${d.Name}\nTotal Stats: ${d.Total}\nCatch Rate: ${d.Catch_Rate}`);
+  // Circle tooltips
+  circles
+    .append("title")
+    .text(
+      (d) =>
+        `Name: ${d.Name}\nTotal Stats: ${d.Total}\nCatch Rate: ${d.Catch_Rate}`,
+    );
 
   // plot 3: Parallel Coordinates Plot
   // Source: https://observablehq.com/@d3/brushable-parallel-coordinates?collection=@d3/d3-brush
@@ -335,6 +341,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     "Speed",
   ];
 
+  // Filter data attributes for parallel coords plot
   const parallelData = data.map((d) => ({
     Total: parseInt(d.Total),
     HP: parseInt(d.HP),
@@ -357,7 +364,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .style("font-weight", "bold")
     .text("Distribution of Base Stats");
 
-  // Help indicator
+  // Help indicator text
   parallelSvg
     .append("text")
     .attr("text-anchor", "middle")
@@ -366,10 +373,10 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .text(`*Brush along any axis`)
     .attr("x", chartDims.parallel.innerWidth)
     .attr("y", margins.top - 15)
-    .append('tspan')
+    .append("tspan")
     .text(`to filter by data points`)
     .attr("x", chartDims.parallel.innerWidth)
-    .attr("y", margins.top + chartDims.parallel.innerWidth / 40 - 15)
+    .attr("y", margins.top + chartDims.parallel.innerWidth / 40 - 15);
 
   // Create the horizontal axis scale for each key
   const parallelXAxis = new Map(
@@ -388,13 +395,14 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     chartDims.parallel.height - margins.bottom,
   ]);
 
-  //Create the lines
+  // Compute the paths from data set
   const line = d3
     .line()
     .defined(([, value]) => value != null)
     .x(([key, value]) => parallelXAxis.get(key)(value))
     .y(([key]) => parallelYAxis(key));
 
+  // Draw the paths
   const path = parallelSvg
     .append("g")
     .attr("fill", "none")
@@ -403,7 +411,9 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .selectAll("path")
     .data(parallelData)
     .join("path")
-    .attr("stroke", (d) => activeCategories.has(d.Type_1) ? typeColors(d.Type_1) : deselectedColor)
+    .attr("stroke", (d) =>
+      activeCategories.has(d.Type_1) ? typeColors(d.Type_1) : deselectedColor,
+    )
     .attr("d", (d) => line(d3.cross(keys, [d], (key, d) => [key, d[key]])))
     .call((path) => path.append("title").text((d) => d.name));
 
@@ -440,6 +450,8 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
   // Create the brush behavior.
   const deselectedColor = "#c8d7bd";
   const brushHeight = 50;
+
+  // Create brush object to fit axis dimensions and hook up callback
   const brush = d3
     .brushX()
     .extent([
@@ -448,10 +460,11 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     ])
     .on("start brush end", brushed);
 
+  // Enable brushing
   axes.call(brush);
 
   const selections = new Map();
-  let activePoints = new Set(rawData.map(d => d.Number));
+  let activePoints = new Set(rawData.map((d) => d.Number));
 
   function brushed({ selection }, key) {
     if (selection === null) selections.delete(key);
@@ -462,14 +475,18 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
       const active = Array.from(selections).every(
         ([key, [min, max]]) => d[key] >= min && d[key] <= max,
       );
+      // Transition paths based on filtering
       d3.select(this)
         .transition("brush")
         .duration(animDur)
         .style(
           "stroke",
-          active && activeCategories.has(d.Type_1) ? typeColors(d.Type_1) : deselectedColor,
+          active && activeCategories.has(d.Type_1)
+            ? typeColors(d.Type_1)
+            : deselectedColor,
         );
       if (active) {
+        // Rerender paths on top to cycle occlusion
         d3.select(this).raise();
         selected.push(d);
         activePoints.add(d.Number);
@@ -479,41 +496,51 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     parallelSvg.property("value", selected).dispatch("input");
   }
 
-
-
+  // Add select feature for bars
   const bars = barSvg.selectAll(".bars").on("click", function (event, d) {
     if (activeCategories.has(d.Type_1)) {
       activeCategories.delete(d.Type_1);
+
+      // Transition bars based on filtering
       d3.select(this)
         .transition("bars-select")
-        .duration(animDur)  
+        .duration(animDur)
         .style("opacity", 0.3);
     } else {
       activeCategories.add(d.Type_1);
+      // Transition bars based on filtering
       d3.select(this)
         .transition("bars-deselect")
-        .duration(animDur)  
+        .duration(animDur)
         .style("opacity", 1);
     }
 
     path.each(function (d) {
+      // Transition paths based on filtering
       d3.select(this)
         .transition("paths")
-        .duration(animDur)  
+        .duration(animDur)
         .style(
           "stroke",
-          activePoints.has(d.Number) && activeCategories.has(d.Type_1) ? typeColors(d.Type_1) : deselectedColor,
+          activePoints.has(d.Number) && activeCategories.has(d.Type_1)
+            ? typeColors(d.Type_1)
+            : deselectedColor,
         );
-    })
+    });
     scatterSelect();
   });
 
   function scatterSelect() {
+    // Transition dots based on filtering
     const dots = scatterSvg
       .selectAll(".mark-circle")
       .transition("scatter")
-      .duration(animDur)  
-      .style("fill-opacity", (d) => (activeCategories.has(d.Type_1) && activePoints.has(d.Number) ? 0.9 : 0))
-      .style("stroke-opacity", (d) => (activeCategories.has(d.Type_1) && activePoints.has(d.Number) ? 1 : 0));
+      .duration(animDur)
+      .style("fill-opacity", (d) =>
+        activeCategories.has(d.Type_1) && activePoints.has(d.Number) ? 0.9 : 0,
+      )
+      .style("stroke-opacity", (d) =>
+        activeCategories.has(d.Type_1) && activePoints.has(d.Number) ? 1 : 0,
+      );
   }
 });
