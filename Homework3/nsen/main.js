@@ -12,7 +12,7 @@ const margins = {
 
 // Title Height
 const headerHeight = 100;
-const keyHeight = 10;
+const keyHeight = 20;
 
 // Dimensions for all three charts
 const chartDims = {
@@ -110,9 +110,23 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .attr("x", chartDims.bar.width / 2)
     .attr("y", margins.top - 20)
     .attr("text-anchor", "middle")
-    .style("font-size", "16px")
+    .style("font-size", `${chartDims.bar.innerWidth / 504.1666666667}rem`)
     .style("font-weight", "bold")
     .text("Type 1 vs Frequency");
+
+  // Help indicator
+  barSvg
+    .append("text")
+    .attr("text-anchor", "middle")
+    .style("font-size", `${chartDims.bar.innerWidth / 756.25}rem`)
+    .style("font-weight", "bold")
+    .text(`*Select bars to filter`)
+    .attr("x", chartDims.bar.innerWidth)
+    .attr("y", margins.top)
+    .append('tspan')
+    .text(`data by Type 1`)
+    .attr("x", chartDims.bar.innerWidth)
+    .attr("y", margins.top + chartDims.bar.innerWidth / 40)
 
   // Create x and y axis
 
@@ -218,7 +232,7 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
     .attr("x", chartDims.scatter.width / 2)
     .attr("y", margins.top - 20)
     .attr("text-anchor", "middle")
-    .style("font-size", "16px")
+    .style("font-size", `${chartDims.scatter.innerWidth / 504.1666666667}rem`)
     .style("font-weight", "bold")
     .text("Total Stats vs Catch Rate %");
 
@@ -331,11 +345,25 @@ d3.csv("data/pokemon_data.csv").then((rawData) => {
   parallelSvg
     .append("text")
     .attr("x", chartDims.parallel.width / 2)
-    .attr("y", margins.top + keyHeight - 20)
+    .attr("y", margins.top + keyHeight - 30)
     .attr("text-anchor", "middle")
-    .style("font-size", "16px")
+    .style("font-size", `${chartDims.parallel.innerWidth / 504.1666666667}rem`)
     .style("font-weight", "bold")
     .text("Distribution of Base Stats");
+
+  // Help indicator
+  parallelSvg
+    .append("text")
+    .attr("text-anchor", "middle")
+    .style("font-size", `${chartDims.parallel.innerWidth / 756.25}rem`)
+    .style("font-weight", "bold")
+    .text(`*Brush along any axis`)
+    .attr("x", chartDims.parallel.width - margins.right - 15)
+    .attr("y", margins.top - 15)
+    .append('tspan')
+    .text(`to filter by data points`)
+    .attr("x", chartDims.parallel.width - margins.right - 15)
+    .attr("y", margins.top + chartDims.parallel.innerWidth / 40 - 15)
 
   // Create the horizontal axis scale for each key
   const parallelXAxis = new Map(
