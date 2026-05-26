@@ -1,0 +1,8 @@
+.parent {
+	display: flex;
+	flex-direction: row;
+}
+
+/* .chart {
+	border: 1px solid black;
+} */

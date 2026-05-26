@@ -1,0 +1,25 @@
+.parent {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	gap: 20px;
+}
+
+.inline-block-child {
+	width: 50%;
+  display: inline-block;
+}
+
+.sankey {
+	width: 50%;
+	transform: translate(0, -50px);
+}
+
+.pie {
+  position: relative;
+}
+
+.bar {
+	position: relative;
+}
