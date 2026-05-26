@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Global Terrorism Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <h1>Global Terrorism Patterns, 1970-2017</h1>
+        <p>Focus + context dashboard using the Global Terrorism Database.</p>
+      </div>
+      <div class="controls" aria-label="Dashboard controls">
+        <label>
+          Region
+          <select id="region-select"></select>
+        </label>
+        <label>
+          Map metric
+          <select id="metric-select">
+            <option value="incidents">Incidents</option>
+            <option value="killed">Fatalities</option>
+            <option value="wounded">Wounded</option>
+          </select>
+        </label>
+        <label>
+          Start
+          <input
+            id="start-year"
+            type="range"
+            min="1970"
+            max="2017"
+            value="1970"
+          />
+          <span id="start-label">1970</span>
+        </label>
+        <label>
+          End
+          <input
+            id="end-year"
+            type="range"
+            min="1970"
+            max="2017"
+            value="2017"
+          />
+          <span id="end-label">2017</span>
+        </label>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <section class="panel panel-wide" aria-labelledby="trend-title">
+        <div class="panel-title">
+          <h2 id="trend-title">Overview: incidents and fatalities by year</h2>
+          <span id="trend-subtitle"></span>
+        </div>
+        <svg
+          id="trend-chart"
+          role="img"
+          aria-label="Line and area chart showing yearly incidents and fatalities"
+        ></svg>
+      </section>
+
+      <section class="panel panel-map" aria-labelledby="map-title">
+        <div class="panel-title">
+          <h2 id="map-title">Focus: geographic concentration</h2>
+          <span id="map-subtitle"></span>
+        </div>
+        <svg
+          id="map-chart"
+          role="img"
+          aria-label="Geographic proportional symbol map"
+        ></svg>
+      </section>
+
+      <section class="panel panel-profile" aria-labelledby="profile-title">
+        <div class="panel-title">
+          <h2 id="profile-title">
+            Advanced view: attack profile parallel coordinates
+          </h2>
+          <span id="profile-subtitle"></span>
+        </div>
+        <svg
+          id="profile-chart"
+          role="img"
+          aria-label="Parallel coordinates plot of attack profiles"
+        ></svg>
+      </section>
+    </main>
+
+    <div id="tooltip" class="tooltip" role="status" aria-live="polite"></div>
+
+    <script src="vendor/d3.v5.min.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>
