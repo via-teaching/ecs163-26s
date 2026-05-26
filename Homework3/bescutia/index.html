@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ECS 163 HW3 — Student Mental Health Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Student Mental Health Dashboard</h1>
+        <p class="subtitle">
+            ECS 163 Homework 3 — bescutia
+            &nbsp;|&nbsp;
+            Brush the scatter (overview) or click a heatmap cell to filter the detail chart.
+        </p>
+    </header>
+
+    <main>
+        <!-- Top row: overview (left) + focus (right) -->
+        <div class="row">
+            <div id="scatter" class="chart"></div>
+            <div id="bar" class="chart"></div>
+        </div>
+
+        <!-- Bottom row: advanced visualization -->
+        <div class="row">
+            <div id="heatmap" class="chart wide"></div>
+        </div>
+    </main>
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
