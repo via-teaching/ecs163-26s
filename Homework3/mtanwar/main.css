@@ -1,0 +1,230 @@
+/* Basic page setup */
+* {
+  box-sizing: border-box;
+}
+
+/* Page styling */
+body {
+  background-color: #FAFAFA;
+  font-family: Helvetica, Arial, sans-serif;
+  padding: 18px;
+  margin: 0;
+  touch-action: pan-y; /* Prevent pinch zoom on mobile */
+  overscroll-behavior: contain; /* Prevent scroll chaining */
+}
+
+/* Chart background */
+svg {
+  background-color: #FFFFFF;
+  touch-action: none; /* Prevent default touch behaviors on SVG */
+}
+
+/* Main page wrapper */
+.page-container {
+  width: 100%;
+  max-width: 1650px;
+  margin: 0 auto;
+}
+
+/* Dashboard header */
+.dashboard-header {
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 10px 18px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+/* Header title */
+.dashboard-header h1 {
+  font-size: 22px;
+  color: #2C3E50;
+  margin: 0 0 5px 0;
+}
+
+/* Dashboard subtitle */
+.dashboard-header p {
+  font-size: 14px;
+  color: #555555;
+  margin: 0;
+  line-height: 1.35;
+}
+
+/* Main area for the charts */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  height: calc(100vh - 120px);
+  max-height: calc(100vh - 120px);
+}
+
+/* Top row with two charts */
+.top-row {
+  display: flex;
+  gap: 18px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Top row cards */
+.top-row .chart-container {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Bottom row with one chart */
+.bottom-row {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Bottom row chart card */
+.bottom-row .chart-container {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Basic style for each chart card */
+.chart-container {
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Chart title text */
+.chart-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2C3E50;
+  margin: 0 0 8px 0;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Area where the chart is drawn */
+.chart-content {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  touch-action: pan-y; /* Allow vertical scrolling but prevent zoom */
+}
+
+/* Isolate the third chart to prevent zoom propagation */
+#chart-3 {
+  isolation: isolate;
+  touch-action: none; /* Allow zoom only on this chart */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+/* SVG sizing */
+.chart-content svg {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Dropdown fancy styling */
+#address-filter-dropdown {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+}
+
+#address-filter-dropdown option {
+  background-color: #FAFAFA !important;
+  color: #2C3E50 !important;
+  padding: 10px !important;
+  font-weight: 500;
+}
+
+#address-filter-dropdown option:checked,
+#address-filter-dropdown option:hover {
+  background-color: #E8F0FE !important;
+  color: #2C3E50 !important;
+}
+
+#address-filter-dropdown:hover {
+  border-color: #98A2B3;
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  transform: translateY(-1px);
+}
+
+#address-filter-dropdown:focus {
+  border-color: #98A2B3;
+  background-color: #FFFFFF;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+/* Tablet layout */
+@media (max-width: 1024px) {
+  .top-row {
+    flex-direction: column;
+  }
+
+  .dashboard-container {
+    height: auto;
+    max-height: none;
+  }
+
+  .chart-container {
+    min-height: 400px;
+  }
+}
+
+/* Mobile layout */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  .dashboard-header {
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 18px;
+  }
+
+  .dashboard-header p {
+    font-size: 12px;
+  }
+
+  .dashboard-container {
+    gap: 10px;
+  }
+
+  .top-row {
+    gap: 10px;
+  }
+
+  .chart-container {
+    padding: 14px;
+    min-height: 360px;
+  }
+
+  .chart-title {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+}

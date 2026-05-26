@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Student Alcohol and Performance Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Main stylesheet for the dashboard -->
+    <link rel="stylesheet" href="main.css" />
+</head>
+
+<body translate="no">
+    <div class="page-container">
+
+        <!-- Page title and short description -->
+        <div class="dashboard-header">
+            <h1>Alcohol Use, Attendance, and Math Performance Dashboard</h1>
+            <p>
+                This dashboard uses workday alcohol level as the main grouping variable to compare attendance, grade patterns, and lifestyle profiles.
+            </p>
+        </div>
+
+        <!-- Dashboard charts -->
+        <div class="dashboard-container">
+
+            <div class="top-row">
+                <div class="chart-container" id="container-1">
+                    <h2 class="chart-title">Overview: Average Absences by Alcohol Use Level</h2>
+                    <div class="chart-content" id="chart-1"></div>
+                </div>
+
+                <div class="chart-container" id="container-2">
+                    <h2 class="chart-title">Focus View: Student Count by Absence Range and Grade Band</h2>
+                    <div class="chart-content" id="chart-2"></div>
+                </div>
+            </div>
+
+            <div class="bottom-row">
+                <div class="chart-container" id="container-3">
+                    <h2 class="chart-title">Context View: Average Lifestyle Profile by Alcohol Level</h2>
+                    <div class="chart-content" id="chart-3"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- D3 library and dashboard code -->
+    <script src="https://unpkg.com/d3@7/dist/d3.min.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
