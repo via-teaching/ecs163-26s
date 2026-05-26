@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Pokemon Dashboard</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <h1>How to pick the strongest Pokémon?</h1>
+
+  <p class="subtitle" style="color: black">
+    This dashboard explores Pokémon battle attributes to help users compare type strength, legendary and mega evolution status, and individual stat profiles.
+  </p>
+
+  <main id="dashboard">
+
+    <section class="left-column">
+
+      <div class="chart">
+        <h2>Attack vs Defense by Legendary and Mega Status</h2>
+        <svg id="scatter-plot" viewBox="0 0 650 300" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+
+      <div class="chart">
+        <h2>Average Total Stats by Type</h2>
+        <svg id="bar-chart" viewBox="0 0 650 300" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+
+    </section>
+
+    <section class="right-column">
+
+      <div class="chart">
+        <h2>Selected Pokémon Stat Profile</h2>
+
+        <div id="filter-controls">
+          <div class="filter-group">
+            <label for="generation-filter">Generation</label>
+            <select id="generation-filter"></select>
+          </div>
+
+          <div class="filter-group">
+            <label for="type-filter">Type</label>
+            <select id="type-filter"></select>
+          </div>
+
+          <div class="filter-group">
+            <label for="pokemon-select">Pokémon</label>
+            <select id="pokemon-select"></select>
+          </div>
+        </div>
+
+        <svg id="star-plot" viewBox="0 0 500 590" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Load D3.js and the main JavaScript file -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
