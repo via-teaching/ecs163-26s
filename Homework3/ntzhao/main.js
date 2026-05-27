@@ -559,11 +559,11 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
         ];
 
   // Create y-scale for each dimension
-  var y = {};
+  var parallelY = {};
   for (let i in dimensions) {
     name = dimensions[i];
     const extent = d3.extent(data, (d) => +d[name]);
-    y[name] =
+    parallelY[name] =
       name === "Mental health challenges"
         ? d3
             .scaleSymlog()
@@ -574,7 +574,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
   }
 
   // Create x-scale over available dimensions
-  x = d3
+  const parallelX = d3
     .scalePoint()
     .range([0, visSizes.plot3.width])
     .padding(1)
@@ -608,7 +608,9 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .enter()
     .append("path")
     .attr("class", (d) => "line " + getGenreKey(d["Fav genre"]))
-    .attr("d", (d) => d3.line()(dimensions.map((p) => [x(p), y[p](d[p])])))
+    .attr("d", (d) =>
+      d3.line()(dimensions.map((p) => [parallelX(p), parallelY[p](d[p])])),
+    )
     .style("fill", "none")
     .style("stroke", (d) => color(d["Fav genre"]))
     .style("stroke-width", 1.5)
@@ -619,9 +621,9 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .data(dimensions)
     .enter()
     .append("g")
-    .attr("transform", (d) => "translate(" + x(d) + ")")
+    .attr("transform", (d) => "translate(" + parallelX(d) + ")")
     .each(function (d) {
-      return d3.select(this).call(d3.axisLeft().scale(y[d]));
+      return d3.select(this).call(d3.axisLeft().scale(parallelY[d]));
     })
     // Add axis title to each axis
     .append("text")
@@ -703,10 +705,44 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
   g3.append("text")
     .attr("text-anchor", "middle")
     .attr("x", visSizes.plot3.width / 2)
-    .attr("y", -30)
-    .text("Music and Mental Health: Parallel Coorindates")
+    .attr("y", -44)
+    .text("Music and Mental Health: Parallel Coordinates")
     .style("font-family", "Arial")
     .style("font-size", standardFontSize * 1.125);
+
+  // Add parallel coordinates subtitle
+  g3.append("text")
+    .attr("text-anchor", "middle")
+    .attr("x", visSizes.plot3.width / 2)
+    .attr("y", -28)
+    .text("Click and drag on y-axes to brush!")
+    .style("font-family", "Arial")
+    .style("font-size", standardFontSize);
+
+  // Add brushing for selection of groups of lines
+  // This will be a secondary highlighting mechanism for the parallel coordinates plot only
+  // Docs: https://d3-graph-gallery.com/graph/interactivity_brush.html
+  dimensions.forEach((dimension) => {
+    const brush = d3
+      .brushY()
+      .extent([
+        [parallelX(dimension) - 20, 0],
+        [parallelX(dimension) + 20, visSizes.plot3.height],
+      ])
+      .on("brush", () => onStartBrush(dimension))
+      .on("end", function () {
+        if (!d3.event.selection) {
+          return;
+        }
+
+        g3.selectAll(".line")
+          .style("opacity", 0.5)
+          .style("stroke", (d) => color(d["Fav genre"]));
+        d3.select(this).call(brush.move, null);
+      });
+
+    g3.append("g").call(brush);
+  });
 
   // INTERACTIVITY
   const ANIMATION_LENGTH = 100;
@@ -809,5 +845,23 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     deactivateBarHover();
     deactivateDotHover();
     deactivateParallelHover(genre);
+  }
+
+  function onStartBrush(dimension) {
+    if (!d3.event.selection) {
+      return;
+    }
+
+    const [y0, y1] = d3.event.selection;
+    const min = parallelY[dimension].invert(y1);
+    const max = parallelY[dimension].invert(y0);
+
+    g3.selectAll(".line").style("opacity", (d) => {
+      const value = +d[dimension];
+      if (value >= min && value <= max) {
+        return 1;
+      }
+      return 0.05;
+    });
   }
 });
