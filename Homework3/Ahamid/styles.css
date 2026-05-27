@@ -1,0 +1,265 @@
+/*   Global reset & typography   */
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #222;
+  background: #f7f8fa;
+  overflow: hidden; /* dashboard must fit in one fullscreen view */
+}
+
+/*   Header   */
+.dashboard-header {
+  padding: 8px 20px 8px;
+  background: #ffffff;
+  border-bottom: 1px solid #e3e6eb;
+}
+.dashboard-header h1 {
+  margin: 0 0 2px 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #1a2330;
+}
+.dashboard-header .subtitle {
+  margin: 0 0 6px 0;
+  font-size: 11.5px;
+  color: #4a5568;
+  line-height: 1.35;
+  max-width: 1100px;
+}
+
+/*   Interaction control bar (sort, reset, filter readout)   */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: #1a2330;
+  padding-top: 2px;
+}
+.ctrl-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.ctrl-label {
+  font-weight: 500;
+  color: #4a5568;
+}
+.ctrl-input {
+  font-size: 12px;
+  padding: 3px 6px;
+  border: 1px solid #cbd2da;
+  border-radius: 4px;
+  background: #fff;
+  color: #1a2330;
+}
+.ctrl-btn {
+  font-size: 12px;
+  padding: 4px 10px;
+  border: 1px solid #cbd2da;
+  border-radius: 4px;
+  background: #f1f3f5;
+  color: #1a2330;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.ctrl-btn:hover {
+  background: #e3e6eb;
+}
+.ctrl-btn-play.playing {
+  background: #1a73e8;
+  color: #fff;
+  border-color: #1a73e8;
+}
+.ctrl-btn-play.playing:hover {
+  background: #1557b0;
+}
+
+/* Year "spotlight" overlay shown on the scatter while play is running */
+.year-spotlight {
+  font-size: 56px;
+  font-weight: 700;
+  fill: #1a2330;
+  fill-opacity: 0.08;
+  text-anchor: middle;
+  pointer-events: none;
+}
+.filter-readout {
+  font-size: 11.5px;
+  color: #4a5568;
+  margin-left: auto;
+}
+.filter-readout strong { color: #1a2330; }
+
+/*   Dashboard grid: 2 columns × 2 rows, Sankey spans 2 rows   */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 38% 62%;
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+  padding: 10px;
+  /* fill the rest of the viewport below the header */
+  height: calc(100vh - 110px);
+  width: 100vw;
+}
+
+.panel-overview { grid-column: 1; grid-row: 1; }
+.panel-scatter  { grid-column: 1; grid-row: 2; }
+.panel-sankey   { grid-column: 2; grid-row: 1 / span 2; } /* focus view, larger */
+
+/*   Panel   */
+.panel {
+  background: #ffffff;
+  border: 1px solid #e3e6eb;
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.panel-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a2330;
+}
+.panel-sub {
+  margin: 0 0 4px 0;
+  font-size: 11px;
+  color: #6b7280;
+}
+.chart-container {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  position: relative;
+}
+
+/*   SVG defaults   */
+svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.axis text {
+  font-size: 10px;
+  fill: #4a5568;
+}
+.axis line, .axis path {
+  stroke: #cbd2da;
+}
+.axis-label {
+  font-size: 11px;
+  fill: #333;
+  font-weight: 500;
+}
+
+/*   Legend   */
+.legend text {
+  font-size: 10px;
+  fill: #333;
+}
+.legend-title {
+  font-size: 10px;
+  font-weight: 600;
+  fill: #1a2330;
+}
+
+/*   Tooltip   */
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(26, 35, 48, 0.95);
+  color: #ffffff;
+  padding: 6px 9px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.4;
+  z-index: 999;
+  transition: opacity 120ms ease;
+  max-width: 260px;
+}
+.tooltip strong { color: #ffd166; }
+
+/*   Bar chart   */
+.bar {
+  cursor: pointer;
+  /* fill is animated via d3 transitions on selection state changes */
+}
+.bar.selected {
+  stroke: #1a2330;
+  stroke-width: 2.5;
+}
+.bar.dimmed {
+  opacity: 0.25;
+}
+.bar-label {
+  font-size: 10px;
+  fill: #1a2330;
+  pointer-events: none;
+  text-anchor: middle;
+}
+
+/*   Scatterplot   */
+.scatter-dot {
+  stroke: #ffffff;
+  stroke-width: 0.4;
+}
+.scatter-dot.dimmed {
+  opacity: 0.08;
+}
+/* d3-brush styling */
+.brush .selection {
+  fill: #1a2330;
+  fill-opacity: 0.08;
+  stroke: #1a2330;
+  stroke-width: 1.2;
+  stroke-dasharray: 3 3;
+}
+.brush .handle {
+  fill: #1a2330;
+  fill-opacity: 0.2;
+}
+
+/*   Sankey   */
+.sankey-link {
+  fill: none;
+  stroke-opacity: 0.45;
+  transition: stroke-opacity 120ms;
+}
+.sankey-link:hover {
+  stroke-opacity: 0.85;
+}
+.sankey-link.dimmed {
+  stroke-opacity: 0.05;
+}
+.sankey-node rect {
+  stroke: #ffffff;
+  stroke-width: 1;
+  cursor: default;
+}
+.sankey-node text {
+  font-size: 10px;
+  fill: #1a2330;
+  pointer-events: none;
+}
+.sankey-node.dimmed rect {
+  opacity: 0.25;
+}
+.sankey-node.dimmed text {
+  opacity: 0.4;
+}
+
+/*   Empty-state hint when filter yields no data   */
+.empty-hint {
+  font-size: 12px;
+  fill: #b94a48;
+  font-weight: 500;
+}

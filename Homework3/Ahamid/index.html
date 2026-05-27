@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Data Science Salaries — Interactive Dashboard (HW3)</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- D3 core (required by assignment) -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <!-- d3-sankey: official D3 module used for the advanced (Sankey) view -->
+  <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+</head>
+<body>
+  <header class="dashboard-header">
+    <h1>Data Science Salaries Interactive Dashboard</h1>
+    <p class="subtitle">
+      Click an <strong>experience-level bar</strong> to drill down. Drag a box on the
+      <strong>scatterplot</strong> to brush a year × salary range. The
+      <strong>Sankey</strong> on the right re-routes itself live to show only the jobs
+      that match your selection. Use <em>Sort by salary</em> to animate the bar order.
+    </p>
+
+    <!-- Interaction controls -->
+    <div class="controls">
+      <label class="ctrl-group">
+        <span class="ctrl-label">Order bars by:</span>
+        <select id="sort-mode" class="ctrl-input">
+          <option value="experience" selected>Experience level (Entry → Exec)</option>
+          <option value="salary-desc">Average salary (high → low)</option>
+          <option value="salary-asc">Average salary (low → high)</option>
+        </select>
+      </label>
+
+      <label class="ctrl-group">
+        <span class="ctrl-label">Year:</span>
+        <select id="year-select" class="ctrl-input">
+          <option value="all" selected>All years</option>
+          <option value="2020">2020</option>
+          <option value="2021">2021</option>
+          <option value="2022">2022</option>
+          <option value="2023">2023</option>
+        </select>
+        <button id="play-btn" class="ctrl-btn ctrl-btn-play" type="button" title="Cycle through years 2020 → 2023">▶ Play timeline</button>
+      </label>
+
+      <button id="reset-btn" class="ctrl-btn" type="button">Reset filters</button>
+
+      <span id="filter-readout" class="filter-readout">
+        Showing <strong id="filter-count">…</strong> jobs (no filter applied)
+      </span>
+    </div>
+  </header>
+
+  <main class="dashboard-grid">
+    <!-- VIEW 1: OVERVIEW (context) bar chart of avg salary by experience level. -->
+    <section class="panel panel-overview" id="panel-bar">
+      <h2 class="panel-title">Average Salary by Experience Level</h2>
+      <p class="panel-sub">Overview click a bar to filter the other views</p>
+      <div class="chart-container" id="chart-bar"></div>
+    </section>
+
+    <!-- VIEW 2: SCATTER (context) salary vs work year, brushable. -->
+    <section class="panel panel-scatter" id="panel-scatter">
+      <h2 class="panel-title">Salary by Year (drag to brush)</h2>
+      <p class="panel-sub">Each dot is one full-time job. Brush to filter by year × salary.</p>
+      <div class="chart-container" id="chart-scatter"></div>
+    </section>
+
+    <!-- VIEW 3: SANKEY (focus, advanced) flows from experience -> role -> company size. -->
+    <section class="panel panel-sankey" id="panel-sankey">
+      <h2 class="panel-title">Flow of Jobs: Experience → Role → Company Size</h2>
+      <p class="panel-sub">Focus view flow widths animate as filters change</p>
+      <div class="chart-container" id="chart-sankey"></div>
+    </section>
+  </main>
+
+  <!-- Shared tooltip element used by all three views -->
+  <div id="tooltip" class="tooltip" style="opacity:0;"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
