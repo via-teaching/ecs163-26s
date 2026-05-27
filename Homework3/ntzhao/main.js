@@ -740,8 +740,6 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
 
     d3.selectAll(".temp-trendline").interrupt().style("opacity", 0.1);
 
-    d3.select(".trendline").interrupt().style("opacity", 0.1);
-
     d3.select(".trendline-" + getGenreKey(genre))
       .interrupt()
       .style("opacity", 1.0);
@@ -754,7 +752,6 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
       .style("opacity", 0.75)
       .style("fill", (d) => color(d["Fav genre"]));
 
-    d3.select(".trendline").interrupt().style("opacity", 0.75);
     d3.selectAll(".temp-trendline").interrupt().style("opacity", 0.1);
   }
 
