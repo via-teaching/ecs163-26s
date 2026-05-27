@@ -11,7 +11,7 @@ const chordh = 600 - margin.top - margin.bottom; //height used for chord
 const inrad = 140; //chord inner radius 
 const outrad = 150; //chord outer radius 
 
-d3.csv("pokemon.csv").then(rawData => { //load and parse data from csv; named rawData 
+d3.csv("pokemon1.csv").then(rawData => { //load and parse data from csv; named rawData 
     console.log(rawData);
 
     rawData.forEach(function (d) {
