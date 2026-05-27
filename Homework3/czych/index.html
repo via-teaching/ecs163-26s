@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="Data Science Salary Dashboard">
+	<title>Data Science Salary Dashboard</title>
+	<style>
+		* { box-sizing: border-box; }
+		html, body {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+			background: #f7f8fa;
+			color: #1a1a2e;
+		}
+		#dashboard {
+			width: 100%;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+		}
+		header {
+			flex: 0 0 auto;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			padding: 12px 24px;
+			background: #1a1a2e;
+			color: #fff;
+		}
+		header h1 {
+			margin: 0;
+			font-size: 22px;
+			font-weight: 600;
+			letter-spacing: 0.02em;
+		}
+		header p {
+			margin: 6px 0 0;
+			font-size: 13px;
+			line-height: 1.45;
+			color: #b8c0cc;
+			max-width: 960px;
+		}
+		#viz-container {
+			flex: 1;
+			min-height: 0;
+		}
+		svg {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+	<div id="dashboard">
+		<header>
+			<h1>Data Science Salary Dashboard</h1>
+			<p>This dashboard visualizes salary patterns in the data science industry by examining experience levels, job titles, company sizes, and salary trends over time.</p>
+		</header>
+		<div id="viz-container">
+			<svg id="main-svg"></svg>
+		</div>
+	</div>
+
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+	<script src="main.js"></script>
+	<script src="sankey.js"></script>
+	<script src="lineChart.js"></script>
+	<script src="heatmap.js"></script>
+</body>
+</html>
