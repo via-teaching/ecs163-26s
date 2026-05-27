@@ -1,0 +1,44 @@
+Company,Car Name,Engine,CC/Battery,HP,Top Speed,0-100 km/h,Price,Fuel,Seats
+Toyota,Corolla,1.8L I4,1800,139,180,9.8,22000,Petrol,5
+Toyota,Camry Hybrid,2.5L I4 Hybrid,2500,208,190,7.8,33000,Hybrid,5
+Toyota,GR Supra,3.0L I6 Turbo,3000,382,250,4.1,56000,Petrol,2
+Honda,Civic,1.5L I4 Turbo,1500,180,200,7.5,26000,Petrol,5
+Honda,Accord Hybrid,2.0L I4 Hybrid,2000,204,190,7.1,34000,Hybrid,5
+Honda,CR-V,1.5L I4 Turbo,1500,190,190,8.2,31500,Petrol,5
+BMW,330i,2.0L I4 Turbo,2000,255,250,5.6,46500,Petrol,5
+BMW,M3,3.0L I6 Twin Turbo,3000,473,290,4.1,76000,Petrol,5
+BMW,i4 eDrive40,83.9 kWh,84,335,190,5.7,58000,Electric,5
+Mercedes,C300,2.0L I4 Turbo,2000,255,250,6.0,48000,Petrol,5
+Mercedes,AMG C43,2.0L I4 Turbo,2000,402,265,4.6,62000,Petrol,5
+Mercedes,EQS 450,108 kWh,108,355,210,5.9,105000,Electric,5
+Lexus,ES 350,3.5L V6,3500,302,210,6.6,43000,Petrol,5
+Lexus,RX Hybrid,2.5L Hybrid,2500,246,200,7.4,51000,Hybrid,5
+Lexus,LC 500,5.0L V8,5000,471,270,4.4,98000,Petrol,4
+Tesla,Model 3,75 kWh,75,283,225,5.8,39000,Electric,5
+Tesla,Model Y,81 kWh,81,384,217,5.0,45000,Electric,5
+Tesla,Model S Plaid,100 kWh,100,1020,322,2.1,90000,Electric,5
+Ford,Mustang GT,5.0L V8,5000,480,250,4.3,43000,Petrol,4
+Ford,F-150 Hybrid,3.5L V6 Hybrid,3500,430,172,5.7,58000,Hybrid,5
+Ford,Mustang Mach-E,91 kWh,91,346,200,5.1,49000,Electric,5
+Chevrolet,Corvette Stingray,6.2L V8,6200,490,312,3.0,69000,Petrol,2
+Chevrolet,Malibu,1.5L I4 Turbo,1500,160,210,8.5,26000,Petrol,5
+Chevrolet,Bolt EV,65 kWh,65,200,150,6.5,27000,Electric,5
+Hyundai,Elantra,2.0L I4,2000,147,190,8.4,22000,Petrol,5
+Hyundai,Ioniq 5,77.4 kWh,77,320,185,5.1,43000,Electric,5
+Hyundai,Tucson Hybrid,1.6L Hybrid,1600,226,193,7.7,33500,Hybrid,5
+Kia,K5,1.6L I4 Turbo,1600,180,210,7.8,27000,Petrol,5
+Kia,EV6,77.4 kWh,77,320,185,5.2,49000,Electric,5
+Kia,Sorento Hybrid,1.6L Hybrid,1600,227,190,8.4,38000,Hybrid,7
+Porsche,911 Carrera,3.0L H6 Twin Turbo,3000,379,293,4.0,115000,Petrol,4
+Porsche,Taycan,93.4 kWh,93,402,230,5.1,92000,Electric,4
+Porsche,Cayenne,3.0L V6 Turbo,3000,348,248,5.7,84000,Petrol,5
+Nissan,Altima,2.5L I4,2500,188,210,7.6,27000,Petrol,5
+Nissan,Ariya,87 kWh,87,389,200,5.0,51000,Electric,5
+Nissan,Z,3.0L V6 Twin Turbo,3000,400,250,4.5,43000,Petrol,2
+Audi,A4,2.0L I4 Turbo,2000,261,250,5.2,42000,Petrol,5
+Audi,RS5,2.9L V6 Twin Turbo,2900,444,280,3.9,80000,Petrol,4
+Audi,Q4 e-tron,82 kWh,82,295,180,6.2,55000,Electric,5
+Mazda,MX-5 Miata,2.0L I4,2000,181,220,5.7,31000,Petrol,2
+Mazda,CX-90 PHEV,2.5L PHEV,2500,323,210,5.9,48000,Hybrid,7
+Subaru,WRX,2.4L H4 Turbo,2400,271,240,5.5,34000,Petrol,5
+Subaru,Outback,2.5L H4,2500,182,195,8.6,30000,Petrol,5
