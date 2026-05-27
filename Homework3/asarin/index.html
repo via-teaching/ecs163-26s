@@ -1,0 +1,151 @@
+<!doctype html>
+<html style="width:100%;height:100%;">
+<head>
+    <meta charset="utf-8">
+    <title>Music & Mental Health Survey Dashboard</title>
+
+    <!-- using inter from google fonts, looks cleaner than the default -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* css vars so i can reuse colors across the page */
+        :root {
+            --border: #dde1e8;
+            --accent: #3b5bdb;
+            --mh-low: #3b82f6;
+            --mh-moderate: #22c55e;
+            --mh-high: #f59e0b;
+            --mh-veryhigh: #ef4444;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html, body {
+            width: 100%; height: 100%;
+            margin: 0; padding: 0;
+            background: #fff;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        /* header on top, then 2 by 2 chart layout w heatmap on the bottom */
+        #dashboard {
+            width: 100%; height: 100%;
+            display: grid;
+            grid-template-rows: auto 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
+            grid-template-areas:
+                "header  header"
+                "scatter sankey"
+                "heatmap heatmap";
+        }
+
+        /* dashboard title sittin above the 3 panels */
+        #dashboard-header {
+            grid-area: header;
+            padding: 12px 18px 10px 18px;
+            border-bottom: 1px solid var(--border);
+            color: #000;
+        }
+        #dashboard-header h1 {
+            margin: 0 0 3px 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        #dashboard-header p {
+            margin: 0;
+            font-size: 11.5px;
+            color: #000;
+        }
+
+        /* each chart sits inside one of these panels */
+        .panel {
+            overflow: hidden;
+            display: flex;
+        }
+        #scatter-panel { grid-area: scatter; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        #sankey-panel  { grid-area: sankey;  border-bottom: 1px solid var(--border); }
+        #heatmap-panel { grid-area: heatmap; }
+
+        /* svgs fill their panel so they scale w the browser */
+        .panel svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* axis styling, making them pretty */
+        .axis text {
+            fill: #000;
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+        }
+        .axis path, .axis line { stroke: #dde1e8; }
+        .grid line { stroke: #f0f2f5; stroke-dasharray: 3,3; }
+        .grid path { stroke: none; }
+
+        /* new from hw 2 to add interactivity stuling */
+        /* brush selection rectangle gets a light blue tint so it's visible but not loud */
+        .brush .selection {
+            fill: #3b5bdb;
+            fill-opacity: 0.08;
+            stroke: #3b5bdb;
+            stroke-width: 1;
+        }
+        /* brush handles on the edges, small so they don't get in the way */
+        .brush .handle {
+            fill: #3b5bdb;
+            fill-opacity: 0.3;
+        }
+
+        /* tooltip floats next to the cursor on hover */
+        #tooltip {
+            position: fixed;
+            opacity: 0;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 7px 11px;
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
+            color: #1a1d23;
+            pointer-events: none;
+            z-index: 9999;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.09);
+            max-width: 210px;
+            line-height: 1.6;
+        }
+        /* makin the bolded part of the tooltip stand out */
+        #tooltip strong {
+            color: var(--accent);
+            display: block;
+            margin-bottom: 1px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="dashboard">
+
+    <!-- header tells the user what the whole dashboard is about -->
+    <div id="dashboard-header">
+        <h1>Music and Mental Health Survey Dashboard</h1>
+        <p>Seeing how listening habits relate to self-reported anxiety, depression, insomnia, and OCD across music genres. Start in the <strong>scatter (overview)</strong> and drag to brush a region to filter the <strong>heatmap</strong>. Click any <strong>sankey node</strong> to filter both the scatter and heatmap to that listening context or MH bucket with animations.</p>
+    </div>
+
+    <!-- the 3 chart panels, each one gets a svg that the js fills in -->
+    <div id="scatter-panel" class="panel"><svg id="scatter-chart"></svg></div>
+    <div id="sankey-panel"  class="panel"><svg id="sankey-chart"></svg></div>
+    <div id="heatmap-panel" class="panel"><svg id="heatmap-chart"></svg></div>
+</div>
+
+<!-- floating tooltip, hidden until a chart shows it -->
+<div id="tooltip"></div>
+
+<!-- d3 core and the sankey plugin for the advanced view -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
