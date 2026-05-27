@@ -1,0 +1,122 @@
+<!doctype html>
+<html style="width:100%;height:100%;">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="ECS 163 Homework 3 Student Alcohol Consumption Dashboard">
+    <title>Student Alcohol Consumption Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f7f2ea;
+            color: #1f2933;
+        }
+
+        #dashboard {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            fill: #1f2933;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            fill: #55616f;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: bold;
+            fill: #1f2933;
+        }
+
+        .axis-label {
+            font-size: 12px;
+            fill: #333333;
+        }
+
+        .legend-text {
+            font-size: 11px;
+            fill: #333333; 
+        }
+
+        .note {
+            font-size: 11px;
+            fill: #55616f;
+        }
+
+        .axis path,
+        .axis line {
+            stroke: #9aa3ad; 
+
+        }
+
+        .axis text {
+            fill: #333333;
+            font-size: 10px;
+        }
+
+        .panel {
+            fill: #ffffff;
+            stroke: #d8d2c8;
+            stroke-width: 1;
+        }
+
+        .grid line {
+            stroke: #e9e2d8;
+            stroke-width: 1;
+        }
+
+        #tooltip {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            background: white;
+            border: 1px solid #c9c1b5;
+
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 12px;
+
+            color: #1f2933;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); 
+            max-width: 230px;
+        }
+    </style>
+</head>
+
+<body style="width:100%;height:100%;margin:0;">
+    <div id="dashboard">
+
+        <svg></svg>
+        <div id="tooltip"></div>
+    </div>
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="main.js"></script>
+
+</body>
+</html>
+
+
