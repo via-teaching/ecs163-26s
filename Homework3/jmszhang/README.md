@@ -1,0 +1,15 @@
+# Pokemon Interactive Type and Battle Stat Dashboard
+
+In this homework, I still used the Pokemon dataset. The goal of my dashboard was to help users explore Pokemon types and battle stats in a more interactive way. In Homework 2, I made three views to show the dataset. In Homework 3, I kept the same main topic, but I added interactions and animated transitions. I believe this is useful because users can focus on one type or one group of generations instead of only looking at the whole dataset.
+
+First of all, I made a bar chart. This chart shows how many Pokemon are in each primary type. I used this chart as the overview of the dashboard because it gives users a clear idea about the whole dataset. Users can click one bar to select a primary type. For example, if users click Water, the other views will only show Water type Pokemon. If users click the same bar again, the dashboard will go back to all types. This is the selection interaction in my dashboard.
+
+Second, I made a chord diagram. This is the advanced visualization in my dashboard. It shows the relationship between `Type_1` and `Type_2`. If a Pokemon only has one type, it is shown as a same-type connection. This chart is helpful because many Pokemon have two types, and this relationship is not easy to understand from a table. When users select a type in the bar chart, this chord diagram also changes. In this way, users can drill down and see the type pairing pattern for the selected group.
+
+Third, I made a line chart. This chart compares the average battle stats across generations. I used HP, Attack, Defense, Sp_Atk, Sp_Def, and Speed. I added a brushing interaction to this chart. Users can drag across the line chart to select one or more generations. After that, the bar chart and chord diagram will update based on the brushed generations. This helps users compare different parts of the dataset. For example, users can look at early generations or later generations and see whether the type distribution and type pairings are different.
+
+I also added animated transitions. The bars grow from the bottom when the dashboard updates. The chord diagram fades in after filtering. The line chart also draws the lines with animation. These animations are not only for making the dashboard look better. They also help users see that the dashboard changed from one state to another state.
+
+The design of this dashboard follows the focus and context idea. The bar chart gives context for all primary types. The chord diagram and line chart become focus views after users select a type or brush generations. I used the same Pokemon type colors in the dashboard so users can connect the views more easily. I also added tooltips, axis labels, titles, captions, and a reset button to make the dashboard easier to use.
+
+AI Disclosure: I utilized ChatGPT to assist in understanding D3.js interactions, brushing, and animated transitions. I also used ChatGPT to help debug the JavaScript code when the dashboard did not update correctly. I reviewed the final code and I understand the selection interaction, brushing interaction, and transition logic used in this homework.
