@@ -1,0 +1,3 @@
+I used the global terrorism db, where it is too big for git to track, so I excluded it from the git repository.
+
+https://www.kaggle.com/START-UMD/gtd
