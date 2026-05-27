@@ -1,0 +1,296 @@
+<!doctype html>
+<html style="width:100%; height:100%;">
+<head>
+  <meta charset="utf-8">
+  <title>Student Alcohol Consumption</title>
+  <style>
+    /* Base */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #0f1117;
+      font-family: 'Georgia', serif;
+      color: #e8e0d0;
+    }
+
+    /* Title bar for dashboard */
+    #title-bar {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      background: #161820;
+      border-bottom: 1px solid #2a2d3a;
+    }
+
+    #title-bar h1 {
+      font-size: 16px;
+      font-weight: normal;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #c8bfa8;
+    }
+
+    #title-bar span {
+      margin-left: 16px;
+      font-size: 12px;
+      color: #555;
+      letter-spacing: 0.08em;
+    }
+
+    /* create the CSS Grid*/
+    #dashboard {
+      display: grid;
+      /*make left column smaller than right */
+      grid-template-columns: 35fr 65fr;
+      /*set height for all three rows*/
+      grid-template-rows: 30fr 30fr 40fr;
+      width: 100vw;
+      height: calc(100vh - 48px);
+      gap: 1px;
+      background: #2a2d3a;
+    }
+
+    /* Panel 0: heatmap*/
+    #panel-heatmap {
+      grid-column: 1;
+      grid-row: 1;
+      background: #13151e;
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    /*Panel 1: Overview bar chart*/
+    #panel-overview {
+      grid-column: 1;
+      grid-row: 2;
+      background: #13151e;
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    /* Panel 2: Advanced vis parallel axis chart */
+    #panel-parallel {
+      grid-column: 2;
+      grid-row: 1 / 4;
+      background: #11131b;
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    /* Panel 3: scatter plot */
+    #panel-scatter {
+      grid-column: 1;
+      grid-row: 3;
+      background: #13151e;
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    /* style for panel titles */
+    .panel-title {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #7a8099;
+      margin-bottom: 4px;
+    }
+
+    .panel-subtitle {
+      font-size: 10px;
+      color: #444;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    /* Create svg style for each chart */
+    .chart-svg {
+      width: 100%;
+      height: calc(100% - 40px);
+      overflow: visible;
+    }
+
+    /* style for tooltips*/
+    #tooltip {
+      position: fixed;
+      pointer-events: none;
+      background: #1e2130;
+      border: 1px solid #3a3d4a;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 11px;
+      color: #c8bfa8;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 100;
+    }
+
+    /* Keep panels invisible until their turn*/
+    #panel-heatmap,
+    #panel-overview,
+    #panel-parallel,
+    #panel-scatter {
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+
+    /* logic to reveal panels */
+    .panel-visible {
+      opacity: 1 !important;
+    }
+
+    /* Full-screen overlay during guided phase */
+    #intro-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+      padding: 32px;
+    }
+
+    /* Annotation card */
+    #intro-card {
+      position: relative;
+      z-index: 51;
+      max-width: 360px;
+      pointer-events: all;
+      background: rgba(13, 15, 22, 0.97);
+      border: 1px solid #2a2d3a;
+      border-radius: 4px;
+      padding: 20px 24px;
+    }
+
+    #intro-step-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    #intro-headline {
+      font-size: 18px;
+      color: #c8bfa8;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    #intro-body {
+      font-size: 12px;
+      color: #7a8099;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    /* style for next and explore buttons*/
+    #intro-next-btn,
+    #explore-btn {
+      background: none;
+      border: 1px solid #3a3d4a;
+      color: #c8bfa8;
+      font-family: 'Georgia', serif;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 8px 20px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    #intro-next-btn:hover,
+    #explore-btn:hover {
+      background: rgba(200,191,168,0.08);
+      border-color: #c8bfa8;
+    }
+
+    /* Explore button starts hidden, fixed bottom-left */
+    #explore-btn {
+      position: fixed;
+      bottom: 32px;
+      left: 32px;
+      z-index: 52;
+      display: none;
+    }
+
+    /* Brush rectangle style */
+    .selection {
+      fill: rgba(200,191,168,0.08);
+      stroke: #c8bfa8;
+      stroke-width: 1px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Title bar -->
+  <div id="title-bar">
+    <h1>Student Alcohol Consumption</h1>
+    <span>Portuguese Secondary Schools - 649 students</span>
+  </div>
+
+  <!-- Dashboard grid -->
+  <div id="dashboard">
+
+    <!-- Panel 0: Heatmap overview -->
+    <div id="panel-heatmap">
+      <div class="panel-title">Overview</div>
+      <div class="panel-subtitle">Weekend alcohol level vs. final grade</div>
+      <svg id="svg-heatmap" class="chart-svg"></svg>
+    </div>
+
+    <!-- Panel 1: Overview -->
+    <div id="panel-overview">
+      <div class="panel-title">Chart 1 -> Distribution</div>
+      <div class="panel-subtitle">How much do students drin?</div>
+      <svg id="svg-overview" class="chart-svg"></svg>
+    </div>
+
+    <!-- Panel 2: Parallel Coordinates -->
+    <div id="panel-parallel">
+      <div class="panel-title">Chart 2 -> Lifestyle Factors</div>
+      <div class="panel-subtitle">Are there correlating behaviors with alcohol consumption?</div>
+      <svg id="svg-parallel" class="chart-svg"></svg>
+    </div>
+
+    <!-- Panel 3: Scatter Plot -->
+    <div id="panel-scatter">
+      <div class="panel-title">Chart 3 -> Academic Consequences</div>
+      <div class="panel-subtitle">Final grade, number of Absences, weekend drinking habits.</div>
+      <svg id="svg-scatter" class="chart-svg"></svg>
+    </div>
+
+  </div>
+
+  <!-- Tooltip -->
+  <div id="tooltip"></div>
+
+  <!-- D3 v5 -->
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <!-- use main.js -->
+  <script src="main.js"></script>
+
+
+  <!-- Martini glass intro overlay -->
+  <div id="intro-overlay">
+
+    <!-- Annotation card that changes each step -->
+    <div id="intro-card">
+      <div id="intro-step-label">01 / 04</div>
+      <div id="intro-headline"></div>
+      <div id="intro-body"></div>
+      <button id="intro-next-btn">Next</button>
+    </div>
+
+  </div>
+
+  <!-- Button that appears after the last guided step -->
+  <button id="explore-btn">Start Exploring</button>
+
+
+</body>
+</html>
