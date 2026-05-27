@@ -63,7 +63,7 @@ function drawStarChart(newData, genreCounts) {
                 genreName: genreName
             });
 
-        // Background concentric tracking circles (Maintained globally)
+        // create circles for default view
         const levels = 2;
         for (let j = 0; j < levels; j++) {
             gInner.append("circle")
@@ -122,7 +122,7 @@ function drawStarChart(newData, genreCounts) {
             .attr("stroke", colorScale(genreName))
             .attr("stroke-width", 1.5);
 
-        // double click to add genre to 
+        // double click to add genre to add
         gInner.on("dblclick", function(d) {
             if (!window.isSelectMode) return; 
             addGenretoChart(d.radarData, d.genreName);
@@ -167,8 +167,8 @@ function drawStarChart(newData, genreCounts) {
     });
 
     // wrap layer in text
-    const textLayerG = mainViewG.append("g").attr("class", "mainView-text-layer");
-    const shapeLayerG = mainViewG.append("g").attr("class", "mainView-shapes-layer");
+    const textLayerG=mainViewG.append("g").attr("class", "mainView-text-layer");
+    const shapeLayerG=mainViewG.append("g").attr("class", "mainView-shapes-layer");
 
     // Array to manage genres loaded onto main view
     let loadedGenres = [];
@@ -208,7 +208,7 @@ function drawStarChart(newData, genreCounts) {
             // Color identifier
             legendRowG.append("rect")
                 .attr("width", 10).attr("height", 8).attr("rx", 2)
-                .attr("x", 0).attr("y", -29) // Shifted up to match the text label's new baseline
+                .attr("x", 0).attr("y", -29) 
                 .attr("fill", colorScale(genreInfo.name));
 
             // Name label
@@ -227,28 +227,23 @@ function drawStarChart(newData, genreCounts) {
 
                 legendRowG.append("text")
                     .attr("x", subCol * 70)
-                    .attr("y", -8 + (subRow * 14)) 
+                    .attr("y", -8 +(subRow * 14)) 
                     .style("font-size", "10px").style("fill", "#444")
                     .text(`${metric.axis}: ${metric.value.toFixed(1)}`);
             });
         });
     }
 
-    // Add the double clicked genre to the main
-    // selected chart
+    // Add the double clicked genre to the main selected chart
     function addGenretoChart(radarData, genreName) {
-        // if genre has been added do nothing
         if (loadedGenres.some(item => item.name === genreName)) return;
 
-        // max 3
         if (loadedGenres.length >= 3) {
             const elementsToRemove = [...loadedGenres];
             loadedGenres = [];
 
-            // Slide all 3 elements back synchronously
             elementsToRemove.forEach(evictedGenre => {
                 const sourceCell = smallMultiplesG.selectAll(".star-chart-container").filter(d => d.genreName === evictedGenre.name).datum();
-                // (AI USED) Dynamically offset source transformation path based on whether the parent container group has moved left or right
                 const currentParentX = window.isSelectMode ? teamMargin.left : teamMargin.left + 20;
                 const targetLocalX = (currentParentX + 30 + sourceCell.morphX) - (width - 320);
                 const targetLocalY = (teamTop + 50 + sourceCell.morphY) - (teamTop + 140);
@@ -260,9 +255,17 @@ function drawStarChart(newData, genreCounts) {
             });
         }
 
-        // Push new genre to array
-        loadedGenres.push({ name: genreName, data: radarData });
-
+        loadedGenres.push({ name:genreName, data: radarData });
+        
+        // Update bar and scatter based on selected genres
+        const activeGenres = loadedGenres.map(item => item.name);
+        if (typeof window.syncScatter === "function") {
+            window.syncScatter(activeGenres);
+        }
+        if (typeof window.syncBar === "function") {
+            window.syncBar(activeGenres);
+        }
+        
         const sourceCell = smallMultiplesG.selectAll(".star-chart-container").filter(d => d.genreName === genreName).datum();
         const currentParentX = window.isSelectMode ? teamMargin.left : teamMargin.left + 20;
         const initialLocalX = (currentParentX + 30 + sourceCell.morphX) - (width - 320);
@@ -284,14 +287,21 @@ function drawStarChart(newData, genreCounts) {
     }
 
 
-    //Remove the genre from the main selection view
-    // this portion of the code copy pasted from AI
+    // Remove the genre from the main selection view
     function removeGenre(genreName) {
         const targetLayer = shapeLayerG.select(`.wb-layer-${genreName.replace(/[^a-zA-Z0-9]/g, '-')}`);
         if (targetLayer.empty()) return;
 
-        // get element from tracking regoistries
         loadedGenres = loadedGenres.filter(item => item.name !== genreName);
+        const activeGenres = loadedGenres.map(item => item.name);
+        
+        // Synchronize both views simultaneously on value removal
+        if (typeof window.syncScatter === "function") {
+            window.syncScatter(activeGenres);
+        }
+        if (typeof window.syncBar === "function") {
+            window.syncBar(activeGenres);
+        }
 
         const sourceCell = smallMultiplesG.selectAll(".star-chart-container").filter(d => d.genreName === genreName).datum();
         const currentParentX = window.isSelectMode ? teamMargin.left : teamMargin.left + 20;
@@ -302,7 +312,6 @@ function drawStarChart(newData, genreCounts) {
             .attr("transform", `translate(${targetLocalX}, ${targetLocalY}) scale(0.3)`)
             .remove();
 
-        // else display directions
         if (loadedGenres.length === 0) {
             addDirections();
         } else {
@@ -314,44 +323,44 @@ function drawStarChart(newData, genreCounts) {
     toggleStarChartLayout = function(selectionMode) {
         window.isSelectMode = selectionMode;
 
-        // slider location
         smallMultiplesG.transition().duration(1500).ease(d3.easeCubicInOut)
             .attr("transform", `translate(${selectionMode? teamMargin.left : teamMargin.left + 20}, ${teamTop + 50})`);
 
-        // Snappy direct transform tracking durations
         smallMultiplesG.selectAll(".star-chart-container")
             .transition().duration(1500).ease(d3.easeCubicInOut)
             .attr("transform", function(d) {
                 return `translate(${selectionMode ? d.morphX :d.normX}, ${selectionMode? d.morphY : d.normY})`;
             });
 
-        // Hide axis labels when morphed
         smallMultiplesG.selectAll(".grid-axis-text")
             .transition().duration(1500)
             .style("opacity", selectionMode? 0 : 1);
 
-        // ensures that the genre label is close enough when
-        // swapped to selection mode
         smallMultiplesG.selectAll(".footer-label-group")
             .transition().duration(1500).ease(d3.easeCubicInOut)
             .attr("transform", `translate(0, ${selectionMode ? radarRadius + 14 : radarRadius + 25})`);
 
-        // load in the squares
         smallMultiplesG.selectAll(".local-reset-square")
             .transition().duration(1500)
             .style("opacity", selectionMode ? 1 : 0)
             .style("pointer-events", selectionMode? "all" : "none");
 
-        // Load in the main view
         mainViewG.transition().duration(1500)
             .style("opacity", selectionMode ? 1 : 0)
             .style("pointer-events", selectionMode? "all" :"none");
 
-        //reset everything when user goes back to default view
+        // reset everything when user goes back to default view
         if (!selectionMode) {
             shapeLayerG.selectAll(".overlay").remove();
             loadedGenres = [];
             addDirections();
+            
+            if (typeof window.syncScatter === "function") {
+                window.syncScatter(null);
+            }
+            if (typeof window.syncBar=== "function") {
+                window.syncBar(null);
+            }
         }
     };
 

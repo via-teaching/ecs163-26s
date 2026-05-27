@@ -49,16 +49,16 @@ d3.csv("mxmh_survey_results.csv").then(rawData => {
     const genreColors = {
         "Rock": "#3357FF", 
         "Pop": "#FF23A8", 
-        "Hip hop": "#33FF27", 
-        "R&B": "#E3FF23",
+        "Hip hop": "#2e5d2b", 
+        "R&B": "#78177b",
         "Jazz": "#9B33FF", 
-        "Classical": "#33FFF0", 
+        "Classical": "#277f79", 
         "Metal": "#666666", 
         "Country": "#A86F33",
         "EDM": "#FF9F35", 
         "Rap": "#16240c", 
-        "Folk": "#228B22", 
-        "K pop": "#FFD700",
+        "Folk": "#00ff00", 
+        "K pop": "#d20d0d9e",
         "Video game music": "#FF4500", 
         "Others": "#A9A9A9"
     };
@@ -67,6 +67,7 @@ d3.csv("mxmh_survey_results.csv").then(rawData => {
         .domain(Object.keys(genreColors))
         .range(Object.values(genreColors));
 
+    window.fullDataset= newData;
     // draw all 3 graphs
     drawScatterPlot(newData, genreCounts);
     drawBarChart(newData);
@@ -81,13 +82,28 @@ d3.csv("mxmh_survey_results.csv").then(rawData => {
 
     modeBtn.on("click", function() {
         isSelectMode = !isSelectMode;
+        window.isSelectMode = isSelectMode;
         
         if (isSelectMode) {
-            d3.select(this).text("Back");
             toggleStarChartLayout(true); 
+            
+            // clear brush when going select mode
+            if (window.clearActiveBrush) {
+                window.clearActiveBrush();
+            }
         } else {
-            d3.select(this).text("Switch to Selection Mode");
             toggleStarChartLayout(false); 
+            
+            // clear brush when leaving select mode
+            if (window.clearActiveBrush) {
+                window.clearActiveBrush();
+            }
+            // return legend filters when going back
+            d3.selectAll(".participant-dot")
+                .transition()
+                .duration(500)
+                .attr("r", d => hiddenGenres.has(d.genre) ? 0 : 4.5)
+                .style("opacity", d => hiddenGenres.has(d.genre) ? 0 : 0.60);
         }
     });
 

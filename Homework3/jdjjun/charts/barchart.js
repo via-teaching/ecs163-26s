@@ -1,7 +1,14 @@
 // barChart.js 
 function drawBarChart(newData) {
-    // d3.select() crreate the d3 selection object
+    // d3.select() create the d3 selection object
     const svg = d3.select("svg");
+
+    // for the synced view
+    svg.selectAll(".mainTitle").remove();
+    svg.selectAll(".axisLabel").remove();
+    svg.selectAll(".axisGroup").remove();
+    svg.selectAll(".legendGroup").remove();
+    svg.selectAll(".genreGroup").remove();
 
     // Grouped Bar Chart
     const effectCategories = ["Improve", "No effect", "Worsen"];
@@ -33,13 +40,13 @@ function drawBarChart(newData) {
     const x0 = d3.scaleBand()
         .domain(effectData.map(d => d.Genre))
         .range([0, distrWidth])
-        .padding(0.05)
+        .padding(0.2); 
 
-    // Same as above but to group different bar charts data for the same 
-    // genre
+    // Same as above but to group different bar charts data for the same genre
     const x1 = d3.scaleBand()
         .domain(effectCategories)
         .range([0, x0.bandwidth()])
+        .padding(0.05);
 
     // d3.scaleLinear() allows me to scale my percentages from 0-100%
     const y = d3.scaleLinear()
@@ -56,7 +63,6 @@ function drawBarChart(newData) {
     const gBar = svg.append("g")
         .attr("transform", `translate(${distrLeft + 50}, ${distrTop + 40})`);
 
-  
     // Create pie chart if mouse hover
     const pieG = svg.append("g")
         .attr("class", "pie-pieG-group")
@@ -94,21 +100,26 @@ function drawBarChart(newData) {
     const pieLayout = d3.pie().value(p => p.percent).sort(null);
 
     // Create elements for each group 
-    const genreGroups = gBar.selectAll(".genre-group")
+    const genreGroups = gBar.selectAll(".genreGroup")
         .data(effectData)
         .enter().append("g")
-        .attr("class", "genre-group")
+        .attr("class", "genreGroup")
         .attr("transform", d => `translate(${x0(d.Genre)}, 0)`);
 
-    // Draw the actual bar graph
+    // Draw the actual bar graph + animation
     genreGroups.selectAll("rect")
         .data(d => effectCategories.map(c => ({ key: c, value: d[c] })))
         .enter().append("rect")
         .attr("x", d => x1(d.key))
-        .attr("y", d => y(d.value))
         .attr("width", x1.bandwidth())
-        .attr("height", d => distrHeight - y(d.value))
-        .attr("fill", d => effectColors(d.key));
+        .attr("fill", d => effectColors(d.key))
+        .attr("y", distrHeight) 
+        .attr("height", 0)    
+        .transition()
+        .duration(1500) 
+        .attr("y", d => y(d.value))
+        .attr("height", d => distrHeight - y(d.value));
+        
 
     //mouseover logic.
     genreGroups
@@ -151,9 +162,8 @@ function drawBarChart(newData) {
 
         //cursor movement 
         .on("mousemove", function() {
-        const mouseCoords = d3.mouse(svg.node());
-        const tooFarRight = width - 200;
-            //ensure view
+            const mouseCoords = d3.mouse(svg.node());
+            const tooFarRight = width - 200;
             if (mouseCoords[0] > tooFarRight) {
                 pieG.attr("transform", `translate(${mouseCoords[0] - 160}, ${mouseCoords[1] - 120})`);
             } else {
@@ -166,24 +176,28 @@ function drawBarChart(newData) {
 
     // Generate the bottom axis with d3.axisBottom()
     gBar.append("g")
+        .attr("class", "axisGroup") 
         .attr("transform", `translate(0, ${distrHeight})`)
         .call(d3.axisBottom(x0))
         .selectAll("text")
-        .attr("transform", "rotate(-45)")
-        .style("text-anchor", "end")
-        .style("font-size", "10px");
+        // do not rotate for synced view
+        .attr("transform", effectData.length <= 3? "rotate(0)" :"rotate(-45)")
+        .style("text-anchor", effectData.length <= 3 ? "middle" : "end")
+        .style("font-size","10px");
 
     // Ensures it shows as percentage, d3axisLeft() generates the vertical axis
     gBar.append("g")
+        .attr("class", "axisGroup") 
         .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".0%"))); 
 
     //  Add a Legend to the right side of the graph
     const barlegend = gBar.append("g")
+        .attr("class", "legendGroup") 
         .attr("transform", `translate(${distrWidth - 60}, -10)`);
 
     // Add Title to the Bar chart
     svg.append("text")
-        .attr("class", "bar-chart-main-title")
+        .attr("class", "mainTitle") 
         .attr("x", distrLeft + 10)
         .attr("y", distrTop + 27)
         .style("font-weight", "bold")
@@ -192,6 +206,7 @@ function drawBarChart(newData) {
 
     // x axis label
     gBar.append("text")
+        .attr("class", "axisLabel") 
         .attr("x", distrWidth / 2)
         .attr("y", distrHeight + 40)
         .style("font-weight", "bold")
@@ -201,6 +216,7 @@ function drawBarChart(newData) {
 
     // Y label
     gBar.append("text")
+        .attr("class", "axisLabel") 
         .attr("x", -(distrHeight / 2))
         .attr("y", -45)
         .style("font-weight", "bold")
@@ -216,3 +232,20 @@ function drawBarChart(newData) {
         row.append("text").attr("x", 20).attr("y", 12).text(cat).style("font-size", "12px");
     });
 }
+
+// sync bar chart with main view
+window.syncBar = function(activeGenreNames) {
+    if (!activeGenreNames || activeGenreNames.length === 0) {
+        drawBarChart(window.fullDataset); 
+        return;
+    }
+
+    const filteredData = window.fullDataset.filter(d => {
+        let currentGenre = d["Fav genre"];
+        if (currentGenre === "Video game music") currentGenre = "Video game";
+        return activeGenreNames.includes(currentGenre) || activeGenreNames.includes(d["Fav genre"]);
+    });
+
+    // re render layout
+    drawBarChart(filteredData);
+};

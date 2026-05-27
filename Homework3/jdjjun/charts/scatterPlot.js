@@ -68,17 +68,33 @@ function drawScatterPlot(newData, genreCounts) {
         .attr("class", d =>`participant-dot g-${d.genre.replace(/[^a-zA-Z0-9]/g, '-')}`)
         .attr("cx", d => {
             const rawX =spx(d.age) + (Math.random() - 0.5) * 8;
-            return Math.max(2, Math.min(scatterWidth - 2, rawX));
+            d.x_plane = Math.max(2, Math.min(scatterWidth - 2, rawX));
+            return d.x_plane;
         })
         .attr("cy", d => {
             const rawY = spy(d.meanScore) + (Math.random()- 0.5) * 8;
-            return Math.max(2, Math.min(scatterHeight - 2, rawY));
+            d.y_plane = Math.max(2, Math.min(scatterHeight - 2, rawY));
+            return d.y_plane;
         })
         .attr("r", 4.5) 
         .attr("fill", d => colorScale(d.genre))
         .attr("opacity", 0.60) 
         .attr("stroke","#fff")
         .attr("stroke-width", 0.4);
+    
+    dataCircles.style("cursor", "pointer")
+        .on("click", function(d) {
+            // Only isolate dots if the user has activated Selection Mode
+            if (!window.isSelectMode) return;
+
+            const clickedGenre = d.genre;
+
+            // Isolate the scatter plot view smoothly using a fade transition
+            spg.selectAll(".participant-dot")
+                .transition()
+                .duration(500)
+                .style("opacity", dot => dot.genre === clickedGenre ? 0.90 : 0.03);
+        });
 
     dataCircles.append("title")
         .text(d => `Genre: ${d.genre}\nAge: ${d.age} yrs\nMean Score: ${d.meanScore.toFixed(2)}/10\nParticipants: ${d.count}`);
@@ -92,6 +108,7 @@ function drawScatterPlot(newData, genreCounts) {
 
     // Append legend
     const scatterLegendG = svg.append("g")
+        .attr("class", "scatterLegend") // Retained selector class hook
         .attr("transform", `translate(${scatterMargin.left + scatterWidth + 20}, ${scatterMargin.top + 40})`);
 
     // Loop each genres to draw the selection keys
@@ -119,6 +136,9 @@ function drawScatterPlot(newData, genreCounts) {
 
         // Click event handler
         legendRow.on("click", function() {
+            // disable legend when Select Mode
+            if (window.isSelectMode) return;
+
             // filter out crossed data
             const dots = spg.selectAll(".participant-dot")
                 .filter(dot => dot.genre === nameString);
@@ -141,39 +161,113 @@ function drawScatterPlot(newData, genreCounts) {
         });
     });
 
-    //add brush
     const brush = d3.brush()
-        .extent([[60, 40], [scatterWidth+ 65, scatterHeight + 40]])
-        .on("start brush end", brushed)
+        .extent([[0, 0], [scatterWidth, scatterHeight]])
+        .on("start brush end", brushed);
 
-    svg.append("g")
+    const brushGroup = spg.append("g")
         .attr("class", "brush")
         .call(brush);
-    //Add brushed area, see which circles are within the area
-    /** 
+
+    //clear brush when change
+    window.clearActiveBrush = function() {
+        brushGroup.call(brush.move, null);
+    };
+
     function brushed() {
         const selection = d3.event.selection;
-        if (selection) {
-            const [[x0, y0], [x1, y1]] = selection;
-            circle.classed("selected", d => {
-                return x0 <=spx(d.Age) && xScale(d.Age) <= x1 &&
-                   y0 <= yScale(d.Score) && yScale(d.Score) <= y1;
+        
+        if (!selection) {
+            const activeLayers = [];
+            svg.selectAll(".focus-mainView-panel .mainView-shapes-layer path").each(function() {
+                const classList = d3.select(this).attr("class") || "";
+                const match = classList.match(/wb-layer-([a-zA-Z0-9\-]+)/);
+                if (match) activeLayers.push(match[1]);
             });
-        } **/
 
-    function brushed() {
-    const selection = d3.event.selection;
-    if (selection) {
+            if (activeLayers.length > 0) {
+                dataCircles.style("opacity", d => {
+                    const safeClassName = d.genre.replace(/[^a-zA-Z0-9]/g, '-');
+                    return activeLayers.includes(safeClassName) ? 0.90 : 0.03;
+                });
+            } else {
+                dataCircles.style("opacity", 0.60);
+            }
+            return;
+        }
+
         const [[x0, y0], [x1, y1]] = selection;
-        dataCircles.classed("selected", d => {
-            const x = spx(d.age);
-            const y = spy(d.meanScore);
 
-            return x0 <= x && x <= x1 &&
-                   y0 <= y && y <= y1;
+        // local boundary mapping
+        dataCircles.style("opacity", d => {
+            const x = d.x_plane;
+            const y = d.y_plane;
+            const isInside = (x0 <= x && x <= x1 && y0 <= y && y <= y1);
+            return isInside ? 0.90 : 0.15;
         });
     }
+}
+
+// Connect to main starchart view
+window.syncScatter = function(activeGenreNames) {
+    const svg = d3.select("svg");
+    
+    // if no genre loaded, default
+    if (!activeGenreNames || activeGenreNames.length === 0) {
+        // Restore default dot visibility tracking legend settings
+        svg.selectAll(".participant-dot")
+            .transition()
+            .duration(1500)
+            .ease(d3.easeCubicOut)
+            .attr("r", d => hiddenGenres.has(d.genre) ? 0 : 4.5) 
+            .style("opacity", d => hiddenGenres.has(d.genre) ? 0 : 0.60);
+        
+
+        // Restore all legend labels back to regular visibility states
+        svg.selectAll(".scatterLegend").each(function() {
+            const row = d3.select(this);
+            const textNode = row.select("text");
+            const genreName = textNode.text();
+
+            if (hiddenGenres.has(genreName)) {
+                row.select("rect").transition().duration(500).style("opacity", 0.2);
+                textNode.transition().duration(500).style("fill", "#bdb9b9");
+            } else {
+                row.select("rect").transition().duration(500).style("opacity", 1);
+                textNode.transition().duration(500).style("fill", "#222");
+            }
+        });
+        return;
     }
 
-    
-}
+    // ignore default view legend 
+    activeGenreNames.forEach(genreName => {
+        if (hiddenGenres.has(genreName)) {
+            hiddenGenres.delete(genreName); 
+        }
+    });
+
+    // dim everything but loaded genres
+    svg.selectAll(".scatterLegend").each(function() {
+        const row = d3.select(this);
+        const textNode = row.select("text");
+        const genreName = textNode.text();
+
+        const isCurrentlySelected = activeGenreNames.includes(genreName);
+
+        // transition text color and text color
+        textNode.transition().duration(400)
+            .style("fill", isCurrentlySelected ? "#222" : "#bdb9b9")
+            .style("font-weight", isCurrentlySelected ? "bold" : "normal");
+
+        row.select("rect").transition().duration(400)
+            .style("opacity", isCurrentlySelected ? 1 : 0.15);
+    });
+
+    // dim dots if not selected genre
+    svg.selectAll(".participant-dot")
+        .transition()
+        .duration(500)
+        .attr("r", 4.5) 
+        .style("opacity", d => activeGenreNames.includes(d.genre) ? 0.90 : 0.03);
+};
