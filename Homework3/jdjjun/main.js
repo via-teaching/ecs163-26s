@@ -86,13 +86,14 @@ d3.csv("mxmh_survey_results.csv").then(rawData => {
         
         if (isSelectMode) {
             toggleStarChartLayout(true); 
-            
+            modeBtn.text("Back");
             // clear brush when going select mode
             if (window.clearActiveBrush) {
                 window.clearActiveBrush();
             }
         } else {
             toggleStarChartLayout(false); 
+            modeBtn.text("Switch to Selection Mode");
             
             // clear brush when leaving select mode
             if (window.clearActiveBrush) {

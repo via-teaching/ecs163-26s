@@ -57,7 +57,7 @@ function drawBarChart(newData) {
     // Chose colors based on positive/negative connotations
     const effectColors = d3.scaleOrdinal()
         .domain(effectCategories)
-        .range(["#2db42d", "#FFD700", "#FF3333"]);
+        .range(["#47df42", "#edea45", "#FF3333"]);
 
     // Create chart container
     const gBar = svg.append("g")
@@ -199,9 +199,9 @@ function drawBarChart(newData) {
     svg.append("text")
         .attr("class", "mainTitle") 
         .attr("x", distrLeft + 10)
-        .attr("y", distrTop + 27)
+        .attr("y", distrTop + 25)
+        .style("font-size", "17px")
         .style("font-weight", "bold")
-        .style("font-size", "16px")
         .text("Does Listening To Music Improve Mental Health?");
 
     // x axis label
