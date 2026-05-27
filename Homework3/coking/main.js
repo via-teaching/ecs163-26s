@@ -46,6 +46,8 @@ const alcoholColor = d3.scaleSequential()
 const tooltip = d3.select("#tooltip");
 
 function showTooltip(html, event) {
+  // Don't show tooltips while the guided intro is running
+  if (appState !== "explore") return;
   tooltip
     .style("opacity", 1)
     .html(html)
@@ -139,10 +141,17 @@ function advanceIntroStep() {
 
   currentStep++;
 
-  // On the last step, swap Next button for Explore button
+  // The scatter panel is bottom-left, so on the last step move the card
+  // to the top-left so it doesn't overlap the newly revealed chart
+  var overlay = document.getElementById("intro-overlay");
   if (currentStep >= introSteps.length) {
+    overlay.style.alignItems = "flex-start";
+    overlay.style.paddingTop = "80px";
     document.getElementById("intro-next-btn").style.display = "none";
     document.getElementById("explore-btn").style.display    = "block";
+  } else {
+    overlay.style.alignItems = "flex-end";
+    overlay.style.paddingTop = "32px";
   }
 }
 
@@ -417,44 +426,56 @@ function drawOverview(data) {
       d3.select(this).attr("opacity", 1);
     });
 
-  // Brush is added over the full chart area so the user can drag across levels
+  // Brush is added over the full chart area so the user can drag across any bars
   var brush = d3.brushX()
     .extent([[0, 0], [innerW, innerH]])
     .on("end", function() {
-      // If no selection exists (user clicked without dragging), reset
+      if (appState !== "explore") return;
+
+      // No selection means the user clicked to clear, so restore all data
       if (!d3.event.selection) {
         updateParallel(globalData);
         updateScatter(globalData);
         return;
       }
 
-      // Convert pixel selection back to Walc level values
       var sel = d3.event.selection;
 
-      // Find which Walc levels fall inside the brushed pixel range
-      // x0 is the outer band scale mapping "Dalc"/"Walc" to positions
-      // We only care about the Walc group, so we check x1 (inner scale) positions
-      // offset by x0("Walc") to get absolute positions
-      var walcOffset = x0("Walc");
-      var selected = [];
-      levels.forEach(function(level) {
-        var barLeft  = walcOffset + x1(level);
-        var barRight = barLeft + x1.bandwidth();
-        var barMid   = (barLeft + barRight) / 2;
-        if (barMid >= sel[0] && barMid <= sel[1]) {
-          selected.push(level);
+      // Check both Dalc and Walc groups to see which bars are selected.
+      // For each type, collect any level whose bar midpoint falls in the brush range.
+      var selectedByType = {};
+      types.forEach(function(type) {
+        var groupOffset = x0(type);
+        var matchedLevels = [];
+        levels.forEach(function(level) {
+          var barMid = groupOffset + x1(level) + x1.bandwidth() / 2;
+          if (barMid >= sel[0] && barMid <= sel[1]) {
+            matchedLevels.push(level);
+          }
+        });
+        if (matchedLevels.length > 0) {
+          selectedByType[type] = matchedLevels;
         }
       });
 
-      if (selected.length === 0) {
+      // If nothing was hit at all, reset
+      if (Object.keys(selectedByType).length === 0) {
         updateParallel(globalData);
         updateScatter(globalData);
         return;
       }
 
-      // Filter global data to only students whose Walc is in the selection
+      // Filter students who match ALL brushed constraints.
+      // If only one group was brushed, only that field is filtered.
       var filtered = globalData.filter(function(d) {
-        return selected.indexOf(d.Walc) !== -1;
+        var pass = true;
+        if (selectedByType["Dalc"]) {
+          pass = pass && selectedByType["Dalc"].indexOf(d.Dalc) !== -1;
+        }
+        if (selectedByType["Walc"]) {
+          pass = pass && selectedByType["Walc"].indexOf(d.Walc) !== -1;
+        }
+        return pass;
       });
 
       updateParallel(filtered);
@@ -547,6 +568,9 @@ function drawParallel(data) {
   };
   var buildPath = parallelBuildPath;
 
+  // Track which student is currently selected (null means none)
+  var selectedStudent = null;
+
   //Draw all student lines at low opacity so patterns emerge from the overlap
   parallelLineGroup = svg.append("g").attr("class", "lines");
   var lineGroup = parallelLineGroup;
@@ -560,11 +584,11 @@ function drawParallel(data) {
     .attr("stroke", function(d) { return alcoholColor(d.Walc); })
     .attr("stroke-width", 1)
     .attr("opacity", 0.35)
+    .style("cursor", "pointer")
     .on("mouseover", function(d) {
-      d3.select(this)
-        .attr("stroke-width", 2.5)
-        .attr("opacity", 1)
-        .raise();
+      // Only highlight on hover if no student is locked in by a click
+      if (selectedStudent !== null) return;
+      d3.select(this).attr("stroke-width", 2.5).attr("opacity", 1).raise();
       showTooltip(
         "Weekend alcohol: " + d.Walc + "  Workday: " + d.Dalc + "<br/>" +
         "Goes out: " + d.goout + "  Study time: " + d.studytime + "<br/>" +
@@ -578,10 +602,49 @@ function drawParallel(data) {
         .style("top",  (d3.event.pageY - 28) + "px");
     })
     .on("mouseout", function() {
-      d3.select(this)
-        .attr("stroke-width", 1)
-        .attr("opacity", 0.35);
+      // Only reset on mouseout if this line isn't the selected one
+      if (selectedStudent !== null) return;
+      d3.select(this).attr("stroke-width", 1).attr("opacity", 0.35);
       hideTooltip();
+    })
+    .on("click", function(d) {
+      if (appState !== "explore") return;
+
+      // If this line is already selected, deselect everything
+      if (selectedStudent === d) {
+        selectedStudent = null;
+        // Restore all lines to normal
+        lineGroup.selectAll("path")
+          .attr("stroke-width", 1)
+          .attr("opacity", 0.35);
+        // Restore full data in scatter
+        updateScatter(globalData);
+        hideTooltip();
+        return;
+      }
+
+      // Lock this student as selected
+      selectedStudent = d;
+
+      // Dim all lines, then highlight only this one
+      lineGroup.selectAll("path")
+        .attr("stroke-width", 1)
+        .attr("opacity", 0.08);
+
+      d3.select(this)
+        .attr("stroke-width", 3)
+        .attr("opacity", 1)
+        .raise();
+
+      // Show only this student in the scatter plot
+      updateScatter([d]);
+
+      showTooltip(
+        "Weekend alcohol: " + d.Walc + "  Workday: " + d.Dalc + "<br/>" +
+        "Goes out: " + d.goout + "  Study time: " + d.studytime + "<br/>" +
+        "Final grade: " + d.G3 + "  Absences: " + d.absences,
+        d3.event
+      );
     });
 
   //Draw a vertical axis for each dimension with its label above
@@ -690,8 +753,10 @@ function drawScatter(data) {
   scatterX = x;
   scatterY = y;
   scatterR = r;
-  //Bottom axis with light gridlines going up
-  svg.append("g")
+
+  // Store axis groups as variables so the zoom handler can redraw them in place.
+  // These are the only axis elements — no separate static append before this.
+  var xAxisGroup = svg.append("g")
     .attr("transform", "translate(0," + innerH + ")")
     .call(d3.axisBottom(x).ticks(8).tickSize(-innerH))
     .call(function(g) {
@@ -708,8 +773,7 @@ function drawScatter(data) {
     .attr("font-size", "11px")
     .text("Number of Absences");
 
-  //Left axis
-  svg.append("g")
+  var yAxisGroup = svg.append("g")
     .call(d3.axisLeft(y).ticks(6).tickSize(-innerW))
     .call(function(g) {
       g.select(".domain").remove();
@@ -735,16 +799,14 @@ function drawScatter(data) {
     .attr("width",  innerW)
     .attr("height", innerH);
 
-  // Wrap dots in a group that uses the clip path
-  scatterDotGroup = svg.append("g")
-    .attr("class", "dots")
-    .attr("clip-path", "url(#scatter-clip)");
-
   //Sort so students with more failures (bigger dots) render first,
   //preventing them from covering smaller dots in the foreground
   var sorted = data.slice().sort(function(a, b) { return b.failures - a.failures; });
-  
-  scatterDotGroup = svg.append("g").attr("class", "dots");
+
+  // Wrap dots in a group with the clip path so they don't overflow during zoom
+  scatterDotGroup = svg.append("g")
+    .attr("class", "dots")
+    .attr("clip-path", "url(#scatter-clip)");
   scatterDotGroup.selectAll("circle")
     .data(sorted)
     .enter()
@@ -833,15 +895,6 @@ function drawScatter(data) {
   // Store the original scales so zoom can reference them
   var xOrig = x.copy();
   var yOrig = y.copy();
-
-  // Store references to the axis groups so zoom can redraw them
-  var xAxisGroup = svg.append("g")
-    .attr("transform", "translate(0," + innerH + ")")
-    .call(d3.axisBottom(x).ticks(8).tickSize(-innerH));
-  // Note: remove the earlier axisBottom call and replace with this stored reference
-
-  var yAxisGroup = svg.append("g")
-    .call(d3.axisLeft(y).ticks(6).tickSize(-innerW));
 
   // Zoom behavior: rescale both axes and reposition all dots
   var zoom = d3.zoom()
