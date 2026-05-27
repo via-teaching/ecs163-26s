@@ -1,0 +1,97 @@
+/* Reset margins and ensure dashboard fits exactly on one screen */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Prevents scrolling = dashboard */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5; /* Light background for better readability */
+}
+/* Dashboard container uses Flexbox for vertical stacking */
+#dashboard-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full viewport height */
+    padding: 8px;
+    box-sizing: border-box; 
+}
+/* minimal header styling */
+header {
+    height: 40px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+/* Rows use Flexbox for horizontal layout of charts */
+.row {
+    display: flex;
+    gap: 10px; 
+}
+
+/* Parallel Coordinates = more vertical space */
+.top-row {
+    flex: 1.3;
+    margin-bottom: 10px;
+}
+.bottom-row {
+    flex: 1; /* equal height for the two bottom charts */
+}
+
+/* Container for individual charts with white background and shadows */
+.view-container {
+    width: 100%;
+    height: 45vh; /* Responsive height: 45% of the screen height */
+    min-height: 350px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden; /* Prevents scrollbars inside the chart */
+}
+/* D3 elements scale dynamically with browser resizing */
+svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+/* Chart titles and axis labels */
+.chart-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    fill: #000;
+}
+.axis-label {
+    font-size: 12px;
+    font-weight: 500;
+    fill: #333;
+}
+
+/* Style the axis lines and ticks */
+.axis path,
+.axis line {
+    stroke: #333;
+}
+.axis text {
+    font-size: 10px;
+    fill: #333;
+}
+
+/* Horizontal legend for 'Music effects' */
+#legend-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 600;
+}
+/* Legend items: colored squares/swatch with labels */
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.legend-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px; /* Rounded corners*/
+}
