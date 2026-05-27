@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Pokemon Stats Interactive Dashboard</title>
+    <link rel="stylesheet" href="hw3.css">
+</head>
+
+<body>
+
+    <h1 class="dashboard-title">Pokemon Types Analysis</h1>
+
+    <div class="dashboard-grid">
+
+        <div class="top-row">
+            <div class="chart-card flex-half">
+                <svg id="bar-chart"></svg>
+            </div>
+
+            <div class="chart-card flex-half">
+                <svg id="donut-chart"></svg>
+            </div>
+        </div>
+
+        <div class="chart-card full-width">
+            <svg id="pcp-chart"></svg>
+        </div>
+
+    </div>
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="hw3.js"></script>
+</body>
+
+</html>
