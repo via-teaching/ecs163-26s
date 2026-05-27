@@ -8,7 +8,7 @@ function drawScatterPlot(newData, genreCounts) {
         .key(d=>d["Fav genre"])
         .key(d=>+d["Age"])
         .rollup(leaves=>{
-            const totalLeaves = leaves.length;
+            const totalLeaves =leaves.length;
             const anxiety = d3.mean(leaves, d=>+d["Anxiety"]) || 0;
             const depression = d3.mean(leaves, d=>+d["Anxiety"]) || 0;
             const insomnia = d3.mean(leaves, d=>+d["Insomnia"]) || 0;
