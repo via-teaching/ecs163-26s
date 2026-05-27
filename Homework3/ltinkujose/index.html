@@ -1,0 +1,34 @@
+<!doctype html>
+<!-- This section defines the overall HTML document structure -->
+<html style="width:100%;height:100%;">
+
+<head>
+	<meta charset="utf-8">
+	<!-- This section adds the webpage title shown in the browser tab -->
+	<title>Global Terrorism Dashboard</title>
+</head>
+
+<!-- This section creates the webpage body container for the D3 dashboard -->
+<body style="width:100%;height:100%;margin: 0;">
+
+	<!-- This section creates the SVG canvas used for all D3 visualizations -->
+	<svg width="1800" height="1200"></svg>
+
+	<!-- This section loads the D3.js visualization library -->
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+
+	<!-- This section loads the line chart visualization script -->
+	<script src="linechart.js"></script>
+	<!-- This section loads the node-link diagram visualization script -->
+	<script src="nodelink.js"></script>
+
+	<!-- This section loads the streamgraph visualization script -->
+	<script src="streamgraph.js"></script>
+	<!-- This section loads the North America animated bar chart script -->
+	<script src="northamerica.js"></script>
+
+	<!-- This section loads the main dashboard processing and rendering script -->
+	<script src="main.js"></script>
+
+</body>
+</html>

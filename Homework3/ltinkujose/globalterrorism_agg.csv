@@ -1,0 +1,3113 @@
+iyear,region_txt,attacktype1_txt,count,nkill,nwound
+1970,Australasia & Oceania,Bombing/Explosion,1,0.0,0.0
+1970,Central America & Caribbean,Assassination,2,2.0,0.0
+1970,Central America & Caribbean,Hostage Taking (Kidnapping),5,1.0,0.0
+1970,East Asia,Facility/Infrastructure Attack,1,0.0,0.0
+1970,East Asia,Hijacking,1,0.0,0.0
+1970,Eastern Europe,Bombing/Explosion,8,0.0,0.0
+1970,Eastern Europe,Facility/Infrastructure Attack,4,0.0,0.0
+1970,Middle East & North Africa,Armed Assault,4,0.0,1.0
+1970,Middle East & North Africa,Assassination,1,1.0,0.0
+1970,Middle East & North Africa,Bombing/Explosion,14,0.0,2.0
+1970,Middle East & North Africa,Facility/Infrastructure Attack,1,0.0,0.0
+1970,Middle East & North Africa,Hijacking,1,0.0,1.0
+1970,Middle East & North Africa,Hostage Taking (Barricade Incident),2,0.0,0.0
+1970,Middle East & North Africa,Hostage Taking (Kidnapping),4,0.0,0.0
+1970,Middle East & North Africa,Unknown,1,0.0,1.0
+1970,North America,Armed Assault,28,17.0,16.0
+1970,North America,Assassination,8,5.0,3.0
+1970,North America,Bombing/Explosion,278,7.0,110.0
+1970,North America,Facility/Infrastructure Attack,149,0.0,24.0
+1970,North America,Hijacking,2,0.0,0.0
+1970,North America,Hostage Taking (Kidnapping),5,5.0,2.0
+1970,North America,Unarmed Assault,2,0.0,5.0
+1970,South America,Armed Assault,12,0.0,2.0
+1970,South America,Assassination,9,5.0,1.0
+1970,South America,Bombing/Explosion,11,0.0,0.0
+1970,South America,Facility/Infrastructure Attack,11,2.0,0.0
+1970,South America,Hijacking,1,0.0,0.0
+1970,South America,Hostage Taking (Barricade Incident),1,0.0,0.0
+1970,South America,Hostage Taking (Kidnapping),19,4.0,1.0
+1970,South America,Unknown,1,0.0,0.0
+1970,South Asia,Assassination,1,4.0,20.0
+1970,Southeast Asia,Assassination,1,1.0,0.0
+1970,Southeast Asia,Bombing/Explosion,6,37.0,12.0
+1970,Southeast Asia,Unknown,3,3.0,1.0
+1970,Sub-Saharan Africa,Hostage Taking (Kidnapping),2,0.0,0.0
+1970,Sub-Saharan Africa,Unknown,1,1.0,0.0
+1970,Western Europe,Armed Assault,17,19.0,1.0
+1970,Western Europe,Bombing/Explosion,15,52.0,0.0
+1970,Western Europe,Facility/Infrastructure Attack,8,7.0,9.0
+1970,Western Europe,Hijacking,6,1.0,0.0
+1970,Western Europe,Hostage Taking (Kidnapping),3,0.0,0.0
+1970,Western Europe,Unarmed Assault,1,0.0,0.0
+1971,Australasia & Oceania,Bombing/Explosion,1,0.0,0.0
+1971,Central America & Caribbean,Armed Assault,3,0.0,0.0
+1971,Central America & Caribbean,Assassination,1,0.0,0.0
+1971,Central America & Caribbean,Hostage Taking (Kidnapping),1,0.0,0.0
+1971,East Asia,Bombing/Explosion,1,25.0,0.0
+1971,Eastern Europe,Bombing/Explosion,1,0.0,0.0
+1971,Eastern Europe,Facility/Infrastructure Attack,4,0.0,0.0
+1971,Middle East & North Africa,Armed Assault,7,0.0,0.0
+1971,Middle East & North Africa,Assassination,2,2.0,0.0
+1971,Middle East & North Africa,Bombing/Explosion,36,1.0,11.0
+1971,Middle East & North Africa,Facility/Infrastructure Attack,1,0.0,0.0
+1971,Middle East & North Africa,Hijacking,2,0.0,0.0
+1971,Middle East & North Africa,Hostage Taking (Kidnapping),5,1.0,0.0
+1971,Middle East & North Africa,Unknown,2,3.0,0.0
+1971,North America,Armed Assault,21,9.0,14.0
+1971,North America,Assassination,4,5.0,0.0
+1971,North America,Bombing/Explosion,143,5.0,13.0
+1971,North America,Facility/Infrastructure Attack,75,0.0,27.0
+1971,North America,Hijacking,1,0.0,0.0
+1971,North America,Hostage Taking (Barricade Incident),1,0.0,0.0
+1971,North America,Hostage Taking (Kidnapping),1,0.0,1.0
+1971,North America,Unknown,1,1.0,0.0
+1971,South America,Armed Assault,8,4.0,0.0
+1971,South America,Assassination,2,2.0,0.0
+1971,South America,Bombing/Explosion,3,0.0,0.0
+1971,South America,Facility/Infrastructure Attack,2,0.0,0.0
+1971,South America,Hostage Taking (Kidnapping),9,0.0,0.0
+1971,Southeast Asia,Assassination,2,2.0,10.0
+1971,Southeast Asia,Bombing/Explosion,3,0.0,0.0
+1971,Southeast Asia,Hijacking,1,0.0,0.0
+1971,Sub-Saharan Africa,Hijacking,1,0.0,0.0
+1971,Sub-Saharan Africa,Hostage Taking (Kidnapping),1,1.0,0.0
+1971,Western Europe,Armed Assault,5,1.0,0.0
+1971,Western Europe,Assassination,59,62.0,6.0
+1971,Western Europe,Bombing/Explosion,51,48.0,0.0
+1971,Western Europe,Facility/Infrastructure Attack,6,1.0,0.0
+1971,Western Europe,Hijacking,1,0.0,0.0
+1971,Western Europe,Hostage Taking (Kidnapping),3,0.0,0.0
+1972,Australasia & Oceania,Assassination,6,0.0,0.0
+1972,Australasia & Oceania,Bombing/Explosion,2,1.0,0.0
+1972,Central America & Caribbean,Bombing/Explosion,3,0.0,0.0
+1972,Eastern Europe,Bombing/Explosion,1,26.0,0.0
+1972,Middle East & North Africa,Armed Assault,2,1.0,3.0
+1972,Middle East & North Africa,Assassination,21,0.0,1.0
+1972,Middle East & North Africa,Bombing/Explosion,23,29.0,77.0
+1972,Middle East & North Africa,Hijacking,5,0.0,2.0
+1972,Middle East & North Africa,Hostage Taking (Barricade Incident),1,0.0,0.0
+1972,Middle East & North Africa,Hostage Taking (Kidnapping),1,3.0,0.0
+1972,North America,Armed Assault,3,5.0,5.0
+1972,North America,Assassination,9,3.0,1.0
+1972,North America,Bombing/Explosion,40,2.0,24.0
+1972,North America,Facility/Infrastructure Attack,15,1.0,11.0
+1972,North America,Hijacking,3,0.0,0.0
+1972,North America,Hostage Taking (Barricade Incident),2,0.0,1.0
+1972,North America,Hostage Taking (Kidnapping),1,0.0,0.0
+1972,South America,Armed Assault,3,0.0,1.0
+1972,South America,Assassination,17,4.0,0.0
+1972,South America,Bombing/Explosion,8,1.0,0.0
+1972,South America,Hostage Taking (Kidnapping),5,1.0,0.0
+1972,South Asia,Hijacking,1,0.0,0.0
+1972,Southeast Asia,Armed Assault,5,2.0,1.0
+1972,Southeast Asia,Assassination,7,1.0,0.0
+1972,Southeast Asia,Bombing/Explosion,3,81.0,0.0
+1972,Southeast Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+1972,Sub-Saharan Africa,Assassination,4,0.0,0.0
+1972,Western Europe,Armed Assault,50,50.0,0.0
+1972,Western Europe,Assassination,201,200.0,4.0
+1972,Western Europe,Bombing/Explosion,108,141.0,273.0
+1972,Western Europe,Facility/Infrastructure Attack,4,0.0,0.0
+1972,Western Europe,Hijacking,3,5.0,5.0
+1972,Western Europe,Hostage Taking (Kidnapping),9,8.0,0.0
+1972,Western Europe,Unknown,1,1.0,0.0
+1973,Australasia & Oceania,Armed Assault,1,0.0,0.0
+1973,Central America & Caribbean,Assassination,1,0.0,0.0
+1973,Central America & Caribbean,Bombing/Explosion,1,0.0,0.0
+1973,Central America & Caribbean,Hostage Taking (Kidnapping),3,0.0,0.0
+1973,Central America & Caribbean,Unarmed Assault,1,0.0,0.0
+1973,East Asia,Facility/Infrastructure Attack,2,0.0,0.0
+1973,Eastern Europe,Bombing/Explosion,1,1.0,7.0
+1973,Middle East & North Africa,Armed Assault,2,0.0,0.0
+1973,Middle East & North Africa,Assassination,1,1.0,0.0
+1973,Middle East & North Africa,Bombing/Explosion,14,2.0,18.0
+1973,Middle East & North Africa,Hijacking,1,0.0,0.0
+1973,Middle East & North Africa,Hostage Taking (Barricade Incident),1,4.0,0.0
+1973,North America,Armed Assault,22,30.0,24.0
+1973,North America,Assassination,8,11.0,0.0
+1973,North America,Bombing/Explosion,22,0.0,5.0
+1973,North America,Facility/Infrastructure Attack,4,0.0,0.0
+1973,North America,Hostage Taking (Barricade Incident),2,2.0,2.0
+1973,North America,Hostage Taking (Kidnapping),6,3.0,2.0
+1973,South America,Armed Assault,10,1.0,1.0
+1973,South America,Assassination,15,13.0,1.0
+1973,South America,Bombing/Explosion,22,0.0,16.0
+1973,South America,Facility/Infrastructure Attack,6,0.0,0.0
+1973,South America,Hijacking,3,0.0,0.0
+1973,South America,Hostage Taking (Barricade Incident),1,0.0,0.0
+1973,South America,Hostage Taking (Kidnapping),26,2.0,1.0
+1973,South Asia,Unknown,1,0.0,1.0
+1973,Southeast Asia,Bombing/Explosion,1,0.0,8.0
+1973,Southeast Asia,Hostage Taking (Kidnapping),1,0.0,0.0
+1973,Sub-Saharan Africa,Assassination,2,2.0,2.0
+1973,Sub-Saharan Africa,Hostage Taking (Kidnapping),2,3.0,0.0
+1973,Western Europe,Armed Assault,27,10.0,3.0
+1973,Western Europe,Assassination,137,144.0,5.0
+1973,Western Europe,Bombing/Explosion,88,72.0,347.0
+1973,Western Europe,Facility/Infrastructure Attack,24,0.0,1.0
+1973,Western Europe,Hijacking,4,34.0,1.0
+1973,Western Europe,Hostage Taking (Barricade Incident),3,32.0,50.0
+1973,Western Europe,Hostage Taking (Kidnapping),5,3.0,0.0
+1973,Western Europe,Unarmed Assault,2,0.0,0.0
+1974,Australasia & Oceania,Facility/Infrastructure Attack,1,0.0,0.0
+1974,Central America & Caribbean,Armed Assault,1,0.0,3.0
+1974,Central America & Caribbean,Bombing/Explosion,6,0.0,0.0
+1974,Central America & Caribbean,Hostage Taking (Barricade Incident),1,0.0,0.0
+1974,Central America & Caribbean,Hostage Taking (Kidnapping),3,0.0,0.0
+1974,East Asia,Assassination,1,1.0,0.0
+1974,East Asia,Facility/Infrastructure Attack,2,0.0,7.0
+1974,East Asia,Hijacking,1,0.0,0.0
+1974,Eastern Europe,Bombing/Explosion,1,0.0,0.0
+1974,Eastern Europe,Hostage Taking (Kidnapping),1,1.0,0.0
+1974,Middle East & North Africa,Armed Assault,3,9.0,3.0
+1974,Middle East & North Africa,Assassination,4,1.0,4.0
+1974,Middle East & North Africa,Bombing/Explosion,27,28.0,154.0
+1974,Middle East & North Africa,Facility/Infrastructure Attack,1,0.0,0.0
+1974,Middle East & North Africa,Hijacking,2,1.0,2.0
+1974,Middle East & North Africa,Hostage Taking (Barricade Incident),2,35.0,0.0
+1974,Middle East & North Africa,Hostage Taking (Kidnapping),2,0.0,0.0
+1974,Middle East & North Africa,Unknown,1,7.0,5.0
+1974,North America,Armed Assault,15,8.0,10.0
+1974,North America,Assassination,3,6.0,0.0
+1974,North America,Bombing/Explosion,76,3.0,43.0
+1974,North America,Facility/Infrastructure Attack,11,0.0,0.0
+1974,North America,Hostage Taking (Kidnapping),4,1.0,0.0
+1974,North America,Unarmed Assault,2,0.0,1.0
+1974,South America,Armed Assault,4,2.0,7.0
+1974,South America,Assassination,12,12.0,3.0
+1974,South America,Bombing/Explosion,44,0.0,15.0
+1974,South America,Facility/Infrastructure Attack,2,0.0,0.0
+1974,South America,Hostage Taking (Barricade Incident),1,0.0,1.0
+1974,South America,Hostage Taking (Kidnapping),18,7.0,3.0
+1974,South Asia,Bombing/Explosion,2,0.0,2.0
+1974,Southeast Asia,Assassination,1,3.0,0.0
+1974,Southeast Asia,Hostage Taking (Kidnapping),2,2.0,0.0
+1974,Sub-Saharan Africa,Assassination,1,1.0,0.0
+1974,Sub-Saharan Africa,Bombing/Explosion,3,2.0,1.0
+1974,Sub-Saharan Africa,Hostage Taking (Kidnapping),3,1.0,0.0
+1974,Western Europe,Armed Assault,23,15.0,0.0
+1974,Western Europe,Assassination,136,137.0,9.0
+1974,Western Europe,Bombing/Explosion,126,253.0,591.0
+1974,Western Europe,Facility/Infrastructure Attack,25,0.0,1.0
+1974,Western Europe,Hostage Taking (Barricade Incident),1,0.0,0.0
+1974,Western Europe,Hostage Taking (Kidnapping),4,2.0,0.0
+1974,Western Europe,Unarmed Assault,2,1.0,0.0
+1975,Central America & Caribbean,Armed Assault,2,2.0,0.0
+1975,Central America & Caribbean,Assassination,4,23.0,1.0
+1975,Central America & Caribbean,Hostage Taking (Barricade Incident),3,11.0,0.0
+1975,East Asia,Bombing/Explosion,11,0.0,0.0
+1975,East Asia,Facility/Infrastructure Attack,1,0.0,2.0
+1975,Middle East & North Africa,Armed Assault,4,29.0,28.0
+1975,Middle East & North Africa,Assassination,6,7.0,0.0
+1975,Middle East & North Africa,Bombing/Explosion,28,6.0,63.0
+1975,Middle East & North Africa,Hijacking,1,0.0,1.0
+1975,Middle East & North Africa,Hostage Taking (Barricade Incident),1,18.0,0.0
+1975,Middle East & North Africa,Hostage Taking (Kidnapping),4,0.0,0.0
+1975,North America,Armed Assault,9,32.0,8.0
+1975,North America,Assassination,9,6.0,3.0
+1975,North America,Bombing/Explosion,133,17.0,152.0
+1975,North America,Facility/Infrastructure Attack,4,0.0,0.0
+1975,North America,Hostage Taking (Barricade Incident),2,0.0,0.0
+1975,North America,Hostage Taking (Kidnapping),1,0.0,0.0
+1975,North America,Unknown,1,1.0,0.0
+1975,South America,Armed Assault,14,123.0,10.0
+1975,South America,Assassination,7,5.0,4.0
+1975,South America,Bombing/Explosion,25,1.0,2.0
+1975,South America,Facility/Infrastructure Attack,2,0.0,0.0
+1975,South America,Hostage Taking (Barricade Incident),1,0.0,0.0
+1975,South America,Hostage Taking (Kidnapping),5,1.0,0.0
+1975,South America,Unknown,1,0.0,0.0
+1975,South Asia,Assassination,2,2.0,0.0
+1975,South Asia,Bombing/Explosion,2,4.0,0.0
+1975,Southeast Asia,Bombing/Explosion,3,1.0,45.0
+1975,Southeast Asia,Hostage Taking (Barricade Incident),1,0.0,3.0
+1975,Southeast Asia,Hostage Taking (Kidnapping),3,0.0,0.0
+1975,Sub-Saharan Africa,Assassination,3,2.0,0.0
+1975,Sub-Saharan Africa,Bombing/Explosion,3,27.0,100.0
+1975,Sub-Saharan Africa,Hostage Taking (Kidnapping),6,0.0,0.0
+1975,Western Europe,Armed Assault,52,39.0,1.0
+1975,Western Europe,Assassination,150,166.0,5.0
+1975,Western Europe,Bombing/Explosion,165,80.0,143.0
+1975,Western Europe,Facility/Infrastructure Attack,57,0.0,0.0
+1975,Western Europe,Hostage Taking (Barricade Incident),5,6.0,46.0
+1975,Western Europe,Hostage Taking (Kidnapping),8,7.0,0.0
+1975,Western Europe,Unknown,1,1.0,0.0
+1976,Central America & Caribbean,Armed Assault,9,6.0,1.0
+1976,Central America & Caribbean,Assassination,5,4.0,2.0
+1976,Central America & Caribbean,Bombing/Explosion,28,73.0,15.0
+1976,Central America & Caribbean,Facility/Infrastructure Attack,1,0.0,0.0
+1976,Central America & Caribbean,Hostage Taking (Kidnapping),2,1.0,0.0
+1976,East Asia,Assassination,1,0.0,1.0
+1976,East Asia,Bombing/Explosion,1,2.0,0.0
+1976,Middle East & North Africa,Armed Assault,4,4.0,0.0
+1976,Middle East & North Africa,Assassination,7,10.0,2.0
+1976,Middle East & North Africa,Bombing/Explosion,37,17.0,347.0
+1976,Middle East & North Africa,Facility/Infrastructure Attack,1,0.0,0.0
+1976,Middle East & North Africa,Hostage Taking (Barricade Incident),2,14.0,39.0
+1976,Middle East & North Africa,Hostage Taking (Kidnapping),2,0.0,0.0
+1976,Middle East & North Africa,Unknown,2,0.0,0.0
+1976,North America,Armed Assault,15,23.0,5.0
+1976,North America,Assassination,10,3.0,3.0
+1976,North America,Bombing/Explosion,79,1.0,34.0
+1976,North America,Facility/Infrastructure Attack,12,0.0,1.0
+1976,North America,Hijacking,1,1.0,3.0
+1976,North America,Hostage Taking (Kidnapping),5,1.0,0.0
+1976,North America,Unarmed Assault,2,0.0,0.0
+1976,North America,Unknown,1,1.0,0.0
+1976,South America,Armed Assault,17,53.0,0.0
+1976,South America,Assassination,27,32.0,8.0
+1976,South America,Bombing/Explosion,31,45.0,97.0
+1976,South America,Facility/Infrastructure Attack,2,0.0,0.0
+1976,South America,Hostage Taking (Kidnapping),14,4.0,1.0
+1976,South Asia,Bombing/Explosion,3,1.0,2.0
+1976,South Asia,Facility/Infrastructure Attack,1,0.0,1.0
+1976,Southeast Asia,Armed Assault,4,27.0,14.0
+1976,Southeast Asia,Bombing/Explosion,3,7.0,34.0
+1976,Southeast Asia,Facility/Infrastructure Attack,1,0.0,0.0
+1976,Southeast Asia,Hijacking,2,13.0,25.0
+1976,Southeast Asia,Hostage Taking (Kidnapping),2,0.0,0.0
+1976,Sub-Saharan Africa,Armed Assault,1,1.0,0.0
+1976,Sub-Saharan Africa,Assassination,2,5.0,1.0
+1976,Sub-Saharan Africa,Bombing/Explosion,3,2.0,0.0
+1976,Sub-Saharan Africa,Hostage Taking (Kidnapping),5,0.0,0.0
+1976,Western Europe,Armed Assault,74,46.0,9.0
+1976,Western Europe,Assassination,152,179.0,10.0
+1976,Western Europe,Bombing/Explosion,234,74.0,79.0
+1976,Western Europe,Facility/Infrastructure Attack,95,6.0,22.0
+1976,Western Europe,Hijacking,1,13.0,0.0
+1976,Western Europe,Hostage Taking (Barricade Incident),4,2.0,0.0
+1976,Western Europe,Hostage Taking (Kidnapping),15,2.0,0.0
+1976,Western Europe,Unarmed Assault,1,0.0,0.0
+1976,Western Europe,Unknown,2,1.0,0.0
+1977,Central America & Caribbean,Armed Assault,6,26.0,12.0
+1977,Central America & Caribbean,Assassination,4,6.0,0.0
+1977,Central America & Caribbean,Bombing/Explosion,5,0.0,0.0
+1977,Central America & Caribbean,Hostage Taking (Barricade Incident),1,0.0,0.0
+1977,Central America & Caribbean,Hostage Taking (Kidnapping),8,4.0,0.0
+1977,East Asia,Bombing/Explosion,4,0.0,0.0
+1977,Eastern Europe,Armed Assault,1,0.0,0.0
+1977,Eastern Europe,Bombing/Explosion,1,1.0,7.0
+1977,Middle East & North Africa,Armed Assault,35,13.0,4.0
+1977,Middle East & North Africa,Assassination,17,15.0,3.0
+1977,Middle East & North Africa,Bombing/Explosion,153,9.0,108.0
+1977,Middle East & North Africa,Facility/Infrastructure Attack,3,0.0,0.0
+1977,Middle East & North Africa,Unknown,3,6.0,0.0
+1977,North America,Armed Assault,11,10.0,4.0
+1977,North America,Assassination,9,3.0,5.0
+1977,North America,Bombing/Explosion,92,1.0,23.0
+1977,North America,Facility/Infrastructure Attack,28,0.0,0.0
+1977,North America,Hostage Taking (Barricade Incident),5,1.0,0.0
+1977,North America,Hostage Taking (Kidnapping),4,0.0,0.0
+1977,South America,Armed Assault,12,15.0,20.0
+1977,South America,Assassination,19,21.0,5.0
+1977,South America,Bombing/Explosion,55,1.0,17.0
+1977,South America,Facility/Infrastructure Attack,4,0.0,0.0
+1977,South America,Hijacking,1,0.0,0.0
+1977,South America,Hostage Taking (Barricade Incident),1,0.0,0.0
+1977,South America,Hostage Taking (Kidnapping),27,10.0,0.0
+1977,South Asia,Bombing/Explosion,1,0.0,1.0
+1977,South Asia,Hijacking,1,0.0,0.0
+1977,Southeast Asia,Armed Assault,3,1.0,1.0
+1977,Southeast Asia,Assassination,1,1.0,50.0
+1977,Southeast Asia,Bombing/Explosion,3,0.0,21.0
+1977,Southeast Asia,Hijacking,1,100.0,0.0
+1977,Sub-Saharan Africa,Armed Assault,3,4.0,0.0
+1977,Sub-Saharan Africa,Assassination,3,3.0,0.0
+1977,Sub-Saharan Africa,Bombing/Explosion,8,0.0,31.0
+1977,Sub-Saharan Africa,Facility/Infrastructure Attack,1,0.0,0.0
+1977,Sub-Saharan Africa,Hijacking,1,3.0,0.0
+1977,Sub-Saharan Africa,Hostage Taking (Kidnapping),7,4.0,1.0
+1977,Sub-Saharan Africa,Unknown,6,3.0,4.0
+1977,Western Europe,Armed Assault,184,72.0,48.0
+1977,Western Europe,Assassination,93,91.0,12.0
+1977,Western Europe,Bombing/Explosion,313,21.0,109.0
+1977,Western Europe,Facility/Infrastructure Attack,146,2.0,16.0
+1977,Western Europe,Hijacking,3,4.0,11.0
+1977,Western Europe,Hostage Taking (Barricade Incident),6,0.0,3.0
+1977,Western Europe,Hostage Taking (Kidnapping),21,4.0,1.0
+1977,Western Europe,Unknown,5,1.0,1.0
+1978,Australasia & Oceania,Bombing/Explosion,2,2.0,9.0
+1978,Central America & Caribbean,Armed Assault,36,68.0,53.0
+1978,Central America & Caribbean,Assassination,53,44.0,16.0
+1978,Central America & Caribbean,Bombing/Explosion,57,38.0,49.0
+1978,Central America & Caribbean,Facility/Infrastructure Attack,8,2.0,4.0
+1978,Central America & Caribbean,Hostage Taking (Barricade Incident),6,7.0,8.0
+1978,Central America & Caribbean,Hostage Taking (Kidnapping),17,1.0,0.0
+1978,Central America & Caribbean,Unknown,22,4.0,13.0
+1978,East Asia,Armed Assault,6,3.0,1.0
+1978,East Asia,Assassination,2,0.0,1.0
+1978,East Asia,Bombing/Explosion,3,0.0,0.0
+1978,East Asia,Facility/Infrastructure Attack,23,0.0,51.0
+1978,East Asia,Unarmed Assault,1,1.0,0.0
+1978,Eastern Europe,Assassination,1,0.0,1.0
+1978,Eastern Europe,Bombing/Explosion,1,4.0,0.0
+1978,Middle East & North Africa,Armed Assault,14,21.0,20.0
+1978,Middle East & North Africa,Assassination,26,38.0,9.0
+1978,Middle East & North Africa,Bombing/Explosion,73,133.0,535.0
+1978,Middle East & North Africa,Facility/Infrastructure Attack,9,422.0,0.0
+1978,Middle East & North Africa,Hostage Taking (Barricade Incident),1,42.0,76.0
+1978,Middle East & North Africa,Hostage Taking (Kidnapping),2,0.0,0.0
+1978,Middle East & North Africa,Unarmed Assault,1,5.0,0.0
+1978,Middle East & North Africa,Unknown,2,10.0,1.0
+1978,North America,Armed Assault,16,5.0,6.0
+1978,North America,Assassination,6,5.0,2.0
+1978,North America,Bombing/Explosion,67,1.0,4.0
+1978,North America,Facility/Infrastructure Attack,14,2.0,13.0
+1978,North America,Hostage Taking (Barricade Incident),4,0.0,0.0
+1978,North America,Hostage Taking (Kidnapping),9,2.0,1.0
+1978,North America,Unknown,1,0.0,0.0
+1978,South America,Armed Assault,43,32.0,18.0
+1978,South America,Assassination,38,32.0,2.0
+1978,South America,Bombing/Explosion,73,10.0,29.0
+1978,South America,Facility/Infrastructure Attack,4,0.0,0.0
+1978,South America,Hostage Taking (Barricade Incident),17,0.0,1.0
+1978,South America,Hostage Taking (Kidnapping),37,7.0,1.0
+1978,South America,Unknown,10,12.0,0.0
+1978,South Asia,Armed Assault,1,1.0,2.0
+1978,South Asia,Bombing/Explosion,1,4.0,0.0
+1978,Southeast Asia,Armed Assault,15,109.0,40.0
+1978,Southeast Asia,Assassination,3,1.0,2.0
+1978,Southeast Asia,Bombing/Explosion,19,28.0,175.0
+1978,Southeast Asia,Hostage Taking (Kidnapping),4,0.0,0.0
+1978,Southeast Asia,Unknown,3,20.0,2.0
+1978,Sub-Saharan Africa,Armed Assault,4,28.0,0.0
+1978,Sub-Saharan Africa,Assassination,12,23.0,0.0
+1978,Sub-Saharan Africa,Bombing/Explosion,22,55.0,116.0
+1978,Sub-Saharan Africa,Facility/Infrastructure Attack,1,0.0,0.0
+1978,Sub-Saharan Africa,Hostage Taking (Kidnapping),3,4.0,0.0
+1978,Sub-Saharan Africa,Unknown,4,2.0,5.0
+1978,Western Europe,Armed Assault,106,51.0,66.0
+1978,Western Europe,Assassination,122,112.0,53.0
+1978,Western Europe,Bombing/Explosion,326,42.0,189.0
+1978,Western Europe,Facility/Infrastructure Attack,122,8.0,10.0
+1978,Western Europe,Hostage Taking (Barricade Incident),15,3.0,14.0
+1978,Western Europe,Hostage Taking (Kidnapping),25,11.0,1.0
+1978,Western Europe,Unarmed Assault,3,1.0,0.0
+1978,Western Europe,Unknown,10,3.0,1.0
+1979,Australasia & Oceania,Bombing/Explosion,2,0.0,9.0
+1979,Central America & Caribbean,Armed Assault,140,190.0,75.0
+1979,Central America & Caribbean,Assassination,116,141.0,27.0
+1979,Central America & Caribbean,Bombing/Explosion,98,90.0,56.0
+1979,Central America & Caribbean,Facility/Infrastructure Attack,46,15.0,12.0
+1979,Central America & Caribbean,Hijacking,1,0.0,0.0
+1979,Central America & Caribbean,Hostage Taking (Barricade Incident),48,4.0,0.0
+1979,Central America & Caribbean,Hostage Taking (Kidnapping),51,23.0,2.0
+1979,Central America & Caribbean,Unarmed Assault,1,0.0,0.0
+1979,Central America & Caribbean,Unknown,108,73.0,17.0
+1979,East Asia,Armed Assault,3,0.0,0.0
+1979,East Asia,Assassination,1,0.0,1.0
+1979,East Asia,Facility/Infrastructure Attack,9,0.0,0.0
+1979,East Asia,Unarmed Assault,1,2.0,1.0
+1979,East Asia,Unknown,2,3.0,0.0
+1979,Eastern Europe,Bombing/Explosion,1,0.0,5.0
+1979,Middle East & North Africa,Armed Assault,50,85.0,156.0
+1979,Middle East & North Africa,Assassination,109,103.0,51.0
+1979,Middle East & North Africa,Bombing/Explosion,256,159.0,739.0
+1979,Middle East & North Africa,Facility/Infrastructure Attack,9,1.0,2.0
+1979,Middle East & North Africa,Hijacking,5,0.0,0.0
+1979,Middle East & North Africa,Hostage Taking (Barricade Incident),4,6.0,1.0
+1979,Middle East & North Africa,Hostage Taking (Kidnapping),8,2.0,3.0
+1979,Middle East & North Africa,Unknown,14,10.0,1.0
+1979,North America,Armed Assault,14,16.0,30.0
+1979,North America,Assassination,9,3.0,1.0
+1979,North America,Bombing/Explosion,44,3.0,26.0
+1979,North America,Facility/Infrastructure Attack,5,0.0,1.0
+1979,North America,Hijacking,1,0.0,0.0
+1979,North America,Hostage Taking (Barricade Incident),1,0.0,0.0
+1979,North America,Hostage Taking (Kidnapping),4,1.0,0.0
+1979,North America,Unknown,1,0.0,0.0
+1979,South America,Armed Assault,43,55.0,18.0
+1979,South America,Assassination,42,44.0,19.0
+1979,South America,Bombing/Explosion,80,34.0,22.0
+1979,South America,Facility/Infrastructure Attack,7,2.0,0.0
+1979,South America,Hostage Taking (Barricade Incident),13,3.0,12.0
+1979,South America,Hostage Taking (Kidnapping),24,17.0,0.0
+1979,South America,Unknown,27,28.0,6.0
+1979,South Asia,Armed Assault,12,20.0,6.0
+1979,South Asia,Assassination,7,7.0,0.0
+1979,South Asia,Bombing/Explosion,6,63.0,54.0
+1979,South Asia,Facility/Infrastructure Attack,5,0.0,0.0
+1979,South Asia,Hostage Taking (Kidnapping),2,1.0,0.0
+1979,South Asia,Unarmed Assault,1,0.0,2.0
+1979,South Asia,Unknown,1,1.0,1.0
+1979,Southeast Asia,Armed Assault,37,129.0,144.0
+1979,Southeast Asia,Assassination,18,14.0,1.0
+1979,Southeast Asia,Bombing/Explosion,10,50.0,136.0
+1979,Southeast Asia,Facility/Infrastructure Attack,2,0.0,0.0
+1979,Southeast Asia,Hostage Taking (Barricade Incident),1,0.0,1.0
+1979,Southeast Asia,Hostage Taking (Kidnapping),8,32.0,6.0
+1979,Southeast Asia,Unknown,10,35.0,12.0
+1979,Sub-Saharan Africa,Armed Assault,18,58.0,36.0
+1979,Sub-Saharan Africa,Assassination,22,36.0,11.0
+1979,Sub-Saharan Africa,Bombing/Explosion,60,101.0,106.0
+1979,Sub-Saharan Africa,Facility/Infrastructure Attack,7,22.0,3.0
+1979,Sub-Saharan Africa,Hostage Taking (Barricade Incident),1,7.0,0.0
+1979,Sub-Saharan Africa,Hostage Taking (Kidnapping),7,0.0,0.0
+1979,Sub-Saharan Africa,Unknown,9,110.0,5.0
+1979,Western Europe,Armed Assault,130,46.0,128.0
+1979,Western Europe,Assassination,202,157.0,57.0
+1979,Western Europe,Bombing/Explosion,501,82.0,480.0
+1979,Western Europe,Facility/Infrastructure Attack,107,4.0,9.0
+1979,Western Europe,Hijacking,2,0.0,0.0
+1979,Western Europe,Hostage Taking (Barricade Incident),8,0.0,0.0
+1979,Western Europe,Hostage Taking (Kidnapping),42,5.0,11.0
+1979,Western Europe,Unarmed Assault,4,1.0,1.0
+1979,Western Europe,Unknown,24,6.0,3.0
+1980,Australasia & Oceania,Armed Assault,1,0.0,1.0
+1980,Australasia & Oceania,Assassination,1,2.0,0.0
+1980,Australasia & Oceania,Bombing/Explosion,5,0.0,2.0
+1980,Central America & Caribbean,Armed Assault,355,2274.0,271.0
+1980,Central America & Caribbean,Assassination,267,371.0,22.0
+1980,Central America & Caribbean,Bombing/Explosion,234,70.0,166.0
+1980,Central America & Caribbean,Facility/Infrastructure Attack,52,15.0,0.0
+1980,Central America & Caribbean,Hostage Taking (Barricade Incident),31,8.0,4.0
+1980,Central America & Caribbean,Hostage Taking (Kidnapping),80,91.0,1.0
+1980,Central America & Caribbean,Unarmed Assault,1,5.0,0.0
+1980,Central America & Caribbean,Unknown,50,142.0,3.0
+1980,East Asia,Bombing/Explosion,1,0.0,2.0
+1980,Eastern Europe,Bombing/Explosion,1,0.0,2.0
+1980,Middle East & North Africa,Armed Assault,49,66.0,40.0
+1980,Middle East & North Africa,Assassination,124,118.0,101.0
+1980,Middle East & North Africa,Bombing/Explosion,221,251.0,871.0
+1980,Middle East & North Africa,Facility/Infrastructure Attack,16,0.0,0.0
+1980,Middle East & North Africa,Hijacking,7,0.0,0.0
+1980,Middle East & North Africa,Hostage Taking (Kidnapping),10,3.0,0.0
+1980,Middle East & North Africa,Unknown,10,4.0,7.0
+1980,North America,Armed Assault,16,12.0,7.0
+1980,North America,Assassination,9,6.0,2.0
+1980,North America,Bombing/Explosion,33,0.0,13.0
+1980,North America,Facility/Infrastructure Attack,7,0.0,0.0
+1980,North America,Hijacking,1,0.0,0.0
+1980,North America,Hostage Taking (Barricade Incident),2,0.0,0.0
+1980,North America,Hostage Taking (Kidnapping),6,0.0,0.0
+1980,North America,Unknown,1,0.0,0.0
+1980,South America,Armed Assault,74,67.0,35.0
+1980,South America,Assassination,36,39.0,5.0
+1980,South America,Bombing/Explosion,126,89.0,80.0
+1980,South America,Facility/Infrastructure Attack,25,0.0,0.0
+1980,South America,Hijacking,4,0.0,0.0
+1980,South America,Hostage Taking (Barricade Incident),15,0.0,1.0
+1980,South America,Hostage Taking (Kidnapping),22,7.0,2.0
+1980,South America,Unarmed Assault,1,0.0,0.0
+1980,South America,Unknown,16,4.0,0.0
+1980,South Asia,Armed Assault,2,6.0,7.0
+1980,South Asia,Assassination,4,9.0,80.0
+1980,South Asia,Bombing/Explosion,6,25.0,24.0
+1980,Southeast Asia,Armed Assault,6,32.0,9.0
+1980,Southeast Asia,Assassination,2,2.0,0.0
+1980,Southeast Asia,Bombing/Explosion,62,191.0,680.0
+1980,Southeast Asia,Facility/Infrastructure Attack,9,1.0,2.0
+1980,Southeast Asia,Hostage Taking (Kidnapping),2,1.0,1.0
+1980,Southeast Asia,Unknown,6,17.0,27.0
+1980,Sub-Saharan Africa,Armed Assault,8,26.0,85.0
+1980,Sub-Saharan Africa,Assassination,8,6.0,1.0
+1980,Sub-Saharan Africa,Bombing/Explosion,36,46.0,205.0
+1980,Sub-Saharan Africa,Hostage Taking (Kidnapping),1,1.0,2.0
+1980,Sub-Saharan Africa,Unknown,5,3.0,1.0
+1980,Western Europe,Armed Assault,63,41.0,67.0
+1980,Western Europe,Assassination,167,161.0,45.0
+1980,Western Europe,Bombing/Explosion,272,166.0,745.0
+1980,Western Europe,Facility/Infrastructure Attack,60,13.0,17.0
+1980,Western Europe,Hijacking,2,0.0,0.0
+1980,Western Europe,Hostage Taking (Barricade Incident),2,1.0,2.0
+1980,Western Europe,Hostage Taking (Kidnapping),19,7.0,6.0
+1980,Western Europe,Unknown,10,1.0,1.0
+1981,Australasia & Oceania,Assassination,1,1.0,0.0
+1981,Australasia & Oceania,Bombing/Explosion,1,0.0,0.0
+1981,Australasia & Oceania,Facility/Infrastructure Attack,1,0.0,0.0
+1981,Central America & Caribbean,Armed Assault,512,2523.0,437.0
+1981,Central America & Caribbean,Assassination,133,196.0,15.0
+1981,Central America & Caribbean,Bombing/Explosion,356,258.0,228.0
+1981,Central America & Caribbean,Facility/Infrastructure Attack,53,20.0,16.0
+1981,Central America & Caribbean,Hijacking,3,0.0,0.0
+1981,Central America & Caribbean,Hostage Taking (Barricade Incident),9,0.0,0.0
+1981,Central America & Caribbean,Hostage Taking (Kidnapping),64,33.0,2.0
+1981,Central America & Caribbean,Unknown,18,121.0,5.0
+1981,East Asia,Bombing/Explosion,3,0.0,25.0
+1981,East Asia,Facility/Infrastructure Attack,1,0.0,0.0
+1981,Eastern Europe,Assassination,1,0.0,1.0
+1981,Eastern Europe,Bombing/Explosion,2,0.0,0.0
+1981,Eastern Europe,Hijacking,1,0.0,4.0
+1981,Middle East & North Africa,Armed Assault,31,41.0,63.0
+1981,Middle East & North Africa,Assassination,75,82.0,74.0
+1981,Middle East & North Africa,Bombing/Explosion,176,631.0,1272.0
+1981,Middle East & North Africa,Facility/Infrastructure Attack,11,1.0,4.0
+1981,Middle East & North Africa,Hijacking,1,4.0,6.0
+1981,Middle East & North Africa,Hostage Taking (Kidnapping),8,1.0,1.0
+1981,Middle East & North Africa,Unknown,10,12.0,5.0
+1981,North America,Armed Assault,10,1.0,4.0
+1981,North America,Assassination,5,3.0,3.0
+1981,North America,Bombing/Explosion,42,2.0,12.0
+1981,North America,Facility/Infrastructure Attack,10,0.0,0.0
+1981,North America,Hostage Taking (Barricade Incident),8,1.0,2.0
+1981,North America,Hostage Taking (Kidnapping),2,1.0,0.0
+1981,South America,Armed Assault,83,291.0,30.0
+1981,South America,Assassination,36,39.0,8.0
+1981,South America,Bombing/Explosion,179,11.0,24.0
+1981,South America,Facility/Infrastructure Attack,26,0.0,2.0
+1981,South America,Hijacking,5,0.0,0.0
+1981,South America,Hostage Taking (Barricade Incident),9,5.0,0.0
+1981,South America,Hostage Taking (Kidnapping),26,10.0,1.0
+1981,South America,Unknown,19,46.0,11.0
+1981,South Asia,Assassination,8,18.0,8.0
+1981,South Asia,Bombing/Explosion,10,3.0,8.0
+1981,South Asia,Facility/Infrastructure Attack,1,0.0,0.0
+1981,South Asia,Hijacking,2,1.0,0.0
+1981,South Asia,Unknown,2,15.0,8.0
+1981,Southeast Asia,Armed Assault,7,48.0,34.0
+1981,Southeast Asia,Assassination,1,10.0,0.0
+1981,Southeast Asia,Bombing/Explosion,19,38.0,352.0
+1981,Southeast Asia,Facility/Infrastructure Attack,6,15.0,26.0
+1981,Southeast Asia,Hijacking,1,4.0,0.0
+1981,Southeast Asia,Hostage Taking (Barricade Incident),3,0.0,0.0
+1981,Southeast Asia,Hostage Taking (Kidnapping),3,0.0,1.0
+1981,Southeast Asia,Unknown,10,86.0,11.0
+1981,Sub-Saharan Africa,Armed Assault,4,11.0,3.0
+1981,Sub-Saharan Africa,Assassination,13,16.0,2.0
+1981,Sub-Saharan Africa,Bombing/Explosion,63,68.0,39.0
+1981,Sub-Saharan Africa,Facility/Infrastructure Attack,11,2.0,0.0
+1981,Sub-Saharan Africa,Hijacking,1,0.0,0.0
+1981,Sub-Saharan Africa,Hostage Taking (Kidnapping),1,0.0,0.0
+1981,Sub-Saharan Africa,Unknown,5,5.0,0.0
+1981,Western Europe,Armed Assault,50,31.0,41.0
+1981,Western Europe,Assassination,132,100.0,67.0
+1981,Western Europe,Bombing/Explosion,231,34.0,463.0
+1981,Western Europe,Facility/Infrastructure Attack,31,1.0,9.0
+1981,Western Europe,Hijacking,4,0.0,1.0
+1981,Western Europe,Hostage Taking (Barricade Incident),5,2.0,3.0
+1981,Western Europe,Hostage Taking (Kidnapping),18,6.0,2.0
+1981,Western Europe,Unarmed Assault,3,1.0,0.0
+1981,Western Europe,Unknown,10,2.0,4.0
+1982,Australasia & Oceania,Bombing/Explosion,2,0.0,3.0
+1982,Central America & Caribbean,Armed Assault,446,2876.0,218.0
+1982,Central America & Caribbean,Assassination,97,279.0,8.0
+1982,Central America & Caribbean,Bombing/Explosion,302,129.0,125.0
+1982,Central America & Caribbean,Facility/Infrastructure Attack,55,2.0,0.0
+1982,Central America & Caribbean,Hijacking,1,0.0,0.0
+1982,Central America & Caribbean,Hostage Taking (Barricade Incident),30,17.0,16.0
+1982,Central America & Caribbean,Hostage Taking (Kidnapping),43,9.0,2.0
+1982,Central America & Caribbean,Unknown,22,86.0,24.0
+1982,East Asia,Facility/Infrastructure Attack,3,1.0,3.0
+1982,Eastern Europe,Assassination,2,2.0,0.0
+1982,Eastern Europe,Bombing/Explosion,1,0.0,0.0
+1982,Middle East & North Africa,Armed Assault,40,10.0,35.0
+1982,Middle East & North Africa,Assassination,53,74.0,106.0
+1982,Middle East & North Africa,Bombing/Explosion,182,488.0,1583.0
+1982,Middle East & North Africa,Facility/Infrastructure Attack,5,9.0,0.0
+1982,Middle East & North Africa,Hijacking,2,0.0,2.0
+1982,Middle East & North Africa,Hostage Taking (Barricade Incident),1,3.0,10.0
+1982,Middle East & North Africa,Hostage Taking (Kidnapping),5,1.0,1.0
+1982,Middle East & North Africa,Unknown,2,2.0,1.0
+1982,North America,Armed Assault,2,0.0,0.0
+1982,North America,Assassination,11,8.0,6.0
+1982,North America,Bombing/Explosion,48,2.0,30.0
+1982,North America,Facility/Infrastructure Attack,13,1.0,8.0
+1982,North America,Hostage Taking (Barricade Incident),4,2.0,0.0
+1982,North America,Hostage Taking (Kidnapping),2,0.0,1.0
+1982,North America,Unarmed Assault,1,0.0,0.0
+1982,North America,Unknown,5,0.0,0.0
+1982,South America,Armed Assault,150,421.0,68.0
+1982,South America,Assassination,82,107.0,12.0
+1982,South America,Bombing/Explosion,274,96.0,89.0
+1982,South America,Facility/Infrastructure Attack,55,2.0,11.0
+1982,South America,Hijacking,2,1.0,0.0
+1982,South America,Hostage Taking (Barricade Incident),8,1.0,1.0
+1982,South America,Hostage Taking (Kidnapping),37,11.0,0.0
+1982,South America,Unknown,31,33.0,5.0
+1982,South Asia,Armed Assault,1,6.0,0.0
+1982,South Asia,Assassination,6,9.0,1.0
+1982,South Asia,Bombing/Explosion,9,27.0,106.0
+1982,South Asia,Hijacking,1,1.0,1.0
+1982,South Asia,Unknown,3,31.0,7.0
+1982,Southeast Asia,Armed Assault,7,41.0,6.0
+1982,Southeast Asia,Assassination,8,22.0,2.0
+1982,Southeast Asia,Bombing/Explosion,15,23.0,236.0
+1982,Southeast Asia,Facility/Infrastructure Attack,5,7.0,5.0
+1982,Southeast Asia,Hijacking,1,0.0,0.0
+1982,Southeast Asia,Hostage Taking (Kidnapping),1,0.0,0.0
+1982,Southeast Asia,Unknown,6,50.0,21.0
+1982,Sub-Saharan Africa,Armed Assault,3,10.0,0.0
+1982,Sub-Saharan Africa,Assassination,4,10.0,5.0
+1982,Sub-Saharan Africa,Bombing/Explosion,37,31.0,122.0
+1982,Sub-Saharan Africa,Facility/Infrastructure Attack,2,0.0,0.0
+1982,Sub-Saharan Africa,Hijacking,1,0.0,1.0
+1982,Sub-Saharan Africa,Hostage Taking (Kidnapping),7,8.0,0.0
+1982,Sub-Saharan Africa,Unknown,6,9.0,2.0
+1982,Western Europe,Armed Assault,16,10.0,20.0
+1982,Western Europe,Assassination,98,90.0,30.0
+1982,Western Europe,Bombing/Explosion,255,67.0,394.0
+1982,Western Europe,Facility/Infrastructure Attack,10,2.0,0.0
+1982,Western Europe,Hostage Taking (Barricade Incident),7,3.0,9.0
+1982,Western Europe,Hostage Taking (Kidnapping),10,2.0,0.0
+1982,Western Europe,Unarmed Assault,2,2.0,0.0
+1982,Western Europe,Unknown,4,2.0,6.0
+1983,Central America & Caribbean,Armed Assault,531,4878.0,571.0
+1983,Central America & Caribbean,Assassination,32,43.0,4.0
+1983,Central America & Caribbean,Bombing/Explosion,205,535.0,364.0
+1983,Central America & Caribbean,Facility/Infrastructure Attack,22,4.0,6.0
+1983,Central America & Caribbean,Hijacking,1,0.0,0.0
+1983,Central America & Caribbean,Hostage Taking (Barricade Incident),4,0.0,0.0
+1983,Central America & Caribbean,Hostage Taking (Kidnapping),38,4.0,4.0
+1983,Central America & Caribbean,Unknown,25,90.0,52.0
+1983,East Asia,Bombing/Explosion,4,1.0,4.0
+1983,East Asia,Facility/Infrastructure Attack,9,2.0,1.0
+1983,Eastern Europe,Assassination,1,2.0,4.0
+1983,Eastern Europe,Bombing/Explosion,1,0.0,0.0
+1983,Middle East & North Africa,Armed Assault,52,46.0,59.0
+1983,Middle East & North Africa,Assassination,25,17.0,21.0
+1983,Middle East & North Africa,Bombing/Explosion,233,687.0,1057.0
+1983,Middle East & North Africa,Facility/Infrastructure Attack,10,0.0,0.0
+1983,Middle East & North Africa,Hijacking,3,0.0,2.0
+1983,Middle East & North Africa,Hostage Taking (Kidnapping),6,1.0,0.0
+1983,Middle East & North Africa,Unknown,5,5.0,6.0
+1983,North America,Armed Assault,2,3.0,1.0
+1983,North America,Assassination,4,2.0,1.0
+1983,North America,Bombing/Explosion,22,0.0,2.0
+1983,North America,Facility/Infrastructure Attack,12,2.0,3.0
+1983,North America,Hijacking,1,0.0,0.0
+1983,North America,Hostage Taking (Barricade Incident),5,1.0,0.0
+1983,North America,Unknown,1,0.0,0.0
+1983,South America,Armed Assault,234,1709.0,148.0
+1983,South America,Assassination,161,285.0,16.0
+1983,South America,Bombing/Explosion,375,106.0,180.0
+1983,South America,Facility/Infrastructure Attack,47,11.0,3.0
+1983,South America,Hijacking,1,0.0,0.0
+1983,South America,Hostage Taking (Barricade Incident),15,0.0,1.0
+1983,South America,Hostage Taking (Kidnapping),58,16.0,1.0
+1983,South America,Unknown,59,152.0,34.0
+1983,South Asia,Armed Assault,4,10.0,23.0
+1983,South Asia,Assassination,18,19.0,8.0
+1983,South Asia,Bombing/Explosion,35,42.0,221.0
+1983,South Asia,Facility/Infrastructure Attack,1,0.0,0.0
+1983,South Asia,Hostage Taking (Kidnapping),1,4.0,0.0
+1983,South Asia,Unknown,4,0.0,0.0
+1983,Southeast Asia,Armed Assault,5,68.0,19.0
+1983,Southeast Asia,Assassination,3,3.0,0.0
+1983,Southeast Asia,Bombing/Explosion,10,35.0,61.0
+1983,Southeast Asia,Facility/Infrastructure Attack,1,0.0,0.0
+1983,Southeast Asia,Hostage Taking (Kidnapping),1,0.0,0.0
+1983,Southeast Asia,Unknown,2,16.0,0.0
+1983,Sub-Saharan Africa,Armed Assault,5,176.0,7.0
+1983,Sub-Saharan Africa,Assassination,14,22.0,6.0
+1983,Sub-Saharan Africa,Bombing/Explosion,69,161.0,668.0
+1983,Sub-Saharan Africa,Facility/Infrastructure Attack,2,0.0,0.0
+1983,Sub-Saharan Africa,Hostage Taking (Kidnapping),8,0.0,1.0
+1983,Sub-Saharan Africa,Unknown,8,123.0,0.0
+1983,Western Europe,Armed Assault,19,12.0,18.0
+1983,Western Europe,Assassination,102,89.0,34.0
+1983,Western Europe,Bombing/Explosion,292,58.0,434.0
+1983,Western Europe,Facility/Infrastructure Attack,38,0.0,0.0
+1983,Western Europe,Hijacking,2,0.0,0.0
+1983,Western Europe,Hostage Taking (Barricade Incident),2,0.0,0.0
+1983,Western Europe,Hostage Taking (Kidnapping),12,4.0,0.0
+1983,Western Europe,Unarmed Assault,2,0.0,0.0
+1983,Western Europe,Unknown,6,0.0,2.0
+1984,Australasia & Oceania,Assassination,2,11.0,1.0
+1984,Australasia & Oceania,Bombing/Explosion,4,1.0,0.0
+1984,Australasia & Oceania,Facility/Infrastructure Attack,5,0.0,0.0
+1984,Central America & Caribbean,Armed Assault,430,4430.0,595.0
+1984,Central America & Caribbean,Assassination,35,38.0,29.0
+1984,Central America & Caribbean,Bombing/Explosion,162,571.0,177.0
+1984,Central America & Caribbean,Facility/Infrastructure Attack,23,25.0,3.0
+1984,Central America & Caribbean,Hostage Taking (Barricade Incident),2,0.0,0.0
+1984,Central America & Caribbean,Hostage Taking (Kidnapping),19,31.0,0.0
+1984,Central America & Caribbean,Unknown,10,17.0,33.0
+1984,East Asia,Armed Assault,1,0.0,0.0
+1984,East Asia,Bombing/Explosion,1,0.0,9.0
+1984,East Asia,Facility/Infrastructure Attack,12,0.0,2.0
+1984,East Asia,Unarmed Assault,1,0.0,0.0
+1984,Eastern Europe,Assassination,2,3.0,1.0
+1984,Eastern Europe,Bombing/Explosion,1,0.0,0.0
+1984,Eastern Europe,Unknown,1,0.0,1.0
+1984,Middle East & North Africa,Armed Assault,44,5.0,33.0
+1984,Middle East & North Africa,Assassination,31,36.0,15.0
+1984,Middle East & North Africa,Bombing/Explosion,160,89.0,699.0
+1984,Middle East & North Africa,Facility/Infrastructure Attack,5,0.0,0.0
+1984,Middle East & North Africa,Hijacking,7,4.0,3.0
+1984,Middle East & North Africa,Hostage Taking (Barricade Incident),1,3.0,7.0
+1984,Middle East & North Africa,Hostage Taking (Kidnapping),16,1.0,1.0
+1984,Middle East & North Africa,Unknown,4,11.0,5.0
+1984,North America,Armed Assault,1,0.0,3.0
+1984,North America,Assassination,5,8.0,1.0
+1984,North America,Bombing/Explosion,31,8.0,6.0
+1984,North America,Facility/Infrastructure Attack,21,0.0,1.0
+1984,North America,Hijacking,2,0.0,0.0
+1984,North America,Hostage Taking (Barricade Incident),3,0.0,0.0
+1984,North America,Unarmed Assault,4,0.0,778.0
+1984,South America,Armed Assault,282,2013.0,465.0
+1984,South America,Assassination,152,257.0,23.0
+1984,South America,Bombing/Explosion,859,186.0,379.0
+1984,South America,Facility/Infrastructure Attack,50,58.0,15.0
+1984,South America,Hijacking,3,3.0,1.0
+1984,South America,Hostage Taking (Barricade Incident),20,1.0,7.0
+1984,South America,Hostage Taking (Kidnapping),30,6.0,1.0
+1984,South America,Unknown,96,471.0,93.0
+1984,South Asia,Armed Assault,17,58.0,106.0
+1984,South Asia,Assassination,74,99.0,20.0
+1984,South Asia,Bombing/Explosion,116,377.0,447.0
+1984,South Asia,Facility/Infrastructure Attack,13,2.0,0.0
+1984,South Asia,Hijacking,6,18.0,12.0
+1984,South Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+1984,South Asia,Hostage Taking (Kidnapping),2,0.0,0.0
+1984,South Asia,Unknown,15,139.0,53.0
+1984,Southeast Asia,Armed Assault,3,18.0,16.0
+1984,Southeast Asia,Assassination,17,29.0,3.0
+1984,Southeast Asia,Bombing/Explosion,5,58.0,41.0
+1984,Southeast Asia,Hostage Taking (Kidnapping),3,7.0,0.0
+1984,Southeast Asia,Unknown,18,152.0,68.0
+1984,Sub-Saharan Africa,Armed Assault,7,57.0,55.0
+1984,Sub-Saharan Africa,Assassination,18,17.0,3.0
+1984,Sub-Saharan Africa,Bombing/Explosion,79,386.0,252.0
+1984,Sub-Saharan Africa,Facility/Infrastructure Attack,4,0.0,0.0
+1984,Sub-Saharan Africa,Hijacking,1,0.0,2.0
+1984,Sub-Saharan Africa,Hostage Taking (Barricade Incident),1,200.0,200.0
+1984,Sub-Saharan Africa,Hostage Taking (Kidnapping),5,3.0,0.0
+1984,Sub-Saharan Africa,Unknown,11,368.0,15.0
+1984,Western Europe,Armed Assault,38,18.0,35.0
+1984,Western Europe,Assassination,107,100.0,82.0
+1984,Western Europe,Bombing/Explosion,358,50.0,490.0
+1984,Western Europe,Facility/Infrastructure Attack,29,0.0,0.0
+1984,Western Europe,Hijacking,2,3.0,0.0
+1984,Western Europe,Hostage Taking (Barricade Incident),1,0.0,0.0
+1984,Western Europe,Hostage Taking (Kidnapping),2,2.0,2.0
+1984,Western Europe,Unarmed Assault,2,0.0,2.0
+1984,Western Europe,Unknown,2,2.0,0.0
+1985,Australasia & Oceania,Assassination,1,0.0,0.0
+1985,Australasia & Oceania,Bombing/Explosion,6,0.0,11.0
+1985,Central America & Caribbean,Armed Assault,413,2468.0,365.0
+1985,Central America & Caribbean,Assassination,35,51.0,4.0
+1985,Central America & Caribbean,Bombing/Explosion,255,178.0,168.0
+1985,Central America & Caribbean,Facility/Infrastructure Attack,19,29.0,13.0
+1985,Central America & Caribbean,Hostage Taking (Barricade Incident),23,2.0,0.0
+1985,Central America & Caribbean,Hostage Taking (Kidnapping),27,1.0,0.0
+1985,Central America & Caribbean,Unknown,8,5.0,3.0
+1985,East Asia,Assassination,1,0.0,0.0
+1985,East Asia,Bombing/Explosion,4,2.0,4.0
+1985,East Asia,Facility/Infrastructure Attack,5,0.0,3.0
+1985,Eastern Europe,Bombing/Explosion,5,2.0,0.0
+1985,Middle East & North Africa,Armed Assault,3,2.0,7.0
+1985,Middle East & North Africa,Assassination,4,2.0,3.0
+1985,Middle East & North Africa,Bombing/Explosion,91,713.0,1672.0
+1985,Middle East & North Africa,Facility/Infrastructure Attack,2,0.0,2.0
+1985,Middle East & North Africa,Hijacking,6,1.0,0.0
+1985,Middle East & North Africa,Hostage Taking (Kidnapping),26,5.0,0.0
+1985,Middle East & North Africa,Unarmed Assault,1,0.0,0.0
+1985,North America,Assassination,3,1.0,5.0
+1985,North America,Bombing/Explosion,27,331.0,7.0
+1985,North America,Facility/Infrastructure Attack,11,1.0,2.0
+1985,North America,Hostage Taking (Barricade Incident),1,1.0,1.0
+1985,North America,Hostage Taking (Kidnapping),1,0.0,0.0
+1985,North America,Unarmed Assault,1,0.0,0.0
+1985,South America,Armed Assault,184,1234.0,199.0
+1985,South America,Assassination,95,117.0,29.0
+1985,South America,Bombing/Explosion,593,175.0,387.0
+1985,South America,Facility/Infrastructure Attack,66,10.0,0.0
+1985,South America,Hijacking,2,0.0,0.0
+1985,South America,Hostage Taking (Barricade Incident),24,12.0,1.0
+1985,South America,Hostage Taking (Kidnapping),43,11.0,2.0
+1985,South America,Unarmed Assault,1,0.0,2.0
+1985,South America,Unknown,32,141.0,32.0
+1985,South Asia,Armed Assault,22,264.0,143.0
+1985,South Asia,Assassination,39,70.0,49.0
+1985,South Asia,Bombing/Explosion,74,237.0,196.0
+1985,South Asia,Facility/Infrastructure Attack,3,12.0,0.0
+1985,South Asia,Hijacking,2,20.0,0.0
+1985,South Asia,Hostage Taking (Kidnapping),8,12.0,12.0
+1985,South Asia,Unknown,13,53.0,8.0
+1985,Southeast Asia,Armed Assault,10,78.0,50.0
+1985,Southeast Asia,Assassination,31,56.0,9.0
+1985,Southeast Asia,Bombing/Explosion,25,99.0,230.0
+1985,Southeast Asia,Facility/Infrastructure Attack,6,31.0,7.0
+1985,Southeast Asia,Hostage Taking (Barricade Incident),2,5.0,6.0
+1985,Southeast Asia,Hostage Taking (Kidnapping),4,0.0,0.0
+1985,Southeast Asia,Unknown,50,190.0,89.0
+1985,Sub-Saharan Africa,Armed Assault,4,33.0,0.0
+1985,Sub-Saharan Africa,Assassination,19,20.0,18.0
+1985,Sub-Saharan Africa,Bombing/Explosion,91,128.0,333.0
+1985,Sub-Saharan Africa,Facility/Infrastructure Attack,8,7.0,69.0
+1985,Sub-Saharan Africa,Hijacking,1,0.0,0.0
+1985,Sub-Saharan Africa,Hostage Taking (Barricade Incident),2,0.0,0.0
+1985,Sub-Saharan Africa,Hostage Taking (Kidnapping),2,0.0,0.0
+1985,Sub-Saharan Africa,Unarmed Assault,1,5.0,2.0
+1985,Sub-Saharan Africa,Unknown,13,18.0,2.0
+1985,Western Europe,Armed Assault,23,14.0,16.0
+1985,Western Europe,Assassination,83,83.0,9.0
+1985,Western Europe,Bombing/Explosion,311,99.0,912.0
+1985,Western Europe,Facility/Infrastructure Attack,18,0.0,5.0
+1985,Western Europe,Hijacking,4,62.0,27.0
+1985,Western Europe,Hostage Taking (Barricade Incident),3,0.0,11.0
+1985,Western Europe,Hostage Taking (Kidnapping),5,1.0,0.0
+1985,Western Europe,Unarmed Assault,1,0.0,0.0
+1985,Western Europe,Unknown,18,2.0,5.0
+1986,Australasia & Oceania,Bombing/Explosion,3,1.0,22.0
+1986,Australasia & Oceania,Facility/Infrastructure Attack,1,0.0,0.0
+1986,Central America & Caribbean,Armed Assault,239,614.0,234.0
+1986,Central America & Caribbean,Assassination,20,20.0,3.0
+1986,Central America & Caribbean,Bombing/Explosion,114,76.0,44.0
+1986,Central America & Caribbean,Facility/Infrastructure Attack,4,0.0,0.0
+1986,Central America & Caribbean,Hostage Taking (Kidnapping),11,8.0,8.0
+1986,Central America & Caribbean,Unknown,5,37.0,22.0
+1986,East Asia,Armed Assault,1,0.0,11.0
+1986,East Asia,Bombing/Explosion,6,5.0,20.0
+1986,East Asia,Facility/Infrastructure Attack,5,3.0,0.0
+1986,Eastern Europe,Assassination,2,1.0,1.0
+1986,Eastern Europe,Bombing/Explosion,1,0.0,33.0
+1986,Middle East & North Africa,Armed Assault,16,15.0,20.0
+1986,Middle East & North Africa,Assassination,35,37.0,11.0
+1986,Middle East & North Africa,Bombing/Explosion,115,263.0,1317.0
+1986,Middle East & North Africa,Facility/Infrastructure Attack,2,21.0,3.0
+1986,Middle East & North Africa,Hijacking,1,62.0,32.0
+1986,Middle East & North Africa,Hostage Taking (Barricade Incident),1,0.0,0.0
+1986,Middle East & North Africa,Hostage Taking (Kidnapping),20,2.0,2.0
+1986,Middle East & North Africa,Unknown,6,9.0,16.0
+1986,North America,Armed Assault,1,0.0,0.0
+1986,North America,Assassination,3,1.0,2.0
+1986,North America,Bombing/Explosion,34,0.0,3.0
+1986,North America,Facility/Infrastructure Attack,14,0.0,0.0
+1986,North America,Unarmed Assault,1,0.0,32.0
+1986,South America,Armed Assault,236,886.0,142.0
+1986,South America,Assassination,154,212.0,33.0
+1986,South America,Bombing/Explosion,647,90.0,328.0
+1986,South America,Facility/Infrastructure Attack,60,12.0,7.0
+1986,South America,Hijacking,1,2.0,0.0
+1986,South America,Hostage Taking (Barricade Incident),26,2.0,2.0
+1986,South America,Hostage Taking (Kidnapping),36,39.0,8.0
+1986,South America,Unarmed Assault,1,0.0,0.0
+1986,South America,Unknown,23,108.0,2.0
+1986,South Asia,Armed Assault,52,299.0,116.0
+1986,South Asia,Assassination,48,58.0,22.0
+1986,South Asia,Bombing/Explosion,121,472.0,1213.0
+1986,South Asia,Facility/Infrastructure Attack,3,25.0,63.0
+1986,South Asia,Hijacking,1,20.0,150.0
+1986,South Asia,Hostage Taking (Kidnapping),11,20.0,5.0
+1986,South Asia,Unarmed Assault,1,0.0,0.0
+1986,South Asia,Unknown,36,250.0,125.0
+1986,Southeast Asia,Armed Assault,13,88.0,159.0
+1986,Southeast Asia,Assassination,24,43.0,9.0
+1986,Southeast Asia,Bombing/Explosion,36,43.0,207.0
+1986,Southeast Asia,Facility/Infrastructure Attack,3,2.0,0.0
+1986,Southeast Asia,Hijacking,1,15.0,0.0
+1986,Southeast Asia,Hostage Taking (Kidnapping),9,35.0,0.0
+1986,Southeast Asia,Unknown,16,116.0,39.0
+1986,Sub-Saharan Africa,Armed Assault,6,7.0,1.0
+1986,Sub-Saharan Africa,Assassination,19,22.0,22.0
+1986,Sub-Saharan Africa,Bombing/Explosion,124,89.0,362.0
+1986,Sub-Saharan Africa,Facility/Infrastructure Attack,9,249.0,51.0
+1986,Sub-Saharan Africa,Hostage Taking (Kidnapping),3,40.0,0.0
+1986,Sub-Saharan Africa,Unknown,24,392.0,66.0
+1986,Western Europe,Armed Assault,28,11.0,14.0
+1986,Western Europe,Assassination,66,67.0,12.0
+1986,Western Europe,Bombing/Explosion,305,78.0,816.0
+1986,Western Europe,Facility/Infrastructure Attack,40,0.0,3.0
+1986,Western Europe,Hostage Taking (Kidnapping),6,2.0,0.0
+1986,Western Europe,Unarmed Assault,3,3.0,0.0
+1986,Western Europe,Unknown,7,4.0,1.0
+1987,Australasia & Oceania,Bombing/Explosion,2,0.0,1.0
+1987,Australasia & Oceania,Facility/Infrastructure Attack,1,0.0,0.0
+1987,Central America & Caribbean,Armed Assault,292,882.0,440.0
+1987,Central America & Caribbean,Assassination,18,19.0,2.0
+1987,Central America & Caribbean,Bombing/Explosion,216,221.0,206.0
+1987,Central America & Caribbean,Facility/Infrastructure Attack,12,1.0,0.0
+1987,Central America & Caribbean,Hostage Taking (Barricade Incident),2,0.0,0.0
+1987,Central America & Caribbean,Hostage Taking (Kidnapping),12,0.0,0.0
+1987,Central America & Caribbean,Unknown,14,91.0,23.0
+1987,East Asia,Armed Assault,1,0.0,0.0
+1987,East Asia,Assassination,1,1.0,2.0
+1987,East Asia,Bombing/Explosion,7,0.0,1.0
+1987,East Asia,Facility/Infrastructure Attack,1,0.0,0.0
+1987,Eastern Europe,Assassination,1,0.0,1.0
+1987,Middle East & North Africa,Armed Assault,41,109.0,53.0
+1987,Middle East & North Africa,Assassination,35,28.0,29.0
+1987,Middle East & North Africa,Bombing/Explosion,82,241.0,426.0
+1987,Middle East & North Africa,Facility/Infrastructure Attack,4,0.0,0.0
+1987,Middle East & North Africa,Hijacking,1,0.0,0.0
+1987,Middle East & North Africa,Hostage Taking (Barricade Incident),2,1.0,0.0
+1987,Middle East & North Africa,Hostage Taking (Kidnapping),26,0.0,0.0
+1987,Middle East & North Africa,Unknown,11,202.0,8.0
+1987,North America,Bombing/Explosion,19,0.0,1.0
+1987,North America,Facility/Infrastructure Attack,16,1.0,0.0
+1987,South America,Armed Assault,269,722.0,255.0
+1987,South America,Assassination,202,284.0,52.0
+1987,South America,Bombing/Explosion,647,311.0,248.0
+1987,South America,Facility/Infrastructure Attack,31,5.0,3.0
+1987,South America,Hostage Taking (Barricade Incident),18,0.0,0.0
+1987,South America,Hostage Taking (Kidnapping),36,63.0,28.0
+1987,South America,Unknown,62,65.0,132.0
+1987,South Asia,Armed Assault,102,973.0,229.0
+1987,South Asia,Assassination,84,212.0,32.0
+1987,South Asia,Bombing/Explosion,120,720.0,1954.0
+1987,South Asia,Facility/Infrastructure Attack,16,1.0,1.0
+1987,South Asia,Hostage Taking (Kidnapping),6,0.0,1.0
+1987,South Asia,Unarmed Assault,1,0.0,2.0
+1987,South Asia,Unknown,19,83.0,90.0
+1987,Southeast Asia,Armed Assault,39,231.0,61.0
+1987,Southeast Asia,Assassination,36,50.0,10.0
+1987,Southeast Asia,Bombing/Explosion,64,75.0,267.0
+1987,Southeast Asia,Facility/Infrastructure Attack,3,1.0,0.0
+1987,Southeast Asia,Hostage Taking (Barricade Incident),4,5.0,0.0
+1987,Southeast Asia,Hostage Taking (Kidnapping),7,3.0,0.0
+1987,Southeast Asia,Unarmed Assault,1,19.0,140.0
+1987,Southeast Asia,Unknown,9,20.0,7.0
+1987,Sub-Saharan Africa,Armed Assault,35,512.0,195.0
+1987,Sub-Saharan Africa,Assassination,16,23.0,9.0
+1987,Sub-Saharan Africa,Bombing/Explosion,89,74.0,405.0
+1987,Sub-Saharan Africa,Facility/Infrastructure Attack,2,0.0,2.0
+1987,Sub-Saharan Africa,Hostage Taking (Kidnapping),7,1.0,7.0
+1987,Sub-Saharan Africa,Unarmed Assault,1,2.0,3.0
+1987,Sub-Saharan Africa,Unknown,24,36.0,18.0
+1987,Western Europe,Armed Assault,19,13.0,27.0
+1987,Western Europe,Assassination,102,87.0,16.0
+1987,Western Europe,Bombing/Explosion,231,92.0,379.0
+1987,Western Europe,Facility/Infrastructure Attack,34,0.0,0.0
+1987,Western Europe,Hijacking,1,1.0,0.0
+1987,Western Europe,Hostage Taking (Kidnapping),5,1.0,0.0
+1987,Western Europe,Unknown,24,0.0,9.0
+1988,Australasia & Oceania,Armed Assault,3,21.0,7.0
+1988,Australasia & Oceania,Assassination,5,1.0,3.0
+1988,Australasia & Oceania,Bombing/Explosion,2,0.0,1.0
+1988,Australasia & Oceania,Hostage Taking (Kidnapping),2,0.0,0.0
+1988,Central America & Caribbean,Armed Assault,158,557.0,275.0
+1988,Central America & Caribbean,Assassination,38,35.0,6.0
+1988,Central America & Caribbean,Bombing/Explosion,265,122.0,188.0
+1988,Central America & Caribbean,Facility/Infrastructure Attack,20,1.0,1.0
+1988,Central America & Caribbean,Hostage Taking (Barricade Incident),2,0.0,0.0
+1988,Central America & Caribbean,Hostage Taking (Kidnapping),10,24.0,0.0
+1988,Central America & Caribbean,Unknown,2,0.0,30.0
+1988,East Asia,Armed Assault,3,0.0,0.0
+1988,East Asia,Assassination,1,0.0,0.0
+1988,East Asia,Bombing/Explosion,9,0.0,1.0
+1988,East Asia,Facility/Infrastructure Attack,9,0.0,0.0
+1988,East Asia,Unarmed Assault,1,0.0,25.0
+1988,East Asia,Unknown,1,0.0,0.0
+1988,Eastern Europe,Facility/Infrastructure Attack,4,0.0,0.0
+1988,Middle East & North Africa,Armed Assault,41,136.0,132.0
+1988,Middle East & North Africa,Assassination,52,43.0,22.0
+1988,Middle East & North Africa,Bombing/Explosion,121,173.0,649.0
+1988,Middle East & North Africa,Facility/Infrastructure Attack,16,0.0,0.0
+1988,Middle East & North Africa,Hijacking,1,6.0,0.0
+1988,Middle East & North Africa,Hostage Taking (Kidnapping),12,5.0,0.0
+1988,Middle East & North Africa,Unarmed Assault,1,0.0,0.0
+1988,Middle East & North Africa,Unknown,2,2.0,4.0
+1988,North America,Assassination,1,2.0,0.0
+1988,North America,Bombing/Explosion,17,1.0,1.0
+1988,North America,Facility/Infrastructure Attack,11,0.0,0.0
+1988,North America,Hostage Taking (Barricade Incident),1,0.0,0.0
+1988,South America,Armed Assault,291,1399.0,320.0
+1988,South America,Assassination,233,394.0,49.0
+1988,South America,Bombing/Explosion,417,169.0,398.0
+1988,South America,Facility/Infrastructure Attack,20,6.0,6.0
+1988,South America,Hijacking,5,0.0,1.0
+1988,South America,Hostage Taking (Barricade Incident),11,0.0,0.0
+1988,South America,Hostage Taking (Kidnapping),51,10.0,2.0
+1988,South America,Unarmed Assault,3,1.0,0.0
+1988,South America,Unknown,10,45.0,6.0
+1988,South Asia,Armed Assault,259,964.0,616.0
+1988,South Asia,Assassination,274,570.0,102.0
+1988,South Asia,Bombing/Explosion,236,649.0,1884.0
+1988,South Asia,Facility/Infrastructure Attack,14,5.0,0.0
+1988,South Asia,Hijacking,1,0.0,1.0
+1988,South Asia,Hostage Taking (Kidnapping),11,14.0,0.0
+1988,South Asia,Unknown,6,19.0,50.0
+1988,Southeast Asia,Armed Assault,86,470.0,144.0
+1988,Southeast Asia,Assassination,83,101.0,20.0
+1988,Southeast Asia,Bombing/Explosion,46,62.0,330.0
+1988,Southeast Asia,Facility/Infrastructure Attack,5,13.0,1.0
+1988,Southeast Asia,Hijacking,1,2.0,0.0
+1988,Southeast Asia,Hostage Taking (Barricade Incident),2,1.0,0.0
+1988,Southeast Asia,Hostage Taking (Kidnapping),16,8.0,12.0
+1988,Southeast Asia,Unknown,3,5.0,0.0
+1988,Sub-Saharan Africa,Armed Assault,55,458.0,158.0
+1988,Sub-Saharan Africa,Assassination,37,35.0,8.0
+1988,Sub-Saharan Africa,Bombing/Explosion,221,195.0,880.0
+1988,Sub-Saharan Africa,Facility/Infrastructure Attack,6,3.0,0.0
+1988,Sub-Saharan Africa,Hijacking,1,4.0,11.0
+1988,Sub-Saharan Africa,Hostage Taking (Kidnapping),4,17.0,0.0
+1988,Sub-Saharan Africa,Unknown,13,23.0,26.0
+1988,Western Europe,Armed Assault,26,26.0,94.0
+1988,Western Europe,Assassination,97,74.0,18.0
+1988,Western Europe,Bombing/Explosion,315,336.0,477.0
+1988,Western Europe,Facility/Infrastructure Attack,46,0.0,0.0
+1988,Western Europe,Hostage Taking (Kidnapping),3,1.0,0.0
+1988,Western Europe,Unknown,2,0.0,1.0
+1989,Australasia & Oceania,Armed Assault,11,8.0,23.0
+1989,Australasia & Oceania,Assassination,8,7.0,2.0
+1989,Australasia & Oceania,Bombing/Explosion,6,0.0,0.0
+1989,Australasia & Oceania,Facility/Infrastructure Attack,4,0.0,0.0
+1989,Central America & Caribbean,Armed Assault,191,283.0,336.0
+1989,Central America & Caribbean,Assassination,69,64.0,31.0
+1989,Central America & Caribbean,Bombing/Explosion,209,91.0,370.0
+1989,Central America & Caribbean,Facility/Infrastructure Attack,20,0.0,1.0
+1989,Central America & Caribbean,Hijacking,1,0.0,0.0
+1989,Central America & Caribbean,Hostage Taking (Barricade Incident),6,8.0,3.0
+1989,Central America & Caribbean,Hostage Taking (Kidnapping),6,5.0,0.0
+1989,Central America & Caribbean,Unknown,1,1.0,0.0
+1989,East Asia,Assassination,4,2.0,1.0
+1989,East Asia,Bombing/Explosion,7,20.0,11.0
+1989,East Asia,Facility/Infrastructure Attack,4,0.0,0.0
+1989,East Asia,Hijacking,2,0.0,1.0
+1989,East Asia,Unknown,1,0.0,0.0
+1989,Eastern Europe,Armed Assault,1,1.0,0.0
+1989,Eastern Europe,Bombing/Explosion,13,5.0,27.0
+1989,Eastern Europe,Hijacking,2,0.0,0.0
+1989,Middle East & North Africa,Armed Assault,126,220.0,81.0
+1989,Middle East & North Africa,Assassination,145,163.0,175.0
+1989,Middle East & North Africa,Bombing/Explosion,147,58.0,266.0
+1989,Middle East & North Africa,Facility/Infrastructure Attack,18,2.0,10.0
+1989,Middle East & North Africa,Hostage Taking (Barricade Incident),2,3.0,0.0
+1989,Middle East & North Africa,Hostage Taking (Kidnapping),22,17.0,0.0
+1989,Middle East & North Africa,Unarmed Assault,5,17.0,32.0
+1989,North America,Armed Assault,1,15.0,14.0
+1989,North America,Assassination,6,2.0,4.0
+1989,North America,Bombing/Explosion,17,1.0,9.0
+1989,North America,Facility/Infrastructure Attack,20,0.0,1.0
+1989,South America,Armed Assault,299,1462.0,237.0
+1989,South America,Assassination,293,460.0,74.0
+1989,South America,Bombing/Explosion,694,359.0,568.0
+1989,South America,Facility/Infrastructure Attack,23,9.0,14.0
+1989,South America,Hijacking,3,1.0,0.0
+1989,South America,Hostage Taking (Barricade Incident),7,0.0,0.0
+1989,South America,Hostage Taking (Kidnapping),63,34.0,2.0
+1989,South America,Unarmed Assault,1,0.0,0.0
+1989,South America,Unknown,2,14.0,0.0
+1989,South Asia,Armed Assault,310,1746.0,452.0
+1989,South Asia,Assassination,245,507.0,42.0
+1989,South Asia,Bombing/Explosion,258,581.0,1540.0
+1989,South Asia,Facility/Infrastructure Attack,80,3.0,0.0
+1989,South Asia,Hijacking,3,2.0,2.0
+1989,South Asia,Hostage Taking (Kidnapping),23,41.0,0.0
+1989,South Asia,Unarmed Assault,1,1.0,0.0
+1989,South Asia,Unknown,6,12.0,1.0
+1989,Southeast Asia,Armed Assault,63,327.0,83.0
+1989,Southeast Asia,Assassination,61,92.0,21.0
+1989,Southeast Asia,Bombing/Explosion,63,183.0,373.0
+1989,Southeast Asia,Facility/Infrastructure Attack,5,2.0,2.0
+1989,Southeast Asia,Hijacking,1,0.0,0.0
+1989,Southeast Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+1989,Southeast Asia,Hostage Taking (Kidnapping),9,2.0,0.0
+1989,Sub-Saharan Africa,Armed Assault,95,742.0,299.0
+1989,Sub-Saharan Africa,Assassination,43,35.0,26.0
+1989,Sub-Saharan Africa,Bombing/Explosion,139,404.0,153.0
+1989,Sub-Saharan Africa,Facility/Infrastructure Attack,3,0.0,0.0
+1989,Sub-Saharan Africa,Hijacking,1,0.0,0.0
+1989,Sub-Saharan Africa,Hostage Taking (Barricade Incident),2,10.0,9.0
+1989,Sub-Saharan Africa,Hostage Taking (Kidnapping),2,0.0,0.0
+1989,Sub-Saharan Africa,Unknown,6,11.0,9.0
+1989,Western Europe,Armed Assault,24,10.0,13.0
+1989,Western Europe,Assassination,106,68.0,34.0
+1989,Western Europe,Bombing/Explosion,244,39.0,185.0
+1989,Western Europe,Facility/Infrastructure Attack,63,0.0,2.0
+1989,Western Europe,Hostage Taking (Kidnapping),5,2.0,0.0
+1989,Western Europe,Unarmed Assault,1,0.0,0.0
+1989,Western Europe,Unknown,1,0.0,0.0
+1990,Australasia & Oceania,Armed Assault,8,8.0,10.0
+1990,Australasia & Oceania,Assassination,4,4.0,2.0
+1990,Australasia & Oceania,Bombing/Explosion,1,0.0,0.0
+1990,Australasia & Oceania,Facility/Infrastructure Attack,3,0.0,0.0
+1990,Australasia & Oceania,Hostage Taking (Kidnapping),2,0.0,0.0
+1990,Central America & Caribbean,Armed Assault,80,318.0,269.0
+1990,Central America & Caribbean,Assassination,43,44.0,8.0
+1990,Central America & Caribbean,Bombing/Explosion,172,35.0,165.0
+1990,Central America & Caribbean,Facility/Infrastructure Attack,6,0.0,8.0
+1990,Central America & Caribbean,Hijacking,1,0.0,0.0
+1990,Central America & Caribbean,Hostage Taking (Barricade Incident),3,0.0,0.0
+1990,Central America & Caribbean,Hostage Taking (Kidnapping),11,9.0,0.0
+1990,East Asia,Armed Assault,18,0.0,106.0
+1990,East Asia,Assassination,1,0.0,0.0
+1990,East Asia,Bombing/Explosion,27,4.0,29.0
+1990,East Asia,Facility/Infrastructure Attack,50,0.0,1.0
+1990,East Asia,Unarmed Assault,2,0.0,0.0
+1990,East Asia,Unknown,1,0.0,0.0
+1990,Eastern Europe,Armed Assault,16,35.0,66.0
+1990,Eastern Europe,Assassination,7,7.0,0.0
+1990,Eastern Europe,Bombing/Explosion,27,17.0,56.0
+1990,Eastern Europe,Facility/Infrastructure Attack,5,0.0,0.0
+1990,Eastern Europe,Hijacking,1,0.0,0.0
+1990,Eastern Europe,Hostage Taking (Kidnapping),1,0.0,0.0
+1990,Eastern Europe,Unknown,1,0.0,0.0
+1990,Middle East & North Africa,Armed Assault,143,434.0,196.0
+1990,Middle East & North Africa,Assassination,165,146.0,67.0
+1990,Middle East & North Africa,Bombing/Explosion,137,155.0,272.0
+1990,Middle East & North Africa,Facility/Infrastructure Attack,18,0.0,1.0
+1990,Middle East & North Africa,Hijacking,1,4.0,0.0
+1990,Middle East & North Africa,Hostage Taking (Kidnapping),22,14.0,6.0
+1990,Middle East & North Africa,Unarmed Assault,3,21.0,124.0
+1990,Middle East & North Africa,Unknown,5,4.0,4.0
+1990,North America,Assassination,7,8.0,1.0
+1990,North America,Bombing/Explosion,16,0.0,7.0
+1990,North America,Facility/Infrastructure Attack,13,0.0,0.0
+1990,North America,Hostage Taking (Kidnapping),1,0.0,0.0
+1990,South America,Armed Assault,210,1119.0,253.0
+1990,South America,Assassination,261,438.0,36.0
+1990,South America,Bombing/Explosion,500,210.0,769.0
+1990,South America,Facility/Infrastructure Attack,26,6.0,8.0
+1990,South America,Hijacking,2,1.0,0.0
+1990,South America,Hostage Taking (Barricade Incident),10,0.0,0.0
+1990,South America,Hostage Taking (Kidnapping),67,87.0,3.0
+1990,South Asia,Armed Assault,202,1667.0,648.0
+1990,South Asia,Assassination,163,301.0,31.0
+1990,South Asia,Bombing/Explosion,179,406.0,1399.0
+1990,South Asia,Facility/Infrastructure Attack,13,0.0,0.0
+1990,South Asia,Hijacking,2,0.0,0.0
+1990,South Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+1990,South Asia,Hostage Taking (Kidnapping),35,254.0,0.0
+1990,South Asia,Unarmed Assault,1,1.0,60.0
+1990,South Asia,Unknown,5,49.0,0.0
+1990,Southeast Asia,Armed Assault,96,360.0,168.0
+1990,Southeast Asia,Assassination,70,121.0,22.0
+1990,Southeast Asia,Bombing/Explosion,157,64.0,256.0
+1990,Southeast Asia,Facility/Infrastructure Attack,9,0.0,0.0
+1990,Southeast Asia,Hijacking,1,5.0,0.0
+1990,Southeast Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+1990,Southeast Asia,Hostage Taking (Kidnapping),14,12.0,2.0
+1990,Sub-Saharan Africa,Armed Assault,85,512.0,545.0
+1990,Sub-Saharan Africa,Assassination,41,37.0,12.0
+1990,Sub-Saharan Africa,Bombing/Explosion,287,87.0,209.0
+1990,Sub-Saharan Africa,Facility/Infrastructure Attack,23,4.0,17.0
+1990,Sub-Saharan Africa,Hostage Taking (Barricade Incident),1,0.0,0.0
+1990,Sub-Saharan Africa,Hostage Taking (Kidnapping),12,18.0,0.0
+1990,Sub-Saharan Africa,Unknown,1,2.0,0.0
+1990,Western Europe,Armed Assault,18,10.0,11.0
+1990,Western Europe,Assassination,115,72.0,32.0
+1990,Western Europe,Bombing/Explosion,228,37.0,236.0
+1990,Western Europe,Facility/Infrastructure Attack,24,0.0,0.0
+1990,Western Europe,Hostage Taking (Barricade Incident),1,0.0,0.0
+1990,Western Europe,Hostage Taking (Kidnapping),3,1.0,2.0
+1990,Western Europe,Unarmed Assault,1,0.0,11.0
+1991,Australasia & Oceania,Assassination,2,3.0,0.0
+1991,Australasia & Oceania,Bombing/Explosion,3,0.0,0.0
+1991,Australasia & Oceania,Facility/Infrastructure Attack,5,0.0,0.0
+1991,Central America & Caribbean,Armed Assault,324,611.0,966.0
+1991,Central America & Caribbean,Assassination,61,51.0,15.0
+1991,Central America & Caribbean,Bombing/Explosion,295,43.0,124.0
+1991,Central America & Caribbean,Facility/Infrastructure Attack,15,4.0,0.0
+1991,Central America & Caribbean,Hijacking,2,0.0,0.0
+1991,Central America & Caribbean,Hostage Taking (Barricade Incident),2,0.0,0.0
+1991,Central America & Caribbean,Hostage Taking (Kidnapping),21,2.0,0.0
+1991,Central America & Caribbean,Unknown,9,3.0,2.0
+1991,Central Asia,Armed Assault,2,5.0,12.0
+1991,Central Asia,Bombing/Explosion,2,23.0,0.0
+1991,Central Asia,Hijacking,2,0.0,0.0
+1991,Central Asia,Hostage Taking (Kidnapping),1,0.0,0.0
+1991,East Asia,Armed Assault,3,0.0,0.0
+1991,East Asia,Assassination,2,2.0,0.0
+1991,East Asia,Bombing/Explosion,6,0.0,2.0
+1991,East Asia,Facility/Infrastructure Attack,12,6.0,29.0
+1991,East Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+1991,East Asia,Hostage Taking (Kidnapping),2,0.0,0.0
+1991,East Asia,Unarmed Assault,1,0.0,0.0
+1991,East Asia,Unknown,2,0.0,0.0
+1991,Eastern Europe,Armed Assault,27,245.0,46.0
+1991,Eastern Europe,Assassination,7,3.0,5.0
+1991,Eastern Europe,Bombing/Explosion,38,24.0,14.0
+1991,Eastern Europe,Facility/Infrastructure Attack,2,0.0,2.0
+1991,Eastern Europe,Hijacking,4,0.0,0.0
+1991,Eastern Europe,Hostage Taking (Kidnapping),3,0.0,0.0
+1991,Eastern Europe,Unknown,3,1.0,5.0
+1991,Middle East & North Africa,Armed Assault,154,296.0,341.0
+1991,Middle East & North Africa,Assassination,123,115.0,94.0
+1991,Middle East & North Africa,Bombing/Explosion,268,105.0,406.0
+1991,Middle East & North Africa,Facility/Infrastructure Attack,34,11.0,20.0
+1991,Middle East & North Africa,Hijacking,3,0.0,0.0
+1991,Middle East & North Africa,Hostage Taking (Kidnapping),18,14.0,5.0
+1991,Middle East & North Africa,Unarmed Assault,5,2.0,17.0
+1991,Middle East & North Africa,Unknown,7,1.0,9.0
+1991,North America,Armed Assault,2,7.0,2.0
+1991,North America,Assassination,4,8.0,0.0
+1991,North America,Bombing/Explosion,13,0.0,0.0
+1991,North America,Facility/Infrastructure Attack,20,0.0,2.0
+1991,North America,Hostage Taking (Kidnapping),1,0.0,0.0
+1991,South America,Armed Assault,296,1614.0,286.0
+1991,South America,Assassination,221,333.0,45.0
+1991,South America,Bombing/Explosion,687,239.0,556.0
+1991,South America,Facility/Infrastructure Attack,38,1.0,0.0
+1991,South America,Hijacking,6,1.0,3.0
+1991,South America,Hostage Taking (Barricade Incident),9,6.0,0.0
+1991,South America,Hostage Taking (Kidnapping),59,43.0,6.0
+1991,South America,Unknown,6,1.0,0.0
+1991,South Asia,Armed Assault,225,1403.0,915.0
+1991,South Asia,Assassination,103,218.0,89.0
+1991,South Asia,Bombing/Explosion,208,832.0,1754.0
+1991,South Asia,Facility/Infrastructure Attack,40,3.0,20.0
+1991,South Asia,Hostage Taking (Kidnapping),91,52.0,5.0
+1991,South Asia,Unarmed Assault,2,0.0,0.0
+1991,South Asia,Unknown,8,7.0,109.0
+1991,Southeast Asia,Armed Assault,73,422.0,185.0
+1991,Southeast Asia,Assassination,28,50.0,10.0
+1991,Southeast Asia,Bombing/Explosion,81,93.0,229.0
+1991,Southeast Asia,Facility/Infrastructure Attack,7,0.0,0.0
+1991,Southeast Asia,Hijacking,1,4.0,2.0
+1991,Southeast Asia,Hostage Taking (Barricade Incident),1,5.0,2.0
+1991,Southeast Asia,Hostage Taking (Kidnapping),14,0.0,0.0
+1991,Southeast Asia,Unknown,1,0.0,1.0
+1991,Sub-Saharan Africa,Armed Assault,125,1090.0,579.0
+1991,Sub-Saharan Africa,Assassination,63,113.0,29.0
+1991,Sub-Saharan Africa,Bombing/Explosion,46,105.0,99.0
+1991,Sub-Saharan Africa,Facility/Infrastructure Attack,18,10.0,35.0
+1991,Sub-Saharan Africa,Hijacking,6,0.0,0.0
+1991,Sub-Saharan Africa,Hostage Taking (Kidnapping),4,2.0,2.0
+1991,Sub-Saharan Africa,Unarmed Assault,2,2.0,5.0
+1991,Sub-Saharan Africa,Unknown,7,25.0,34.0
+1991,Western Europe,Armed Assault,40,19.0,24.0
+1991,Western Europe,Assassination,116,96.0,47.0
+1991,Western Europe,Bombing/Explosion,341,46.0,370.0
+1991,Western Europe,Facility/Infrastructure Attack,162,4.0,15.0
+1991,Western Europe,Hijacking,1,0.0,0.0
+1991,Western Europe,Hostage Taking (Barricade Incident),3,0.0,0.0
+1991,Western Europe,Hostage Taking (Kidnapping),8,3.0,0.0
+1991,Western Europe,Unarmed Assault,4,1.0,10.0
+1991,Western Europe,Unknown,21,1.0,7.0
+1992,Australasia & Oceania,Armed Assault,6,8.0,11.0
+1992,Australasia & Oceania,Assassination,1,1.0,0.0
+1992,Australasia & Oceania,Facility/Infrastructure Attack,4,0.0,0.0
+1992,Australasia & Oceania,Hijacking,1,0.0,0.0
+1992,Australasia & Oceania,Unknown,5,0.0,3.0
+1992,Central America & Caribbean,Armed Assault,50,43.0,40.0
+1992,Central America & Caribbean,Assassination,44,56.0,10.0
+1992,Central America & Caribbean,Bombing/Explosion,74,8.0,108.0
+1992,Central America & Caribbean,Facility/Infrastructure Attack,19,0.0,1.0
+1992,Central America & Caribbean,Hijacking,3,0.0,0.0
+1992,Central America & Caribbean,Hostage Taking (Barricade Incident),3,0.0,0.0
+1992,Central America & Caribbean,Hostage Taking (Kidnapping),6,2.0,0.0
+1992,Central America & Caribbean,Unarmed Assault,1,0.0,0.0
+1992,Central America & Caribbean,Unknown,12,3.0,5.0
+1992,Central Asia,Armed Assault,29,172.0,821.0
+1992,Central Asia,Assassination,11,16.0,4.0
+1992,Central Asia,Bombing/Explosion,24,117.0,82.0
+1992,Central Asia,Facility/Infrastructure Attack,1,0.0,0.0
+1992,Central Asia,Hijacking,2,2.0,0.0
+1992,Central Asia,Hostage Taking (Kidnapping),6,5.0,0.0
+1992,Central Asia,Unknown,4,8.0,0.0
+1992,East Asia,Armed Assault,9,0.0,0.0
+1992,East Asia,Assassination,10,5.0,4.0
+1992,East Asia,Bombing/Explosion,22,7.0,33.0
+1992,East Asia,Facility/Infrastructure Attack,26,15.0,13.0
+1992,East Asia,Hostage Taking (Kidnapping),1,0.0,0.0
+1992,East Asia,Unarmed Assault,1,0.0,0.0
+1992,East Asia,Unknown,5,0.0,0.0
+1992,Eastern Europe,Armed Assault,27,33.0,54.0
+1992,Eastern Europe,Assassination,10,6.0,8.0
+1992,Eastern Europe,Bombing/Explosion,40,59.0,92.0
+1992,Eastern Europe,Facility/Infrastructure Attack,3,1.0,18.0
+1992,Eastern Europe,Hijacking,2,1.0,0.0
+1992,Eastern Europe,Hostage Taking (Kidnapping),4,10.0,0.0
+1992,Eastern Europe,Unarmed Assault,1,0.0,0.0
+1992,Eastern Europe,Unknown,4,0.0,2.0
+1992,Middle East & North Africa,Armed Assault,393,1247.0,635.0
+1992,Middle East & North Africa,Assassination,337,358.0,217.0
+1992,Middle East & North Africa,Bombing/Explosion,253,214.0,490.0
+1992,Middle East & North Africa,Facility/Infrastructure Attack,132,16.0,55.0
+1992,Middle East & North Africa,Hijacking,2,0.0,1.0
+1992,Middle East & North Africa,Hostage Taking (Barricade Incident),6,3.0,0.0
+1992,Middle East & North Africa,Hostage Taking (Kidnapping),20,14.0,2.0
+1992,Middle East & North Africa,Unarmed Assault,19,4.0,37.0
+1992,Middle East & North Africa,Unknown,30,23.0,31.0
+1992,North America,Armed Assault,2,4.0,0.0
+1992,North America,Assassination,8,4.0,4.0
+1992,North America,Bombing/Explosion,5,0.0,0.0
+1992,North America,Facility/Infrastructure Attack,24,0.0,2.0
+1992,North America,Hostage Taking (Barricade Incident),1,0.0,0.0
+1992,North America,Unarmed Assault,1,0.0,1.0
+1992,South America,Armed Assault,230,775.0,307.0
+1992,South America,Assassination,182,303.0,95.0
+1992,South America,Bombing/Explosion,689,436.0,1085.0
+1992,South America,Facility/Infrastructure Attack,37,13.0,10.0
+1992,South America,Hijacking,3,0.0,0.0
+1992,South America,Hostage Taking (Barricade Incident),8,1.0,0.0
+1992,South America,Hostage Taking (Kidnapping),32,6.0,0.0
+1992,South America,Unarmed Assault,3,0.0,0.0
+1992,South America,Unknown,20,2.0,0.0
+1992,South Asia,Armed Assault,203,1519.0,967.0
+1992,South Asia,Assassination,113,277.0,95.0
+1992,South Asia,Bombing/Explosion,131,498.0,1186.0
+1992,South Asia,Facility/Infrastructure Attack,34,27.0,50.0
+1992,South Asia,Hijacking,1,0.0,0.0
+1992,South Asia,Hostage Taking (Barricade Incident),3,2.0,20.0
+1992,South Asia,Hostage Taking (Kidnapping),31,6.0,3.0
+1992,South Asia,Unarmed Assault,5,0.0,0.0
+1992,South Asia,Unknown,24,118.0,160.0
+1992,Southeast Asia,Armed Assault,90,445.0,166.0
+1992,Southeast Asia,Assassination,58,89.0,18.0
+1992,Southeast Asia,Bombing/Explosion,97,135.0,583.0
+1992,Southeast Asia,Facility/Infrastructure Attack,8,0.0,0.0
+1992,Southeast Asia,Hijacking,1,0.0,0.0
+1992,Southeast Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+1992,Southeast Asia,Hostage Taking (Kidnapping),22,3.0,1.0
+1992,Southeast Asia,Unarmed Assault,1,0.0,0.0
+1992,Southeast Asia,Unknown,1,1.0,0.0
+1992,Sub-Saharan Africa,Armed Assault,206,1888.0,1022.0
+1992,Sub-Saharan Africa,Assassination,205,328.0,77.0
+1992,Sub-Saharan Africa,Bombing/Explosion,96,143.0,385.0
+1992,Sub-Saharan Africa,Facility/Infrastructure Attack,17,41.0,0.0
+1992,Sub-Saharan Africa,Hijacking,7,0.0,0.0
+1992,Sub-Saharan Africa,Hostage Taking (Kidnapping),14,0.0,0.0
+1992,Sub-Saharan Africa,Unarmed Assault,5,0.0,30.0
+1992,Sub-Saharan Africa,Unknown,20,42.0,33.0
+1992,Western Europe,Armed Assault,82,20.0,186.0
+1992,Western Europe,Assassination,132,121.0,70.0
+1992,Western Europe,Bombing/Explosion,307,33.0,510.0
+1992,Western Europe,Facility/Infrastructure Attack,167,3.0,39.0
+1992,Western Europe,Hijacking,2,0.0,0.0
+1992,Western Europe,Hostage Taking (Kidnapping),6,0.0,0.0
+1992,Western Europe,Unarmed Assault,11,1.0,1.0
+1992,Western Europe,Unknown,62,1.0,32.0
+1994,Australasia & Oceania,Armed Assault,2,17.0,26.0
+1994,Australasia & Oceania,Assassination,1,0.0,0.0
+1994,Australasia & Oceania,Bombing/Explosion,4,2.0,8.0
+1994,Australasia & Oceania,Facility/Infrastructure Attack,3,0.0,0.0
+1994,Australasia & Oceania,Hostage Taking (Barricade Incident),1,1.0,0.0
+1994,Australasia & Oceania,Hostage Taking (Kidnapping),1,0.0,0.0
+1994,Australasia & Oceania,Unknown,2,0.0,0.0
+1994,Central America & Caribbean,Armed Assault,19,53.0,31.0
+1994,Central America & Caribbean,Assassination,37,37.0,11.0
+1994,Central America & Caribbean,Bombing/Explosion,71,60.0,110.0
+1994,Central America & Caribbean,Facility/Infrastructure Attack,4,0.0,0.0
+1994,Central America & Caribbean,Hijacking,8,2.0,2.0
+1994,Central America & Caribbean,Hostage Taking (Barricade Incident),8,1.0,1.0
+1994,Central America & Caribbean,Hostage Taking (Kidnapping),18,4.0,6.0
+1994,Central America & Caribbean,Unarmed Assault,5,18.0,1.0
+1994,Central America & Caribbean,Unknown,10,9.0,16.0
+1994,Central Asia,Armed Assault,8,20.0,25.0
+1994,Central Asia,Assassination,22,27.0,7.0
+1994,Central Asia,Bombing/Explosion,26,58.0,163.0
+1994,Central Asia,Hijacking,1,0.0,0.0
+1994,Central Asia,Hostage Taking (Kidnapping),4,0.0,0.0
+1994,Central Asia,Unarmed Assault,1,15.0,53.0
+1994,Central Asia,Unknown,3,2.0,10.0
+1994,East Asia,Armed Assault,8,17.0,86.0
+1994,East Asia,Assassination,6,3.0,5.0
+1994,East Asia,Bombing/Explosion,6,3.0,16.0
+1994,East Asia,Facility/Infrastructure Attack,2,0.0,0.0
+1994,East Asia,Hijacking,3,0.0,0.0
+1994,East Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+1994,East Asia,Hostage Taking (Kidnapping),4,3.0,3.0
+1994,East Asia,Unarmed Assault,2,8.0,500.0
+1994,East Asia,Unknown,2,0.0,2.0
+1994,Eastern Europe,Armed Assault,8,0.0,4.0
+1994,Eastern Europe,Assassination,27,19.0,14.0
+1994,Eastern Europe,Bombing/Explosion,48,20.0,5.0
+1994,Eastern Europe,Facility/Infrastructure Attack,2,0.0,0.0
+1994,Eastern Europe,Hijacking,4,7.0,19.0
+1994,Eastern Europe,Hostage Taking (Barricade Incident),3,1.0,0.0
+1994,Eastern Europe,Unknown,3,2.0,4.0
+1994,Middle East & North Africa,Armed Assault,303,1209.0,546.0
+1994,Middle East & North Africa,Assassination,305,354.0,142.0
+1994,Middle East & North Africa,Bombing/Explosion,292,283.0,1072.0
+1994,Middle East & North Africa,Facility/Infrastructure Attack,29,3.0,3.0
+1994,Middle East & North Africa,Hijacking,7,5.0,0.0
+1994,Middle East & North Africa,Hostage Taking (Kidnapping),39,35.0,2.0
+1994,Middle East & North Africa,Unarmed Assault,29,32.0,72.0
+1994,Middle East & North Africa,Unknown,47,144.0,145.0
+1994,North America,Armed Assault,15,61.0,10.0
+1994,North America,Assassination,22,30.0,7.0
+1994,North America,Bombing/Explosion,19,6.0,17.0
+1994,North America,Facility/Infrastructure Attack,23,1.0,9.0
+1994,North America,Hostage Taking (Barricade Incident),10,0.0,1.0
+1994,North America,Hostage Taking (Kidnapping),7,0.0,0.0
+1994,North America,Unknown,5,0.0,5.0
+1994,South America,Armed Assault,57,86.0,94.0
+1994,South America,Assassination,52,76.0,12.0
+1994,South America,Bombing/Explosion,180,167.0,324.0
+1994,South America,Facility/Infrastructure Attack,12,1.0,2.0
+1994,South America,Hijacking,1,0.0,0.0
+1994,South America,Hostage Taking (Barricade Incident),3,0.0,0.0
+1994,South America,Hostage Taking (Kidnapping),41,4.0,1.0
+1994,South America,Unarmed Assault,2,0.0,30.0
+1994,South America,Unknown,25,72.0,32.0
+1994,South Asia,Armed Assault,122,399.0,371.0
+1994,South Asia,Assassination,66,150.0,315.0
+1994,South Asia,Bombing/Explosion,135,293.0,816.0
+1994,South Asia,Facility/Infrastructure Attack,6,1.0,50.0
+1994,South Asia,Hijacking,4,4.0,1.0
+1994,South Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+1994,South Asia,Hostage Taking (Kidnapping),11,5.0,0.0
+1994,South Asia,Unarmed Assault,7,4.0,4.0
+1994,South Asia,Unknown,24,129.0,430.0
+1994,Southeast Asia,Armed Assault,22,128.0,117.0
+1994,Southeast Asia,Assassination,20,33.0,7.0
+1994,Southeast Asia,Bombing/Explosion,49,85.0,231.0
+1994,Southeast Asia,Facility/Infrastructure Attack,5,0.0,5.0
+1994,Southeast Asia,Hijacking,1,0.0,1.0
+1994,Southeast Asia,Hostage Taking (Barricade Incident),1,50.0,0.0
+1994,Southeast Asia,Hostage Taking (Kidnapping),41,58.0,6.0
+1994,Southeast Asia,Unknown,12,36.0,11.0
+1994,Sub-Saharan Africa,Armed Assault,148,2372.0,481.0
+1994,Sub-Saharan Africa,Assassination,111,196.0,71.0
+1994,Sub-Saharan Africa,Bombing/Explosion,79,270.0,508.0
+1994,Sub-Saharan Africa,Facility/Infrastructure Attack,10,26.0,0.0
+1994,Sub-Saharan Africa,Hijacking,6,0.0,0.0
+1994,Sub-Saharan Africa,Hostage Taking (Barricade Incident),2,3.0,0.0
+1994,Sub-Saharan Africa,Hostage Taking (Kidnapping),23,7.0,8.0
+1994,Sub-Saharan Africa,Unarmed Assault,6,3.0,34.0
+1994,Sub-Saharan Africa,Unknown,47,355.0,83.0
+1994,Western Europe,Armed Assault,104,12.0,86.0
+1994,Western Europe,Assassination,102,80.0,35.0
+1994,Western Europe,Bombing/Explosion,244,9.0,161.0
+1994,Western Europe,Facility/Infrastructure Attack,93,0.0,9.0
+1994,Western Europe,Hijacking,2,0.0,0.0
+1994,Western Europe,Hostage Taking (Barricade Incident),4,4.0,6.0
+1994,Western Europe,Hostage Taking (Kidnapping),2,0.0,0.0
+1994,Western Europe,Unarmed Assault,9,0.0,43.0
+1994,Western Europe,Unknown,24,0.0,25.0
+1995,Australasia & Oceania,Armed Assault,6,2.0,3.0
+1995,Australasia & Oceania,Assassination,1,1.0,1.0
+1995,Australasia & Oceania,Bombing/Explosion,1,0.0,0.0
+1995,Australasia & Oceania,Facility/Infrastructure Attack,3,0.0,13.0
+1995,Australasia & Oceania,Hijacking,1,0.0,0.0
+1995,Australasia & Oceania,Unarmed Assault,1,0.0,0.0
+1995,Australasia & Oceania,Unknown,5,3.0,0.0
+1995,Central America & Caribbean,Armed Assault,28,8.0,55.0
+1995,Central America & Caribbean,Assassination,61,62.0,15.0
+1995,Central America & Caribbean,Bombing/Explosion,30,1.0,6.0
+1995,Central America & Caribbean,Facility/Infrastructure Attack,6,0.0,0.0
+1995,Central America & Caribbean,Hijacking,1,1.0,0.0
+1995,Central America & Caribbean,Hostage Taking (Barricade Incident),1,1.0,15.0
+1995,Central America & Caribbean,Hostage Taking (Kidnapping),18,6.0,2.0
+1995,Central America & Caribbean,Unarmed Assault,2,0.0,10.0
+1995,Central America & Caribbean,Unknown,21,2.0,1.0
+1995,Central Asia,Armed Assault,5,9.0,6.0
+1995,Central Asia,Assassination,31,43.0,10.0
+1995,Central Asia,Bombing/Explosion,13,19.0,31.0
+1995,Central Asia,Hijacking,1,2.0,10.0
+1995,Central Asia,Hostage Taking (Kidnapping),1,1.0,0.0
+1995,Central Asia,Unknown,4,20.0,9.0
+1995,East Asia,Armed Assault,3,0.0,2.0
+1995,East Asia,Assassination,5,3.0,2.0
+1995,East Asia,Bombing/Explosion,11,1.0,100.0
+1995,East Asia,Facility/Infrastructure Attack,2,0.0,0.0
+1995,East Asia,Hijacking,2,0.0,0.0
+1995,East Asia,Unarmed Assault,9,13.0,6219.0
+1995,East Asia,Unknown,6,4.0,103.0
+1995,Eastern Europe,Armed Assault,7,7.0,8.0
+1995,Eastern Europe,Assassination,19,17.0,14.0
+1995,Eastern Europe,Bombing/Explosion,32,11.0,36.0
+1995,Eastern Europe,Facility/Infrastructure Attack,1,0.0,0.0
+1995,Eastern Europe,Hijacking,4,1.0,2.0
+1995,Eastern Europe,Hostage Taking (Barricade Incident),1,121.0,0.0
+1995,Eastern Europe,Hostage Taking (Kidnapping),1,0.0,0.0
+1995,Eastern Europe,Unarmed Assault,2,1.0,0.0
+1995,Eastern Europe,Unknown,1,0.0,1.0
+1995,Middle East & North Africa,Armed Assault,150,294.0,315.0
+1995,Middle East & North Africa,Assassination,189,227.0,38.0
+1995,Middle East & North Africa,Bombing/Explosion,176,432.0,1806.0
+1995,Middle East & North Africa,Facility/Infrastructure Attack,42,25.0,13.0
+1995,Middle East & North Africa,Hijacking,2,0.0,0.0
+1995,Middle East & North Africa,Hostage Taking (Barricade Incident),1,0.0,0.0
+1995,Middle East & North Africa,Hostage Taking (Kidnapping),15,11.0,1.0
+1995,Middle East & North Africa,Unarmed Assault,1,0.0,7.0
+1995,Middle East & North Africa,Unknown,14,31.0,25.0
+1995,North America,Armed Assault,17,52.0,26.0
+1995,North America,Assassination,9,7.0,1.0
+1995,North America,Bombing/Explosion,17,170.0,651.0
+1995,North America,Facility/Infrastructure Attack,32,1.0,80.0
+1995,North America,Hostage Taking (Barricade Incident),8,8.0,4.0
+1995,North America,Hostage Taking (Kidnapping),6,2.0,2.0
+1995,North America,Unarmed Assault,1,0.0,1.0
+1995,North America,Unknown,4,0.0,1.0
+1995,South America,Armed Assault,42,295.0,56.0
+1995,South America,Assassination,26,44.0,8.0
+1995,South America,Bombing/Explosion,82,155.0,276.0
+1995,South America,Facility/Infrastructure Attack,13,0.0,28.0
+1995,South America,Hijacking,3,2.0,0.0
+1995,South America,Hostage Taking (Barricade Incident),1,0.0,0.0
+1995,South America,Hostage Taking (Kidnapping),24,20.0,3.0
+1995,South America,Unarmed Assault,16,1.0,37.0
+1995,South America,Unknown,48,133.0,64.0
+1995,South Asia,Armed Assault,348,706.0,480.0
+1995,South Asia,Assassination,304,363.0,123.0
+1995,South Asia,Bombing/Explosion,175,630.0,1523.0
+1995,South Asia,Facility/Infrastructure Attack,43,2.0,115.0
+1995,South Asia,Hijacking,5,0.0,0.0
+1995,South Asia,Hostage Taking (Kidnapping),21,27.0,21.0
+1995,South Asia,Unarmed Assault,74,5.0,31.0
+1995,South Asia,Unknown,81,400.0,439.0
+1995,Southeast Asia,Armed Assault,19,50.0,29.0
+1995,Southeast Asia,Assassination,18,18.0,8.0
+1995,Southeast Asia,Bombing/Explosion,75,52.0,221.0
+1995,Southeast Asia,Facility/Infrastructure Attack,7,5.0,17.0
+1995,Southeast Asia,Hijacking,2,2.0,0.0
+1995,Southeast Asia,Hostage Taking (Barricade Incident),2,114.0,1.0
+1995,Southeast Asia,Hostage Taking (Kidnapping),28,7.0,7.0
+1995,Southeast Asia,Unknown,17,64.0,27.0
+1995,Sub-Saharan Africa,Armed Assault,97,831.0,240.0
+1995,Sub-Saharan Africa,Assassination,31,34.0,6.0
+1995,Sub-Saharan Africa,Bombing/Explosion,55,211.0,369.0
+1995,Sub-Saharan Africa,Facility/Infrastructure Attack,4,0.0,1.0
+1995,Sub-Saharan Africa,Hijacking,4,0.0,0.0
+1995,Sub-Saharan Africa,Hostage Taking (Kidnapping),24,9.0,6.0
+1995,Sub-Saharan Africa,Unarmed Assault,2,14.0,1.0
+1995,Sub-Saharan Africa,Unknown,22,221.0,188.0
+1995,Western Europe,Armed Assault,18,2.0,16.0
+1995,Western Europe,Assassination,35,33.0,23.0
+1995,Western Europe,Bombing/Explosion,124,26.0,254.0
+1995,Western Europe,Facility/Infrastructure Attack,143,3.0,10.0
+1995,Western Europe,Hijacking,5,3.0,3.0
+1995,Western Europe,Hostage Taking (Kidnapping),3,0.0,0.0
+1995,Western Europe,Unknown,9,1.0,16.0
+1996,Australasia & Oceania,Armed Assault,2,8.0,2.0
+1996,Australasia & Oceania,Assassination,1,1.0,0.0
+1996,Australasia & Oceania,Bombing/Explosion,9,2.0,9.0
+1996,Australasia & Oceania,Hostage Taking (Barricade Incident),2,0.0,0.0
+1996,Australasia & Oceania,Hostage Taking (Kidnapping),1,0.0,0.0
+1996,Australasia & Oceania,Unknown,4,12.0,3.0
+1996,Central America & Caribbean,Armed Assault,24,21.0,36.0
+1996,Central America & Caribbean,Assassination,31,55.0,3.0
+1996,Central America & Caribbean,Bombing/Explosion,24,8.0,86.0
+1996,Central America & Caribbean,Facility/Infrastructure Attack,4,0.0,0.0
+1996,Central America & Caribbean,Hostage Taking (Barricade Incident),2,0.0,0.0
+1996,Central America & Caribbean,Hostage Taking (Kidnapping),20,3.0,2.0
+1996,Central America & Caribbean,Unarmed Assault,3,0.0,3.0
+1996,Central America & Caribbean,Unknown,8,1.0,7.0
+1996,Central Asia,Armed Assault,5,31.0,17.0
+1996,Central Asia,Assassination,11,19.0,2.0
+1996,Central Asia,Bombing/Explosion,15,6.0,25.0
+1996,Central Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+1996,Central Asia,Hostage Taking (Kidnapping),1,0.0,0.0
+1996,East Asia,Armed Assault,4,0.0,2.0
+1996,East Asia,Assassination,11,14.0,9.0
+1996,East Asia,Bombing/Explosion,63,17.0,116.0
+1996,East Asia,Facility/Infrastructure Attack,2,0.0,0.0
+1996,East Asia,Hijacking,2,0.0,0.0
+1996,East Asia,Hostage Taking (Kidnapping),2,1.0,0.0
+1996,East Asia,Unarmed Assault,4,0.0,32.0
+1996,East Asia,Unknown,1,0.0,2.0
+1996,Eastern Europe,Armed Assault,17,5.0,13.0
+1996,Eastern Europe,Assassination,35,45.0,14.0
+1996,Eastern Europe,Bombing/Explosion,109,92.0,187.0
+1996,Eastern Europe,Facility/Infrastructure Attack,1,0.0,0.0
+1996,Eastern Europe,Hijacking,1,1.0,0.0
+1996,Eastern Europe,Hostage Taking (Barricade Incident),1,23.0,0.0
+1996,Eastern Europe,Hostage Taking (Kidnapping),6,0.0,0.0
+1996,Eastern Europe,Unarmed Assault,2,0.0,2.0
+1996,Eastern Europe,Unknown,3,1.0,3.0
+1996,Middle East & North Africa,Armed Assault,95,389.0,156.0
+1996,Middle East & North Africa,Assassination,72,89.0,36.0
+1996,Middle East & North Africa,Bombing/Explosion,157,413.0,1839.0
+1996,Middle East & North Africa,Facility/Infrastructure Attack,17,7.0,4.0
+1996,Middle East & North Africa,Hijacking,5,3.0,1.0
+1996,Middle East & North Africa,Hostage Taking (Barricade Incident),2,0.0,0.0
+1996,Middle East & North Africa,Hostage Taking (Kidnapping),9,10.0,1.0
+1996,Middle East & North Africa,Unarmed Assault,3,4.0,23.0
+1996,Middle East & North Africa,Unknown,13,46.0,25.0
+1996,North America,Armed Assault,39,54.0,191.0
+1996,North America,Assassination,18,31.0,4.0
+1996,North America,Bombing/Explosion,19,2.0,121.0
+1996,North America,Facility/Infrastructure Attack,17,0.0,0.0
+1996,North America,Hostage Taking (Barricade Incident),1,0.0,0.0
+1996,North America,Hostage Taking (Kidnapping),12,11.0,3.0
+1996,North America,Unarmed Assault,2,0.0,1.0
+1996,North America,Unknown,3,0.0,11.0
+1996,South America,Armed Assault,125,158.0,101.0
+1996,South America,Assassination,84,228.0,32.0
+1996,South America,Bombing/Explosion,165,132.0,326.0
+1996,South America,Facility/Infrastructure Attack,10,4.0,1.0
+1996,South America,Hijacking,3,0.0,0.0
+1996,South America,Hostage Taking (Barricade Incident),1,0.0,0.0
+1996,South America,Hostage Taking (Kidnapping),48,16.0,7.0
+1996,South America,Unarmed Assault,1,0.0,4.0
+1996,South America,Unknown,80,187.0,111.0
+1996,South Asia,Armed Assault,189,642.0,807.0
+1996,South Asia,Assassination,135,214.0,196.0
+1996,South Asia,Bombing/Explosion,253,831.0,3638.0
+1996,South Asia,Facility/Infrastructure Attack,23,0.0,5.0
+1996,South Asia,Hijacking,7,1.0,0.0
+1996,South Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+1996,South Asia,Hostage Taking (Kidnapping),18,21.0,6.0
+1996,South Asia,Unarmed Assault,6,5.0,51.0
+1996,South Asia,Unknown,107,231.0,720.0
+1996,Southeast Asia,Armed Assault,47,85.0,264.0
+1996,Southeast Asia,Assassination,21,15.0,13.0
+1996,Southeast Asia,Bombing/Explosion,29,45.0,154.0
+1996,Southeast Asia,Facility/Infrastructure Attack,42,5.0,0.0
+1996,Southeast Asia,Hijacking,1,0.0,0.0
+1996,Southeast Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+1996,Southeast Asia,Hostage Taking (Kidnapping),22,28.0,4.0
+1996,Southeast Asia,Unarmed Assault,1,1.0,0.0
+1996,Southeast Asia,Unknown,29,91.0,76.0
+1996,Sub-Saharan Africa,Armed Assault,77,1030.0,181.0
+1996,Sub-Saharan Africa,Assassination,30,50.0,22.0
+1996,Sub-Saharan Africa,Bombing/Explosion,30,76.0,220.0
+1996,Sub-Saharan Africa,Facility/Infrastructure Attack,22,0.0,0.0
+1996,Sub-Saharan Africa,Hijacking,3,0.0,0.0
+1996,Sub-Saharan Africa,Hostage Taking (Barricade Incident),3,124.0,0.0
+1996,Sub-Saharan Africa,Hostage Taking (Kidnapping),12,4.0,30.0
+1996,Sub-Saharan Africa,Unarmed Assault,1,1.0,0.0
+1996,Sub-Saharan Africa,Unknown,39,1273.0,246.0
+1996,Western Europe,Armed Assault,14,2.0,6.0
+1996,Western Europe,Assassination,29,24.0,7.0
+1996,Western Europe,Bombing/Explosion,346,16.0,572.0
+1996,Western Europe,Facility/Infrastructure Attack,78,0.0,1.0
+1996,Western Europe,Hijacking,1,0.0,0.0
+1996,Western Europe,Hostage Taking (Kidnapping),4,1.0,0.0
+1996,Western Europe,Unknown,4,0.0,3.0
+1997,Australasia & Oceania,Bombing/Explosion,2,0.0,0.0
+1997,Australasia & Oceania,Facility/Infrastructure Attack,1,0.0,0.0
+1997,Australasia & Oceania,Hostage Taking (Kidnapping),2,0.0,0.0
+1997,Australasia & Oceania,Unarmed Assault,2,0.0,23.0
+1997,Central America & Caribbean,Armed Assault,38,24.0,79.0
+1997,Central America & Caribbean,Assassination,20,32.0,4.0
+1997,Central America & Caribbean,Bombing/Explosion,33,3.0,33.0
+1997,Central America & Caribbean,Facility/Infrastructure Attack,4,0.0,5.0
+1997,Central America & Caribbean,Hijacking,3,0.0,2.0
+1997,Central America & Caribbean,Hostage Taking (Kidnapping),5,4.0,0.0
+1997,Central America & Caribbean,Unarmed Assault,5,0.0,2.0
+1997,Central America & Caribbean,Unknown,9,10.0,10.0
+1997,Central Asia,Armed Assault,14,36.0,11.0
+1997,Central Asia,Assassination,7,8.0,2.0
+1997,Central Asia,Bombing/Explosion,17,6.0,34.0
+1997,Central Asia,Facility/Infrastructure Attack,1,0.0,0.0
+1997,Central Asia,Hostage Taking (Kidnapping),8,1.0,0.0
+1997,Central Asia,Unknown,2,30.0,0.0
+1997,East Asia,Armed Assault,9,0.0,13.0
+1997,East Asia,Assassination,4,1.0,2.0
+1997,East Asia,Bombing/Explosion,21,37.0,103.0
+1997,East Asia,Hijacking,2,0.0,0.0
+1997,East Asia,Hostage Taking (Kidnapping),3,0.0,0.0
+1997,East Asia,Unarmed Assault,1,0.0,0.0
+1997,Eastern Europe,Armed Assault,46,31.0,73.0
+1997,Eastern Europe,Assassination,31,26.0,21.0
+1997,Eastern Europe,Bombing/Explosion,125,54.0,193.0
+1997,Eastern Europe,Facility/Infrastructure Attack,5,0.0,0.0
+1997,Eastern Europe,Hijacking,2,0.0,0.0
+1997,Eastern Europe,Hostage Taking (Kidnapping),33,2.0,0.0
+1997,Eastern Europe,Unarmed Assault,3,1.0,3.0
+1997,Eastern Europe,Unknown,3,1.0,1.0
+1997,Middle East & North Africa,Armed Assault,206,3146.0,531.0
+1997,Middle East & North Africa,Assassination,59,103.0,19.0
+1997,Middle East & North Africa,Bombing/Explosion,178,551.0,1978.0
+1997,Middle East & North Africa,Facility/Infrastructure Attack,10,4.0,2.0
+1997,Middle East & North Africa,Hostage Taking (Kidnapping),22,42.0,0.0
+1997,Middle East & North Africa,Unarmed Assault,3,2.0,0.0
+1997,Middle East & North Africa,Unknown,70,843.0,52.0
+1997,North America,Armed Assault,36,183.0,32.0
+1997,North America,Assassination,28,33.0,4.0
+1997,North America,Bombing/Explosion,18,1.0,10.0
+1997,North America,Facility/Infrastructure Attack,19,0.0,1.0
+1997,North America,Hostage Taking (Kidnapping),27,9.0,9.0
+1997,North America,Unarmed Assault,2,0.0,2.0
+1997,North America,Unknown,7,5.0,8.0
+1997,South America,Armed Assault,165,680.0,179.0
+1997,South America,Assassination,115,259.0,6.0
+1997,South America,Bombing/Explosion,223,106.0,409.0
+1997,South America,Facility/Infrastructure Attack,13,0.0,4.0
+1997,South America,Hijacking,3,0.0,1.0
+1997,South America,Hostage Taking (Barricade Incident),3,4.0,0.0
+1997,South America,Hostage Taking (Kidnapping),153,46.0,19.0
+1997,South America,Unarmed Assault,3,0.0,10.0
+1997,South America,Unknown,96,222.0,128.0
+1997,South Asia,Armed Assault,150,713.0,468.0
+1997,South Asia,Assassination,116,175.0,138.0
+1997,South Asia,Bombing/Explosion,157,706.0,2026.0
+1997,South Asia,Facility/Infrastructure Attack,4,0.0,0.0
+1997,South Asia,Hijacking,2,0.0,0.0
+1997,South Asia,Hostage Taking (Kidnapping),8,4.0,0.0
+1997,South Asia,Unarmed Assault,1,2.0,0.0
+1997,South Asia,Unknown,52,215.0,247.0
+1997,Southeast Asia,Armed Assault,36,122.0,155.0
+1997,Southeast Asia,Assassination,8,21.0,4.0
+1997,Southeast Asia,Bombing/Explosion,41,89.0,429.0
+1997,Southeast Asia,Facility/Infrastructure Attack,8,40.0,19.0
+1997,Southeast Asia,Hostage Taking (Kidnapping),21,15.0,4.0
+1997,Southeast Asia,Unknown,45,48.0,79.0
+1997,Sub-Saharan Africa,Armed Assault,97,1091.0,638.0
+1997,Sub-Saharan Africa,Assassination,11,19.0,0.0
+1997,Sub-Saharan Africa,Bombing/Explosion,56,165.0,461.0
+1997,Sub-Saharan Africa,Facility/Infrastructure Attack,42,0.0,2.0
+1997,Sub-Saharan Africa,Hijacking,2,0.0,1.0
+1997,Sub-Saharan Africa,Hostage Taking (Kidnapping),10,1.0,2.0
+1997,Sub-Saharan Africa,Unarmed Assault,2,1.0,1.0
+1997,Sub-Saharan Africa,Unknown,59,911.0,285.0
+1997,Western Europe,Armed Assault,29,13.0,20.0
+1997,Western Europe,Assassination,21,19.0,2.0
+1997,Western Europe,Bombing/Explosion,252,4.0,34.0
+1997,Western Europe,Facility/Infrastructure Attack,30,0.0,32.0
+1997,Western Europe,Hijacking,2,0.0,0.0
+1997,Western Europe,Hostage Taking (Kidnapping),7,1.0,0.0
+1997,Western Europe,Unarmed Assault,3,2.0,2.0
+1997,Western Europe,Unknown,5,1.0,5.0
+1998,Australasia & Oceania,Armed Assault,1,0.0,0.0
+1998,Australasia & Oceania,Bombing/Explosion,4,0.0,2.0
+1998,Australasia & Oceania,Facility/Infrastructure Attack,1,0.0,0.0
+1998,Central America & Caribbean,Bombing/Explosion,1,0.0,0.0
+1998,Central Asia,Armed Assault,8,40.0,10.0
+1998,Central Asia,Assassination,1,2.0,0.0
+1998,Central Asia,Bombing/Explosion,14,18.0,41.0
+1998,Central Asia,Hostage Taking (Kidnapping),2,1.0,0.0
+1998,East Asia,Bombing/Explosion,8,50.0,16.0
+1998,East Asia,Unarmed Assault,1,0.0,150.0
+1998,Eastern Europe,Armed Assault,34,49.0,24.0
+1998,Eastern Europe,Assassination,7,7.0,8.0
+1998,Eastern Europe,Bombing/Explosion,51,49.0,127.0
+1998,Eastern Europe,Facility/Infrastructure Attack,5,0.0,0.0
+1998,Eastern Europe,Hijacking,1,0.0,0.0
+1998,Eastern Europe,Hostage Taking (Kidnapping),5,3.0,1.0
+1998,Eastern Europe,Unarmed Assault,1,0.0,1.0
+1998,Eastern Europe,Unknown,1,1.0,3.0
+1998,Middle East & North Africa,Armed Assault,71,408.0,77.0
+1998,Middle East & North Africa,Assassination,3,6.0,1.0
+1998,Middle East & North Africa,Bombing/Explosion,153,552.0,1198.0
+1998,Middle East & North Africa,Facility/Infrastructure Attack,2,0.0,2.0
+1998,Middle East & North Africa,Hijacking,1,1.0,0.0
+1998,Middle East & North Africa,Hostage Taking (Kidnapping),6,8.0,0.0
+1998,Middle East & North Africa,Unknown,11,104.0,13.0
+1998,North America,Armed Assault,4,6.0,6.0
+1998,North America,Assassination,1,1.0,0.0
+1998,North America,Bombing/Explosion,12,1.0,2.0
+1998,North America,Facility/Infrastructure Attack,19,0.0,0.0
+1998,North America,Unarmed Assault,1,0.0,0.0
+1998,South America,Armed Assault,29,203.0,3.0
+1998,South America,Assassination,2,1.0,1.0
+1998,South America,Bombing/Explosion,51,92.0,164.0
+1998,South America,Facility/Infrastructure Attack,3,2.0,0.0
+1998,South America,Hostage Taking (Kidnapping),17,299.0,21.0
+1998,South America,Unarmed Assault,6,2.0,2.0
+1998,South Asia,Armed Assault,44,401.0,104.0
+1998,South Asia,Assassination,5,17.0,54.0
+1998,South Asia,Bombing/Explosion,84,494.0,1290.0
+1998,South Asia,Hijacking,1,0.0,0.0
+1998,South Asia,Unknown,2,325.0,2.0
+1998,Southeast Asia,Armed Assault,8,11.0,52.0
+1998,Southeast Asia,Assassination,1,0.0,0.0
+1998,Southeast Asia,Bombing/Explosion,13,8.0,85.0
+1998,Southeast Asia,Facility/Infrastructure Attack,1,0.0,0.0
+1998,Southeast Asia,Hostage Taking (Kidnapping),5,0.0,0.0
+1998,Southeast Asia,Unarmed Assault,2,3.0,0.0
+1998,Southeast Asia,Unknown,2,32.0,0.0
+1998,Sub-Saharan Africa,Armed Assault,47,889.0,255.0
+1998,Sub-Saharan Africa,Assassination,1,2.0,0.0
+1998,Sub-Saharan Africa,Bombing/Explosion,20,320.0,4150.0
+1998,Sub-Saharan Africa,Facility/Infrastructure Attack,3,37.0,9.0
+1998,Sub-Saharan Africa,Hostage Taking (Kidnapping),8,27.0,0.0
+1998,Sub-Saharan Africa,Unarmed Assault,1,96.0,12.0
+1998,Sub-Saharan Africa,Unknown,7,66.0,14.0
+1998,Western Europe,Armed Assault,18,16.0,4.0
+1998,Western Europe,Assassination,3,4.0,0.0
+1998,Western Europe,Bombing/Explosion,93,34.0,279.0
+1998,Western Europe,Facility/Infrastructure Attack,24,0.0,0.0
+1998,Western Europe,Unarmed Assault,3,0.0,0.0
+1999,Australasia & Oceania,Armed Assault,1,2.0,0.0
+1999,Australasia & Oceania,Bombing/Explosion,3,0.0,0.0
+1999,Central America & Caribbean,Armed Assault,5,6.0,2.0
+1999,Central America & Caribbean,Assassination,1,0.0,1.0
+1999,Central America & Caribbean,Bombing/Explosion,1,0.0,0.0
+1999,Central America & Caribbean,Hostage Taking (Kidnapping),1,0.0,0.0
+1999,Central Asia,Armed Assault,3,8.0,1.0
+1999,Central Asia,Assassination,1,1.0,3.0
+1999,Central Asia,Bombing/Explosion,14,20.0,158.0
+1999,Central Asia,Hijacking,1,6.0,0.0
+1999,Central Asia,Hostage Taking (Kidnapping),5,0.0,5.0
+1999,East Asia,Bombing/Explosion,4,5.0,50.0
+1999,Eastern Europe,Armed Assault,35,33.0,42.0
+1999,Eastern Europe,Assassination,11,7.0,42.0
+1999,Eastern Europe,Bombing/Explosion,67,383.0,881.0
+1999,Eastern Europe,Facility/Infrastructure Attack,12,12.0,6.0
+1999,Eastern Europe,Hostage Taking (Kidnapping),6,1.0,1.0
+1999,Eastern Europe,Unarmed Assault,2,0.0,0.0
+1999,Eastern Europe,Unknown,5,4.0,7.0
+1999,Middle East & North Africa,Armed Assault,95,415.0,215.0
+1999,Middle East & North Africa,Assassination,13,20.0,49.0
+1999,Middle East & North Africa,Bombing/Explosion,170,176.0,574.0
+1999,Middle East & North Africa,Facility/Infrastructure Attack,12,15.0,10.0
+1999,Middle East & North Africa,Hijacking,1,0.0,0.0
+1999,Middle East & North Africa,Hostage Taking (Kidnapping),13,16.0,19.0
+1999,Middle East & North Africa,Unarmed Assault,1,0.0,1.0
+1999,Middle East & North Africa,Unknown,11,30.0,9.0
+1999,North America,Armed Assault,9,5.0,16.0
+1999,North America,Bombing/Explosion,8,0.0,2.0
+1999,North America,Facility/Infrastructure Attack,23,0.0,1.0
+1999,North America,Hostage Taking (Kidnapping),1,15.0,24.0
+1999,North America,Unarmed Assault,15,0.0,1.0
+1999,South America,Armed Assault,25,128.0,32.0
+1999,South America,Assassination,7,8.0,10.0
+1999,South America,Bombing/Explosion,50,64.0,204.0
+1999,South America,Facility/Infrastructure Attack,3,0.0,0.0
+1999,South America,Hijacking,2,0.0,0.0
+1999,South America,Hostage Taking (Barricade Incident),1,0.0,0.0
+1999,South America,Hostage Taking (Kidnapping),40,8.0,1.0
+1999,South America,Unarmed Assault,2,65.0,0.0
+1999,South America,Unknown,4,20.0,3.0
+1999,South Asia,Armed Assault,63,514.0,266.0
+1999,South Asia,Assassination,16,27.0,26.0
+1999,South Asia,Bombing/Explosion,128,329.0,1357.0
+1999,South Asia,Facility/Infrastructure Attack,2,0.0,0.0
+1999,South Asia,Hijacking,1,1.0,0.0
+1999,South Asia,Hostage Taking (Kidnapping),9,5.0,0.0
+1999,South Asia,Unarmed Assault,2,2.0,5.0
+1999,South Asia,Unknown,4,22.0,2.0
+1999,Southeast Asia,Armed Assault,45,61.0,82.0
+1999,Southeast Asia,Assassination,1,3.0,1.0
+1999,Southeast Asia,Bombing/Explosion,26,43.0,206.0
+1999,Southeast Asia,Facility/Infrastructure Attack,11,0.0,0.0
+1999,Southeast Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+1999,Southeast Asia,Hostage Taking (Kidnapping),16,9.0,12.0
+1999,Southeast Asia,Unarmed Assault,3,1.0,4.0
+1999,Southeast Asia,Unknown,4,6.0,0.0
+1999,Sub-Saharan Africa,Armed Assault,54,650.0,478.0
+1999,Sub-Saharan Africa,Assassination,7,9.0,0.0
+1999,Sub-Saharan Africa,Bombing/Explosion,39,85.0,289.0
+1999,Sub-Saharan Africa,Facility/Infrastructure Attack,10,0.0,9.0
+1999,Sub-Saharan Africa,Hostage Taking (Kidnapping),21,41.0,0.0
+1999,Sub-Saharan Africa,Unarmed Assault,2,0.0,1.0
+1999,Sub-Saharan Africa,Unknown,10,100.0,12.0
+1999,Western Europe,Armed Assault,32,1.0,21.0
+1999,Western Europe,Assassination,4,2.0,0.0
+1999,Western Europe,Bombing/Explosion,142,5.0,142.0
+1999,Western Europe,Facility/Infrastructure Attack,41,3.0,44.0
+1999,Western Europe,Hijacking,1,0.0,0.0
+1999,Western Europe,Hostage Taking (Barricade Incident),4,0.0,0.0
+1999,Western Europe,Hostage Taking (Kidnapping),2,1.0,0.0
+1999,Western Europe,Unarmed Assault,9,0.0,14.0
+1999,Western Europe,Unknown,1,0.0,0.0
+2000,Australasia & Oceania,Armed Assault,1,0.0,0.0
+2000,Australasia & Oceania,Bombing/Explosion,1,0.0,0.0
+2000,Australasia & Oceania,Hijacking,1,0.0,0.0
+2000,Australasia & Oceania,Hostage Taking (Kidnapping),3,7.0,17.0
+2000,Central America & Caribbean,Armed Assault,3,6.0,13.0
+2000,Central America & Caribbean,Assassination,3,4.0,1.0
+2000,Central America & Caribbean,Bombing/Explosion,8,1.0,14.0
+2000,Central Asia,Armed Assault,4,6.0,3.0
+2000,Central Asia,Assassination,3,2.0,4.0
+2000,Central Asia,Bombing/Explosion,5,9.0,78.0
+2000,Central Asia,Facility/Infrastructure Attack,1,0.0,0.0
+2000,Central Asia,Hostage Taking (Kidnapping),7,1.0,2.0
+2000,Central Asia,Unknown,1,0.0,2.0
+2000,East Asia,Armed Assault,1,0.0,16.0
+2000,East Asia,Bombing/Explosion,7,1.0,2.0
+2000,East Asia,Hijacking,1,0.0,1.0
+2000,East Asia,Unarmed Assault,10,0.0,0.0
+2000,Eastern Europe,Armed Assault,61,112.0,150.0
+2000,Eastern Europe,Assassination,17,14.0,8.0
+2000,Eastern Europe,Bombing/Explosion,142,251.0,548.0
+2000,Eastern Europe,Facility/Infrastructure Attack,6,0.0,0.0
+2000,Eastern Europe,Hostage Taking (Kidnapping),2,1.0,0.0
+2000,Eastern Europe,Unarmed Assault,3,1.0,1.0
+2000,Eastern Europe,Unknown,3,23.0,3.0
+2000,Middle East & North Africa,Armed Assault,115,440.0,161.0
+2000,Middle East & North Africa,Assassination,10,8.0,10.0
+2000,Middle East & North Africa,Bombing/Explosion,116,112.0,396.0
+2000,Middle East & North Africa,Facility/Infrastructure Attack,7,5.0,2.0
+2000,Middle East & North Africa,Hijacking,3,0.0,0.0
+2000,Middle East & North Africa,Hostage Taking (Kidnapping),7,14.0,3.0
+2000,Middle East & North Africa,Unarmed Assault,3,2.0,1.0
+2000,Middle East & North Africa,Unknown,11,43.0,13.0
+2000,North America,Armed Assault,3,4.0,4.0
+2000,North America,Assassination,1,1.0,0.0
+2000,North America,Bombing/Explosion,6,0.0,3.0
+2000,North America,Facility/Infrastructure Attack,27,0.0,0.0
+2000,North America,Hostage Taking (Kidnapping),1,0.0,0.0
+2000,North America,Unarmed Assault,3,0.0,33.0
+2000,South America,Armed Assault,25,153.0,16.0
+2000,South America,Assassination,8,35.0,1.0
+2000,South America,Bombing/Explosion,70,48.0,143.0
+2000,South America,Facility/Infrastructure Attack,8,74.0,4.0
+2000,South America,Hostage Taking (Kidnapping),36,70.0,22.0
+2000,South America,Unknown,3,50.0,5.0
+2000,South Asia,Armed Assault,97,564.0,396.0
+2000,South Asia,Assassination,28,114.0,90.0
+2000,South Asia,Bombing/Explosion,202,595.0,1831.0
+2000,South Asia,Facility/Infrastructure Attack,5,6.0,2.0
+2000,South Asia,Hijacking,1,0.0,0.0
+2000,South Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+2000,South Asia,Hostage Taking (Kidnapping),19,20.0,43.0
+2000,South Asia,Unarmed Assault,1,0.0,2.0
+2000,South Asia,Unknown,3,79.0,0.0
+2000,Southeast Asia,Armed Assault,64,180.0,189.0
+2000,Southeast Asia,Assassination,8,10.0,33.0
+2000,Southeast Asia,Bombing/Explosion,155,169.0,825.0
+2000,Southeast Asia,Facility/Infrastructure Attack,5,1.0,0.0
+2000,Southeast Asia,Hijacking,1,0.0,0.0
+2000,Southeast Asia,Hostage Taking (Kidnapping),18,31.0,6.0
+2000,Southeast Asia,Unknown,5,68.0,1.0
+2000,Sub-Saharan Africa,Armed Assault,89,537.0,212.0
+2000,Sub-Saharan Africa,Assassination,7,6.0,3.0
+2000,Sub-Saharan Africa,Bombing/Explosion,31,55.0,164.0
+2000,Sub-Saharan Africa,Facility/Infrastructure Attack,11,66.0,6.0
+2000,Sub-Saharan Africa,Hostage Taking (Barricade Incident),1,0.0,0.0
+2000,Sub-Saharan Africa,Hostage Taking (Kidnapping),32,71.0,46.0
+2000,Sub-Saharan Africa,Unarmed Assault,3,200.0,27.0
+2000,Sub-Saharan Africa,Unknown,17,91.0,158.0
+2000,Western Europe,Armed Assault,30,7.0,9.0
+2000,Western Europe,Assassination,18,20.0,33.0
+2000,Western Europe,Bombing/Explosion,161,15.0,102.0
+2000,Western Europe,Facility/Infrastructure Attack,41,0.0,3.0
+2000,Western Europe,Unarmed Assault,3,0.0,8.0
+2001,Australasia & Oceania,Facility/Infrastructure Attack,3,0.0,0.0
+2001,Australasia & Oceania,Unarmed Assault,1,0.0,0.0
+2001,Central America & Caribbean,Armed Assault,1,0.0,0.0
+2001,Central America & Caribbean,Assassination,3,2.0,1.0
+2001,Central America & Caribbean,Bombing/Explosion,4,0.0,2.0
+2001,Central Asia,Armed Assault,4,5.0,2.0
+2001,Central Asia,Assassination,6,8.0,0.0
+2001,Central Asia,Bombing/Explosion,3,2.0,11.0
+2001,Central Asia,Facility/Infrastructure Attack,3,1.0,7.0
+2001,Central Asia,Hostage Taking (Kidnapping),1,0.0,0.0
+2001,Central Asia,Unarmed Assault,1,0.0,7.0
+2001,East Asia,Armed Assault,1,0.0,0.0
+2001,East Asia,Bombing/Explosion,16,7.0,39.0
+2001,East Asia,Facility/Infrastructure Attack,2,2.0,18.0
+2001,Eastern Europe,Armed Assault,70,111.0,62.0
+2001,Eastern Europe,Assassination,19,17.0,7.0
+2001,Eastern Europe,Bombing/Explosion,122,147.0,468.0
+2001,Eastern Europe,Facility/Infrastructure Attack,17,3.0,1.0
+2001,Eastern Europe,Hijacking,1,1.0,0.0
+2001,Eastern Europe,Hostage Taking (Barricade Incident),2,1.0,2.0
+2001,Eastern Europe,Hostage Taking (Kidnapping),12,4.0,6.0
+2001,Eastern Europe,Unarmed Assault,4,0.0,6.0
+2001,Eastern Europe,Unknown,5,10.0,6.0
+2001,Middle East & North Africa,Armed Assault,181,610.0,289.0
+2001,Middle East & North Africa,Assassination,12,19.0,4.0
+2001,Middle East & North Africa,Bombing/Explosion,144,223.0,1108.0
+2001,Middle East & North Africa,Facility/Infrastructure Attack,4,0.0,2.0
+2001,Middle East & North Africa,Hijacking,2,3.0,2.0
+2001,Middle East & North Africa,Hostage Taking (Barricade Incident),1,0.0,0.0
+2001,Middle East & North Africa,Hostage Taking (Kidnapping),9,19.0,6.0
+2001,Middle East & North Africa,Unarmed Assault,2,1.0,4.0
+2001,Middle East & North Africa,Unknown,7,32.0,9.0
+2001,North America,Armed Assault,2,12.0,3.0
+2001,North America,Assassination,1,1.0,0.0
+2001,North America,Bombing/Explosion,8,0.0,2.0
+2001,North America,Facility/Infrastructure Attack,21,0.0,0.0
+2001,North America,Hijacking,4,3001.0,16493.0
+2001,North America,Unarmed Assault,12,7.0,22.0
+2001,South America,Armed Assault,35,358.0,23.0
+2001,South America,Assassination,25,28.0,11.0
+2001,South America,Bombing/Explosion,71,45.0,383.0
+2001,South America,Facility/Infrastructure Attack,12,13.0,17.0
+2001,South America,Hijacking,3,0.0,0.0
+2001,South America,Hostage Taking (Kidnapping),70,46.0,6.0
+2001,South America,Unarmed Assault,3,5.0,6.0
+2001,South America,Unknown,10,98.0,0.0
+2001,South Asia,Armed Assault,136,714.0,373.0
+2001,South Asia,Assassination,30,38.0,19.0
+2001,South Asia,Bombing/Explosion,172,466.0,1806.0
+2001,South Asia,Facility/Infrastructure Attack,16,34.0,56.0
+2001,South Asia,Hostage Taking (Kidnapping),20,65.0,21.0
+2001,South Asia,Unarmed Assault,6,1.0,10.0
+2001,South Asia,Unknown,5,49.0,3.0
+2001,Southeast Asia,Armed Assault,50,193.0,99.0
+2001,Southeast Asia,Assassination,14,18.0,12.0
+2001,Southeast Asia,Bombing/Explosion,80,38.0,373.0
+2001,Southeast Asia,Facility/Infrastructure Attack,15,1.0,7.0
+2001,Southeast Asia,Hijacking,1,0.0,2.0
+2001,Southeast Asia,Hostage Taking (Barricade Incident),1,16.0,41.0
+2001,Southeast Asia,Hostage Taking (Kidnapping),15,27.0,4.0
+2001,Southeast Asia,Unarmed Assault,5,3.0,0.0
+2001,Southeast Asia,Unknown,4,15.0,0.0
+2001,Sub-Saharan Africa,Armed Assault,71,711.0,419.0
+2001,Sub-Saharan Africa,Assassination,8,5.0,1.0
+2001,Sub-Saharan Africa,Bombing/Explosion,27,56.0,104.0
+2001,Sub-Saharan Africa,Facility/Infrastructure Attack,18,79.0,34.0
+2001,Sub-Saharan Africa,Hijacking,3,0.0,0.0
+2001,Sub-Saharan Africa,Hostage Taking (Kidnapping),17,101.0,27.0
+2001,Sub-Saharan Africa,Unarmed Assault,4,2.0,5.0
+2001,Sub-Saharan Africa,Unknown,14,215.0,64.0
+2001,Western Europe,Armed Assault,31,22.0,30.0
+2001,Western Europe,Assassination,9,9.0,8.0
+2001,Western Europe,Bombing/Explosion,153,8.0,215.0
+2001,Western Europe,Facility/Infrastructure Attack,37,0.0,3.0
+2001,Western Europe,Hostage Taking (Kidnapping),1,0.0,0.0
+2001,Western Europe,Unarmed Assault,3,1.0,3.0
+2002,Australasia & Oceania,Assassination,1,1.0,0.0
+2002,Australasia & Oceania,Bombing/Explosion,1,0.0,0.0
+2002,Central America & Caribbean,Assassination,1,0.0,1.0
+2002,Central America & Caribbean,Facility/Infrastructure Attack,1,0.0,0.0
+2002,Central America & Caribbean,Hostage Taking (Kidnapping),1,0.0,0.0
+2002,Central Asia,Assassination,2,2.0,1.0
+2002,Central Asia,Bombing/Explosion,3,1.0,17.0
+2002,Central Asia,Hostage Taking (Kidnapping),1,0.0,0.0
+2002,East Asia,Bombing/Explosion,3,1.0,18.0
+2002,East Asia,Hijacking,1,0.0,0.0
+2002,Eastern Europe,Armed Assault,22,57.0,24.0
+2002,Eastern Europe,Assassination,11,13.0,0.0
+2002,Eastern Europe,Bombing/Explosion,68,270.0,435.0
+2002,Eastern Europe,Facility/Infrastructure Attack,1,0.0,0.0
+2002,Eastern Europe,Hostage Taking (Barricade Incident),1,170.0,0.0
+2002,Eastern Europe,Hostage Taking (Kidnapping),5,2.0,3.0
+2002,Eastern Europe,Unarmed Assault,2,3.0,1.0
+2002,Eastern Europe,Unknown,2,3.0,1.0
+2002,Middle East & North Africa,Armed Assault,140,586.0,382.0
+2002,Middle East & North Africa,Assassination,3,9.0,0.0
+2002,Middle East & North Africa,Bombing/Explosion,163,510.0,1758.0
+2002,Middle East & North Africa,Facility/Infrastructure Attack,2,0.0,2.0
+2002,Middle East & North Africa,Hijacking,1,0.0,0.0
+2002,Middle East & North Africa,Hostage Taking (Barricade Incident),1,0.0,0.0
+2002,Middle East & North Africa,Hostage Taking (Kidnapping),8,42.0,1.0
+2002,Middle East & North Africa,Unarmed Assault,1,0.0,3.0
+2002,Middle East & North Africa,Unknown,7,28.0,11.0
+2002,North America,Armed Assault,2,3.0,4.0
+2002,North America,Bombing/Explosion,20,0.0,7.0
+2002,North America,Facility/Infrastructure Attack,10,0.0,0.0
+2002,North America,Hijacking,1,1.0,0.0
+2002,South America,Armed Assault,23,80.0,31.0
+2002,South America,Assassination,11,17.0,20.0
+2002,South America,Bombing/Explosion,84,228.0,631.0
+2002,South America,Facility/Infrastructure Attack,5,0.0,0.0
+2002,South America,Hijacking,2,5.0,3.0
+2002,South America,Hostage Taking (Kidnapping),33,36.0,0.0
+2002,South America,Unarmed Assault,2,0.0,4.0
+2002,South America,Unknown,2,3.0,1.0
+2002,South Asia,Armed Assault,90,685.0,348.0
+2002,South Asia,Assassination,26,34.0,33.0
+2002,South Asia,Bombing/Explosion,197,421.0,2032.0
+2002,South Asia,Facility/Infrastructure Attack,8,0.0,1.0
+2002,South Asia,Hijacking,1,0.0,1.0
+2002,South Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+2002,South Asia,Hostage Taking (Kidnapping),8,6.0,0.0
+2002,South Asia,Unknown,3,142.0,0.0
+2002,Southeast Asia,Armed Assault,31,89.0,91.0
+2002,Southeast Asia,Assassination,9,23.0,12.0
+2002,Southeast Asia,Bombing/Explosion,55,266.0,838.0
+2002,Southeast Asia,Facility/Infrastructure Attack,6,1.0,0.0
+2002,Southeast Asia,Hostage Taking (Kidnapping),8,5.0,5.0
+2002,Southeast Asia,Unknown,1,12.0,10.0
+2002,Sub-Saharan Africa,Armed Assault,55,896.0,133.0
+2002,Sub-Saharan Africa,Assassination,4,8.0,1.0
+2002,Sub-Saharan Africa,Bombing/Explosion,31,53.0,127.0
+2002,Sub-Saharan Africa,Facility/Infrastructure Attack,4,0.0,0.0
+2002,Sub-Saharan Africa,Hostage Taking (Kidnapping),15,16.0,10.0
+2002,Sub-Saharan Africa,Unarmed Assault,2,7.0,47.0
+2002,Sub-Saharan Africa,Unknown,10,61.0,20.0
+2002,Western Europe,Armed Assault,4,2.0,5.0
+2002,Western Europe,Assassination,5,3.0,2.0
+2002,Western Europe,Bombing/Explosion,95,4.0,84.0
+2002,Western Europe,Facility/Infrastructure Attack,12,0.0,0.0
+2002,Western Europe,Hostage Taking (Barricade Incident),1,0.0,2.0
+2002,Western Europe,Unarmed Assault,3,0.0,1.0
+2003,Australasia & Oceania,Assassination,1,1.0,0.0
+2003,Australasia & Oceania,Facility/Infrastructure Attack,1,0.0,0.0
+2003,Australasia & Oceania,Unarmed Assault,2,0.0,0.0
+2003,Central America & Caribbean,Armed Assault,2,4.0,6.0
+2003,Central America & Caribbean,Assassination,2,1.0,0.0
+2003,Central America & Caribbean,Facility/Infrastructure Attack,4,0.0,0.0
+2003,Central Asia,Armed Assault,1,0.0,0.0
+2003,Central Asia,Bombing/Explosion,3,1.0,0.0
+2003,Central Asia,Facility/Infrastructure Attack,2,0.0,0.0
+2003,Central Asia,Hostage Taking (Kidnapping),1,0.0,1.0
+2003,East Asia,Armed Assault,1,0.0,60.0
+2003,East Asia,Bombing/Explosion,4,1.0,16.0
+2003,East Asia,Facility/Infrastructure Attack,1,0.0,0.0
+2003,Eastern Europe,Armed Assault,18,30.0,20.0
+2003,Eastern Europe,Assassination,9,32.0,78.0
+2003,Eastern Europe,Bombing/Explosion,60,272.0,712.0
+2003,Eastern Europe,Facility/Infrastructure Attack,8,0.0,2.0
+2003,Eastern Europe,Unarmed Assault,4,0.0,7.0
+2003,Eastern Europe,Unknown,1,3.0,3.0
+2003,Middle East & North Africa,Armed Assault,83,230.0,123.0
+2003,Middle East & North Africa,Assassination,19,32.0,12.0
+2003,Middle East & North Africa,Bombing/Explosion,192,739.0,3088.0
+2003,Middle East & North Africa,Facility/Infrastructure Attack,1,0.0,0.0
+2003,Middle East & North Africa,Hijacking,1,0.0,0.0
+2003,Middle East & North Africa,Hostage Taking (Kidnapping),1,4.0,1.0
+2003,Middle East & North Africa,Unarmed Assault,1,0.0,16.0
+2003,Middle East & North Africa,Unknown,12,58.0,12.0
+2003,North America,Armed Assault,1,2.0,1.0
+2003,North America,Bombing/Explosion,7,0.0,0.0
+2003,North America,Facility/Infrastructure Attack,24,0.0,0.0
+2003,North America,Unarmed Assault,2,0.0,0.0
+2003,South America,Armed Assault,14,49.0,25.0
+2003,South America,Assassination,5,5.0,1.0
+2003,South America,Bombing/Explosion,77,128.0,544.0
+2003,South America,Facility/Infrastructure Attack,5,0.0,0.0
+2003,South America,Hostage Taking (Kidnapping),14,5.0,0.0
+2003,South America,Unknown,2,4.0,5.0
+2003,South Asia,Armed Assault,100,331.0,211.0
+2003,South Asia,Assassination,39,58.0,49.0
+2003,South Asia,Bombing/Explosion,185,389.0,1332.0
+2003,South Asia,Facility/Infrastructure Attack,13,2.0,0.0
+2003,South Asia,Hostage Taking (Barricade Incident),1,6.0,8.0
+2003,South Asia,Hostage Taking (Kidnapping),13,15.0,2.0
+2003,South Asia,Unarmed Assault,1,1.0,0.0
+2003,South Asia,Unknown,1,0.0,2.0
+2003,Southeast Asia,Armed Assault,49,217.0,129.0
+2003,Southeast Asia,Assassination,8,8.0,3.0
+2003,Southeast Asia,Bombing/Explosion,70,120.0,615.0
+2003,Southeast Asia,Facility/Infrastructure Attack,9,0.0,3.0
+2003,Southeast Asia,Hijacking,1,0.0,0.0
+2003,Southeast Asia,Hostage Taking (Kidnapping),3,3.0,0.0
+2003,Southeast Asia,Unknown,5,6.0,9.0
+2003,Sub-Saharan Africa,Armed Assault,39,436.0,94.0
+2003,Sub-Saharan Africa,Assassination,3,3.0,0.0
+2003,Sub-Saharan Africa,Bombing/Explosion,8,27.0,56.0
+2003,Sub-Saharan Africa,Facility/Infrastructure Attack,2,0.0,0.0
+2003,Sub-Saharan Africa,Hostage Taking (Barricade Incident),1,0.0,0.0
+2003,Sub-Saharan Africa,Hostage Taking (Kidnapping),13,30.0,1.0
+2003,Sub-Saharan Africa,Unarmed Assault,1,12.0,0.0
+2003,Sub-Saharan Africa,Unknown,6,47.0,7.0
+2003,Western Europe,Armed Assault,7,0.0,2.0
+2003,Western Europe,Assassination,2,3.0,2.0
+2003,Western Europe,Bombing/Explosion,83,2.0,56.0
+2003,Western Europe,Facility/Infrastructure Attack,18,0.0,0.0
+2003,Western Europe,Hijacking,1,0.0,0.0
+2003,Western Europe,Hostage Taking (Kidnapping),1,0.0,0.0
+2003,Western Europe,Unarmed Assault,9,0.0,70.0
+2004,Central America & Caribbean,Armed Assault,3,35.0,44.0
+2004,Central America & Caribbean,Assassination,2,3.0,0.0
+2004,Central Asia,Armed Assault,2,23.0,5.0
+2004,Central Asia,Assassination,2,0.0,1.0
+2004,Central Asia,Bombing/Explosion,4,13.0,26.0
+2004,East Asia,Assassination,1,0.0,2.0
+2004,East Asia,Bombing/Explosion,3,4.0,5.0
+2004,Eastern Europe,Armed Assault,5,21.0,26.0
+2004,Eastern Europe,Assassination,7,11.0,66.0
+2004,Eastern Europe,Bombing/Explosion,26,138.0,342.0
+2004,Eastern Europe,Facility/Infrastructure Attack,3,1.0,0.0
+2004,Eastern Europe,Hijacking,1,46.0,0.0
+2004,Eastern Europe,Hostage Taking (Barricade Incident),1,344.0,727.0
+2004,Eastern Europe,Unarmed Assault,2,0.0,15.0
+2004,Eastern Europe,Unknown,1,47.0,0.0
+2004,Middle East & North Africa,Armed Assault,87,383.0,224.0
+2004,Middle East & North Africa,Assassination,36,64.0,50.0
+2004,Middle East & North Africa,Bombing/Explosion,299,2004.0,4892.0
+2004,Middle East & North Africa,Facility/Infrastructure Attack,7,13.0,0.0
+2004,Middle East & North Africa,Hostage Taking (Barricade Incident),1,22.0,26.0
+2004,Middle East & North Africa,Hostage Taking (Kidnapping),54,41.0,8.0
+2004,Middle East & North Africa,Unknown,8,31.0,67.0
+2004,North America,Assassination,1,0.0,3.0
+2004,North America,Bombing/Explosion,1,0.0,0.0
+2004,North America,Facility/Infrastructure Attack,10,0.0,0.0
+2004,South America,Armed Assault,9,37.0,21.0
+2004,South America,Assassination,5,6.0,0.0
+2004,South America,Bombing/Explosion,23,37.0,192.0
+2004,South America,Hostage Taking (Kidnapping),3,0.0,0.0
+2004,South America,Unknown,2,9.0,5.0
+2004,South Asia,Armed Assault,91,959.0,507.0
+2004,South Asia,Assassination,36,52.0,34.0
+2004,South Asia,Bombing/Explosion,207,534.0,2106.0
+2004,South Asia,Facility/Infrastructure Attack,8,14.0,27.0
+2004,South Asia,Hostage Taking (Barricade Incident),1,4.0,0.0
+2004,South Asia,Hostage Taking (Kidnapping),17,12.0,8.0
+2004,South Asia,Unarmed Assault,1,0.0,3.0
+2004,South Asia,Unknown,8,41.0,25.0
+2004,Southeast Asia,Armed Assault,38,77.0,46.0
+2004,Southeast Asia,Assassination,10,31.0,77.0
+2004,Southeast Asia,Bombing/Explosion,43,167.0,428.0
+2004,Southeast Asia,Facility/Infrastructure Attack,2,0.0,0.0
+2004,Southeast Asia,Hostage Taking (Kidnapping),2,6.0,0.0
+2004,Sub-Saharan Africa,Armed Assault,19,229.0,98.0
+2004,Sub-Saharan Africa,Assassination,3,2.0,0.0
+2004,Sub-Saharan Africa,Bombing/Explosion,4,19.0,23.0
+2004,Sub-Saharan Africa,Hostage Taking (Kidnapping),1,0.0,0.0
+2004,Sub-Saharan Africa,Unknown,7,67.0,40.0
+2004,Western Europe,Armed Assault,5,3.0,2.0
+2004,Western Europe,Assassination,1,1.0,2.0
+2004,Western Europe,Bombing/Explosion,49,192.0,1846.0
+2004,Western Europe,Facility/Infrastructure Attack,3,0.0,0.0
+2004,Western Europe,Unarmed Assault,1,0.0,3.0
+2005,Central America & Caribbean,Armed Assault,1,1.0,0.0
+2005,Central America & Caribbean,Bombing/Explosion,2,0.0,14.0
+2005,Central Asia,Armed Assault,2,14.0,36.0
+2005,Central Asia,Bombing/Explosion,7,3.0,30.0
+2005,Central Asia,Hostage Taking (Kidnapping),1,0.0,0.0
+2005,Central Asia,Unknown,1,1.0,0.0
+2005,East Asia,Bombing/Explosion,2,12.0,3.0
+2005,Eastern Europe,Armed Assault,22,115.0,185.0
+2005,Eastern Europe,Assassination,7,3.0,2.0
+2005,Eastern Europe,Bombing/Explosion,46,40.0,165.0
+2005,Eastern Europe,Facility/Infrastructure Attack,1,0.0,0.0
+2005,Middle East & North Africa,Armed Assault,177,623.0,390.0
+2005,Middle East & North Africa,Assassination,128,211.0,307.0
+2005,Middle East & North Africa,Bombing/Explosion,489,2944.0,6496.0
+2005,Middle East & North Africa,Facility/Infrastructure Attack,8,0.0,0.0
+2005,Middle East & North Africa,Hijacking,1,12.0,0.0
+2005,Middle East & North Africa,Hostage Taking (Kidnapping),66,89.0,12.0
+2005,Middle East & North Africa,Unarmed Assault,1,0.0,0.0
+2005,Middle East & North Africa,Unknown,12,39.0,15.0
+2005,North America,Assassination,1,2.0,0.0
+2005,North America,Bombing/Explosion,9,0.0,0.0
+2005,North America,Facility/Infrastructure Attack,11,0.0,0.0
+2005,North America,Unarmed Assault,1,0.0,0.0
+2005,South America,Armed Assault,16,60.0,28.0
+2005,South America,Assassination,4,5.0,3.0
+2005,South America,Bombing/Explosion,23,64.0,77.0
+2005,South America,Hostage Taking (Kidnapping),4,2.0,0.0
+2005,South America,Unknown,2,21.0,0.0
+2005,South Asia,Armed Assault,163,468.0,333.0
+2005,South Asia,Assassination,61,88.0,43.0
+2005,South Asia,Bombing/Explosion,304,683.0,2324.0
+2005,South Asia,Facility/Infrastructure Attack,14,16.0,109.0
+2005,South Asia,Hijacking,1,0.0,1.0
+2005,South Asia,Hostage Taking (Kidnapping),43,29.0,12.0
+2005,South Asia,Unarmed Assault,2,3.0,2.0
+2005,South Asia,Unknown,16,78.0,59.0
+2005,Southeast Asia,Armed Assault,90,136.0,109.0
+2005,Southeast Asia,Assassination,19,21.0,6.0
+2005,Southeast Asia,Bombing/Explosion,86,100.0,729.0
+2005,Southeast Asia,Facility/Infrastructure Attack,5,0.0,0.0
+2005,Southeast Asia,Hostage Taking (Kidnapping),1,2.0,0.0
+2005,Southeast Asia,Unarmed Assault,1,1.0,0.0
+2005,Southeast Asia,Unknown,2,6.0,2.0
+2005,Sub-Saharan Africa,Armed Assault,33,289.0,241.0
+2005,Sub-Saharan Africa,Assassination,5,19.0,43.0
+2005,Sub-Saharan Africa,Bombing/Explosion,10,24.0,45.0
+2005,Sub-Saharan Africa,Facility/Infrastructure Attack,2,0.0,0.0
+2005,Sub-Saharan Africa,Hostage Taking (Kidnapping),5,19.0,11.0
+2005,Sub-Saharan Africa,Unknown,5,28.0,10.0
+2005,Western Europe,Armed Assault,8,3.0,0.0
+2005,Western Europe,Bombing/Explosion,86,57.0,890.0
+2005,Western Europe,Facility/Infrastructure Attack,9,0.0,51.0
+2005,Western Europe,Unarmed Assault,1,0.0,1.0
+2006,Australasia & Oceania,Bombing/Explosion,1,0.0,0.0
+2006,Australasia & Oceania,Facility/Infrastructure Attack,1,0.0,0.0
+2006,Central America & Caribbean,Armed Assault,2,3.0,1.0
+2006,Central America & Caribbean,Assassination,3,4.0,0.0
+2006,Central Asia,Armed Assault,2,3.0,2.0
+2006,Central Asia,Assassination,1,0.0,0.0
+2006,Central Asia,Bombing/Explosion,2,3.0,4.0
+2006,Central Asia,Facility/Infrastructure Attack,1,0.0,0.0
+2006,East Asia,Armed Assault,1,0.0,1.0
+2006,Eastern Europe,Armed Assault,13,23.0,9.0
+2006,Eastern Europe,Assassination,1,1.0,2.0
+2006,Eastern Europe,Bombing/Explosion,39,32.0,53.0
+2006,Eastern Europe,Facility/Infrastructure Attack,4,0.0,0.0
+2006,Eastern Europe,Hostage Taking (Kidnapping),1,0.0,0.0
+2006,Eastern Europe,Unarmed Assault,10,2.0,9.0
+2006,Eastern Europe,Unknown,2,1.0,2.0
+2006,Middle East & North Africa,Armed Assault,290,1031.0,590.0
+2006,Middle East & North Africa,Assassination,56,125.0,30.0
+2006,Middle East & North Africa,Bombing/Explosion,718,3669.0,8535.0
+2006,Middle East & North Africa,Facility/Infrastructure Attack,10,21.0,4.0
+2006,Middle East & North Africa,Hijacking,1,2.0,5.0
+2006,Middle East & North Africa,Hostage Taking (Barricade Incident),2,0.0,0.0
+2006,Middle East & North Africa,Hostage Taking (Kidnapping),100,140.0,11.0
+2006,Middle East & North Africa,Unknown,10,44.0,23.0
+2006,North America,Armed Assault,4,7.0,8.0
+2006,North America,Bombing/Explosion,5,1.0,31.0
+2006,North America,Facility/Infrastructure Attack,4,0.0,0.0
+2006,North America,Hostage Taking (Kidnapping),1,0.0,0.0
+2006,North America,Unarmed Assault,1,0.0,9.0
+2006,South America,Armed Assault,8,39.0,15.0
+2006,South America,Assassination,7,9.0,0.0
+2006,South America,Bombing/Explosion,19,25.0,91.0
+2006,South America,Facility/Infrastructure Attack,3,0.0,0.0
+2006,South America,Hostage Taking (Kidnapping),10,2.0,0.0
+2006,South America,Unknown,3,18.0,0.0
+2006,South Asia,Armed Assault,236,855.0,586.0
+2006,South Asia,Assassination,46,66.0,23.0
+2006,South Asia,Bombing/Explosion,546,1858.0,4455.0
+2006,South Asia,Facility/Infrastructure Attack,28,24.0,15.0
+2006,South Asia,Hijacking,1,0.0,1.0
+2006,South Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+2006,South Asia,Hostage Taking (Kidnapping),64,86.0,30.0
+2006,South Asia,Unarmed Assault,1,0.0,1.0
+2006,South Asia,Unknown,15,48.0,31.0
+2006,Southeast Asia,Armed Assault,129,157.0,83.0
+2006,Southeast Asia,Assassination,19,19.0,15.0
+2006,Southeast Asia,Bombing/Explosion,89,77.0,463.0
+2006,Southeast Asia,Facility/Infrastructure Attack,21,0.0,8.0
+2006,Southeast Asia,Hostage Taking (Kidnapping),11,1.0,6.0
+2006,Southeast Asia,Unarmed Assault,1,0.0,1.0
+2006,Southeast Asia,Unknown,2,6.0,6.0
+2006,Sub-Saharan Africa,Armed Assault,51,633.0,203.0
+2006,Sub-Saharan Africa,Assassination,6,18.0,21.0
+2006,Sub-Saharan Africa,Bombing/Explosion,23,230.0,92.0
+2006,Sub-Saharan Africa,Facility/Infrastructure Attack,8,22.0,7.0
+2006,Sub-Saharan Africa,Hijacking,1,0.0,0.0
+2006,Sub-Saharan Africa,Hostage Taking (Barricade Incident),3,5.0,1.0
+2006,Sub-Saharan Africa,Hostage Taking (Kidnapping),14,25.0,0.0
+2006,Sub-Saharan Africa,Unarmed Assault,1,0.0,1.0
+2006,Sub-Saharan Africa,Unknown,7,39.0,35.0
+2006,Western Europe,Armed Assault,3,2.0,0.0
+2006,Western Europe,Assassination,1,1.0,0.0
+2006,Western Europe,Bombing/Explosion,64,3.0,23.0
+2006,Western Europe,Facility/Infrastructure Attack,27,0.0,4.0
+2006,Western Europe,Hostage Taking (Barricade Incident),1,0.0,2.0
+2006,Western Europe,Hostage Taking (Kidnapping),1,0.0,0.0
+2006,Western Europe,Unarmed Assault,1,0.0,2.0
+2007,Australasia & Oceania,Hostage Taking (Barricade Incident),1,0.0,0.0
+2007,Central America & Caribbean,Armed Assault,2,0.0,2.0
+2007,Central America & Caribbean,Assassination,1,1.0,0.0
+2007,Central America & Caribbean,Hijacking,1,1.0,0.0
+2007,Central Asia,Bombing/Explosion,2,1.0,0.0
+2007,Central Asia,Facility/Infrastructure Attack,1,0.0,0.0
+2007,Central Asia,Unarmed Assault,1,0.0,1.0
+2007,Eastern Europe,Armed Assault,33,30.0,52.0
+2007,Eastern Europe,Assassination,2,1.0,0.0
+2007,Eastern Europe,Bombing/Explosion,22,23.0,90.0
+2007,Eastern Europe,Facility/Infrastructure Attack,3,3.0,1.0
+2007,Eastern Europe,Unarmed Assault,1,0.0,0.0
+2007,Eastern Europe,Unknown,1,0.0,1.0
+2007,Middle East & North Africa,Armed Assault,295,918.0,740.0
+2007,Middle East & North Africa,Assassination,50,61.0,21.0
+2007,Middle East & North Africa,Bombing/Explosion,948,5846.0,13550.0
+2007,Middle East & North Africa,Facility/Infrastructure Attack,8,57.0,200.0
+2007,Middle East & North Africa,Hijacking,2,0.0,0.0
+2007,Middle East & North Africa,Hostage Taking (Barricade Incident),2,0.0,5.0
+2007,Middle East & North Africa,Hostage Taking (Kidnapping),72,285.0,189.0
+2007,Middle East & North Africa,Unarmed Assault,1,0.0,1.0
+2007,Middle East & North Africa,Unknown,7,13.0,3.0
+2007,North America,Armed Assault,7,24.0,3.0
+2007,North America,Assassination,1,1.0,3.0
+2007,North America,Bombing/Explosion,3,0.0,0.0
+2007,North America,Facility/Infrastructure Attack,7,0.0,0.0
+2007,South America,Armed Assault,13,43.0,37.0
+2007,South America,Assassination,3,5.0,0.0
+2007,South America,Bombing/Explosion,26,34.0,126.0
+2007,South America,Facility/Infrastructure Attack,2,0.0,0.0
+2007,South America,Hostage Taking (Kidnapping),3,1.0,0.0
+2007,South Asia,Armed Assault,239,1165.0,647.0
+2007,South Asia,Assassination,43,70.0,115.0
+2007,South Asia,Bombing/Explosion,558,2296.0,4300.0
+2007,South Asia,Facility/Infrastructure Attack,32,19.0,25.0
+2007,South Asia,Hostage Taking (Barricade Incident),2,0.0,0.0
+2007,South Asia,Hostage Taking (Kidnapping),94,86.0,223.0
+2007,South Asia,Unknown,14,50.0,14.0
+2007,Southeast Asia,Armed Assault,147,231.0,121.0
+2007,Southeast Asia,Assassination,18,31.0,6.0
+2007,Southeast Asia,Bombing/Explosion,153,115.0,892.0
+2007,Southeast Asia,Facility/Infrastructure Attack,38,3.0,35.0
+2007,Southeast Asia,Hostage Taking (Kidnapping),7,8.0,0.0
+2007,Southeast Asia,Unarmed Assault,1,0.0,1.0
+2007,Southeast Asia,Unknown,1,2.0,2.0
+2007,Sub-Saharan Africa,Armed Assault,105,761.0,297.0
+2007,Sub-Saharan Africa,Assassination,21,18.0,11.0
+2007,Sub-Saharan Africa,Bombing/Explosion,104,388.0,578.0
+2007,Sub-Saharan Africa,Facility/Infrastructure Attack,14,35.0,28.0
+2007,Sub-Saharan Africa,Hijacking,4,0.0,0.0
+2007,Sub-Saharan Africa,Hostage Taking (Barricade Incident),1,10.0,0.0
+2007,Sub-Saharan Africa,Hostage Taking (Kidnapping),45,70.0,68.0
+2007,Sub-Saharan Africa,Unarmed Assault,1,5.0,0.0
+2007,Sub-Saharan Africa,Unknown,7,96.0,92.0
+2007,Western Europe,Armed Assault,8,12.0,21.0
+2007,Western Europe,Assassination,1,2.0,0.0
+2007,Western Europe,Bombing/Explosion,50,1.0,20.0
+2007,Western Europe,Facility/Infrastructure Attack,10,0.0,0.0
+2007,Western Europe,Hostage Taking (Kidnapping),2,0.0,3.0
+2007,Western Europe,Unarmed Assault,1,2.0,0.0
+2008,Australasia & Oceania,Bombing/Explosion,2,0.0,0.0
+2008,Australasia & Oceania,Facility/Infrastructure Attack,2,0.0,0.0
+2008,Australasia & Oceania,Unarmed Assault,4,0.0,0.0
+2008,Central Asia,Armed Assault,6,0.0,4.0
+2008,Central Asia,Assassination,3,1.0,2.0
+2008,Central Asia,Bombing/Explosion,25,19.0,70.0
+2008,Central Asia,Facility/Infrastructure Attack,1,0.0,1.0
+2008,Central Asia,Hostage Taking (Kidnapping),1,0.0,0.0
+2008,East Asia,Armed Assault,4,23.0,24.0
+2008,East Asia,Bombing/Explosion,16,12.0,114.0
+2008,East Asia,Facility/Infrastructure Attack,2,3.0,12.0
+2008,East Asia,Hijacking,1,1.0,0.0
+2008,East Asia,Hostage Taking (Kidnapping),1,0.0,1.0
+2008,East Asia,Unarmed Assault,1,0.0,46.0
+2008,Eastern Europe,Armed Assault,68,54.0,85.0
+2008,Eastern Europe,Assassination,14,7.0,7.0
+2008,Eastern Europe,Bombing/Explosion,111,31.0,208.0
+2008,Eastern Europe,Facility/Infrastructure Attack,12,7.0,12.0
+2008,Eastern Europe,Hostage Taking (Kidnapping),2,1.0,0.0
+2008,Eastern Europe,Unarmed Assault,1,0.0,20.0
+2008,Eastern Europe,Unknown,1,1.0,0.0
+2008,Middle East & North Africa,Armed Assault,244,517.0,640.0
+2008,Middle East & North Africa,Assassination,76,114.0,212.0
+2008,Middle East & North Africa,Bombing/Explosion,1132,2757.0,7639.0
+2008,Middle East & North Africa,Facility/Infrastructure Attack,13,0.0,1.0
+2008,Middle East & North Africa,Hijacking,1,0.0,0.0
+2008,Middle East & North Africa,Hostage Taking (Kidnapping),56,47.0,1.0
+2008,Middle East & North Africa,Unarmed Assault,3,4.0,45.0
+2008,Middle East & North Africa,Unknown,11,28.0,7.0
+2008,North America,Armed Assault,4,3.0,16.0
+2008,North America,Bombing/Explosion,9,11.0,104.0
+2008,North America,Facility/Infrastructure Attack,12,0.0,4.0
+2008,North America,Hostage Taking (Kidnapping),2,7.0,0.0
+2008,North America,Unarmed Assault,3,0.0,2.0
+2008,North America,Unknown,1,2.0,0.0
+2008,South America,Armed Assault,15,41.0,29.0
+2008,South America,Assassination,12,12.0,11.0
+2008,South America,Bombing/Explosion,89,44.0,208.0
+2008,South America,Facility/Infrastructure Attack,11,0.0,1.0
+2008,South America,Hijacking,1,0.0,0.0
+2008,South America,Hostage Taking (Kidnapping),11,0.0,1.0
+2008,South America,Unknown,5,12.0,3.0
+2008,South Asia,Armed Assault,431,920.0,530.0
+2008,South Asia,Assassination,74,180.0,305.0
+2008,South Asia,Bombing/Explosion,877,1991.0,5258.0
+2008,South Asia,Facility/Infrastructure Attack,94,12.0,50.0
+2008,South Asia,Hijacking,8,22.0,4.0
+2008,South Asia,Hostage Taking (Barricade Incident),5,109.0,98.0
+2008,South Asia,Hostage Taking (Kidnapping),210,134.0,45.0
+2008,South Asia,Unarmed Assault,11,9.0,38.0
+2008,South Asia,Unknown,49,140.0,99.0
+2008,Southeast Asia,Armed Assault,175,272.0,98.0
+2008,Southeast Asia,Assassination,20,19.0,7.0
+2008,Southeast Asia,Bombing/Explosion,214,69.0,905.0
+2008,Southeast Asia,Facility/Infrastructure Attack,51,3.0,26.0
+2008,Southeast Asia,Hostage Taking (Kidnapping),33,13.0,2.0
+2008,Southeast Asia,Unarmed Assault,2,0.0,2.0
+2008,Southeast Asia,Unknown,19,27.0,20.0
+2008,Sub-Saharan Africa,Armed Assault,140,1049.0,1216.0
+2008,Sub-Saharan Africa,Assassination,20,32.0,26.0
+2008,Sub-Saharan Africa,Bombing/Explosion,116,327.0,613.0
+2008,Sub-Saharan Africa,Facility/Infrastructure Attack,8,12.0,2.0
+2008,Sub-Saharan Africa,Hijacking,5,0.0,0.0
+2008,Sub-Saharan Africa,Hostage Taking (Kidnapping),70,34.0,28.0
+2008,Sub-Saharan Africa,Unarmed Assault,1,0.0,1.0
+2008,Sub-Saharan Africa,Unknown,20,21.0,19.0
+2008,Western Europe,Armed Assault,6,1.0,4.0
+2008,Western Europe,Bombing/Explosion,71,2.0,66.0
+2008,Western Europe,Facility/Infrastructure Attack,79,0.0,4.0
+2008,Western Europe,Hostage Taking (Kidnapping),2,0.0,0.0
+2008,Western Europe,Unarmed Assault,5,0.0,2.0
+2009,Australasia & Oceania,Bombing/Explosion,1,0.0,0.0
+2009,Central America & Caribbean,Armed Assault,1,1.0,0.0
+2009,Central America & Caribbean,Assassination,2,2.0,0.0
+2009,Central America & Caribbean,Bombing/Explosion,6,0.0,1.0
+2009,Central Asia,Armed Assault,3,0.0,1.0
+2009,Central Asia,Assassination,2,2.0,0.0
+2009,Central Asia,Bombing/Explosion,24,8.0,29.0
+2009,Central Asia,Facility/Infrastructure Attack,1,0.0,0.0
+2009,Central Asia,Hostage Taking (Kidnapping),1,0.0,0.0
+2009,East Asia,Armed Assault,3,185.0,0.0
+2009,East Asia,Bombing/Explosion,2,1.0,2.0
+2009,East Asia,Facility/Infrastructure Attack,1,0.0,0.0
+2009,East Asia,Unarmed Assault,2,0.0,54.0
+2009,Eastern Europe,Armed Assault,49,44.0,22.0
+2009,Eastern Europe,Assassination,17,14.0,21.0
+2009,Eastern Europe,Bombing/Explosion,89,75.0,227.0
+2009,Eastern Europe,Facility/Infrastructure Attack,2,2.0,0.0
+2009,Eastern Europe,Hostage Taking (Kidnapping),7,8.0,4.0
+2009,Eastern Europe,Unarmed Assault,1,0.0,1.0
+2009,Middle East & North Africa,Armed Assault,167,246.0,161.0
+2009,Middle East & North Africa,Assassination,75,160.0,412.0
+2009,Middle East & North Africa,Bombing/Explosion,1066,2523.0,9264.0
+2009,Middle East & North Africa,Facility/Infrastructure Attack,13,6.0,1.0
+2009,Middle East & North Africa,Hostage Taking (Kidnapping),25,25.0,0.0
+2009,Middle East & North Africa,Unarmed Assault,2,1.0,17.0
+2009,Middle East & North Africa,Unknown,13,21.0,7.0
+2009,North America,Armed Assault,7,18.0,39.0
+2009,North America,Assassination,1,2.0,3.0
+2009,North America,Bombing/Explosion,5,0.0,2.0
+2009,North America,Facility/Infrastructure Attack,3,0.0,0.0
+2009,South America,Armed Assault,31,63.0,36.0
+2009,South America,Assassination,9,8.0,2.0
+2009,South America,Bombing/Explosion,85,33.0,199.0
+2009,South America,Facility/Infrastructure Attack,21,1.0,3.0
+2009,South America,Hijacking,4,0.0,0.0
+2009,South America,Hostage Taking (Barricade Incident),1,0.0,0.0
+2009,South America,Hostage Taking (Kidnapping),8,31.0,4.0
+2009,South Asia,Armed Assault,468,962.0,674.0
+2009,South Asia,Assassination,80,155.0,165.0
+2009,South Asia,Bombing/Explosion,995,2146.0,5458.0
+2009,South Asia,Facility/Infrastructure Attack,131,21.0,25.0
+2009,South Asia,Hijacking,11,2.0,1.0
+2009,South Asia,Hostage Taking (Barricade Incident),2,0.0,0.0
+2009,South Asia,Hostage Taking (Kidnapping),166,139.0,64.0
+2009,South Asia,Unarmed Assault,12,7.0,218.0
+2009,South Asia,Unknown,80,133.0,124.0
+2009,Southeast Asia,Armed Assault,283,335.0,192.0
+2009,Southeast Asia,Assassination,27,31.0,18.0
+2009,Southeast Asia,Bombing/Explosion,174,69.0,673.0
+2009,Southeast Asia,Facility/Infrastructure Attack,48,0.0,2.0
+2009,Southeast Asia,Hijacking,2,0.0,0.0
+2009,Southeast Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+2009,Southeast Asia,Hostage Taking (Kidnapping),16,4.0,0.0
+2009,Southeast Asia,Unknown,10,43.0,7.0
+2009,Sub-Saharan Africa,Armed Assault,86,402.0,216.0
+2009,Sub-Saharan Africa,Assassination,13,33.0,18.0
+2009,Sub-Saharan Africa,Bombing/Explosion,70,211.0,385.0
+2009,Sub-Saharan Africa,Facility/Infrastructure Attack,22,418.0,8.0
+2009,Sub-Saharan Africa,Hijacking,1,0.0,1.0
+2009,Sub-Saharan Africa,Hostage Taking (Kidnapping),56,157.0,259.0
+2009,Sub-Saharan Africa,Unarmed Assault,2,1.0,1.0
+2009,Sub-Saharan Africa,Unknown,33,509.0,13.0
+2009,Western Europe,Armed Assault,17,5.0,34.0
+2009,Western Europe,Assassination,2,8.0,12.0
+2009,Western Europe,Bombing/Explosion,51,2.0,52.0
+2009,Western Europe,Facility/Infrastructure Attack,106,0.0,4.0
+2009,Western Europe,Hijacking,5,0.0,1.0
+2009,Western Europe,Unknown,1,0.0,1.0
+2010,Australasia & Oceania,Armed Assault,1,0.0,0.0
+2010,Central America & Caribbean,Facility/Infrastructure Attack,1,0.0,0.0
+2010,Central Asia,Armed Assault,2,1.0,3.0
+2010,Central Asia,Assassination,1,0.0,1.0
+2010,Central Asia,Bombing/Explosion,5,7.0,38.0
+2010,Central Asia,Hostage Taking (Kidnapping),1,0.0,1.0
+2010,East Asia,Bombing/Explosion,1,7.0,14.0
+2010,Eastern Europe,Armed Assault,63,65.0,42.0
+2010,Eastern Europe,Assassination,31,33.0,16.0
+2010,Eastern Europe,Bombing/Explosion,152,123.0,564.0
+2010,Eastern Europe,Facility/Infrastructure Attack,11,0.0,0.0
+2010,Eastern Europe,Hijacking,1,0.0,0.0
+2010,Eastern Europe,Hostage Taking (Barricade Incident),1,6.0,17.0
+2010,Eastern Europe,Hostage Taking (Kidnapping),2,8.0,0.0
+2010,Middle East & North Africa,Armed Assault,222,421.0,249.0
+2010,Middle East & North Africa,Assassination,165,173.0,329.0
+2010,Middle East & North Africa,Bombing/Explosion,1003,1939.0,7152.0
+2010,Middle East & North Africa,Facility/Infrastructure Attack,16,3.0,44.0
+2010,Middle East & North Africa,Hostage Taking (Barricade Incident),1,58.0,75.0
+2010,Middle East & North Africa,Hostage Taking (Kidnapping),35,13.0,0.0
+2010,Middle East & North Africa,Unarmed Assault,2,1.0,0.0
+2010,Middle East & North Africa,Unknown,19,55.0,22.0
+2010,North America,Armed Assault,1,1.0,2.0
+2010,North America,Bombing/Explosion,9,0.0,0.0
+2010,North America,Facility/Infrastructure Attack,11,2.0,15.0
+2010,North America,Hostage Taking (Barricade Incident),1,1.0,0.0
+2010,North America,Hostage Taking (Kidnapping),1,0.0,0.0
+2010,North America,Unarmed Assault,1,0.0,0.0
+2010,South America,Armed Assault,20,32.0,34.0
+2010,South America,Assassination,5,1.0,2.0
+2010,South America,Bombing/Explosion,93,24.0,110.0
+2010,South America,Facility/Infrastructure Attack,14,0.0,1.0
+2010,South America,Hijacking,1,0.0,0.0
+2010,South America,Hostage Taking (Kidnapping),13,1.0,0.0
+2010,South America,Unknown,2,0.0,2.0
+2010,South Asia,Armed Assault,493,971.0,442.0
+2010,South Asia,Assassination,118,224.0,315.0
+2010,South Asia,Bombing/Explosion,891,1935.0,4117.0
+2010,South Asia,Facility/Infrastructure Attack,135,27.0,33.0
+2010,South Asia,Hijacking,3,0.0,0.0
+2010,South Asia,Hostage Taking (Barricade Incident),4,84.0,92.0
+2010,South Asia,Hostage Taking (Kidnapping),269,229.0,30.0
+2010,South Asia,Unarmed Assault,13,5.0,178.0
+2010,South Asia,Unknown,55,220.0,189.0
+2010,Southeast Asia,Armed Assault,204,253.0,178.0
+2010,Southeast Asia,Assassination,14,9.0,18.0
+2010,Southeast Asia,Bombing/Explosion,159,48.0,436.0
+2010,Southeast Asia,Facility/Infrastructure Attack,77,2.0,0.0
+2010,Southeast Asia,Hijacking,1,1.0,0.0
+2010,Southeast Asia,Hostage Taking (Barricade Incident),1,0.0,0.0
+2010,Southeast Asia,Hostage Taking (Kidnapping),13,8.0,0.0
+2010,Southeast Asia,Unknown,4,1.0,2.0
+2010,Sub-Saharan Africa,Armed Assault,93,334.0,212.0
+2010,Sub-Saharan Africa,Assassination,22,44.0,46.0
+2010,Sub-Saharan Africa,Bombing/Explosion,107,306.0,771.0
+2010,Sub-Saharan Africa,Facility/Infrastructure Attack,7,0.0,0.0
+2010,Sub-Saharan Africa,Hijacking,5,0.0,6.0
+2010,Sub-Saharan Africa,Hostage Taking (Kidnapping),57,15.0,38.0
+2010,Sub-Saharan Africa,Unarmed Assault,4,1.0,7.0
+2010,Sub-Saharan Africa,Unknown,36,130.0,62.0
+2010,Western Europe,Armed Assault,15,2.0,9.0
+2010,Western Europe,Assassination,4,0.0,1.0
+2010,Western Europe,Bombing/Explosion,90,3.0,24.0
+2010,Western Europe,Facility/Infrastructure Attack,21,0.0,1.0
+2010,Western Europe,Hijacking,2,0.0,0.0
+2010,Western Europe,Unarmed Assault,1,0.0,7.0
+2011,Central America & Caribbean,Armed Assault,1,2.0,0.0
+2011,Central Asia,Armed Assault,1,2.0,0.0
+2011,Central Asia,Bombing/Explosion,8,11.0,3.0
+2011,East Asia,Armed Assault,2,19.0,32.0
+2011,East Asia,Bombing/Explosion,2,0.0,0.0
+2011,Eastern Europe,Armed Assault,61,55.0,31.0
+2011,Eastern Europe,Assassination,21,32.0,12.0
+2011,Eastern Europe,Bombing/Explosion,110,87.0,551.0
+2011,Eastern Europe,Facility/Infrastructure Attack,2,0.0,0.0
+2011,Eastern Europe,Hostage Taking (Kidnapping),3,0.0,0.0
+2011,Eastern Europe,Unknown,1,0.0,1.0
+2011,Middle East & North Africa,Armed Assault,388,648.0,336.0
+2011,Middle East & North Africa,Assassination,175,142.0,375.0
+2011,Middle East & North Africa,Bombing/Explosion,986,1713.0,5240.0
+2011,Middle East & North Africa,Facility/Infrastructure Attack,33,14.0,22.0
+2011,Middle East & North Africa,Hijacking,1,1.0,0.0
+2011,Middle East & North Africa,Hostage Taking (Barricade Incident),1,0.0,0.0
+2011,Middle East & North Africa,Hostage Taking (Kidnapping),56,35.0,3.0
+2011,Middle East & North Africa,Unarmed Assault,3,1.0,5.0
+2011,Middle East & North Africa,Unknown,20,97.0,108.0
+2011,North America,Armed Assault,3,0.0,2.0
+2011,North America,Bombing/Explosion,5,0.0,1.0
+2011,North America,Facility/Infrastructure Attack,3,0.0,0.0
+2011,North America,Hostage Taking (Kidnapping),1,0.0,0.0
+2011,South America,Armed Assault,13,14.0,7.0
+2011,South America,Assassination,3,2.0,4.0
+2011,South America,Bombing/Explosion,66,15.0,76.0
+2011,South America,Facility/Infrastructure Attack,13,0.0,0.0
+2011,South America,Hijacking,1,0.0,0.0
+2011,South America,Hostage Taking (Kidnapping),8,9.0,0.0
+2011,South America,Unknown,2,3.0,3.0
+2011,South Asia,Armed Assault,590,999.0,731.0
+2011,South Asia,Assassination,109,248.0,300.0
+2011,South Asia,Bombing/Explosion,1028,2108.0,4184.0
+2011,South Asia,Facility/Infrastructure Attack,122,18.0,30.0
+2011,South Asia,Hijacking,2,1.0,2.0
+2011,South Asia,Hostage Taking (Barricade Incident),1,7.0,5.0
+2011,South Asia,Hostage Taking (Kidnapping),212,186.0,21.0
+2011,South Asia,Unarmed Assault,12,2.0,22.0
+2011,South Asia,Unknown,62,156.0,113.0
+2011,Southeast Asia,Armed Assault,141,186.0,154.0
+2011,Southeast Asia,Assassination,14,25.0,24.0
+2011,Southeast Asia,Bombing/Explosion,147,73.0,529.0
+2011,Southeast Asia,Facility/Infrastructure Attack,31,3.0,3.0
+2011,Southeast Asia,Hijacking,1,0.0,0.0
+2011,Southeast Asia,Hostage Taking (Kidnapping),13,3.0,4.0
+2011,Southeast Asia,Unarmed Assault,1,2.0,0.0
+2011,Southeast Asia,Unknown,8,7.0,16.0
+2011,Sub-Saharan Africa,Armed Assault,183,489.0,231.0
+2011,Sub-Saharan Africa,Assassination,20,32.0,14.0
+2011,Sub-Saharan Africa,Bombing/Explosion,178,585.0,1185.0
+2011,Sub-Saharan Africa,Facility/Infrastructure Attack,18,11.0,7.0
+2011,Sub-Saharan Africa,Hijacking,2,0.0,0.0
+2011,Sub-Saharan Africa,Hostage Taking (Kidnapping),70,43.0,12.0
+2011,Sub-Saharan Africa,Unarmed Assault,3,1.0,56.0
+2011,Sub-Saharan Africa,Unknown,20,76.0,108.0
+2011,Western Europe,Armed Assault,12,74.0,68.0
+2011,Western Europe,Bombing/Explosion,60,9.0,24.0
+2011,Western Europe,Facility/Infrastructure Attack,20,0.0,3.0
+2011,Western Europe,Hijacking,2,0.0,0.0
+2011,Western Europe,Unarmed Assault,1,0.0,1.0
+2012,Central America & Caribbean,Assassination,1,2.0,1.0
+2012,Central Asia,Armed Assault,3,2.0,6.0
+2012,Central Asia,Assassination,5,4.0,3.0
+2012,Central Asia,Bombing/Explosion,3,0.0,2.0
+2012,Central Asia,Facility/Infrastructure Attack,1,0.0,0.0
+2012,East Asia,Armed Assault,1,22.0,14.0
+2012,East Asia,Bombing/Explosion,1,4.0,14.0
+2012,East Asia,Hijacking,1,0.0,10.0
+2012,East Asia,Unarmed Assault,1,1.0,0.0
+2012,Eastern Europe,Armed Assault,50,73.0,44.0
+2012,Eastern Europe,Assassination,14,8.0,7.0
+2012,Eastern Europe,Bombing/Explosion,104,97.0,276.0
+2012,Eastern Europe,Hostage Taking (Kidnapping),2,1.0,1.0
+2012,Eastern Europe,Unarmed Assault,2,0.0,4.0
+2012,Eastern Europe,Unknown,1,0.0,0.0
+2012,Middle East & North Africa,Armed Assault,494,1094.0,754.0
+2012,Middle East & North Africa,Assassination,129,157.0,99.0
+2012,Middle East & North Africa,Bombing/Explosion,1634,3388.0,9842.0
+2012,Middle East & North Africa,Facility/Infrastructure Attack,45,12.0,59.0
+2012,Middle East & North Africa,Hijacking,1,0.0,0.0
+2012,Middle East & North Africa,Hostage Taking (Barricade Incident),3,16.0,43.0
+2012,Middle East & North Africa,Hostage Taking (Kidnapping),77,258.0,7.0
+2012,Middle East & North Africa,Unarmed Assault,2,0.0,4.0
+2012,Middle East & North Africa,Unknown,24,108.0,53.0
+2012,North America,Armed Assault,7,16.0,5.0
+2012,North America,Assassination,1,1.0,0.0
+2012,North America,Bombing/Explosion,8,0.0,7.0
+2012,North America,Facility/Infrastructure Attack,17,0.0,2.0
+2012,North America,Hostage Taking (Kidnapping),4,7.0,0.0
+2012,North America,Unarmed Assault,2,0.0,1.0
+2012,South America,Armed Assault,22,62.0,76.0
+2012,South America,Assassination,3,1.0,2.0
+2012,South America,Bombing/Explosion,88,100.0,379.0
+2012,South America,Facility/Infrastructure Attack,2,0.0,0.0
+2012,South America,Hostage Taking (Kidnapping),12,7.0,0.0
+2012,South America,Unknown,6,10.0,13.0
+2012,South Asia,Armed Assault,885,2313.0,1514.0
+2012,South Asia,Assassination,183,232.0,246.0
+2012,South Asia,Bombing/Explosion,2321,3422.0,6472.0
+2012,South Asia,Facility/Infrastructure Attack,95,9.0,26.0
+2012,South Asia,Hijacking,1,0.0,1.0
+2012,South Asia,Hostage Taking (Barricade Incident),8,43.0,13.0
+2012,South Asia,Hostage Taking (Kidnapping),186,272.0,55.0
+2012,South Asia,Unarmed Assault,19,6.0,1186.0
+2012,South Asia,Unknown,105,289.0,127.0
+2012,Southeast Asia,Armed Assault,191,271.0,250.0
+2012,Southeast Asia,Assassination,37,32.0,10.0
+2012,Southeast Asia,Bombing/Explosion,301,121.0,1253.0
+2012,Southeast Asia,Facility/Infrastructure Attack,34,1.0,1.0
+2012,Southeast Asia,Hijacking,1,0.0,0.0
+2012,Southeast Asia,Hostage Taking (Barricade Incident),1,5.0,3.0
+2012,Southeast Asia,Hostage Taking (Kidnapping),16,7.0,0.0
+2012,Southeast Asia,Unknown,6,16.0,9.0
+2012,Sub-Saharan Africa,Armed Assault,420,1357.0,641.0
+2012,Sub-Saharan Africa,Assassination,86,118.0,43.0
+2012,Sub-Saharan Africa,Bombing/Explosion,468,1052.0,1631.0
+2012,Sub-Saharan Africa,Facility/Infrastructure Attack,90,65.0,12.0
+2012,Sub-Saharan Africa,Hijacking,1,0.0,0.0
+2012,Sub-Saharan Africa,Hostage Taking (Barricade Incident),5,1.0,0.0
+2012,Sub-Saharan Africa,Hostage Taking (Kidnapping),56,99.0,62.0
+2012,Sub-Saharan Africa,Unarmed Assault,2,2.0,1.0
+2012,Sub-Saharan Africa,Unknown,40,302.0,146.0
+2012,Western Europe,Armed Assault,12,10.0,1.0
+2012,Western Europe,Assassination,2,0.0,2.0
+2012,Western Europe,Bombing/Explosion,155,0.0,5.0
+2012,Western Europe,Facility/Infrastructure Attack,21,1.0,1.0
+2012,Western Europe,Hostage Taking (Barricade Incident),1,0.0,1.0
+2012,Western Europe,Unarmed Assault,2,0.0,5.0
+2013,Australasia & Oceania,Facility/Infrastructure Attack,1,0.0,0.0
+2013,Central America & Caribbean,Armed Assault,6,6.0,0.0
+2013,Central America & Caribbean,Assassination,5,3.0,3.0
+2013,Central America & Caribbean,Bombing/Explosion,2,0.0,0.0
+2013,Central America & Caribbean,Facility/Infrastructure Attack,1,0.0,0.0
+2013,Central Asia,Assassination,2,2.0,1.0
+2013,Central Asia,Bombing/Explosion,1,0.0,0.0
+2013,Central Asia,Facility/Infrastructure Attack,3,0.0,0.0
+2013,Central Asia,Unarmed Assault,1,0.0,1.0
+2013,East Asia,Armed Assault,10,59.0,63.0
+2013,East Asia,Bombing/Explosion,4,1.0,8.0
+2013,East Asia,Facility/Infrastructure Attack,1,0.0,0.0
+2013,Eastern Europe,Armed Assault,44,53.0,34.0
+2013,Eastern Europe,Assassination,13,9.0,3.0
+2013,Eastern Europe,Bombing/Explosion,91,86.0,250.0
+2013,Eastern Europe,Facility/Infrastructure Attack,10,0.0,2.0
+2013,Eastern Europe,Hostage Taking (Kidnapping),2,3.0,2.0
+2013,Eastern Europe,Unarmed Assault,4,0.0,4.0
+2013,Eastern Europe,Unknown,1,0.0,1.0
+2013,Middle East & North Africa,Armed Assault,991,2016.0,1572.0
+2013,Middle East & North Africa,Assassination,311,267.0,426.0
+2013,Middle East & North Africa,Bombing/Explosion,2921,7386.0,19297.0
+2013,Middle East & North Africa,Facility/Infrastructure Attack,81,9.0,7.0
+2013,Middle East & North Africa,Hijacking,6,0.0,1.0
+2013,Middle East & North Africa,Hostage Taking (Barricade Incident),12,159.0,52.0
+2013,Middle East & North Africa,Hostage Taking (Kidnapping),183,192.0,22.0
+2013,Middle East & North Africa,Unarmed Assault,5,1.0,7.0
+2013,Middle East & North Africa,Unknown,50,134.0,112.0
+2013,North America,Armed Assault,4,10.0,9.0
+2013,North America,Assassination,2,3.0,0.0
+2013,North America,Bombing/Explosion,9,3.0,264.0
+2013,North America,Facility/Infrastructure Attack,12,52.0,252.0
+2013,North America,Hijacking,1,2.0,16.0
+2013,North America,Hostage Taking (Kidnapping),1,0.0,5.0
+2013,North America,Unarmed Assault,3,0.0,0.0
+2013,South America,Armed Assault,36,59.0,85.0
+2013,South America,Assassination,11,9.0,0.0
+2013,South America,Bombing/Explosion,92,70.0,187.0
+2013,South America,Facility/Infrastructure Attack,14,0.0,1.0
+2013,South America,Hostage Taking (Kidnapping),21,20.0,10.0
+2013,South America,Unknown,8,2.0,9.0
+2013,South Asia,Armed Assault,1061,2382.0,1545.0
+2013,South Asia,Assassination,314,370.0,510.0
+2013,South Asia,Bombing/Explosion,2613,3709.0,8000.0
+2013,South Asia,Facility/Infrastructure Attack,202,41.0,49.0
+2013,South Asia,Hijacking,3,6.0,4.0
+2013,South Asia,Hostage Taking (Barricade Incident),8,23.0,40.0
+2013,South Asia,Hostage Taking (Kidnapping),281,316.0,116.0
+2013,South Asia,Unarmed Assault,18,0.0,621.0
+2013,South Asia,Unknown,112,223.0,213.0
+2013,Southeast Asia,Armed Assault,369,367.0,337.0
+2013,Southeast Asia,Assassination,129,104.0,82.0
+2013,Southeast Asia,Bombing/Explosion,469,208.0,911.0
+2013,Southeast Asia,Facility/Infrastructure Attack,136,10.0,19.0
+2013,Southeast Asia,Hijacking,1,0.0,0.0
+2013,Southeast Asia,Hostage Taking (Barricade Incident),3,0.0,1.0
+2013,Southeast Asia,Hostage Taking (Kidnapping),63,22.0,13.0
+2013,Southeast Asia,Unarmed Assault,2,0.0,2.0
+2013,Southeast Asia,Unknown,16,12.0,27.0
+2013,Sub-Saharan Africa,Armed Assault,411,2379.0,791.0
+2013,Sub-Saharan Africa,Assassination,62,67.0,74.0
+2013,Sub-Saharan Africa,Bombing/Explosion,326,816.0,1051.0
+2013,Sub-Saharan Africa,Facility/Infrastructure Attack,42,27.0,24.0
+2013,Sub-Saharan Africa,Hijacking,4,5.0,0.0
+2013,Sub-Saharan Africa,Hostage Taking (Barricade Incident),2,80.0,201.0
+2013,Sub-Saharan Africa,Hostage Taking (Kidnapping),82,298.0,152.0
+2013,Sub-Saharan Africa,Unarmed Assault,3,1.0,3.0
+2013,Sub-Saharan Africa,Unknown,67,184.0,111.0
+2013,Western Europe,Armed Assault,30,7.0,68.0
+2013,Western Europe,Assassination,4,0.0,0.0
+2013,Western Europe,Bombing/Explosion,157,0.0,10.0
+2013,Western Europe,Facility/Infrastructure Attack,61,0.0,4.0
+2013,Western Europe,Hijacking,2,0.0,0.0
+2013,Western Europe,Hostage Taking (Barricade Incident),1,0.0,2.0
+2013,Western Europe,Hostage Taking (Kidnapping),1,0.0,1.0
+2013,Western Europe,Unarmed Assault,3,0.0,0.0
+2013,Western Europe,Unknown,2,0.0,0.0
+2014,Australasia & Oceania,Armed Assault,2,1.0,3.0
+2014,Australasia & Oceania,Facility/Infrastructure Attack,6,0.0,0.0
+2014,Australasia & Oceania,Hostage Taking (Barricade Incident),1,3.0,4.0
+2014,Central America & Caribbean,Armed Assault,3,5.0,29.0
+2014,Central America & Caribbean,Assassination,1,0.0,1.0
+2014,Central America & Caribbean,Facility/Infrastructure Attack,1,0.0,35.0
+2014,Central Asia,Armed Assault,2,4.0,4.0
+2014,Central Asia,Assassination,1,1.0,1.0
+2014,Central Asia,Bombing/Explosion,3,0.0,0.0
+2014,Central Asia,Facility/Infrastructure Attack,1,0.0,1.0
+2014,Central Asia,Hostage Taking (Kidnapping),1,0.0,1.0
+2014,Central Asia,Unknown,1,0.0,0.0
+2014,East Asia,Armed Assault,14,184.0,229.0
+2014,East Asia,Assassination,1,1.0,0.0
+2014,East Asia,Bombing/Explosion,26,136.0,249.0
+2014,East Asia,Unarmed Assault,1,0.0,0.0
+2014,East Asia,Unknown,1,1.0,0.0
+2014,Eastern Europe,Armed Assault,268,596.0,444.0
+2014,Eastern Europe,Assassination,15,11.0,9.0
+2014,Eastern Europe,Bombing/Explosion,452,742.0,754.0
+2014,Eastern Europe,Facility/Infrastructure Attack,69,4.0,18.0
+2014,Eastern Europe,Hijacking,1,0.0,0.0
+2014,Eastern Europe,Hostage Taking (Barricade Incident),7,1.0,2.0
+2014,Eastern Europe,Hostage Taking (Kidnapping),93,18.0,78.0
+2014,Eastern Europe,Unarmed Assault,8,3.0,3.0
+2014,Eastern Europe,Unknown,49,92.0,21.0
+2014,Middle East & North Africa,Armed Assault,1154,3465.0,1779.0
+2014,Middle East & North Africa,Assassination,390,358.0,359.0
+2014,Middle East & North Africa,Bombing/Explosion,4436,9065.0,19384.0
+2014,Middle East & North Africa,Facility/Infrastructure Attack,168,106.0,16.0
+2014,Middle East & North Africa,Hijacking,21,12.0,9.0
+2014,Middle East & North Africa,Hostage Taking (Barricade Incident),12,119.0,117.0
+2014,Middle East & North Africa,Hostage Taking (Kidnapping),500,5740.0,250.0
+2014,Middle East & North Africa,Unarmed Assault,13,12.0,147.0
+2014,Middle East & North Africa,Unknown,245,1203.0,540.0
+2014,North America,Armed Assault,21,32.0,23.0
+2014,North America,Assassination,1,0.0,2.0
+2014,North America,Bombing/Explosion,5,1.0,1.0
+2014,North America,Facility/Infrastructure Attack,6,0.0,0.0
+2014,North America,Hostage Taking (Kidnapping),3,1.0,0.0
+2014,North America,Unarmed Assault,1,0.0,1.0
+2014,South America,Armed Assault,43,47.0,37.0
+2014,South America,Assassination,10,7.0,2.0
+2014,South America,Bombing/Explosion,150,52.0,279.0
+2014,South America,Facility/Infrastructure Attack,32,0.0,2.0
+2014,South America,Hostage Taking (Barricade Incident),1,1.0,0.0
+2014,South America,Hostage Taking (Kidnapping),30,20.0,10.0
+2014,South America,Unarmed Assault,2,1.0,13.0
+2014,South America,Unknown,15,29.0,12.0
+2014,South Asia,Armed Assault,1227,3081.0,1975.0
+2014,South Asia,Assassination,292,316.0,323.0
+2014,South Asia,Bombing/Explosion,2634,3232.0,6195.0
+2014,South Asia,Facility/Infrastructure Attack,229,69.0,88.0
+2014,South Asia,Hijacking,5,2.0,7.0
+2014,South Asia,Hostage Taking (Barricade Incident),16,191.0,144.0
+2014,South Asia,Hostage Taking (Kidnapping),367,591.0,97.0
+2014,South Asia,Unarmed Assault,17,3.0,52.0
+2014,South Asia,Unknown,211,873.0,580.0
+2014,Southeast Asia,Armed Assault,387,453.0,483.0
+2014,Southeast Asia,Assassination,81,88.0,48.0
+2014,Southeast Asia,Bombing/Explosion,433,128.0,897.0
+2014,Southeast Asia,Facility/Infrastructure Attack,78,2.0,2.0
+2014,Southeast Asia,Hijacking,4,2.0,0.0
+2014,Southeast Asia,Hostage Taking (Barricade Incident),2,0.0,0.0
+2014,Southeast Asia,Hostage Taking (Kidnapping),70,18.0,11.0
+2014,Southeast Asia,Unarmed Assault,1,0.0,0.0
+2014,Southeast Asia,Unknown,26,11.0,10.0
+2014,Sub-Saharan Africa,Armed Assault,934,7944.0,1606.0
+2014,Sub-Saharan Africa,Assassination,128,210.0,116.0
+2014,Sub-Saharan Africa,Bombing/Explosion,553,2244.0,2546.0
+2014,Sub-Saharan Africa,Facility/Infrastructure Attack,107,191.0,37.0
+2014,Sub-Saharan Africa,Hijacking,17,12.0,8.0
+2014,Sub-Saharan Africa,Hostage Taking (Barricade Incident),7,119.0,91.0
+2014,Sub-Saharan Africa,Hostage Taking (Kidnapping),333,1432.0,751.0
+2014,Sub-Saharan Africa,Unarmed Assault,6,15.0,33.0
+2014,Sub-Saharan Africa,Unknown,236,1184.0,128.0
+2014,Western Europe,Armed Assault,16,5.0,10.0
+2014,Western Europe,Bombing/Explosion,107,0.0,2.0
+2014,Western Europe,Facility/Infrastructure Attack,86,0.0,4.0
+2014,Western Europe,Hijacking,1,0.0,0.0
+2014,Western Europe,Unarmed Assault,5,0.0,15.0
+2015,Australasia & Oceania,Armed Assault,1,2.0,0.0
+2015,Australasia & Oceania,Bombing/Explosion,1,0.0,0.0
+2015,Australasia & Oceania,Facility/Infrastructure Attack,12,0.0,0.0
+2015,Central America & Caribbean,Armed Assault,1,0.0,0.0
+2015,Central Asia,Armed Assault,6,13.0,11.0
+2015,Central Asia,Bombing/Explosion,1,0.0,0.0
+2015,Central Asia,Facility/Infrastructure Attack,2,0.0,0.0
+2015,Central Asia,Hostage Taking (Kidnapping),1,0.0,1.0
+2015,East Asia,Armed Assault,7,92.0,32.0
+2015,East Asia,Assassination,2,11.0,5.0
+2015,East Asia,Bombing/Explosion,7,19.0,34.0
+2015,East Asia,Facility/Infrastructure Attack,8,0.0,0.0
+2015,East Asia,Hostage Taking (Kidnapping),1,0.0,0.0
+2015,East Asia,Unarmed Assault,2,1.0,13.0
+2015,East Asia,Unknown,1,0.0,0.0
+2015,Eastern Europe,Armed Assault,157,38.0,216.0
+2015,Eastern Europe,Assassination,12,13.0,2.0
+2015,Eastern Europe,Bombing/Explosion,457,498.0,777.0
+2015,Eastern Europe,Facility/Infrastructure Attack,25,0.0,0.0
+2015,Eastern Europe,Hostage Taking (Barricade Incident),2,0.0,1.0
+2015,Eastern Europe,Hostage Taking (Kidnapping),13,109.0,317.0
+2015,Eastern Europe,Unknown,18,132.0,120.0
+2015,Middle East & North Africa,Armed Assault,845,1588.0,1191.0
+2015,Middle East & North Africa,Assassination,237,346.0,256.0
+2015,Middle East & North Africa,Bombing/Explosion,3912,11156.0,20900.0
+2015,Middle East & North Africa,Facility/Infrastructure Attack,97,6.0,13.0
+2015,Middle East & North Africa,Hijacking,10,2.0,1.0
+2015,Middle East & North Africa,Hostage Taking (Barricade Incident),13,83.0,60.0
+2015,Middle East & North Africa,Hostage Taking (Kidnapping),459,1751.0,141.0
+2015,Middle East & North Africa,Unarmed Assault,40,16.0,86.0
+2015,Middle East & North Africa,Unknown,423,2906.0,1109.0
+2015,North America,Armed Assault,13,28.0,28.0
+2015,North America,Assassination,6,6.0,0.0
+2015,North America,Bombing/Explosion,19,16.0,22.0
+2015,North America,Facility/Infrastructure Attack,18,0.0,0.0
+2015,North America,Hostage Taking (Barricade Incident),2,13.0,16.0
+2015,North America,Hostage Taking (Kidnapping),1,0.0,1.0
+2015,North America,Unarmed Assault,3,0.0,3.0
+2015,South America,Armed Assault,27,36.0,17.0
+2015,South America,Assassination,15,16.0,6.0
+2015,South America,Bombing/Explosion,87,44.0,102.0
+2015,South America,Facility/Infrastructure Attack,18,6.0,0.0
+2015,South America,Hostage Taking (Barricade Incident),2,0.0,0.0
+2015,South America,Hostage Taking (Kidnapping),15,19.0,6.0
+2015,South America,Unknown,12,7.0,14.0
+2015,South Asia,Armed Assault,1112,3765.0,2747.0
+2015,South Asia,Assassination,402,488.0,482.0
+2015,South Asia,Bombing/Explosion,2109,2369.0,5227.0
+2015,South Asia,Facility/Infrastructure Attack,274,51.0,176.0
+2015,South Asia,Hijacking,6,41.0,17.0
+2015,South Asia,Hostage Taking (Barricade Incident),20,167.0,162.0
+2015,South Asia,Hostage Taking (Kidnapping),397,537.0,183.0
+2015,South Asia,Unarmed Assault,29,12.0,609.0
+2015,South Asia,Unknown,236,870.0,630.0
+2015,Southeast Asia,Armed Assault,366,380.0,475.0
+2015,Southeast Asia,Assassination,119,101.0,69.0
+2015,Southeast Asia,Bombing/Explosion,436,118.0,803.0
+2015,Southeast Asia,Facility/Infrastructure Attack,62,1.0,10.0
+2015,Southeast Asia,Hijacking,2,0.0,0.0
+2015,Southeast Asia,Hostage Taking (Barricade Incident),5,4.0,0.0
+2015,Southeast Asia,Hostage Taking (Kidnapping),63,30.0,19.0
+2015,Southeast Asia,Unarmed Assault,1,0.0,1.0
+2015,Southeast Asia,Unknown,18,12.0,9.0
+2015,Sub-Saharan Africa,Armed Assault,766,5726.0,1477.0
+2015,Sub-Saharan Africa,Assassination,130,249.0,108.0
+2015,Sub-Saharan Africa,Bombing/Explosion,527,2834.0,3874.0
+2015,Sub-Saharan Africa,Facility/Infrastructure Attack,54,31.0,6.0
+2015,Sub-Saharan Africa,Hijacking,20,13.0,1.0
+2015,Sub-Saharan Africa,Hostage Taking (Barricade Incident),30,332.0,302.0
+2015,Sub-Saharan Africa,Hostage Taking (Kidnapping),246,742.0,326.0
+2015,Sub-Saharan Africa,Unarmed Assault,11,0.0,42.0
+2015,Sub-Saharan Africa,Unknown,180,836.0,261.0
+2015,Western Europe,Armed Assault,67,49.0,125.0
+2015,Western Europe,Assassination,4,1.0,5.0
+2015,Western Europe,Bombing/Explosion,106,5.0,122.0
+2015,Western Europe,Facility/Infrastructure Attack,135,0.0,25.0
+2015,Western Europe,Hostage Taking (Barricade Incident),8,113.0,237.0
+2015,Western Europe,Hostage Taking (Kidnapping),1,0.0,0.0
+2015,Western Europe,Unarmed Assault,9,3.0,10.0
+2015,Western Europe,Unknown,3,0.0,2.0
+2016,Australasia & Oceania,Armed Assault,2,0.0,1.0
+2016,Australasia & Oceania,Facility/Infrastructure Attack,8,0.0,0.0
+2016,Central America & Caribbean,Armed Assault,2,7.0,0.0
+2016,Central America & Caribbean,Assassination,1,2.0,0.0
+2016,Central Asia,Armed Assault,4,6.0,8.0
+2016,Central Asia,Assassination,2,0.0,5.0
+2016,Central Asia,Bombing/Explosion,7,3.0,5.0
+2016,Central Asia,Hijacking,1,4.0,6.0
+2016,Central Asia,Hostage Taking (Barricade Incident),1,6.0,1.0
+2016,Central Asia,Hostage Taking (Kidnapping),1,1.0,0.0
+2016,Central Asia,Unarmed Assault,1,1.0,0.0
+2016,East Asia,Armed Assault,1,0.0,9.0
+2016,East Asia,Bombing/Explosion,3,5.0,4.0
+2016,East Asia,Facility/Infrastructure Attack,2,0.0,0.0
+2016,East Asia,Hijacking,1,8.0,5.0
+2016,East Asia,Hostage Taking (Barricade Incident),1,19.0,26.0
+2016,Eastern Europe,Armed Assault,33,73.0,47.0
+2016,Eastern Europe,Assassination,12,5.0,4.0
+2016,Eastern Europe,Bombing/Explosion,55,30.0,48.0
+2016,Eastern Europe,Facility/Infrastructure Attack,15,0.0,1.0
+2016,Eastern Europe,Hostage Taking (Barricade Incident),1,0.0,1.0
+2016,Eastern Europe,Hostage Taking (Kidnapping),12,2.0,1.0
+2016,Eastern Europe,Unarmed Assault,4,0.0,4.0
+2016,Eastern Europe,Unknown,2,2.0,1.0
+2016,Middle East & North Africa,Armed Assault,724,1520.0,870.0
+2016,Middle East & North Africa,Assassination,170,224.0,202.0
+2016,Middle East & North Africa,Bombing/Explosion,4270,12049.0,20853.0
+2016,Middle East & North Africa,Facility/Infrastructure Attack,130,1.0,112.0
+2016,Middle East & North Africa,Hijacking,8,1.0,0.0
+2016,Middle East & North Africa,Hostage Taking (Barricade Incident),8,69.0,80.0
+2016,Middle East & North Africa,Hostage Taking (Kidnapping),389,2985.0,700.0
+2016,Middle East & North Africa,Unarmed Assault,14,8.0,24.0
+2016,Middle East & North Africa,Unknown,402,2348.0,592.0
+2016,North America,Armed Assault,20,19.0,58.0
+2016,North America,Assassination,6,3.0,1.0
+2016,North America,Bombing/Explosion,9,1.0,30.0
+2016,North America,Facility/Infrastructure Attack,37,0.0,0.0
+2016,North America,Hostage Taking (Barricade Incident),1,50.0,53.0
+2016,North America,Unarmed Assault,2,0.0,31.0
+2016,South America,Armed Assault,41,41.0,59.0
+2016,South America,Assassination,8,4.0,0.0
+2016,South America,Bombing/Explosion,54,26.0,109.0
+2016,South America,Facility/Infrastructure Attack,23,0.0,0.0
+2016,South America,Hostage Taking (Barricade Incident),1,0.0,0.0
+2016,South America,Hostage Taking (Kidnapping),24,1.0,1.0
+2016,South America,Unknown,8,15.0,10.0
+2016,South Asia,Armed Assault,864,3094.0,2338.0
+2016,South Asia,Assassination,262,295.0,322.0
+2016,South Asia,Bombing/Explosion,1569,2147.0,4752.0
+2016,South Asia,Facility/Infrastructure Attack,191,62.0,11.0
+2016,South Asia,Hijacking,2,0.0,0.0
+2016,South Asia,Hostage Taking (Barricade Incident),25,144.0,267.0
+2016,South Asia,Hostage Taking (Kidnapping),350,597.0,189.0
+2016,South Asia,Unarmed Assault,34,7.0,416.0
+2016,South Asia,Unknown,342,1457.0,982.0
+2016,Southeast Asia,Armed Assault,283,294.0,281.0
+2016,Southeast Asia,Assassination,174,154.0,105.0
+2016,Southeast Asia,Bombing/Explosion,451,153.0,805.0
+2016,Southeast Asia,Facility/Infrastructure Attack,75,0.0,2.0
+2016,Southeast Asia,Hijacking,12,6.0,4.0
+2016,Southeast Asia,Hostage Taking (Barricade Incident),10,0.0,0.0
+2016,Southeast Asia,Hostage Taking (Kidnapping),62,20.0,22.0
+2016,Southeast Asia,Unknown,10,12.0,1.0
+2016,Sub-Saharan Africa,Armed Assault,697,3201.0,1303.0
+2016,Sub-Saharan Africa,Assassination,179,237.0,147.0
+2016,Sub-Saharan Africa,Bombing/Explosion,619,1513.0,2330.0
+2016,Sub-Saharan Africa,Facility/Infrastructure Attack,100,128.0,52.0
+2016,Sub-Saharan Africa,Hijacking,17,7.0,4.0
+2016,Sub-Saharan Africa,Hostage Taking (Barricade Incident),12,90.0,86.0
+2016,Sub-Saharan Africa,Hostage Taking (Kidnapping),290,999.0,594.0
+2016,Sub-Saharan Africa,Unarmed Assault,6,1.0,19.0
+2016,Sub-Saharan Africa,Unknown,157,476.0,107.0
+2016,Western Europe,Armed Assault,62,113.0,524.0
+2016,Western Europe,Assassination,7,5.0,1.0
+2016,Western Europe,Bombing/Explosion,71,103.0,289.0
+2016,Western Europe,Facility/Infrastructure Attack,115,0.0,5.0
+2016,Western Europe,Hijacking,2,1.0,0.0
+2016,Western Europe,Hostage Taking (Barricade Incident),1,3.0,1.0
+2016,Western Europe,Hostage Taking (Kidnapping),4,0.0,3.0
+2016,Western Europe,Unarmed Assault,10,13.0,76.0
+2016,Western Europe,Unknown,1,0.0,1.0
+2017,Australasia & Oceania,Armed Assault,2,1.0,0.0
+2017,Australasia & Oceania,Bombing/Explosion,2,0.0,0.0
+2017,Australasia & Oceania,Facility/Infrastructure Attack,4,0.0,0.0
+2017,Australasia & Oceania,Hostage Taking (Barricade Incident),1,2.0,3.0
+2017,Australasia & Oceania,Hostage Taking (Kidnapping),2,0.0,3.0
+2017,Australasia & Oceania,Unarmed Assault,1,1.0,18.0
+2017,Central America & Caribbean,Armed Assault,1,2.0,0.0
+2017,Central America & Caribbean,Assassination,1,2.0,1.0
+2017,Central America & Caribbean,Facility/Infrastructure Attack,2,0.0,0.0
+2017,Central Asia,Assassination,1,0.0,5.0
+2017,Central Asia,Bombing/Explosion,4,1.0,2.0
+2017,Central Asia,Facility/Infrastructure Attack,1,0.0,0.0
+2017,Central Asia,Unknown,1,5.0,0.0
+2017,East Asia,Armed Assault,2,8.0,6.0
+2017,East Asia,Bombing/Explosion,3,8.0,71.0
+2017,East Asia,Facility/Infrastructure Attack,2,0.0,0.0
+2017,Eastern Europe,Armed Assault,18,57.0,29.0
+2017,Eastern Europe,Assassination,14,8.0,22.0
+2017,Eastern Europe,Bombing/Explosion,43,35.0,122.0
+2017,Eastern Europe,Facility/Infrastructure Attack,23,0.0,0.0
+2017,Eastern Europe,Hostage Taking (Barricade Incident),1,0.0,1.0
+2017,Eastern Europe,Hostage Taking (Kidnapping),4,1.0,1.0
+2017,Eastern Europe,Unarmed Assault,5,0.0,7.0
+2017,Eastern Europe,Unknown,2,0.0,1.0
+2017,Middle East & North Africa,Armed Assault,498,1215.0,693.0
+2017,Middle East & North Africa,Assassination,125,108.0,127.0
+2017,Middle East & North Africa,Bombing/Explosion,2506,6301.0,6944.0
+2017,Middle East & North Africa,Facility/Infrastructure Attack,62,12.0,2.0
+2017,Middle East & North Africa,Hijacking,11,0.0,2.0
+2017,Middle East & North Africa,Hostage Taking (Barricade Incident),13,457.0,76.0
+2017,Middle East & North Africa,Hostage Taking (Kidnapping),226,836.0,119.0
+2017,Middle East & North Africa,Unarmed Assault,12,11.0,28.0
+2017,Middle East & North Africa,Unknown,327,1879.0,401.0
+2017,North America,Armed Assault,38,100.0,903.0
+2017,North America,Assassination,14,13.0,9.0
+2017,North America,Bombing/Explosion,6,0.0,4.0
+2017,North America,Facility/Infrastructure Attack,31,0.0,0.0
+2017,North America,Hostage Taking (Barricade Incident),2,1.0,0.0
+2017,North America,Hostage Taking (Kidnapping),2,1.0,1.0
+2017,North America,Unarmed Assault,4,9.0,46.0
+2017,South America,Armed Assault,37,53.0,24.0
+2017,South America,Assassination,19,15.0,1.0
+2017,South America,Bombing/Explosion,52,16.0,105.0
+2017,South America,Facility/Infrastructure Attack,22,0.0,0.0
+2017,South America,Hijacking,1,0.0,0.0
+2017,South America,Hostage Taking (Barricade Incident),5,0.0,20.0
+2017,South America,Hostage Taking (Kidnapping),32,10.0,2.0
+2017,South America,Unknown,4,7.0,4.0
+2017,South Asia,Armed Assault,793,2593.0,1882.0
+2017,South Asia,Assassination,327,347.0,355.0
+2017,South Asia,Bombing/Explosion,1388,2965.0,5435.0
+2017,South Asia,Facility/Infrastructure Attack,290,56.0,104.0
+2017,South Asia,Hijacking,7,0.0,0.0
+2017,South Asia,Hostage Taking (Barricade Incident),17,15.0,23.0
+2017,South Asia,Hostage Taking (Kidnapping),273,421.0,158.0
+2017,South Asia,Unarmed Assault,44,3.0,148.0
+2017,South Asia,Unknown,291,1264.0,885.0
+2017,Southeast Asia,Armed Assault,286,301.0,353.0
+2017,Southeast Asia,Assassination,125,127.0,56.0
+2017,Southeast Asia,Bombing/Explosion,339,190.0,570.0
+2017,Southeast Asia,Facility/Infrastructure Attack,111,0.0,2.0
+2017,Southeast Asia,Hijacking,16,10.0,1.0
+2017,Southeast Asia,Hostage Taking (Barricade Incident),20,19.0,0.0
+2017,Southeast Asia,Hostage Taking (Kidnapping),72,132.0,16.0
+2017,Southeast Asia,Unarmed Assault,2,0.0,1.0
+2017,Southeast Asia,Unknown,49,32.0,9.0
+2017,Sub-Saharan Africa,Armed Assault,628,2375.0,1068.0
+2017,Sub-Saharan Africa,Assassination,181,204.0,79.0
+2017,Sub-Saharan Africa,Bombing/Explosion,600,2290.0,2410.0
+2017,Sub-Saharan Africa,Facility/Infrastructure Attack,98,98.0,81.0
+2017,Sub-Saharan Africa,Hijacking,20,6.0,3.0
+2017,Sub-Saharan Africa,Hostage Taking (Barricade Incident),21,319.0,131.0
+2017,Sub-Saharan Africa,Hostage Taking (Kidnapping),266,722.0,229.0
+2017,Sub-Saharan Africa,Unarmed Assault,10,33.0,421.0
+2017,Sub-Saharan Africa,Unknown,146,665.0,195.0
+2017,Western Europe,Armed Assault,62,28.0,175.0
+2017,Western Europe,Assassination,9,2.0,9.0
+2017,Western Europe,Bombing/Explosion,81,25.0,152.0
+2017,Western Europe,Facility/Infrastructure Attack,105,0.0,8.0
+2017,Western Europe,Hijacking,3,6.0,17.0
+2017,Western Europe,Hostage Taking (Barricade Incident),2,1.0,0.0
+2017,Western Europe,Hostage Taking (Kidnapping),1,0.0,1.0
+2017,Western Europe,Unarmed Assault,23,21.0,147.0
+2017,Western Europe,Unknown,5,0.0,0.0
