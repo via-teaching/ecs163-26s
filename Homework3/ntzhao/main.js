@@ -11,7 +11,7 @@ const headerHeight = 60;
 
 // Width allocated to legend box
 const legendWidth = 60;
-const scatterLegendWidth = 30;
+const scatterLegendWidth = 32;
 
 // Square size allocated to legend color
 const legendDotSize = useLargeLayout ? windowHeight * 0.02 : 10;
@@ -447,7 +447,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .append("g")
     .attr(
       "transform",
-      `translate(${visSizes.plot2.width + 8}, ${useLargeLayout ? 40 : 0})`,
+      `translate(${visSizes.plot2.width + 4}, ${useLargeLayout ? 40 : 0})`,
     );
 
   // Create legend label
