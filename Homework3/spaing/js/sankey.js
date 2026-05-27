@@ -20,7 +20,7 @@ function drawSankey(data) {
 
     const container = document.getElementById("view3");
     const W = container.clientWidth, H = container.clientHeight;
-    const margin = { top: 68, right: 120, bottom: 30, left: 90 };
+    const margin = { top: 90, right: 120, bottom: 30, left: 90 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
 
@@ -275,6 +275,17 @@ function drawSankey(data) {
         return base + sections;
     }
 
+    function makeNodeTip(node) {
+        const rows = filterByNode(currentData, node);
+        const dot = c => `<span style="display:inline-block;width:10px;height:10px;background:${c};border-radius:2px;margin-right:3px;vertical-align:middle"></span>`;
+        const base = `<strong>${dot(nodeColor(node))}${node.label}</strong><br/>${rows.length.toLocaleString()} people`;
+        const sections = [0, 1, 2, 3]
+            .filter(col => col !== node.col)
+            .map(col => renderBreakdown(breakdownForCol(rows, col)))
+            .join('');
+        return base + sections;
+    }
+
     // --- Hover helpers ---
     function fadeAll() {
         linkPaths.transition().duration(TRANSITION_MS)
@@ -426,7 +437,7 @@ function drawSankey(data) {
                 linkPaths.filter(l => l.source === d || l.target === d)
                     .transition().duration(TRANSITION_MS).attr("stroke-opacity", HOVR_LINK);
             }
-            tipShow(`<strong>${d.label}</strong><br/>${d.value.toLocaleString()} people`, event);
+            tipShow(makeNodeTip(d), event);
         })
         .on("mousemove", tipMove)
         .on("mouseout", () => { if (!subBandsActive) restoreAll(); tipHide(); })
@@ -456,6 +467,10 @@ function drawSankey(data) {
         .attr("text-anchor", "middle").attr("font-size", "11px")
         .attr("fill", "#888").attr("font-style", "italic")
         .text("Scroll to zoom | Drag to pan | Double-click to reset zoom");
+    svg.append("text").attr("x", W / 2).attr("y", 56)
+        .attr("text-anchor", "middle").attr("font-size", "11px")
+        .attr("fill", "#888").attr("font-style", "italic")
+        .text("Click a band or node to reveal conditional sub-bands across all connections");
 
     // --- Update function ---
     return function update(filteredData) {
