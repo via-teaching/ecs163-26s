@@ -37,6 +37,11 @@ var scatterDotGroup   = null;
 var parallelBuildPath = null;
 var scatterX = null, scatterY = null, scatterR = null;
 
+// Shared state for the parallel chart so draw, update, and event handlers
+// all agree on what is selected and what is currently filtered in
+var selectedStudent      = null;
+var currentFilteredSet   = null; // null means no filter (all students visible)
+
 
 const alcoholColor = d3.scaleSequential()
   .domain([1, 5])
@@ -141,14 +146,18 @@ function advanceIntroStep() {
 
   currentStep++;
 
-  // The scatter panel is bottom-left, so on the last step move the card
-  // to the top-left so it doesn't overlap the newly revealed chart
+  // The scatter panel is bottom-left, so on the last step move both the card
+  // AND the explore button to the top-left so nothing overlaps the chart
   var overlay = document.getElementById("intro-overlay");
+  var exploreBtn = document.getElementById("explore-btn");
   if (currentStep >= introSteps.length) {
     overlay.style.alignItems = "flex-start";
     overlay.style.paddingTop = "80px";
     document.getElementById("intro-next-btn").style.display = "none";
-    document.getElementById("explore-btn").style.display    = "block";
+    // Move explore button to top instead of its default bottom:32px
+    exploreBtn.style.bottom = "auto";
+    exploreBtn.style.top    = "220px";
+    exploreBtn.style.display = "block";
   } else {
     overlay.style.alignItems = "flex-end";
     overlay.style.paddingTop = "32px";
@@ -440,42 +449,53 @@ function drawOverview(data) {
       }
 
       var sel = d3.event.selection;
+      var brushCenter = (sel[0] + sel[1]) / 2;
 
-      // Check both Dalc and Walc groups to see which bars are selected.
-      // For each type, collect any level whose bar midpoint falls in the brush range.
-      var selectedByType = {};
+      // Determine which group the center of the brush falls inside.
+      // This is the user's intent — if they drag within Dalc, filter Dalc only.
+      // Using the center prevents accidental bleed into the neighboring group.
+      var activeType = null;
       types.forEach(function(type) {
-        var groupOffset = x0(type);
-        var matchedLevels = [];
-        levels.forEach(function(level) {
-          var barMid = groupOffset + x1(level) + x1.bandwidth() / 2;
-          if (barMid >= sel[0] && barMid <= sel[1]) {
-            matchedLevels.push(level);
-          }
-        });
-        if (matchedLevels.length > 0) {
-          selectedByType[type] = matchedLevels;
+        var groupLeft  = x0(type);
+        var groupRight = groupLeft + x0.bandwidth();
+        if (brushCenter >= groupLeft && brushCenter <= groupRight) {
+          activeType = type;
         }
       });
 
-      // If nothing was hit at all, reset
-      if (Object.keys(selectedByType).length === 0) {
+      // If the center didn't land inside any group (dragged into the gap), reset
+      if (!activeType) {
         updateParallel(globalData);
         updateScatter(globalData);
         return;
       }
 
-      // Filter students who match ALL brushed constraints.
-      // If only one group was brushed, only that field is filtered.
+      // Within the active group, clamp the selection to that group's pixel
+      // bounds before checking bar midpoints. This means even if the user drags
+      // past the group edge, bars in the neighboring group can never be caught.
+      var groupOffset = x0(activeType);
+      var groupLeft   = groupOffset;
+      var groupRight  = groupOffset + x0.bandwidth();
+      var clampedL    = Math.max(sel[0], groupLeft);
+      var clampedR    = Math.min(sel[1], groupRight);
+
+      var matchedLevels = [];
+      levels.forEach(function(level) {
+        var barMid = groupOffset + x1(level) + x1.bandwidth() / 2;
+        if (barMid >= clampedL && barMid <= clampedR) {
+          matchedLevels.push(level);
+        }
+      });
+
+      if (matchedLevels.length === 0) {
+        updateParallel(globalData);
+        updateScatter(globalData);
+        return;
+      }
+
+      // Filter only on the active type's field
       var filtered = globalData.filter(function(d) {
-        var pass = true;
-        if (selectedByType["Dalc"]) {
-          pass = pass && selectedByType["Dalc"].indexOf(d.Dalc) !== -1;
-        }
-        if (selectedByType["Walc"]) {
-          pass = pass && selectedByType["Walc"].indexOf(d.Walc) !== -1;
-        }
-        return pass;
+        return matchedLevels.indexOf(d[activeType]) !== -1;
       });
 
       updateParallel(filtered);
@@ -568,8 +588,8 @@ function drawParallel(data) {
   };
   var buildPath = parallelBuildPath;
 
-  // Track which student is currently selected (null means none)
-  var selectedStudent = null;
+  // Track which student is currently selected (null means none).
+  // Uses module-scope selectedStudent so updateParallel can read it too.
 
   //Draw all student lines at low opacity so patterns emerge from the overlap
   parallelLineGroup = svg.append("g").attr("class", "lines");
@@ -586,8 +606,10 @@ function drawParallel(data) {
     .attr("opacity", 0.35)
     .style("cursor", "pointer")
     .on("mouseover", function(d) {
-      // Only highlight on hover if no student is locked in by a click
+      // Don't hover-highlight if a student is already click-selected
       if (selectedStudent !== null) return;
+      // Don't hover-highlight if this line is filtered out
+      if (currentFilteredSet !== null && !currentFilteredSet.has(d)) return;
       d3.select(this).attr("stroke-width", 2.5).attr("opacity", 1).raise();
       showTooltip(
         "Weekend alcohol: " + d.Walc + "  Workday: " + d.Dalc + "<br/>" +
@@ -601,24 +623,28 @@ function drawParallel(data) {
         .style("left", (d3.event.pageX + 14) + "px")
         .style("top",  (d3.event.pageY - 28) + "px");
     })
-    .on("mouseout", function() {
-      // Only reset on mouseout if this line isn't the selected one
+    .on("mouseout", function(d) {
       if (selectedStudent !== null) return;
-      d3.select(this).attr("stroke-width", 1).attr("opacity", 0.35);
+      // Restore to the correct opacity for this line's current filter state
+      var baseOpacity = (currentFilteredSet === null || currentFilteredSet.has(d)) ? 0.35 : 0.04;
+      d3.select(this).attr("stroke-width", 1).attr("opacity", baseOpacity);
       hideTooltip();
     })
     .on("click", function(d) {
       if (appState !== "explore") return;
+      // Don't allow clicking a filtered-out line
+      if (currentFilteredSet !== null && !currentFilteredSet.has(d)) return;
 
-      // If this line is already selected, deselect everything
+      // Clicking the already-selected line deselects everything
       if (selectedStudent === d) {
         selectedStudent = null;
-        // Restore all lines to normal
+        // Restore all lines to their current filter-aware opacity
         lineGroup.selectAll("path")
           .attr("stroke-width", 1)
-          .attr("opacity", 0.35);
-        // Restore full data in scatter
-        updateScatter(globalData);
+          .attr("opacity", function(d) {
+            return (currentFilteredSet === null || currentFilteredSet.has(d)) ? 0.35 : 0.04;
+          });
+        updateScatter(currentFilteredSet === null ? globalData : Array.from(currentFilteredSet));
         hideTooltip();
         return;
       }
@@ -629,7 +655,7 @@ function drawParallel(data) {
       // Dim all lines, then highlight only this one
       lineGroup.selectAll("path")
         .attr("stroke-width", 1)
-        .attr("opacity", 0.08);
+        .attr("opacity", 0.04);
 
       d3.select(this)
         .attr("stroke-width", 3)
@@ -940,32 +966,22 @@ function drawScatter(data) {
 function updateParallel(data) {
   if (!parallelLineGroup) return;
 
-  // Bind new data to existing paths
-  var lines = parallelLineGroup.selectAll("path")
-    .data(data);
+  // Update the module-scope filter set so event handlers stay in sync.
+  // null means all students are visible (no active brush).
+  currentFilteredSet = (data === globalData) ? null : new Set(data);
 
-  // Fade out and remove paths that are no longer in the filtered set
-  lines.exit()
-    .transition().duration(300)
-    .attr("opacity", 0)
-    .remove();
+  // Clear any active click-selection since the brush resets the chart context
+  selectedStudent = null;
 
-  // Update existing paths to new data (in case same count, different students)
-  lines.transition().duration(400)
-    .attr("d", parallelBuildPath)
-    .attr("stroke", function(d) { return alcoholColor(d.Walc); })
-    .attr("opacity", 0.35);
-
-  // Add any new paths for data points that weren't there before
-  lines.enter()
-    .append("path")
-    .attr("fill", "none")
-    .attr("stroke", function(d) { return alcoholColor(d.Walc); })
-    .attr("stroke-width", 1)
-    .attr("opacity", 0)
-    .attr("d", parallelBuildPath)
+  // Keep all paths in the DOM to preserve event listeners.
+  // Paths in the filtered set get full opacity; others fade to near-invisible.
+  parallelLineGroup.selectAll("path")
     .transition().duration(400)
-    .attr("opacity", 0.35);
+    .attr("stroke-width", 1)
+    .attr("opacity", function(d) {
+      return (currentFilteredSet === null || currentFilteredSet.has(d)) ? 0.35 : 0.04;
+    })
+    .attr("stroke", function(d) { return alcoholColor(d.Walc); });
 }
 
 function updateScatter(data) {
