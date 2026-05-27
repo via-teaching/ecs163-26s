@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Global Terrorism Trends Dashboard">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Terrorism Trends Dashboard</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header class="dashboard-header">
+    <div>
+      <h1>Global Terrorism Trends Dashboard</h1>
+      <p>
+        This dashboard explores global terrorism incidents from 1970–2017 through time,
+        location, and attack patterns.
+      </p>
+    </div>
+  </header>
+
+  <main class="dashboard">
+    <section class="chart-card chart-wide">
+      <h2>Overview: Attacks Over Time</h2>
+      <p class="chart-note">Number of recorded incidents by year.</p>
+      <svg id="line-chart"></svg>
+    </section>
+
+    <section class="chart-card">
+      <h2>Top 10 Countries by Attacks</h2>
+      <p class="chart-note">Countries with the highest number of recorded incidents.</p>
+      <svg id="bar-chart"></svg>
+    </section>
+
+    <section class="chart-card">
+  <h2>Advanced View: Attack Patterns</h2>
+  <p class="chart-note">
+    Alluvial diagram showing how incidents flow from region to attack type to weapon type.
+  </p>
+  <svg id="alluvial-chart"></svg>
+   </section>
+  </main>
+
+  <footer class="dashboard-footer">
+    <p>
+      Data source: Global Terrorism Database. Views use line chart, bar chart, and alluvial diagram.
+    </p>
+  </footer>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
