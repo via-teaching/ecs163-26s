@@ -759,7 +759,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     d3.selectAll(".bar")
       .transition()
       .duration(ANIMATION_LENGTH)
-      .style("opacity", 0.5);
+      .style("opacity", 0.25);
 
     d3.select(".bar-" + getGenreKey(genre))
       .transition()
