@@ -1,6 +1,7 @@
 //main.js
 //ECS 163 Homework 2 - Student Alcohol Consumption Dashboard
 //Dataset: student-por.csv (Portuguese class, 649 students)
+//Used Anthropic Claude Sonnet 4.6 for reformatting and some bug fixes.
 
 //Creat color scheme for entire project
 //Background colors
@@ -452,7 +453,7 @@ function drawOverview(data) {
       var brushCenter = (sel[0] + sel[1]) / 2;
 
       // Determine which group the center of the brush falls inside.
-      // This is the user's intent — if they drag within Dalc, filter Dalc only.
+      // This is the user's intent - if they drag within Dalc, filter Dalc only.
       // Using the center prevents accidental bleed into the neighboring group.
       var activeType = null;
       types.forEach(function(type) {
@@ -502,7 +503,7 @@ function drawOverview(data) {
       updateScatter(filtered);
     });
 
-  // Attach the brush to the SVG — it creates a transparent overlay rect
+  // Attach the brush to the SVG - it creates a transparent overlay rect
   svg.append("g")
     .attr("class", "brush")
     .call(brush);
@@ -785,7 +786,7 @@ function drawScatter(data) {
   scatterR = r;
 
   // Store axis groups as variables so the zoom handler can redraw them in place.
-  // These are the only axis elements — no separate static append before this.
+  // These are the only axis elements - no separate static append before this.
   var xAxisGroup = svg.append("g")
     .attr("transform", "translate(0," + innerH + ")")
     .call(d3.axisBottom(x).ticks(8).tickSize(-innerH))
