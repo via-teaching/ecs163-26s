@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Pokemon Stats Interactive Dashboard</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #eef1f4;
+      color: #222;
+      overflow: hidden;
+    }
+
+    #title {
+      height: 74px;
+      text-align: center;
+      padding-top: 8px;
+      box-sizing: border-box;
+      background: white;
+      border-bottom: 1px solid #d6dce2;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    p {
+      margin: 4px 0 0 0;
+      color: #555;
+      font-size: 13px;
+    }
+
+    #controls {
+      margin-top: 6px;
+    }
+
+    button {
+      border: 1px solid #b6c0cc;
+      background: #f7f9fb;
+      border-radius: 4px;
+      padding: 3px 8px;
+      margin: 0 3px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #e8edf3;
+    }
+
+    svg {
+      width: 100vw;
+      height: calc(100vh - 74px);
+      background: white;
+      display: block;
+    }
+
+    .chart-title {
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .axis-label {
+      font-size: 12px;
+    }
+
+    .small-note {
+      font-size: 11px;
+      fill: #555;
+    }
+
+    .legend-text {
+      font-size: 11px;
+    }
+
+    .bar {
+      cursor: pointer;
+    }
+
+    .pokemon-dot {
+      cursor: pointer;
+    }
+
+    .brush .selection {
+      fill: #5e88b5;
+      fill-opacity: 0.18;
+      stroke: #315f8f;
+    }
+
+    #tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid #c7d0da;
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-size: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+      opacity: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="title">
+    <h1>Pokemon Stats Interactive Dashboard</h1>
+    <p>Click a type in the overview, then brush the scatterplot to drill down into individual Pokemon.</p>
+    <div id="controls">
+      <button id="sort-name">Sort Types A-Z</button>
+      <button id="sort-count">Sort by Count</button>
+      <button id="reset">Reset Selection</button>
+    </div>
+  </div>
+
+  <svg></svg>
+  <div id="tooltip"></div>
+
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
