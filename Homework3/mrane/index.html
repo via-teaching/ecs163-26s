@@ -1,0 +1,126 @@
+<!-- Manushri Rane, ID# 922220803-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Student Mental Health Dashboard</title>
+  <!-- load D3 library before sankey plugin and main.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  <!-- d3-sankey plugin — attaches to the global d3 object - https://github.com/d3/d3-sankey -->
+  <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #fff; color: #111;
+      font-family: Arial, sans-serif; font-size: 12px;
+      height: 100vh; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    .header {
+      padding: 5px 16px 4px;
+      border-bottom: 1px solid #ddd;
+      flex-shrink: 0;
+      text-align: center;
+    }
+    .header h1 { font-size: 14px; font-weight: bold; margin-bottom: 2px; }
+    .header p  { font-size: 10px; color: #555; line-height: 1.4; }
+    .grid {
+      display: grid;
+      grid-template-columns: 55% 45%;
+      grid-template-rows: 1fr 1fr;
+      flex: 1;
+      min-height: 0;
+    }
+    .panel {
+      border-right: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      padding: 8px 12px 6px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .panel-sankey  { grid-column: 1; grid-row: 1 / 3; }
+    .panel-scatter { grid-column: 2; grid-row: 1; }
+    .panel-heatmap { grid-column: 2; grid-row: 2; border-bottom: none; }
+    .panel-title { font-size: 11px; font-weight: bold; margin-bottom: 1px; flex-shrink: 0; text-align: center; }
+    .panel-sub   { font-size: 9px; color: #777; margin-bottom: 4px; flex-shrink: 0; text-align: center; }
+    .chart-area  { flex: 1; min-height: 0; position: relative; }
+    svg { width: 100%; height: 100%; }
+    /* D3 axis styling */
+    .tick text { font-size: 10px; fill: #444; font-family: Arial, sans-serif; }
+    .tick line  { stroke: #ccc; }
+    .domain     { stroke: #999; }
+    /* Filter status label shown below the Sankey */
+    #filter-label {
+      text-align: center;
+      font-size: 10px;
+      color: #888;
+      padding: 2px 0;
+      flex-shrink: 0;
+      min-height: 14px;
+    }
+    #filter-label span { color: #333; font-weight: bold; }
+    /* d3.brushX selection rectangle styling */
+    .brush .selection {
+      fill: #bbb;
+      fill-opacity: 0.25;
+      stroke: #888;
+      stroke-width: 1;
+    }
+
+    #tooltip {
+      position: fixed;
+      background: #fff;
+      border: 1px solid #bbb;
+      padding: 5px 8px;
+      font-size: 11px;
+      pointer-events: none;
+      opacity: 0;
+      line-height: 1.6;
+      z-index: 100;
+      box-shadow: 1px 2px 6px rgba(0,0,0,.1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>University Student Mental Health Dashboard</h1>
+  <p>
+    This dashboard explores student mental health in terms of its correlation to gender, year of study, GPA, and condition type.
+    For an overview of the population and relevant variables, observe the Sankey diagram on the left, checking ribbon size to see how students flow from gender and year variables into condition and treatment status.
+    To explore the relationship between certain variables and conditions better, click-select the relevant bar of the variable on the Sankey diagram (e.g. Year 1, Has Condition, etc.). Then, 
+    examine whether GPA ranges for that variable seem to be correlating condition rates using the bar chart on the top right, which will be automatically updated through an animation according to your selection.
+    Finally, compare how Depression, Anxiety, and Panic Attacks fluctuate for students in every year who identify with that variable using the heatmap which will also update on the bottom right.
+    Hovering over data in each of these graphs will show you the exact number of students that the percentages have been derived from. In addition, if you brush a range of CGPAs of the bar chart, those values
+    will be reflected in the heatmap as well, so you can assess the patterns in condition prevelance and year of study for groups with specific CPAs.
+  </p>
+</div>
+
+<div class="grid">
+  <div class="panel panel-sankey">
+    <div class="panel-title">Context: Student Flows Between Gender, Year, Condition, and Treatment</div>
+    <div class="panel-sub">Click-select any node to filter the diagram and focus diagrams accordingly. Click the node again to clear your selection. </div>
+    <div class="chart-area" id="sankey-area"></div>
+    <div id="filter-label">Showing all 101 students</div>
+  </div>
+
+  <div class="panel panel-scatter">
+    <div class="panel-title">Focus: Condition Rate by CGPA Range</div>
+    <div class="panel-sub">Brush by dragging your mouse across the range of CGPAs you want to analyze, and the distribution of Year and Condition in that range will update on the heatmap.</div>
+    <div class="chart-area" id="scatter-area"></div>
+  </div>
+
+  <div class="panel panel-heatmap">
+    <div class="panel-title">Focus: Condition Prevalence by Year of Study</div>
+    <div class="panel-sub">Observe the makeup of Year and Condition for the variable you select on the context visualization, or for the CGPA range you select on the bar chart. </div>
+    <div class="chart-area" id="heatmap-area"></div>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+
+<!-- loop in main code -->
+<script src="main.js"></script>
+</body>
+</html>
