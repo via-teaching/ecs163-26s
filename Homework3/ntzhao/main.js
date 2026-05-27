@@ -291,7 +291,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr("fill", (d) => color(d.genre))
     .style("opacity", 0.75)
     .on("mouseover", (d) => onGenreMouseEnter(d.genre))
-    .on("mouseleave", (d) => onGenreMouseLeave(d.genre));
+    .on("mouseleave", onGenreMouseLeave);
 
   // SCATTER PLOT
   // Docs: https://d3-graph-gallery.com/scatter.html
@@ -394,6 +394,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .style("opacity", 0.75)
     .style("stroke-width", 2);
 
+  // Add trendlines for every genre
   for (let genre of genres) {
     const filteredByGenre = data.filter((d) => d["Fav genre"] === genre);
     const {
@@ -435,14 +436,14 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
         ),
       )
       .style("stroke", color(genre))
-      // .attr("stroke-dasharray", "4")
       .style("opacity", 0.2)
       .style("stroke-width", 2);
   }
 
   // Scatterplot legend
-  const scatterLegendRowLength = 1;
+  const scatterparallelLegendRowLength = 1;
 
+  // Create legend element
   const scatterLegend = g2
     .append("g")
     .attr(
@@ -460,6 +461,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .style("font-family", "Arial")
     .style("font-size", standardFontSize * 0.833);
 
+  // Create first line of subtext
   const scatterLegendSubtext = scatterLegend
     .append("text")
     .attr("anchor", "middle")
@@ -469,6 +471,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .style("font-family", "Arial")
     .style("font-size", standardFontSize * 0.75);
 
+  // Create second line of subtext
   const scatterLegendSubtext2 = scatterLegend
     .append("text")
     .attr("anchor", "middle")
@@ -478,6 +481,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .style("font-family", "Arial")
     .style("font-size", standardFontSize * 0.75);
 
+  // Create legend item
   const scatterLegendItem = scatterLegend
     .selectAll(".legend-item")
     .data(genres)
@@ -486,11 +490,11 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr(
       "transform",
       (d, i) =>
-        `translate(${Math.floor(i % scatterLegendRowLength) * 80}, ${Math.floor(i / scatterLegendRowLength) * (scatterLegendDotSize + 4) - 8})`,
+        `translate(${Math.floor(i % scatterparallelLegendRowLength) * 80}, ${Math.floor(i / scatterparallelLegendRowLength) * (scatterLegendDotSize + 4) - 8})`,
     )
     .style("cursor", "pointer")
     .on("mouseover", (event, idx) => onGenreMouseEnter(genres[idx]))
-    .on("mouseleave", (event, idx) => onGenreMouseLeave(genres[idx]));
+    .on("mouseleave", onGenreMouseLeave);
 
   // Create colored squares for legend
   scatterLegendItem
@@ -516,8 +520,6 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
 
   // PARALLEL COORDINATES PLOT
   // Docs: https://d3-graph-gallery.com/parallel.html
-
-  console.log(visSizes.plot3);
 
   // Create element for parallel coordinates plot
   const g3 = d3
@@ -600,8 +602,6 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     }
   }
 
-  const size = 20;
-
   // Create lines for the graph
   g3.selectAll("parallelLines")
     .data(data)
@@ -636,9 +636,9 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
   // Add chart legend to illustrate genre colors
   // With added interactivity (hover to highlight certain genre)
   // Docs: https://d3-graph-gallery.com/graph/custom_legend.html
-  const legendRowLength = useLargeLayout ? 1 : genres.length / 4;
+  const parallelLegendRowLength = useLargeLayout ? 1 : genres.length / 4;
 
-  const legend = g3
+  const parallelLegend = g3
     .append("g")
     .attr(
       "transform",
@@ -646,7 +646,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     );
 
   // Create legend label
-  const legendLabel = legend
+  const parallelLegendLabel = parallelLegend
     .append("text")
     .attr("anchor", "middle")
     .attr("x", 0)
@@ -656,7 +656,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .style("font-size", standardFontSize);
 
   // Create legend hint subtext
-  const legendSubtext = legend
+  const parallelLegendSubtext = parallelLegend
     .append("text")
     .attr("anchor", "middle")
     .attr("x", 0)
@@ -665,7 +665,8 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .style("font-family", "Arial")
     .style("font-size", standardFontSize * 0.833);
 
-  const legendItem = legend
+  // Create legend item
+  const parallelLegendItem = parallelLegend
     .selectAll(".legend-item")
     .data(genres)
     .enter()
@@ -673,14 +674,14 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .attr(
       "transform",
       (d, i) =>
-        `translate(${Math.floor(i % legendRowLength) * 100}, ${Math.floor(i / legendRowLength) * (legendDotSize * 1.2) - 20})`,
+        `translate(${Math.floor(i % parallelLegendRowLength) * 100}, ${Math.floor(i / parallelLegendRowLength) * (legendDotSize * 1.2) - 20})`,
     )
     .style("cursor", "pointer")
     .on("mouseover", (event, idx) => onGenreMouseEnter(genres[idx]))
-    .on("mouseleave", (event, idx) => onGenreMouseLeave(genres[idx]));
+    .on("mouseleave", onGenreMouseLeave);
 
   // Create colored squares for legend
-  legendItem
+  parallelLegendItem
     .append("rect")
     .attr(
       "class",
@@ -692,7 +693,7 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     .style("opacity", 0.75);
 
   // Create legend item text labels
-  legendItem
+  parallelLegendItem
     .append("text")
     .attr("x", legendDotSize + 8)
     .attr("y", legendDotSize / 2)
@@ -745,8 +746,15 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
   });
 
   // INTERACTIVITY
+
+  // Standard animation length
   const ANIMATION_LENGTH = 100;
 
+  /**
+   * Callback to activate styling to select a certain bar in the bar chart for highlighting.
+   *
+   * @param {string} genre The genre to select the bar for.
+   */
   function activateBarHover(genre) {
     d3.selectAll(".bar")
       .transition()
@@ -759,6 +767,11 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
       .style("opacity", 1.0);
   }
 
+  /**
+   * Callback to activate styling to select a certain genre of dots/trendline in the scatterplot for highlighting.
+   *
+   * @param {string} genre The genre to select dots for.
+   */
   function activateDotHover(genre) {
     d3.selectAll(".dot")
       .interrupt()
@@ -781,23 +794,11 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
       .style("opacity", 1.0);
   }
 
-  function deactivateDotHover() {
-    d3.selectAll(".dot")
-      .transition()
-      .duration(ANIMATION_LENGTH)
-      .style("opacity", 0.75)
-      .style("fill", (d) => color(d["Fav genre"]));
-
-    d3.selectAll(".temp-trendline").interrupt().style("opacity", 0.1);
-  }
-
-  function deactivateBarHover() {
-    d3.selectAll(".bar")
-      .transition()
-      .duration(ANIMATION_LENGTH)
-      .style("opacity", 0.75);
-  }
-
+  /**
+   * Callback to activate styling to select a certain genre of lines in the parallel coordinates plot.
+   *
+   * @param {string} genre The genre to select lines for.
+   */
   function activateParallelHover(genre) {
     d3.selectAll(".line")
       .transition()
@@ -822,7 +823,10 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
       .style("opacity", 1.0);
   }
 
-  function deactivateParallelHover(genre) {
+  /**
+   * Callback to clear selection highlights applied to the parallel coordinates plot.
+   */
+  function deactivateParallelHover() {
     d3.selectAll(".line")
       .transition()
       .duration(ANIMATION_LENGTH)
@@ -835,18 +839,55 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
       .style("opacity", 0.75);
   }
 
+  /**
+   * Callback to clear selection highlights applied to the scatterplot.
+   */
+  function deactivateDotHover() {
+    d3.selectAll(".dot")
+      .transition()
+      .duration(ANIMATION_LENGTH)
+      .style("opacity", 0.75)
+      .style("fill", (d) => color(d["Fav genre"]));
+
+    d3.selectAll(".temp-trendline").interrupt().style("opacity", 0.1);
+  }
+
+  /**
+   * Callback to clear selection highlight applied to the bar chart.
+   */
+  function deactivateBarHover() {
+    d3.selectAll(".bar")
+      .transition()
+      .duration(ANIMATION_LENGTH)
+      .style("opacity", 0.75);
+  }
+
+  /**
+   * Callback to trigger "select" animations.
+   *
+   * @param {string} genre
+   */
   function onGenreMouseEnter(genre) {
     activateBarHover(genre);
     activateDotHover(genre);
     activateParallelHover(genre);
   }
 
-  function onGenreMouseLeave(genre) {
+  /**
+   * Callback to trigger animations to deactivate select highlights.
+   * Called when mouse leaves a hoverable element that previously called onGenreMouseEnter.
+   */
+  function onGenreMouseLeave() {
     deactivateBarHover();
     deactivateDotHover();
-    deactivateParallelHover(genre);
+    deactivateParallelHover();
   }
 
+  /**
+   * The callback to trigger styling changes for a brush event on the parallel coordinates plot.
+   *
+   * @param {string} dimension y-axis dimension name
+   */
   function onStartBrush(dimension) {
     if (!d3.event.selection) {
       return;
@@ -856,18 +897,20 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
     const min = parallelY[dimension].invert(y1);
     const max = parallelY[dimension].invert(y0);
 
-    g3.selectAll(".line").style("opacity", (d) => {
-      const value = +d[dimension];
-      if (value >= min && value <= max) {
-        return 1;
-      }
-      return 0.05;
-    }).style("stroke", (d) => {
-      const value = +d[dimension];
-      if (value >= min && value <= max) {
-        return color(d["Fav genre"]);
-      }
-      return "lightgray";
-    });
+    g3.selectAll(".line")
+      .style("opacity", (d) => {
+        const value = +d[dimension];
+        if (value >= min && value <= max) {
+          return 1;
+        }
+        return 0.05;
+      })
+      .style("stroke", (d) => {
+        const value = +d[dimension];
+        if (value >= min && value <= max) {
+          return color(d["Fav genre"]);
+        }
+        return "lightgray";
+      });
   }
 });
