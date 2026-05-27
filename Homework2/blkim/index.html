@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Pokemon stats — Homework 2</title>
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+	<div id="dashboard">
+		<header class="dashboard-header">
+			<h1>Pokemon stats</h1>
+			<p class="subtitle">Pokemon csv from Kaggle (alopez247) · <code>data/pokemon_alopez247.csv</code></p>
+		</header>
+
+		<section class="panel panel-overview" aria-labelledby="title-overview">
+			<h2 id="title-overview" class="panel-title">Overview: primary type mix</h2>
+			<p class="panel-desc">Donut shows share of species by primary type (top types + Other).</p>
+			<div class="svg-wrap">
+				<svg id="svg-overview" role="img" aria-label="Donut chart of Pokemon counts by primary type group"></svg>
+			</div>
+		</section>
+
+		<section class="panel panel-scatter" aria-labelledby="title-scatter">
+			<h2 id="title-scatter" class="panel-title">Focus: physical offense vs. defense</h2>
+			<p class="panel-desc">Each point is one Pokemon; color matches the type groups in the overview.</p>
+			<div class="svg-wrap svg-wrap--grow">
+				<svg id="svg-scatter" role="img" aria-label="Scatter plot of Attack versus Defense"></svg>
+			</div>
+		</section>
+
+		<section class="panel panel-parallel" aria-labelledby="title-parallel">
+			<h2 id="title-parallel" class="panel-title">Advanced: parallel coordinates</h2>
+			<p class="panel-desc">Base stats across six axes (each axis scaled to its own min–max).</p>
+			<div class="svg-wrap">
+				<svg id="svg-parallel" role="img" aria-label="Parallel coordinates of base stats"></svg>
+			</div>
+		</section>
+	</div>
+
+	<script src="https://d3js.org/d3.v7.min.js"></script>
+	<script src="main.js"></script>
+</body>
+</html>

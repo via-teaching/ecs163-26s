@@ -1,0 +1,134 @@
+:root {
+	--bg: #0f1419;
+	--panel: #1a2332;
+	--text: #e8eef5;
+	--muted: #8b9cb3;
+	--border: #2a3a52;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+	background: var(--bg);
+	color: var(--text);
+	overflow: hidden;
+}
+
+#dashboard {
+	display: grid;
+	height: 100vh;
+	width: 100vw;
+	grid-template-columns: minmax(220px, 22vw) 1fr minmax(280px, 30vw);
+	grid-template-rows: auto minmax(0, 1fr);
+	grid-template-areas:
+		"header header header"
+		"overview scatter parallel";
+	gap: 10px 12px;
+	padding: 10px 12px 12px;
+}
+
+.dashboard-header {
+	grid-area: header;
+	border-bottom: 1px solid var(--border);
+	padding-bottom: 6px;
+}
+
+.dashboard-header h1 {
+	margin: 0;
+	font-size: clamp(1.1rem, 2vw, 1.45rem);
+	font-weight: 650;
+	letter-spacing: 0.02em;
+}
+
+.subtitle {
+	margin: 4px 0 0;
+	font-size: 0.82rem;
+	color: var(--muted);
+}
+
+.panel {
+	background: var(--panel);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	padding: 8px 10px 10px;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+
+.panel-overview {
+	grid-area: overview;
+}
+
+.panel-scatter {
+	grid-area: scatter;
+}
+
+.panel-parallel {
+	grid-area: parallel;
+}
+
+.panel-title {
+	margin: 0;
+	font-size: 0.95rem;
+	font-weight: 600;
+	color: var(--text);
+}
+
+.panel-desc {
+	margin: 4px 0 6px;
+	font-size: 0.72rem;
+	color: var(--muted);
+	line-height: 1.35;
+}
+
+.svg-wrap {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	align-items: stretch;
+	justify-content: center;
+}
+
+.svg-wrap--grow {
+	flex: 1;
+}
+
+.svg-wrap svg {
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+
+.axis text {
+	fill: var(--muted);
+	font-size: 10px;
+}
+
+.axis path,
+.axis line {
+	stroke: var(--border);
+}
+
+@media (max-width: 900px) {
+	#dashboard {
+		grid-template-columns: 1fr 1fr;
+		grid-template-rows: auto auto minmax(200px, 28vh) minmax(0, 1fr);
+		grid-template-areas:
+			"header header"
+			"overview overview"
+			"scatter scatter"
+			"parallel parallel";
+		overflow-y: auto;
+	}
+
+	body {
+		overflow: auto;
+	}
+}
