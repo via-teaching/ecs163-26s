@@ -862,6 +862,12 @@ d3.csv("data/mxmh_survey_results.csv").then((rawData) => {
         return 1;
       }
       return 0.05;
+    }).style("stroke", (d) => {
+      const value = +d[dimension];
+      if (value >= min && value <= max) {
+        return color(d["Fav genre"]);
+      }
+      return "lightgray";
     });
   }
 });
