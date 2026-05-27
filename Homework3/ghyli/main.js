@@ -1,6 +1,6 @@
 // Name: Yihong Li
 // SID: 922439678
-// AI Use: ChatGPT was used to explain d3 methods usage and defintions and aid in debugging console errors. 
+// AI Use: ChatGPT was used to explain d3 methods usage and definitions and aid in debugging console errors
 
 let abFilter = 25;
 
@@ -9,7 +9,7 @@ const width = window.innerWidth;
 const height = window.innerHeight;
 
 // sidebar unused = 0
-const sidebarWidth = 0
+const sidebarWidth = 0;
 
 // left half: big scatterplot
 let scatterLeft = sidebarWidth, scatterTop = 0;
