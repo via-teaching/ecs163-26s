@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Pokemon dashboard for ECS 163 Homework 2">
+  <title>Pokemon Type and Battle Stat Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="dashboard">
+    <header class="dashboard-header">
+      <div>
+        <h1>Pokemon Type and Battle Stat Dashboard</h1>
+        <p>Exploring type distribution, dual-type relationships, and stat trends across generations</p>
+      </div>
+      <div class="header-stat">
+        <span id="pokemon-count">721</span>
+        <small>Pokemon in dataset</small>
+      </div>
+    </header>
+
+    <section class="panel panel-bar" aria-label="Overview bar chart">
+      <h2>Overview: Number of Pokemon by Primary Type</h2>
+      <svg id="bar-chart" role="img" aria-label="Bar chart showing Pokemon count by primary type"></svg>
+    </section>
+
+    <section class="panel panel-chord" aria-label="Advanced chord diagram">
+      <h2>Advanced View: Primary and Secondary Type Pairings</h2>
+      <svg id="chord-chart" role="img" aria-label="Chord diagram showing relationships between Pokemon primary and secondary types"></svg>
+    </section>
+
+    <section class="panel panel-line" aria-label="Line chart">
+      <h2>Focus View: Average Battle Stats Across Generations</h2>
+      <svg id="line-chart" role="img" aria-label="Line chart showing average Pokemon stats by generation"></svg>
+    </section>
+  </main>
+
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
