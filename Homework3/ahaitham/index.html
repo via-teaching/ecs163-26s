@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pokemon Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Pokemon Stats Dashboard</h1>
+        <p>brush types in the overview to drill down - zoom into the scatter</p>
+    </header>
+
+    <div class="dashboard">
+        <!-- view 1: bar chart (overview) - brush here -->
+        <div class="view" id="view1">
+            <h2>Pokemon Count by Primary Type</h2>
+            <svg id="chart1"></svg>
+        </div>
+
+        <!-- view 2: scatter plot - pan/zoom here -->
+        <div class="view" id="view2">
+            <h2>Attack vs Defense (colored by Type)</h2>
+            <svg id="chart2"></svg>
+        </div>
+
+        <!-- view 3: parallel coordinates (advanced) -->
+        <div class="view" id="view3">
+            <h2>Stat Profiles - Parallel Coordinates</h2>
+            <svg id="chart3"></svg>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
