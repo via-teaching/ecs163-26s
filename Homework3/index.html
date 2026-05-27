@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Homework 3 - Fitness Wearable Dashboard</title>
+  <style>
+    :root {
+      --bg: #f6f1e8;
+      --panel: rgba(255, 252, 246, 0.94);
+      --panel-border: rgba(78, 63, 47, 0.14);
+      --ink: #1f2933;
+      --muted: #5f6c78;
+      --accent: #15616d;
+      --accent-soft: #e7f1f2;
+      --shadow: 0 16px 34px rgba(54, 42, 28, 0.12);
+      --ring: rgba(21, 97, 109, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(231, 176, 126, 0.3), transparent 30%),
+        radial-gradient(circle at top right, rgba(83, 134, 139, 0.18), transparent 28%),
+        linear-gradient(180deg, #fbf7ef 0%, #efe7da 100%);
+    }
+
+    body {
+      padding: 18px;
+    }
+
+    .dashboard {
+      display: grid;
+      gap: 16px;
+    }
+
+    .header {
+      display: grid;
+      gap: 14px;
+      align-items: end;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.9rem, 2.8vw, 2.8rem);
+      letter-spacing: 0.01em;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      max-width: 72ch;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.58);
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar-label,
+    .summary-pill {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      border: 1px solid rgba(53, 78, 100, 0.16);
+      background: #fffdfa;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 9px 14px;
+      font: inherit;
+      cursor: pointer;
+      transition: background 160ms ease, color 160ms ease, transform 160ms ease, border-color 160ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button.active {
+      background: var(--accent);
+      color: #f8fbfc;
+      border-color: var(--accent);
+    }
+
+    button.secondary {
+      background: var(--accent-soft);
+      border-color: transparent;
+    }
+
+    .summary-pill {
+      margin-left: auto;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--panel-border);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.2fr 0.95fr;
+      gap: 16px;
+      min-height: 76vh;
+    }
+
+    .left-column,
+    .right-column {
+      display: grid;
+      gap: 16px;
+      min-height: 0;
+    }
+
+    .right-column {
+      grid-template-rows: 0.98fr 1.02fr;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 18px 20px 10px;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 1.08rem;
+    }
+
+    .card-header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.4;
+      font-size: 0.92rem;
+    }
+
+    .viz {
+      min-height: 0;
+      position: relative;
+      padding: 0 10px 12px;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .axis text,
+    .legend text {
+      fill: var(--muted);
+      font-size: 12px;
+    }
+
+    .axis line,
+    .axis path {
+      stroke: rgba(59, 75, 90, 0.22);
+    }
+
+    .axis-title,
+    .section-tag,
+    .empty-state {
+      fill: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .chart-title {
+      fill: var(--ink);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .selection-note {
+      position: absolute;
+      right: 18px;
+      bottom: 14px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-align: right;
+      max-width: 240px;
+    }
+
+    .tooltip {
+      position: fixed;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 20;
+      max-width: 280px;
+      background: rgba(23, 28, 33, 0.96);
+      color: #f8fafc;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.84rem;
+      line-height: 1.4;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.26);
+      transition: opacity 100ms ease;
+    }
+
+    .brush .selection {
+      fill: rgba(21, 97, 109, 0.12);
+      stroke: var(--accent);
+    }
+
+    .footnote {
+      position: absolute;
+      left: 18px;
+      bottom: 14px;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    @media (max-width: 1180px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .left-column,
+      .right-column {
+        min-height: auto;
+      }
+
+      .card {
+        min-height: 440px;
+      }
+
+      .summary-pill {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <section class="header">
+      <div>
+        <h1>Fitness Wearable Impact Dashboard</h1>
+        <div class="subtitle">
+          The overview plots each respondent by how strongly their wearable supports exercise and broader lifestyle change. Brush or zoom the overview, then compare how the selected group answers detailed impact questions and how their usage flows into motivation and well-being.
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-label">Selection by usage frequency:</div>
+        <div class="button-row" id="frequency-buttons"></div>
+        <button class="secondary" id="clear-brush" type="button">Clear brush</button>
+        <button class="secondary" id="reset-zoom" type="button">Reset zoom</button>
+        <div class="summary-pill" id="selection-summary">Loading survey data...</div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="left-column">
+        <article class="card">
+          <div class="card-header">
+            <h2>Overview: Respondent Landscape</h2>
+            <p>This context view supports three interactions: frequency selection, rectangular brushing, and pan/zoom for denser clusters.</p>
+          </div>
+          <div class="viz" id="overview">
+            <div class="selection-note">Brush a cluster to define the focus subset. Use the zoom interaction to inspect dense areas without losing the overall layout.</div>
+          </div>
+        </article>
+      </div>
+
+      <div class="right-column">
+        <article class="card">
+          <div class="card-header">
+            <h2>Focus View: Positive Impact by Survey Question</h2>
+            <p>Bars animate and reorder when the selected subset changes, making it easier to track which outcomes rise or fall for the brushed respondents.</p>
+          </div>
+          <div class="viz" id="bars"></div>
+        </article>
+
+        <article class="card">
+          <div class="card-header">
+            <h2>Advanced View: Usage → Motivation → Well-Being</h2>
+            <p>The Sankey diagram summarizes how the active respondents flow from wearable usage frequency into motivation and overall well-being responses.</p>
+          </div>
+          <div class="viz" id="sankey">
+            <div class="footnote">Advanced visualization with coordinated filtering</div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
