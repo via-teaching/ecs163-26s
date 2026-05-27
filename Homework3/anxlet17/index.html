@@ -1,0 +1,132 @@
+
+<!doctype html>
+<html style="width:100%;height:100%;">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="Music & Mental Health Dashboard">
+    <title>Music & Mental Health</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            background: #f7f0f5;
+            color: #3d3048;
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+        }
+
+        #title-bar {
+            width: 100%;
+            padding: 8px 20px;
+            background: #ede0f0;
+            border-bottom: 2px solid #c9a0dc;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        #title-bar h1 {
+            font-size: 18px;
+            color: #3d3048;
+            letter-spacing: 1px;
+        }
+
+        #title-bar p {
+            font-size: 12px;
+            color: #8a7a9b;
+            font-style: italic;
+        }
+
+        #dashboard {
+            display: grid;
+            grid-template-columns: 38% 62%;
+            grid-template-rows: 50% 50%;
+            width: 100%;
+            height: calc(100vh - 44px);
+        }
+
+        .panel {
+            border: 1px solid #ddd0e8;
+            padding: 10px 14px 6px 14px;
+            display: flex;
+            flex-direction: column;
+            background: #fdf6ff;
+        }
+
+        .panel h2 {
+            font-size: 13px;
+            color: #b07cc6;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            flex-shrink: 0;
+        }
+
+        .panel p.subtitle {
+            font-size: 10px;
+            color: #9b8aac;
+            margin-bottom: 4px;
+            flex-shrink: 0;
+        }
+
+        #panel-bar { grid-column: 1; grid-row: 1; }
+        #panel-scatter { grid-column: 1; grid-row: 2; }
+        #panel-parallel { grid-column: 2; grid-row: 1 / 3; }
+
+        .panel svg {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        #tooltip {
+            position: fixed;
+            background: #ede0f0;
+            border: 1px solid #c9a0dc;
+            color: #3d3048;
+            font-size: 11px;
+            padding: 6px 10px;
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="title-bar">
+        <h1>🎵 Music & Mental Health Survey</h1>
+        <p>Exploring how music listening habits relate to anxiety, depression, insomnia, and OCD across 736 respondents</p>
+    </div>
+
+    <div id="dashboard">
+        <div class="panel" id="panel-bar">
+            <h2>Overview — Favorite Genre Distribution</h2>
+            <p class="subtitle">How many respondents prefer each music genre</p>
+            <svg id="svg-bar"></svg>
+        </div>
+
+        <div class="panel" id="panel-scatter">
+            <h2>Focus — Hours Listened vs. Anxiety</h2>
+            <p class="subtitle">Each dot = one person · color = music's reported effect on mental health</p>
+            <svg id="svg-scatter"></svg>
+        </div>
+
+        <div class="panel" id="panel-parallel">
+            <h2>Advanced — Parallel Coordinates: Listening Habits & Mental Health</h2>
+            <p class="subtitle">Each line = one person · trace patterns across age, hours/day, anxiety, depression, insomnia, OCD · color = favorite genre group</p>
+            <svg id="svg-parallel"></svg>
+        </div>
+    </div>
+
+    <div id="tooltip"></div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="main.js"></script>
+
+</body>
+</html>
