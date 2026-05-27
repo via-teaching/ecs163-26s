@@ -626,7 +626,7 @@ function drawParallel(data) {
     .on("mouseout", function(d) {
       if (selectedStudent !== null) return;
       // Restore to the correct opacity for this line's current filter state
-      var baseOpacity = (currentFilteredSet === null || currentFilteredSet.has(d)) ? 0.35 : 0.04;
+      var baseOpacity = (currentFilteredSet === null || currentFilteredSet.has(d)) ? 0.35 : 0;
       d3.select(this).attr("stroke-width", 1).attr("opacity", baseOpacity);
       hideTooltip();
     })
@@ -642,7 +642,7 @@ function drawParallel(data) {
         lineGroup.selectAll("path")
           .attr("stroke-width", 1)
           .attr("opacity", function(d) {
-            return (currentFilteredSet === null || currentFilteredSet.has(d)) ? 0.35 : 0.04;
+            return (currentFilteredSet === null || currentFilteredSet.has(d)) ? 0.35 : 0;
           });
         updateScatter(currentFilteredSet === null ? globalData : Array.from(currentFilteredSet));
         hideTooltip();
@@ -652,10 +652,14 @@ function drawParallel(data) {
       // Lock this student as selected
       selectedStudent = d;
 
-      // Dim all lines, then highlight only this one
+      // Interrupt any in-flight transition before setting opacities,
+      // otherwise a finishing transition can override the click state
+      lineGroup.selectAll("path").interrupt();
+
+      // Hide all lines completely, then bring this one forward
       lineGroup.selectAll("path")
         .attr("stroke-width", 1)
-        .attr("opacity", 0.04);
+        .attr("opacity", 0);
 
       d3.select(this)
         .attr("stroke-width", 3)
@@ -973,13 +977,17 @@ function updateParallel(data) {
   // Clear any active click-selection since the brush resets the chart context
   selectedStudent = null;
 
+  // Interrupt any in-flight transitions before applying new opacities,
+  // so a finishing brush transition can't override a subsequent click state
+  parallelLineGroup.selectAll("path").interrupt();
+
   // Keep all paths in the DOM to preserve event listeners.
   // Paths in the filtered set get full opacity; others fade to near-invisible.
   parallelLineGroup.selectAll("path")
     .transition().duration(400)
     .attr("stroke-width", 1)
     .attr("opacity", function(d) {
-      return (currentFilteredSet === null || currentFilteredSet.has(d)) ? 0.35 : 0.04;
+      return (currentFilteredSet === null || currentFilteredSet.has(d)) ? 0.35 : 0;
     })
     .attr("stroke", function(d) { return alcoholColor(d.Walc); });
 }

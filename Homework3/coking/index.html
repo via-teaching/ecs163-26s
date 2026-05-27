@@ -46,7 +46,7 @@
       display: grid;
       /*make left column smaller than right */
       grid-template-columns: 35fr 65fr;
-      /*set top row and bottom row height*/
+      /*set height for all three rows*/
       grid-template-rows: 30fr 30fr 40fr;
       width: 100vw;
       height: calc(100vh - 48px);
@@ -54,7 +54,7 @@
       background: #2a2d3a;
     }
 
-    /* Chart 0: heatmap, top left */
+    /* Panel 0: heatmap*/
     #panel-heatmap {
       grid-column: 1;
       grid-row: 1;
@@ -128,7 +128,7 @@
       z-index: 100;
     }
 
-    /* Panels start invisible; the sequencer fades them in one at a time */
+    /* Keep panels invisible until their turn*/
     #panel-heatmap,
     #panel-overview,
     #panel-parallel,
@@ -137,7 +137,7 @@
       transition: opacity 0.6s ease;
     }
 
-    /* Class added by JS when a panel is revealed */
+    /* logic to reveal panels */
     .panel-visible {
       opacity: 1 !important;
     }
@@ -147,14 +147,14 @@
       position: fixed;
       inset: 0;
       z-index: 50;
-      pointer-events: none; /* clicks pass through to charts */
+      pointer-events: none;
       display: flex;
       align-items: flex-end;
       justify-content: flex-start;
       padding: 32px;
     }
 
-    /* Annotation card — solid background so it's readable at any position */
+    /* Annotation card */
     #intro-card {
       position: relative;
       z-index: 51;
@@ -187,7 +187,7 @@
       margin-bottom: 16px;
     }
 
-    /* Next / Start Exploring buttons share base style */
+    /* style for next and explore buttons*/
     #intro-next-btn,
     #explore-btn {
       background: none;
@@ -217,7 +217,7 @@
       display: none;
     }
 
-    /* Brush rectangle styling (D3 adds this element) */
+    /* Brush rectangle style */
     .selection {
       fill: rgba(200,191,168,0.08);
       stroke: #c8bfa8;
