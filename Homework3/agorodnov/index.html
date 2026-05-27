@@ -1,0 +1,51 @@
+<!doctype html>
+<html style="width:100%;height:100%;">
+<head>
+	<meta charset="utf-8">
+	<title>Music & Mental Health Dashboard — HW3</title>
+	<style>
+		html, body { width: 100%; height: 100%; margin: 0;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+		body {
+			overflow: hidden;
+			background: linear-gradient(180deg, #3a3e46 0%, #16181c 100%);
+			background-attachment: fixed;
+			color: #e8eaee;
+		}
+		svg { display: block; }
+		.view-title { font-size: 16px; font-weight: 600; fill: #f0f1f3; }
+		.axis-label { font-size: 12px; fill: #c4c7cc; }
+		.axis text { font-size: 11px; fill: #b0b4ba; }
+		.axis path, .axis line { stroke: #5a5f68; }
+		.legend-item { font-size: 11px; fill: #d0d3d8; }
+
+		.hint {
+			font-size: 12px; fill: #b0b4ba;
+		}
+		.hint-strong { font-weight: 600; fill: #f3f4f6; }
+
+		.bar { cursor: pointer; }
+		.bar.dim { opacity: 0.25; }
+		.bar.selected { stroke: #ffffff; stroke-width: 2px; }
+
+		.pc { pointer-events: none; }
+
+		.brush .selection { fill: #7aa6d6; fill-opacity: 0.22; stroke: #9bb9dd; }
+
+		.reset-btn {
+			cursor: pointer;
+		}
+		.reset-btn rect { fill: #3a3e46; stroke: #5a5f68; }
+		.reset-btn:hover rect { fill: #4a4f58; }
+		.reset-btn text { font-size: 12px; fill: #e8eaee; }
+
+		.status { font-size: 12px; fill: #b8bcc2; }
+	</style>
+</head>
+<body>
+	<svg id="dashboard" width="100%"></svg>
+
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<script src="main.js"></script>
+</body>
+</html>

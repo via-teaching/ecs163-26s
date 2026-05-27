@@ -1,0 +1,24 @@
+<!doctype html>
+<html style="width:100%;height:100%;">
+<head>
+	<meta charset="utf-8">
+	<title>Music & Mental Health Dashboard</title>
+	<style>
+		html, body { width: 100%; margin: 0;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+		body { overflow-y: auto; overflow-x: hidden; }
+		svg { display: block; }
+		.view-title { font-size: 16px; font-weight: 600; fill: #222; }
+		.axis-label { font-size: 12px; fill: #444; }
+		.axis text { font-size: 11px; fill: #555; }
+		.axis path, .axis line { stroke: #bbb; }
+		.legend-item { font-size: 11px; fill: #333; }
+	</style>
+</head>
+<body>
+	<svg id="dashboard" width="100%"></svg>
+
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<script src="main.js"></script>
+</body>
+</html>
