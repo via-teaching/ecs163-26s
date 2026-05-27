@@ -1,0 +1,21 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #f4f6f8; color: #17212b; }
+header { background: #151f2b; color: white; padding: 22px 30px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+h1 { margin: 0 0 6px; font-size: 30px; }
+header p { margin: 0; color: #dce5ef; }
+button { border: none; background: #4d8df7; color: white; padding: 12px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+button:hover { background: #2f6fe0; }
+.dashboard { display: grid; grid-template-columns: 1.25fr 1fr; gap: 18px; padding: 18px; }
+.card { background: white; border-radius: 14px; box-shadow: 0 3px 14px rgba(0,0,0,.08); padding: 16px; min-height: 345px; overflow: hidden; }
+.card.wide { grid-row: span 2; min-height: 710px; }
+h2 { margin: 0 0 4px; font-size: 21px; }
+.note { margin: 0 0 10px; color: #526173; font-size: 14px; }
+svg { width: 100%; display: block; }
+#scatter { height: 620px; }
+#bar, #heatmap { height: 265px; }
+.axis text { fill: #46576a; font-size: 12px; }
+.axis path, .axis line { stroke: #cbd5e1; }
+.grid line { stroke: #edf2f7; }
+.legend text { fill: #405064; font-size: 12px; }
+.tooltip { position: absolute; display: none; pointer-events: none; background: rgba(21,31,43,.94); color: white; padding: 9px 11px; border-radius: 8px; font-size: 13px; max-width: 260px; }
+@media (max-width: 1000px) { .dashboard { grid-template-columns: 1fr; } .card.wide { grid-row: auto; } }
