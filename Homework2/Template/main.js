@@ -1,177 +1,215 @@
-let abFilter = 25;
-const width = window.innerWidth;
-const height = window.innerHeight;
+const minAB = 50;
+const salaryScaleFactor = 1e6;
 
-let scatterLeft = 0, scatterTop = 0;
-let scatterMargin = {top: 10, right: 30, bottom: 30, left: 60},
-    scatterWidth = 400 - scatterMargin.left - scatterMargin.right,
-    scatterHeight = 350 - scatterMargin.top - scatterMargin.bottom;
+const focusSvg = d3.select("#focus-svg");
+const overviewSvg = d3.select("#overview-svg");
+const scatterSvg = d3.select("#scatter-svg");
+const focusLegend = d3.select("#focus-legend");
+const overviewLegend = d3.select("#overview-legend");
+const scatterLegend = d3.select("#scatter-legend");
 
-let distrLeft = 400, distrTop = 0;
-let distrMargin = {top: 10, right: 30, bottom: 30, left: 60},
-    distrWidth = 400 - distrMargin.left - distrMargin.right,
-    distrHeight = 350 - distrMargin.top - distrMargin.bottom;
+const colorByLeague = d3.scaleOrdinal().domain(["AL", "NL"]).range(["#377eb8", "#e41a1c"]);
 
-let teamLeft = 0, teamTop = 400;
-let teamMargin = {top: 10, right: 30, bottom: 30, left: 60},
-    teamWidth = width - teamMargin.left - teamMargin.right,
-    teamHeight = height-450 - teamMargin.top - teamMargin.bottom;
+function resizeChart(svg) {
+   const rect = svg.node().parentNode.getBoundingClientRect();
+   svg.attr("width", rect.width).attr("height", rect.height);
+   return { width: rect.width, height: rect.height };
+}
 
-// plots
-d3.csv("players.csv").then(rawData =>{
-    console.log("rawData", rawData);
+function createLegend(container, items) {
+   container.html("");
+   const row = container.append("div");
+   items.forEach(item => {
+     const entry = row.append("div").attr("class", "legend-item");
+     if (item.shape === "square") {
+       entry.append("span").attr("class", "legend-swatch").style("background", item.color);
+     } else if (item.shape === "circle") {
+       entry.append("span").attr("class", "legend-size").style("width", `${item.size}px`).style("height", `${item.size}px`).style("opacity", 0.9);
+     }
+     entry.append("span").text(item.label);
+   });
+}
 
-    rawData.forEach(function(d){
-        d.AB = Number(d.AB);
-        d.H = Number(d.H);
-        d.salary = Number(d.salary);
-        d.SO = Number(d.SO);
-    });
+function formatPct(value) {
+   return d3.format(".2f")(value);
+}
 
+function drawOverview(teamSummary) {
+   const { width, height } = resizeChart(overviewSvg);
+   const margin = { top: 24, right: 8, bottom: 50, left: 60 };
+   const chartWidth = width - margin.left - margin.right;
+   const chartHeight = height - margin.top - margin.bottom;
 
-    const filteredData = rawData.filter(d=>d.AB>abFilter);
-    const processedData = filteredData.map(d=>{
-                          return {
-                              "H_AB":d.H/d.AB,
-                              "SO_AB":d.SO/d.AB,
-                              "teamID":d.teamID,
-                          };
-    });
-    console.log("processedData", processedData);
+   overviewSvg.selectAll("*").remove();
+   const chart = overviewSvg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-    //plot 1: Scatter Plot
-    const svg = d3.select("svg");
+   const x = d3.scaleBand().domain(teamSummary.map(d => d.teamID)).range([0, chartWidth]).padding(0.14);
 
-    const g1 = svg.append("g")
-                .attr("width", scatterWidth + scatterMargin.left + scatterMargin.right)
-                .attr("height", scatterHeight + scatterMargin.top + scatterMargin.bottom)
-                .attr("transform", `translate(${scatterMargin.left}, ${scatterMargin.top})`);
+   const y = d3.scaleLinear().domain([0, d3.max(teamSummary, d => d.avgBattingAvg) * 1.08]).range([chartHeight, 0]).nice();
 
-    // X label
-    g1.append("text")
-    .attr("x", scatterWidth / 2)
-    .attr("y", scatterHeight + 50)
-    .attr("font-size", "20px")
-    .attr("text-anchor", "middle")
-    .text("H/AB");
+   chart.append("g")
+     .attr("transform", `translate(0, ${chartHeight})`).call(d3.axisBottom(x)).selectAll("text")
+     .attr("transform", "rotate(-40)").attr("text-anchor", "end").attr("dx", "-0.05em").attr("dy", "0.15em");
 
+   chart.append("g")
+     .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".2f")));
 
-    // Y label
-    g1.append("text")
-    .attr("x", -(scatterHeight / 2))
-    .attr("y", -40)
-    .attr("font-size", "20px")
-    .attr("text-anchor", "middle")
-    .attr("transform", "rotate(-90)")
-    .text("SO/AB");
+   chart.selectAll("rect.bar")
+     .data(teamSummary).enter().append("rect").attr("class", "bar").attr("x", d => x(d.teamID))
+     .attr("y", d => y(d.avgBattingAvg)).attr("width", x.bandwidth()).attr("height", d => chartHeight - y(d.avgBattingAvg))
+     .attr("fill", d => colorByLeague(d.lgID)).attr("rx", 4).attr("ry", 4)
+     .append("title").text(d => `${d.teamID}: ${formatPct(d.avgBattingAvg)} average across ${d.count} players`);
 
-    // X ticks
-    const x1 = d3.scaleLinear()
-    .domain([0, d3.max(processedData, d => d.H_AB)])
-    .range([0, scatterWidth]);
+   chart.append("text")
+     .attr("x", chartWidth / 2).attr("y", chartHeight + 44).attr("text-anchor", "middle").attr("fill", "#2c3542")
+     .attr("font-size", "13px").text("Team");
 
-    const xAxisCall = d3.axisBottom(x1)
-                        .ticks(7);
-    g1.append("g")
-    .attr("transform", `translate(0, ${scatterHeight})`)
-    .call(xAxisCall)
-    .selectAll("text")
-        .attr("y", "10")
-        .attr("x", "-5")
-        .attr("text-anchor", "end")
-        .attr("transform", "rotate(-40)");
+   chart.append("text")
+     .attr("x", -chartHeight / 2).attr("y", -44).attr("text-anchor", "middle").attr("transform", "rotate(-90)")
+     .attr("fill", "#2c3542").attr("font-size", "13px").text("Average H/AB");
 
-    // Y ticks
-    const y1 = d3.scaleLinear()
-    .domain([0, d3.max(processedData, d => d.SO_AB)])
-    .range([scatterHeight, 0]);
+   createLegend(overviewLegend, [
+     { label: "American League (AL)", color: colorByLeague("AL"), shape: "square" },
+     { label: "National League (NL)", color: colorByLeague("NL"), shape: "square" }
+   ]);
+}
 
-    const yAxisCall = d3.axisLeft(y1)
-                        .ticks(13);
-    g1.append("g").call(yAxisCall);
+function drawScatter(data) {
+   const { width, height } = resizeChart(scatterSvg);
+   const margin = { top: 24, right: 14, bottom: 50, left: 60 };
+   const chartWidth = width - margin.left - margin.right;
+   const chartHeight = height - margin.top - margin.bottom;
 
-    // circles
-    const circles = g1.selectAll("circle").data(processedData);
+   scatterSvg.selectAll("*").remove();
+   const chart = scatterSvg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-    circles.enter().append("circle")
-         .attr("cx", d => x1(d.H_AB))
-         .attr("cy", d => y1(d.SO_AB))
-         .attr("r", 5)
-         .attr("fill", "#69b3a2");
+   const x = d3.scaleLinear()
+     .domain([d3.min(data, d => d.battingAvg) * 0.98, d3.max(data, d => d.battingAvg) * 1.02])
+    .range([0, chartWidth]);
 
-    const g2 = svg.append("g")
-                .attr("width", distrWidth + distrMargin.left + distrMargin.right)
-                .attr("height", distrHeight + distrMargin.top + distrMargin.bottom)
-                .attr("transform", `translate(${distrLeft}, ${distrTop})`);
+   const y = d3.scaleLinear().domain([0, d3.max(data, d => d.strikeRate) * 1.05]).range([chartHeight, 0]);
 
-    //plot 2: Bar Chart for Team Player Count
+   const radius = d3.scaleSqrt().domain(d3.extent(data, d => d.salaryMil)).range([4, 14]);
 
-    const teamCounts = processedData.reduce((s, { teamID }) => (s[teamID] = (s[teamID] || 0) + 1, s), {});
-    const teamData = Object.keys(teamCounts).map((key) => ({ teamID: key, count: teamCounts[key] }));
-    console.log("teamData", teamData);
+   chart.append("g").attr("transform", `translate(0, ${chartHeight})`)
+     .call(d3.axisBottom(x).ticks(6).tickFormat(d3.format(".2f")));
 
+   chart.append("g").call(d3.axisLeft(y).ticks(6).tickFormat(d3.format(".2f")));
 
-    const g3 = svg.append("g")
-                .attr("width", teamWidth + teamMargin.left + teamMargin.right)
-                .attr("height", teamHeight + teamMargin.top + teamMargin.bottom)
-                .attr("transform", `translate(${teamMargin.left}, ${teamTop})`);
+   chart.selectAll("circle")
+     .data(data).enter().append("circle").attr("cx", d => x(d.battingAvg)).attr("cy", d => y(d.strikeRate))
+     .attr("r", d => radius(d.salaryMil)).attr("fill", d => colorByLeague(d.lgID)).attr("fill-opacity", 0.64)
+     .attr("stroke", "#2b2f39").attr("stroke-width", 0.4).append("title")
+     .text(d => `${d.nameFirst} ${d.nameLast} (${d.teamID})\nH/AB: ${formatPct(d.battingAvg)}, SO/AB: ${formatPct(d.strikeRate)}, Salary: $${d.salaryMil.toFixed(2)}M`);
 
-    // X label
-    g3.append("text")
-    .attr("x", teamWidth / 2)
-    .attr("y", teamHeight + 50)
-    .attr("font-size", "20px")
-    .attr("text-anchor", "middle")
-    .text("Team");
+   chart.append("text")
+     .attr("x", chartWidth / 2).attr("y", chartHeight + 44).attr("text-anchor", "middle").attr("fill", "#2c3542")
+     .attr("font-size", "13px").text("H/AB (Batting Average)");
 
+   chart.append("text")
+     .attr("x", -chartHeight / 2).attr("y", -44).attr("text-anchor", "middle").attr("transform", "rotate(-90)")
+     .attr("fill", "#2c3542").attr("font-size", "13px").text("SO/AB (Strikeout Rate)");
 
-    // Y label
-    g3.append("text")
-    .attr("x", -(teamHeight / 2))
-    .attr("y", -40)
-    .attr("font-size", "20px")
-    .attr("text-anchor", "middle")
-    .attr("transform", "rotate(-90)")
-    .text("Number of players");
+   createLegend(scatterLegend, [
+     { label: "American League (AL)", color: colorByLeague("AL"), shape: "square" },
+     { label: "National League (NL)", color: colorByLeague("NL"), shape: "square" },
+     { label: "Higher salary", shape: "circle", size: 14 },
+     { label: "Lower salary", shape: "circle", size: 4 }
+   ]);
+}
 
-    // X ticks
-    const x2 = d3.scaleBand()
-    .domain(teamData.map(d => d.teamID))
-    .range([0, teamWidth])
-    .paddingInner(0.3)
-    .paddingOuter(0.2);
+function drawParallelCoordinates(data) {
+   const { width, height } = resizeChart(focusSvg);
+   const margin = { top: 28, right: 28, bottom: 24, left: 28 };
+   const chartWidth = width - margin.left - margin.right;
+   const chartHeight = height - margin.top - margin.bottom;
 
-    const xAxisCall2 = d3.axisBottom(x2);
-    g3.append("g")
-    .attr("transform", `translate(0, ${teamHeight})`)
-    .call(xAxisCall2)
-    .selectAll("text")
-        .attr("y", "10")
-        .attr("x", "-5")
-        .attr("text-anchor", "end")
-        .attr("transform", "rotate(-40)");
+   focusSvg.selectAll("*").remove();
+   const chart = focusSvg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Y ticks
-    const y2 = d3.scaleLinear()
-    .domain([0, d3.max(teamData, d => d.count)])
-    .range([teamHeight, 0])
-    .nice();
+   const dimensions = [
+     { key: "battingAvg", label: "H/AB" },
+     { key: "strikeRate", label: "SO/AB" },
+     { key: "HR_rate", label: "HR/AB" },
+     { key: "BB_rate", label: "BB/AB" },
+     { key: "salaryMil", label: "Salary ($M)" }
+   ];
 
-    const yAxisCall2 = d3.axisLeft(y2)
-                        .ticks(6);
-    g3.append("g").call(yAxisCall2);
+   const x = d3.scalePoint().domain(dimensions.map(d => d.key)).range([0, chartWidth]).padding(0.5);
 
-    // bars
-    const bars = g3.selectAll("rect").data(teamData);
+   const yScales = {};
+   dimensions.forEach(dimension => {
+     yScales[dimension.key] = d3.scaleLinear().domain(d3.extent(data, record => record[dimension.key]))
+       .range([chartHeight, 0]).nice();
+   });
 
-    bars.enter().append("rect")
-    .attr("y", d => y2(d.count))
-    .attr("x", d => x2(d.teamID))
-    .attr("width", x2.bandwidth())
-    .attr("height", d => teamHeight - y2(d.count))
-    .attr("fill", "steelblue");
+   function lineForPlayer(player) {
+     return d3.line()
+       .x(([key]) => x(key)).y(([key]) => yScales[key](player[key]))(dimensions.map(dim => [dim.key, player[dim.key]]));
+   }
 
+   chart.selectAll("path.player-line")
+     .data(data).enter().append("path").attr("class", "player-line").attr("d", d => lineForPlayer(d))
+     .attr("fill", "none").attr("stroke", d => colorByLeague(d.lgID)).attr("stroke-opacity", 0.16)
+     .attr("stroke-width", 1.2).on("mouseover", function() {
+       d3.select(this).raise().attr("stroke-opacity", 0.9).attr("stroke-width", 2);
+     })
+     .on("mouseout", function() {
+       d3.select(this).attr("stroke-opacity", 0.16).attr("stroke-width", 1.2);
+     });
 
-    }).catch(function(error){
-    console.log(error);
-});
+   chart.selectAll("g.axis")
+     .data(dimensions).enter().append("g").attr("class", "axis").attr("transform", d => `translate(${x(d.key)},0)`)
+     .each(function(dimension) {
+       const axis = d3.axisLeft(yScales[dimension.key]).ticks(5).tickFormat(d3.format(".2f"));
+       d3.select(this).call(axis);
+       d3.select(this).append("text").attr("y", -14).attr("text-anchor", "middle").attr("fill", "#2c3542")
+         .attr("font-size", "12px").text(dimension.label);
+     });
+
+   chart.append("text")
+     .attr("x", chartWidth / 2).attr("y", chartHeight + 42).attr("text-anchor", "middle")
+     .attr("fill", "#2c3542").attr("font-size", "13px").text("Multivariate dimensions for selected players");
+
+   createLegend(focusLegend, [
+     { label: "American League (AL)", color: colorByLeague("AL"), shape: "square" },
+     { label: "National League (NL)", color: colorByLeague("NL"), shape: "square" }
+   ]);
+}
+
+function render() {
+   d3.csv("players.csv").then(rawData => {
+     rawData.forEach(d => {
+       d.AB = +d.AB;
+       d.H = +d.H;
+       d.SO = +d.SO;
+       d.HR = +d.HR;
+       d.BB = +d.BB;
+       d.salary = +d.salary;
+     });
+
+     const players = rawData
+       .filter(d => d.AB >= minAB && d.salary > 0)
+       .map(d => ({
+         ...d,
+         battingAvg: d.H / d.AB,
+         strikeRate: d.SO / d.AB,
+         HR_rate: d.HR / d.AB,
+         BB_rate: d.BB / d.AB,
+         salaryMil: d.salary / salaryScaleFactor
+       }));
+
+     const teamSummary = d3.nest().key(d => d.teamID).entries(players).map(group => ({
+         teamID: group.key, avgBattingAvg: d3.mean(group.values, d => d.battingAvg),
+         count: group.values.length,lgID: group.values[0].lgID
+       }))
+       .sort((a, b) => d3.descending(a.avgBattingAvg, b.avgBattingAvg));
+ 
+     drawOverview(teamSummary);
+     drawScatter(players);
+     drawParallelCoordinates(players);
+   }).catch(error => console.error(error));
+}
+
+render();
+window.addEventListener("resize", render);
