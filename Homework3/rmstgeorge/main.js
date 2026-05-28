@@ -156,7 +156,7 @@ function drawScatter(b, data) {
       .attr("fill", d => dotColor(d))
       .attr("opacity", 0.8)
       .on("click", d => {
-        //selection interaction — click one dot to focus it across all views
+        //selection interaction click one dot to focus it across all views
         brushedNums  = new Set();
         selectedName = (selectedName === d.name) ? null : d.name;
         draw();
@@ -170,7 +170,7 @@ function drawScatter(b, data) {
       .attr("cy", d => y(getStat(d, yStat)))
       .attr("r",  d => d.legendary ? 6 : 3.5);
 
-  //brushing interaction — drag a rectangle to send a subset to other views
+  //brushing interaction drag a rectangle to send a subset to other views
   g.append("g").attr("class","brush")
    .call(d3.brush()
      .extent([[0,0],[iW,iH]])
@@ -205,7 +205,7 @@ function drawParallel(b, data) {
   const iW = b.w - m.left - m.right;
   const iH = b.h - m.top  - m.bottom;
 
-  //one y-scale per stat — domain from full dataset so axes stay stable
+  //one y-scale per stat domain from full dataset so axes stay stable
   const yScales = {};
   stats.forEach(stat => {
     yScales[stat] = d3.scaleLinear()
@@ -337,7 +337,7 @@ function addDropdown(x, y, label, options, current, onChange) {
   });
 }
 
-//color legend below scatter — changes based on colorBy setting
+//color legend below scatter changes based on colorBy setting
 function drawColorLegend(b, data) {
   let entries = [];
   if (colorBy === "Type_1") {
