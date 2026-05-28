@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pokemon Battle Stats Explorer</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+  <header>
+    <h1>Pokemon Battle Stats Explorer</h1>
+
+    <p class="description">
+      This dashboard explores Pokemon battle strength in terms of primary type distribution,
+      dual-type combinations, and multi-stat battle profiles. Users can start from the
+      primary type overview, click a type, and then compare how that type appears in
+      dual-type combinations and battle-stat patterns.
+    </p>
+
+    <div class="controls">
+      <button id="reset-button">Reset Type Selection</button>
+      <span id="selection-label">Current selection: All Types</span>
+    </div>
+  </header>
+
+  <main id="dashboard">
+    <section class="chart-card overview-card">
+      <div class="chart-header">
+        <h2>View 1: Pokemon Count by Primary Type</h2>
+        <p>Overview/context view. Click a type to highlight it across the dashboard.</p>
+      </div>
+      <svg id="bar-chart"></svg>
+    </section>
+
+    <section class="chart-card heatmap-card">
+      <div class="chart-header">
+        <h2>View 2: Dual-Type Combination Heatmap</h2>
+        <p>Focus view. Color shows how many Pokemon share each Type 1 and Type 2 combination.</p>
+      </div>
+      <svg id="heatmap-chart"></svg>
+    </section>
+
+    <section class="chart-card parallel-card">
+      <div class="chart-header">
+        <h2>View 3: Multidimensional Battle Stats</h2>
+        <p>Advanced view. Solid lines represent dual-type Pokemon, while dashed lines represent single-type Pokemon.</p>
+      </div>
+      <svg id="parallel-chart"></svg>
+    </section>
+  </main>
+
+  <div id="tooltip"></div>
+
+  <script src="./main.js"></script>
+</body>
+</html>
