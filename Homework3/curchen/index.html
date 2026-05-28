@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>What Makes a Pokemon Rare?</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>What Makes a Pokemon Rare?</h1>
+    <p class="subtitle">
+      Three lenses on Pokemon rarity: by breeding (who cannot reproduce), by type identity
+      (which combinations are vanishingly rare), and by catchability (the legendaries you can
+      barely catch).
+    </p>
+  </header>
+
+  <main id="dashboard">
+    <section class="view focus" id="view-chord">
+      <h2 class="view-title">Overview. Rarity by Breeding: Who Cannot Reproduce?</h2>
+      <div id="chord-prompt" class="hint">Tip: click two egg groups to list Pokemon shared by both</div>
+      <div id="chord-readout">
+        <ul id="chord-list"></ul>
+      </div>
+      <div class="chart-container"><svg id="chord-svg"></svg></div>
+      <div class="caption">
+        Every Pokemon belongs to an egg group. Arc thickness shows group population; chord
+        thickness shows Pokemon shared by both groups. <strong>Undiscovered</strong>
+        (legendaries, mythicals, babies) sits isolated with no chords. Its members cannot
+        breed at all, which means you can only ever obtain a single copy of each one, making
+        them very rare.
+      </div>
+    </section>
+
+    <section class="view context" id="view-heatmap">
+      <h2 class="view-title">Rarity by Type: Common Typings vs. Rare Combos</h2>
+      <div class="chart-container"><svg id="heatmap-svg"></svg></div>
+      <div class="caption">
+        Cell darkness shows how many Pokemon share that primary and secondary type pairing.
+        Diagonal cells are mono-type Pokemon (only one type, such as Normal mono-type or
+        Water mono-type). Pale blue cells are the rare combinations. Empty cells mean no Pokemon belong to that type pairing at all.
+      </div>
+    </section>
+
+    <section class="view context" id="view-scatter">
+      <h2 class="view-title">The Cost of Rarity: Power vs. Catchability</h2>
+      <div class="gen-controls">
+        <button id="gen-play" type="button">▶ Play</button>
+        <input id="gen-slider" type="range" min="1" max="7" step="1" value="7">
+        <span id="gen-label">All Generations</span>
+      </div>
+      <div id="scatter-readout">
+        <span id="scatter-tip" class="hint">Tip: drag a box across the plot to select Pokemon.</span>
+        <span id="scatter-selection"></span>
+      </div>
+      <div class="chart-container"><svg id="scatter-svg"></svg></div>
+      <div class="caption">
+        Each dot is one Pokemon. The dots in the very top left tend to be Undiscovered
+        (legendaries, mythicals, etc.) and have very high Base Stat Totals. A high BST makes
+        them very strong, so the game balances them out by making them extremely hard to catch.
+      </div>
+    </section>
+  </main>
+
+  <div id="tooltip" class="tooltip" style="opacity:0;"></div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
