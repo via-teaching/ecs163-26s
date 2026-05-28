@@ -1,0 +1,41 @@
+<!doctype html>
+<html style="width:100%;height:100%;">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Pokemon Dashboard">
+	<title>Pokemon Dashboard</title>
+	 <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #111827; color: #e2e8f0; font-family: sans-serif; width: 100%; height: 100%; overflow: hidden; }
+
+    .panel-bg     { fill: #1e2433; }
+    .title        { font-size: 13px; font-weight: 700; fill: #f5a623; }
+    .subtitle     { font-size: 11px; fill: #7b8194; }
+    .axis text    { fill: #9aa0b0; font-size: 10px; }
+    .axis path,
+    .axis line    { stroke: #2e3448; }
+    .axis-label   { font-size: 11px; font-weight: 600; fill: #c8cedd; }
+    .legend-label { font-size: 10px; fill: #9aa0b0; }
+
+    .dot         { cursor: pointer; }
+    .dot.dimmed  { opacity: 0.1; }
+    .dot.focused { stroke: #fff; stroke-width: 1.5; }
+
+    .brush .selection { fill: rgba(245,166,35,0.15); stroke: #f5a623; stroke-width: 1; }
+
+    .pc-line { fill: none; stroke-width: 1.2; }
+
+    .bar { cursor: pointer; }
+  </style>
+</head>
+<body style="width:100%;height:100%;margin: 0;">
+	<svg width="100%" height="100%">
+
+	</svg>
+
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<script src="main.js"></script>
+	
+</body>
+</html>
