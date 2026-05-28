@@ -1,0 +1,47 @@
+<!doctype html>
+<html style="width:100%; height:100%;">
+<head>
+    <meta charset="utf-8">
+    <title>Fitness Dashboard</title>
+    <style>
+        body { 
+            margin: 0; 
+            background: #f4f4f4; 
+            font-family: sans-serif; 
+            height: 100vh;
+            overflow: hidden; /* Prevents scrollbars if charts fit perfectly */
+        }
+        /* Grid setup: 2 columns, top row for Bar/Donut, bottom row for Sankey */
+        .dashboard-container {
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            grid-template-rows: 48vh 48vh; 
+            gap: 15px; 
+            padding: 15px;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        .chart-box {
+            background: white; 
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <div id="view4" class="chart-box"></div>
+        
+        <div id="view5" class="chart-box"></div>
+        
+        <div id="view6" class="chart-box" style="grid-column: span 2;"></div>
+    </div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
