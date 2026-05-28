@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en" style="width:100%;height:100%;">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Interactive Baseball Player Dashboard</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f7fa;
+      color: #2c3e50;
+      height: 100vh;
+    }
+    #dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr 1fr;
+      gap: 14px;
+      height: 100vh;
+      padding: 14px;
+    }
+    .title {
+      grid-column: 1 / -1;
+      padding: 14px 18px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    .title h1 {
+      margin: 0 0 4px 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    .title p {
+      margin: 0;
+      font-size: 0.9rem;
+      opacity: 0.95;
+    }
+    .panel {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .panel h2 {
+      margin: 0 0 4px 0;
+      font-size: 1rem;
+      color: #2c3e50;
+    }
+    .panel-desc {
+      margin: 0 0 10px 0;
+      font-size: 0.82rem;
+      color: #7f8c8d;
+      line-height: 1.3;
+    }
+    .svg-container {
+      flex: 1;
+      position: relative;
+      min-height: 0;
+      border: 1px solid #ecf0f1;
+      border-radius: 6px;
+      background: #fafbfc;
+    }
+    .svg-container svg {
+      width: 100%;
+      height: 100%;
+    }
+    .info-panel {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: #f8f9fa;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      color: #555;
+      border-left: 3px solid #667eea;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+    }
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+    }
+    .brush-enabled {
+      cursor: crosshair;
+    }
+    .brushed-circle {
+      stroke: #e74c3c !important;
+      stroke-width: 2 !important;
+    }
+    text {
+      font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+  <div id="dashboard">
+    <div class="title">
+      <h1>Interactive Baseball Player Performance Dashboard</h1>
+      <p>Brush to select players in context view, detail view animates with performance profiles</p>
+    </div>
+    <div class="panel">
+      <h2>Context: Salary vs Batting Average - Brush to select</h2>
+      <p class="panel-desc">Click and drag to select. Size represents strikeouts. Focus view updates with transitions.</p>
+      <div class="svg-container"><svg id="context-svg"></svg></div>
+      <div class="info-panel" id="context-info">Selected: 0 players</div>
+      <div class="legend" id="context-legend"></div>
+    </div>
+    <div class="panel">
+      <h2>Overview: Team Performance Heat Map</h2>
+      <p class="panel-desc">Average H/AB by team. Darker color = higher batting average.</p>
+      <div class="svg-container"><svg id="overview-svg"></svg></div>
+      <div class="info-panel" id="overview-info">30 teams analyzed</div>
+    </div>
+    <div class="panel" style="grid-column: 1 / -1;">
+      <h2>Focus: Animated Parallel Coordinates -Advanced View</h2>
+      <p class="panel-desc">Multi-dimensional player stats with fade transitions. Lines appear smoothly with player selection above</p>
+      <div class="svg-container" style="height: 280px;"><svg id="focus-svg"></svg></div>
+      <div class="info-panel" id="focus-info">Select players above to see their performance profiles</div>
+    </div>
+  </div>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
