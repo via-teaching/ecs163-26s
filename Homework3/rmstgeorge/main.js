@@ -102,7 +102,7 @@ function panel(b) {
      .attr("x",b.x).attr("y",b.y).attr("width",b.w).attr("height",b.h).attr("rx",6);
 }
 
-// VIEW 1 — SCATTER PLOT (Overview)
+//Scatter plot 
 function drawScatter(b, data) {
   panel(b);
 
@@ -120,22 +120,22 @@ function drawScatter(b, data) {
   svg.append("text").attr("class","subtitle")
      .attr("x", b.x + 14).attr("y", b.y + 38).text("Brush to filter, Dropdowns change axes");
 
-  // x, y, color dropdowns — changing any triggers the viz-change transition
+  //x, y, color dropdowns — changing any triggers the viz-change transition
   addDropdown(b.x + 14,  b.y + 52, "X:",     ["HP","Attack","Defense","Sp_Atk","Sp_Def","Speed","Total"], xStat,   v => { xStat   = v; draw(); });
   addDropdown(b.x + 120, b.y + 52, "Y:",     ["HP","Attack","Defense","Sp_Atk","Sp_Def","Speed","Total"], yStat,   v => { yStat   = v; draw(); });
   addDropdown(b.x + 226, b.y + 52, "Color:", ["Type_1","Generation","isLegendary"],                       colorBy, v => { colorBy = v; draw(); });
 
-  // gridlines
+  //gridlines
   g.append("g").attr("class","axis").attr("opacity",0.15)
    .call(d3.axisLeft(y).tickSize(-iW).tickFormat(""));
 
-  // x-axis
+  //x-axis
   g.append("g").attr("class","axis").attr("transform",`translate(0,${iH})`)
    .call(d3.axisBottom(x).ticks(6));
-  // y-axis
+  //y-axis
   g.append("g").attr("class","axis").call(d3.axisLeft(y).ticks(6));
 
-  // axis labels
+  //axis labels
   g.append("text").attr("class","axis-label").attr("text-anchor","middle")
    .attr("x", iW/2).attr("y", iH + 42).text(xStat);
   g.append("text").attr("class","axis-label").attr("text-anchor","middle")
@@ -143,7 +143,7 @@ function drawScatter(b, data) {
 
   const hasFocus = brushedNums.size > 0 || selectedName;
 
-  // dots — start at bottom and animate up (viz-change animated transition)
+  //dots — start at bottom and animate up (viz-change animated transition)
   g.selectAll(".dot").data(data, d => d.number).enter()
     .append("circle")
       .attr("class", d => {
@@ -156,7 +156,7 @@ function drawScatter(b, data) {
       .attr("fill", d => dotColor(d))
       .attr("opacity", 0.8)
       .on("click", d => {
-        // selection interaction — click one dot to focus it across all views
+        //selection interaction — click one dot to focus it across all views
         brushedNums  = new Set();
         selectedName = (selectedName === d.name) ? null : d.name;
         draw();
@@ -164,13 +164,13 @@ function drawScatter(b, data) {
     .append("title")
       .text(d => `${d.name} (${d.type})\n${xStat} ${getStat(d,xStat)}  ${yStat} ${getStat(d,yStat)}  Total ${d.total}`);
 
-  // animate dots flying to real y position (viz-change animated transition)
+  //animate dots flying to real y position (viz-change animated transition)
   g.selectAll(".dot")
     .transition().duration(600).ease(d3.easeCubicOut)
       .attr("cy", d => y(getStat(d, yStat)))
       .attr("r",  d => d.legendary ? 6 : 3.5);
 
-  // brushing interaction — drag a rectangle to send a subset to other views
+  //brushing interaction — drag a rectangle to send a subset to other views
   g.append("g").attr("class","brush")
    .call(d3.brush()
      .extent([[0,0],[iW,iH]])
@@ -197,7 +197,7 @@ function drawScatter(b, data) {
   drawColorLegend(b, data);
 }
 
-// VIEW 2 — PARALLEL COORDINATES (Advanced focus view)
+//Parallel coordinates
 function drawParallel(b, data) {
   panel(b);
 
@@ -205,7 +205,7 @@ function drawParallel(b, data) {
   const iW = b.w - m.left - m.right;
   const iH = b.h - m.top  - m.bottom;
 
-  // one y-scale per stat — domain from full dataset so axes stay stable
+  //one y-scale per stat — domain from full dataset so axes stay stable
   const yScales = {};
   stats.forEach(stat => {
     yScales[stat] = d3.scaleLinear()
@@ -224,7 +224,7 @@ function drawParallel(b, data) {
      .attr("x", b.x + 14).attr("y", b.y + 38)
      .text(`${data.length} Pokémon: lines animate in from brush selection`);
 
-  // lines start flat at bottom, animate up to real stat values (filtering transition)
+  //lines start flat at bottom, animate up to real stat values (filtering transition)
   g.selectAll(".pc-line").data(data, d => d.number).enter()
     .append("path")
       .attr("class","pc-line")
@@ -235,11 +235,11 @@ function drawParallel(b, data) {
       .attr("opacity", 0.4)
       .attr("d", d => line(stats.map(s => [x(s), yScales[s](getStat(d, s))])));
 
-  // tooltips on lines
+  //tooltips on lines
   g.selectAll(".pc-line").append("title")
    .text(d => `${d.name} (${d.type})\nHP ${d.hp} Atk ${d.attack} Def ${d.defense} SpA ${d.spAtk} SpD ${d.spDef} Spd ${d.speed}`);
 
-  // one vertical axis per stat
+  //one vertical axis per stat
   stats.forEach(stat => {
     const ag = g.append("g").attr("transform", `translate(${x(stat)},0)`);
     ag.append("g").attr("class","axis").call(d3.axisLeft(yScales[stat]).ticks(4));
@@ -248,7 +248,7 @@ function drawParallel(b, data) {
   });
 }
 
-// VIEW 3 — BAR CHART (Average stat by type for focused subset)
+//Bar chart
 function drawBar(b, data) {
   panel(b);
 
@@ -256,7 +256,7 @@ function drawBar(b, data) {
   const iW = b.w - m.left - m.right;
   const iH = b.h - m.top  - m.bottom;
 
-  // average barStat per type, sorted descending (ordering transition on data change)
+  //average barStat per type, sorted descending (ordering transition on data change)
   const byType = d3.nest()
     .key(d => d.type)
     .rollup(rows => d3.mean(rows, d => getStat(d, barStat)))
@@ -273,22 +273,22 @@ function drawBar(b, data) {
   svg.append("text").attr("class","subtitle")
      .attr("x", b.x + 14).attr("y", b.y + 38).text("Updates with brush, Dropdown changes stat");
 
-  // stat dropdown
+  //stat dropdown
   addDropdown(b.x + b.w - 160, b.y + 30, "Stat:",
     ["Total","HP","Attack","Defense","Sp_Atk","Sp_Def","Speed"],
     barStat, v => { barStat = v; draw(); });
 
-  // x-axis
+  //x-axis
   g.append("g").attr("class","axis").attr("transform",`translate(0,${iH})`)
    .call(d3.axisBottom(xSc).ticks(5));
-  // y-axis
+  //y-axis
   g.append("g").attr("class","axis").call(d3.axisLeft(ySc).tickSizeOuter(0));
 
-  // x axis label
+  //x axis label
   g.append("text").attr("class","axis-label").attr("text-anchor","middle")
    .attr("x", iW/2).attr("y", iH + 28).text(`Avg ${barStat}`);
 
-  // bars start at width 0, animate to value (filtering + viz-change transition)
+  //bars start at width 0, animate to value (filtering + viz-change transition)
   g.selectAll(".bar").data(byType, d => d.key).enter()
     .append("rect")
       .attr("class","bar")
@@ -306,7 +306,7 @@ function drawBar(b, data) {
     .transition().duration(500).ease(d3.easeQuadOut)
       .attr("width", d => xSc(d.value));
 
-  // value labels
+  //value labels
   g.selectAll(".bar-label").data(byType, d => d.key).enter()
     .append("text")
       .attr("class","legend-label")
@@ -337,7 +337,7 @@ function addDropdown(x, y, label, options, current, onChange) {
   });
 }
 
-// color legend below scatter — changes based on colorBy setting
+//color legend below scatter — changes based on colorBy setting
 function drawColorLegend(b, data) {
   let entries = [];
   if (colorBy === "Type_1") {
