@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interactive D3 dashboard for Sephora cosmetics products.">
+  <title>Interactive Cosmetics Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="dashboard-header">
+      <div>
+        <h1>Interactive Cosmetics Value Dashboard</h1>
+        <p class="subtitle">This dashboard intends to explore cosmetic product value in terms of category mix, price tier, customer rank, ingredient complexity, and skin-type suitability. Click a category bar; scroll or drag the scatterplot.</p>
+      </div>
+      <section class="summary-strip" aria-label="Dataset summary">
+        <div>
+          <span id="measure-count">--</span>
+          <small>products</small>
+        </div>
+        <div>
+          <span id="year-range">--</span>
+          <small>avg price</small>
+        </div>
+        <div>
+          <span id="pass-rate">--</span>
+          <small>avg rank</small>
+        </div>
+      </section>
+      <button id="reset-filters" class="reset-button" type="button">Reset view</button>
+    </header>
+
+    <section class="dashboard-grid" aria-label="Three-view visualization dashboard">
+      <article class="panel overview-panel">
+        <button id="replay-overview" class="replay-button" type="button">Play animation</button>
+        <svg id="overview-chart" role="img" aria-label="Stacked bar chart showing cosmetics product categories by price tier"></svg>
+      </article>
+      <article class="panel scatter-panel">
+        <svg id="scatter-chart" role="img" aria-label="Scatter plot showing cosmetics price by customer rank"></svg>
+      </article>
+      <article class="panel parallel-panel">
+        <div class="advanced-legend" aria-label="Product category color key">
+          <strong>Product category</strong>
+          <span><i class="key-moisturizer"></i>Moisturizer</span>
+          <span><i class="key-cleanser"></i>Cleanser</span>
+          <span><i class="key-treatment"></i>Treatment</span>
+          <span><i class="key-mask"></i>Face Mask</span>
+          <span><i class="key-eye"></i>Eye cream</span>
+          <span><i class="key-sun"></i>Sun protect</span>
+        </div>
+        <svg id="parallel-chart" role="img" aria-label="Parallel coordinates chart showing cosmetics formula and skin-type profiles"></svg>
+      </article>
+    </section>
+  </main>
+
+  <div id="tooltip" class="tooltip" aria-hidden="true"></div>
+
+  <script src="vendor/d3.v7.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
