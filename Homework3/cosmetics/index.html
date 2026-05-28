@@ -1,0 +1,35 @@
+<!doctype html>
+<html style="width:100%;height:100%;">
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="Parallel Coordinates Plot">
+	<title>Cosmetics Parallel Coordinates</title>
+	<style>
+		* { box-sizing: border-box; margin: 0; padding: 0; }
+		html, body { width: 100%; height: 100%; }
+		body {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			grid-template-rows: 1fr 1fr;
+			gap: 4px;
+			padding: 4px;
+			background: #f0f0f0;
+		}
+		#pc-body  { grid-column: 1 / -1; background: #fff; border-radius: 4px; }
+		#sc-body  { background: #fff; border-radius: 4px; }
+		#bar-body { background: #fff; border-radius: 4px; }
+		.brush .selection { fill: steelblue; fill-opacity: 0.15; stroke: steelblue; stroke-width: 1; }
+	</style>
+</head>
+<body>
+	<div id="pc-body"></div>
+	<div id="sc-body"></div>
+	<div id="bar-body"></div>
+
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<script src="main.js"></script>
+	<script>
+
+	</script>
+</body>
+</html>
