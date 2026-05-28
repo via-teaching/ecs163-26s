@@ -1,0 +1,148 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #fafafa;
+}
+
+header {
+  padding: 8px 16px;
+}
+header h1 {
+  margin: 0;
+  font-size: 22px;
+}
+.subtitle {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #555;
+}
+
+#dashboard {
+  display: grid;
+  grid-template-columns: 60% 40%;
+  grid-template-rows: 50% 50%;
+  height: 92vh;
+  padding: 8px;
+}
+
+.view {
+  background: white;
+  border: 1px solid #ccc;
+  margin: 4px;
+  padding: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.view.focus {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+}
+#view-heatmap { grid-row: 1; grid-column: 2; }
+#view-scatter { grid-row: 2; grid-column: 2; }
+
+.view-title {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+}
+
+.chart-container {
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.chart-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+.caption {
+  font-size: 13px;
+  color: #555;
+  flex: 0 0 auto;
+  margin-top: 4px;
+}
+
+.axis text { font-size: 12px; }
+.axis-label { font-size: 14px; font-weight: bold; }
+
+/* Heatmap has 18 categorical ticks per axis and needs tighter type labels to avoid overlap. */
+#heatmap-svg .axis text { font-size: 10px; }
+
+/* tighter title margin so the heatmap can stretch taller */
+#view-heatmap .view-title { margin-bottom: 0; }
+
+.tooltip {
+  position: absolute;
+  background: #333;
+  color: white;
+  padding: 5px 8px;
+  font-size: 12px;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.legend-text { font-size: 12px; }
+.legend-title { font-size: 13px; font-weight: bold; }
+
+/* generation playback controls above the scatter */
+.gen-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  margin: 2px 0 0;
+  font-size: 13px;
+}
+.gen-controls button {
+  font-size: 13px;
+  padding: 2px 10px;
+  cursor: pointer;
+  border: 1px solid #888;
+  border-radius: 3px;
+  background: #fff;
+}
+.gen-controls button:hover { background: #eee; }
+.gen-controls input[type="range"] { flex: 1 1 auto; cursor: pointer; }
+#gen-label { font-weight: bold; min-width: 110px; }
+
+/* scatter brush readout */
+#scatter-readout {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: #1f2933;
+  margin: 0 0 2px;
+}
+/* selection and tip each on their own line */
+#scatter-selection { display: block; min-height: 15px; }
+#scatter-tip { display: block; }
+/* muted italic hint text */
+.hint { color: #888; font-style: italic; }
+/* translucent brush selection box */
+#scatter-svg .selection { fill: #6390F0; fill-opacity: 0.12; stroke: #4363d8; }
+
+/* instruction line under the chord title */
+#chord-prompt { flex: 0 0 auto; font-size: 13px; margin: 0 0 4px; }
+
+/* list of shared Pokemon, under the prompt */
+#chord-readout {
+  flex: 0 0 auto;
+  margin-top: 4px;
+  font-size: 13px;
+  max-height: 92px;
+  overflow-y: auto;
+}
+#chord-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+}
+#chord-list li { font-size: 12px; color: #1f2933; }
+#chord-list li.empty { color: #999; font-style: italic; }
+.chord-arc { cursor: pointer; }
