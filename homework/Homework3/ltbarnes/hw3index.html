@@ -1,0 +1,222 @@
+<!doctype html>
+<html style="width:100%;height:100%;">
+<head>
+  <meta charset="utf-8">
+  <title>Student Performance Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      overflow: hidden;
+    }
+
+    /* ── Top bar ── */
+    #topbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 44px;
+      background: #1a1f2e;
+      display: flex; align-items: center;
+      padding: 0 16px; gap: 20px;
+      z-index: 200;
+    }
+    #topbar h1 {
+      color: #e8ecf4; font-size: 14px; font-weight: 600;
+      margin: 0; letter-spacing: 0.5px; flex-shrink: 0;
+    }
+    .ctrl-group {
+      display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+    }
+    .ctrl-group label {
+      color: #9ba4b5; font-size: 11px; white-space: nowrap;
+    }
+    .ctrl-group select, .ctrl-group input[type=range] {
+      font-size: 11px; padding: 2px 4px;
+      border: 1px solid #3a4155; border-radius: 3px;
+      background: #252b3b; color: #e8ecf4;
+    }
+    #btn-reset {
+      margin-left: auto;
+      padding: 4px 12px; font-size: 11px;
+      background: #3b5bdb; color: #fff;
+      border: none; border-radius: 4px; cursor: pointer;
+    }
+    #btn-reset:hover { background: #4c6ef5; }
+    #dataset-toggle {
+      display: flex; gap: 4px;
+    }
+    .ds-btn {
+      padding: 3px 10px; font-size: 11px; border-radius: 3px;
+      border: 1px solid #3a4155; cursor: pointer;
+      background: #252b3b; color: #9ba4b5;
+      transition: all 0.2s;
+    }
+    .ds-btn.active { background: #3b5bdb; color: #fff; border-color: #3b5bdb; }
+
+    /* ── Three panels ── */
+    #panels {
+      position: fixed;
+      top: 44px; left: 0; right: 0; bottom: 28px;
+      display: grid;
+      grid-template-columns: 40% 35% 25%;
+    }
+
+    .panel {
+      position: relative;
+      border-right: 1px solid #d0d5e0;
+      overflow: hidden;
+      background: #fff;
+    }
+    .panel:last-child { border-right: none; }
+
+    .panel-title {
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 28px;
+      background: #f7f9fc;
+      border-bottom: 1px solid #dde2ed;
+      display: flex; align-items: center; padding: 0 10px;
+      font-size: 11px; font-weight: 600; color: #444;
+      z-index: 10;
+    }
+    .panel-title .badge {
+      margin-left: 8px; font-size: 9px; font-weight: 400;
+      background: #e8ecf8; color: #3b5bdb;
+      padding: 1px 6px; border-radius: 10px;
+    }
+    .panel svg { position: absolute; top: 28px; left: 0; }
+
+    /* ── Status bar ── */
+    #statusbar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 28px;
+      background: #1a1f2e;
+      display: flex; align-items: center;
+      padding: 0 16px; gap: 20px;
+      font-size: 10px; color: #9ba4b5;
+      z-index: 200;
+    }
+    #status-total, #status-selected, #status-hint { }
+
+    /* ── Tooltip ── */
+    #tooltip {
+      position: fixed;
+      background: rgba(15,20,35,0.92);
+      color: #e8ecf4;
+      border-radius: 5px;
+      padding: 7px 11px;
+      font-size: 11px; line-height: 1.6;
+      pointer-events: none; opacity: 0;
+      transition: opacity 0.1s;
+      z-index: 300;
+      max-width: 220px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* ── Axes ── */
+    .axis path, .axis line { stroke: #ccc; }
+    .axis text { font-size: 9px; fill: #666; }
+
+    /* ── Brush ── */
+    .selection { fill: rgba(59,91,219,0.12); stroke: #3b5bdb; stroke-width: 1.2; }
+    .handle { fill: #3b5bdb; }
+
+    /* ── Heatmap cells ── */
+    .hcell { stroke: #fff; stroke-width: 0.5; }
+
+    /* ── Star coords axes ── */
+    .star-axis { stroke: #bbb; stroke-width: 1; }
+    .star-axis-label { font-size: 9px; fill: #444; font-weight: 600; }
+    .star-dot { transition: r 0.15s; }
+
+    /* ── Axis dropdowns overlay ── */
+    .axis-select {
+      position: absolute;
+      font-size: 10px;
+      background: #fff;
+      border: 1px solid #ccd;
+      border-radius: 3px;
+      color: #333;
+      padding: 1px 2px;
+      z-index: 50;
+      cursor: pointer;
+    }
+
+    /* animation class */
+    .animating { transition: all 0.5s ease; }
+  </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div id="topbar">
+  <h1>📊 Student Performance Dashboard</h1>
+  <div id="dataset-toggle">
+    <button class="ds-btn active" data-ds="mat">Math</button>
+    <button class="ds-btn" data-ds="por">Portuguese</button>
+  </div>
+  <div class="ctrl-group">
+    <label>Scatter X:</label>
+    <select id="sel-x"></select>
+  </div>
+  <div class="ctrl-group">
+    <label>Scatter Y:</label>
+    <select id="sel-y"></select>
+  </div>
+  <div class="ctrl-group">
+    <label>Color by:</label>
+    <select id="sel-color"></select>
+  </div>
+  <div class="ctrl-group">
+    <label>Heatmap rows:</label>
+    <select id="sel-heat-row"></select>
+  </div>
+  <div class="ctrl-group">
+    <label>Heatmap cols:</label>
+    <select id="sel-heat-col"></select>
+  </div>
+  <button id="btn-reset">Reset Selection</button>
+</div>
+
+<!-- Three panel layout -->
+<div id="panels">
+  <div class="panel" id="panel-scatter">
+    <div class="panel-title">
+      Scatter Plot — Overview
+      <span class="badge">Brush to select · Zoom/Pan</span>
+    </div>
+    <svg id="svg-scatter"></svg>
+  </div>
+  <div class="panel" id="panel-heat">
+    <div class="panel-title">
+      2D Heatmap — Focus
+      <span class="badge">Animated on selection</span>
+    </div>
+    <svg id="svg-heat"></svg>
+  </div>
+  <div class="panel" id="panel-star">
+    <div class="panel-title">
+      Star Coordinates — Advanced
+      <span class="badge">Pan &amp; Zoom · Selection</span>
+    </div>
+    <svg id="svg-star"></svg>
+  </div>
+</div>
+
+<!-- Status bar -->
+<div id="statusbar">
+  <span id="status-total">Total: —</span>
+  <span id="status-selected">Selected: —</span>
+  <span id="status-hint">Brush on scatter to filter · Ctrl+click dots to multi-select · Scroll on star coords to zoom</span>
+</div>
+
+<!-- Tooltip -->
+<div id="tooltip"></div>
+
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="hw3main.js"></script>
+
+</body>
+</html>
