@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HW2: Visulaizaiton Dashboard: Layout Design + Visual Encoding</title>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <style>
+    body{
+      margin:0;
+      font-family:'Times New Roman', Times, serif, sans-serif;
+      background:#fafafa;
+    }
+
+    h1{
+      text-align:center;
+      margin:10px;
+    }
+
+    #dashboard{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 55vh 45vh;
+      gap:10px;
+      padding:10px;
+      height:100vh;
+      box-sizing:border-box;
+    }
+
+    .panel{
+      background:white;
+      border-radius:10px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      padding:10px;
+      overflow:hidden;
+    }
+
+    #parallelPanel{
+      grid-row:1 / 3;
+    }
+
+    svg{
+      width:100%;
+      height:100%;
+    }
+
+    .tooltip{
+      position:absolute;
+      background:white;
+      border:1px solid #ccc;
+      padding:10px;
+      border-radius:5px;
+      pointer-events:none;
+      opacity:0;
+    }
+
+    .axis-label{
+      font-size:14px;
+      fill:#333;
+    }
+
+    .title{
+      font-size:18px;
+      font-weight:bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>HW2: Visualization Dashboard: Layout Design + Visual Encoding</h1>
+
+<div id="dashboard">
+
+  <div class="panel", id="parallelPanel">
+    <svg id="parallelSVG"></svg>
+  </div>
+
+  <div class="panel">
+    <svg id="heatmapSVG"></svg>
+  </div>
+
+  <div class="panel">
+    <svg id="scatterSVG"></svg>
+  </div>
+
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script src="hw2.js"></script>
+
+</body>
+</html>
