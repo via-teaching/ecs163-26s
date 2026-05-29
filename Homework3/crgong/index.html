@@ -1,0 +1,78 @@
+<!doctype html>
+<html style="width:100%;height:100%;">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="Music and mental health survey dashboard">
+    <title>Music & Mental Health Dashboard</title>
+
+    <style>
+        /* Full-page setup */
+        body {
+            margin: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f5f3fa;
+            color: #333;
+        }
+
+        /* Dashboard layout */
+        #dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 30vh 70vh;
+            width: 100vw;
+            height: 100vh;
+            gap: 8px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        /* The overview chart goes across the top row */
+        #view1 {
+            grid-column: 1 / 3;
+        }
+
+        /* Shared style for the three chart containers */
+        .view {
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* D3 axis styling */
+        .axis text {
+            font-size: 11px;
+            fill: #555;
+        }
+
+        .axis path,
+        .axis line {
+            stroke: #ccc;
+        }
+
+        /* D3 grid styling */
+        .grid line {
+            stroke: #eee;
+            stroke-dasharray: 2,2;
+        }
+
+        .grid path {
+            stroke-width: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="dashboard">
+        <div id="view1" class="view"></div>
+        <div id="view2" class="view"></div>
+        <div id="view3" class="view"></div>
+    </div>
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
