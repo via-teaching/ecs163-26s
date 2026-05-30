@@ -1,0 +1,103 @@
+<!doctype html>
+<html style="width:100%;height:100%;">
+<head>
+    <meta charset="utf-8">
+    <title>Music & Mental Health Dashboard</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            width: 100%; height: 100%;
+            font-family: sans-serif;
+            background: #f9f9f9;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        #dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 45fr 55fr;
+            width: 100vw;
+            flex: 1;
+            min-height: 0;
+            padding: 10px;
+            gap: 10px;
+        }
+        .panel {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+            overflow: hidden;
+        }
+        #panel-bar   { grid-column: 1; grid-row: 1; }
+        #panel-heat  { grid-column: 2; grid-row: 1 / 3; }
+        #panel-pcp   { grid-column: 1; grid-row: 2; }
+
+        h3 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #333;
+        }
+
+        .axis text { font-size: 10px; }
+        .axis path, .axis line { stroke: #999; }
+
+
+        .cell-label { font-size: 9px; text-anchor: middle; dominant-baseline: central; fill: #333; }
+
+        .legend-label { font-size: 10px; }
+
+        #dashboard-header {
+            width: 100vw;
+            padding: 6px 14px 5px;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+        }
+        #dashboard-header p {
+            font-size: 14px;
+            color: #444;
+            line-height: 1.45;
+            margin: 0;
+        }
+        #dashboard-header strong { color: #222; }
+        #dashboard-header .nav-hint { color: #666; font-style: italic; }
+
+        /* Shrink the grid to share vertical space with the header */
+        #dashboard {
+            height: calc(100vh - 48px);
+        }
+    </style>
+</head>
+<body>
+<div id="dashboard-header">
+    <p>
+        <strong>Music &amp; Mental Health:</strong>
+        This dashboard explores how music genre preferences relate to mental health —
+        anxiety, depression, insomnia, and OCD — across 736 survey respondents.
+        <span class="nav-hint">
+            Start with the genre overview (top-left) &rarr; examine condition severity by genre in the heatmap (right)
+            &rarr; hover the star plot (bottom-left) to drill into full listener profiles including age and daily listening hours.
+        </span>
+    </p>
+</div>
+<div id="dashboard">
+    <div class="panel" id="panel-bar">
+        <h3>Overview: Respondents by Primary Genre</h3>
+        <svg id="svg-bar" width="100%" height="100%"></svg>
+    </div>
+    <div class="panel" id="panel-heat">
+        <h3>Avg Mental Health Score by Genre</h3>
+        <svg id="svg-heat" width="100%" height="100%"></svg>
+    </div>
+    <div class="panel" id="panel-pcp">
+        <h3>Focus: Listener Profile by Genre — condition scores, age &amp; daily listening hours (hover to highlight)</h3>
+        <svg id="svg-pcp" width="100%" height="100%"></svg>
+    </div>
+</div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
