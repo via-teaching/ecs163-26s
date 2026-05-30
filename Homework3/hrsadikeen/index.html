@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title> Data Science Salaries Visualizations </title>
+    <script src="https://d3js.org/d3.v7.min.js"> </script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 10px; margin: 0; overflow: hidden; }
+        .row { display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 20px; }
+        .chart-container { background: #f9f9f9; padding: 20px; border-radius: 8px; }
+        
+        .chart-title { text-align: center; color: #363636; margin-top: 0; margin-bottom: 5px; }
+        
+        .instructions { 
+            text-align: center; 
+            color: #6d6d6d; 
+            font-size: 12px; 
+            font-style: italic; 
+            margin-top: 0; 
+            margin-bottom: 15px; 
+        }
+    </style>
+</head>
+<body>
+
+    <h1 style="text-align: center; margin-bottom: 5px;"> Data Science Salaries Visualizations </h1>
+    
+    <div class="row">
+        <div class="chart-container" id="pie-view">
+            <h3 class="chart-title"> Context 1: Experience Levels </h3>
+            <p class="instructions"> Click a slice to filter the dataset by experience level. Click again to reset. </p>
+        </div>
+        
+        <div class="chart-container" id="bar-view">
+            <h3 class="chart-title" id="histogram-title"> Context 2: Salaries for all levels </h3>
+            <p class="instructions"> Click and drag across the bars to select a specific salary range </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="chart-container" id="parallel-view" style="width: 100%;">
+            <h3 class="chart-title"> Focus: Closer Look at Data Engineers </h3>
+            <p class="instructions"> Automatically updates based on the selections above </p>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+    
+</body>
+</html>
